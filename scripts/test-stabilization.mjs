@@ -19,7 +19,31 @@ async function testSecurity() {
   assert.match(browserService, /\/api\/isolar/, 'browser service should call the internal iSolar API');
 }
 
-const suites = { security: testSecurity };
+async function testGuards() {
+  const { evaluateCronAuthorization, evaluateMutationAccess } = await import('../src/lib/server/requestGuards.js');
+
+  assert.deepEqual(
+    evaluateCronAuthorization({ configuredSecret: '', authorization: '' }),
+    { allowed: false, status: 503, code: 'CRON_NOT_CONFIGURED' }
+  );
+  assert.deepEqual(
+    evaluateCronAuthorization({ configuredSecret: 'server-secret', authorization: 'Bearer wrong' }),
+    { allowed: false, status: 401, code: 'UNAUTHORIZED' }
+  );
+  assert.deepEqual(
+    evaluateCronAuthorization({ configuredSecret: 'server-secret', authorization: 'Bearer server-secret' }),
+    { allowed: true, status: 200, code: null }
+  );
+  assert.equal(evaluateMutationAccess({ nodeEnv: 'development', hostname: 'localhost' }).allowed, true);
+  assert.equal(evaluateMutationAccess({ nodeEnv: 'development', hostname: '127.0.0.1' }).allowed, true);
+  assert.equal(evaluateMutationAccess({ nodeEnv: 'development', hostname: 'example.test' }).code, 'LOCAL_ONLY');
+  assert.deepEqual(
+    evaluateMutationAccess({ nodeEnv: 'production', hostname: 'localhost' }),
+    { allowed: false, status: 503, code: 'MUTATIONS_DISABLED' }
+  );
+}
+
+const suites = { security: testSecurity, guards: testGuards };
 const selected = mode === 'all' ? Object.entries(suites) : [[mode, suites[mode]]];
 
 for (const [name, suite] of selected) {
