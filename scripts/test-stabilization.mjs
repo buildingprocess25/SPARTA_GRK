@@ -110,7 +110,17 @@ async function testFreshness() {
   });
 }
 
-const suites = { security: testSecurity, guards: testGuards, imports: testImports, freshness: testFreshness };
+async function testMigrations() {
+  const snapshotSource = await readFile(new URL('../src/lib/solar/snapshot.js', import.meta.url), 'utf8');
+  const baseline = await readFile(new URL('../prisma/migrations/20261001000000_baseline/migration.sql', import.meta.url), 'utf8');
+
+  assert.doesNotMatch(snapshotSource, /\$executeRawUnsafe|CREATE TABLE IF NOT EXISTS/i);
+  assert.match(baseline, /CREATE TABLE "plant_snapshot_30m"/);
+  assert.match(baseline, /CREATE TABLE "snapshot_run_30m"/);
+  assert.doesNotMatch(baseline, /DROP\s+(?:TABLE|COLUMN)|TRUNCATE|DELETE\s+FROM/i);
+}
+
+const suites = { security: testSecurity, guards: testGuards, imports: testImports, freshness: testFreshness, migrations: testMigrations };
 const selected = mode === 'all' ? Object.entries(suites) : [[mode, suites[mode]]];
 
 for (const [name, suite] of selected) {
