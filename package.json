@@ -1,0 +1,33 @@
+{
+  "name": "alfamart-sustainability-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "daemon": "node scripts/solar-daemon.mjs",
+    "sync:once": "node scripts/sync-once.mjs",
+    "test": "node scripts/test-units-and-denylist.mjs && node scripts/test-metrics-and-cilacap.mjs && node scripts/test-proxy-pr-audit.mjs && node scripts/test-carbon-reconciliation.mjs && node scripts/test-database-and-workbook-reconciliation.mjs && node scripts/test-scheduler-and-snapshots.mjs && node scripts/test-calculator-and-sustainability.mjs && node scripts/test-master-facilities-and-audit.mjs && node scripts/test-excel-upload-and-templates.mjs",
+    "test:stabilization": "node scripts/test-stabilization.mjs"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "lucide-react": "^0.460.0",
+    "next": "^15.3.0",
+    "prisma": "^5.22.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "recharts": "^3.10.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "autoprefixer": "^10.6.1",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "^15.3.0",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^4.3.3"
+  }
+}

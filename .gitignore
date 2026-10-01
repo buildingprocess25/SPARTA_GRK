@@ -1,0 +1,30 @@
+# Dependencies and Next.js output
+node_modules/
+.next/
+out/
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+
+# Local runtime state
+.data/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Agent scratch and editor files
+.superpowers/
+.agents/
+.codex/
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Test and coverage output
+coverage/
+test-results/
+playwright-report/
+
