@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   IMPORT_MODULE,
   classifyReportAgainstHistory,
+  createPrismaMonthlyImportRepository,
   importIsolarMonthlyReport,
   isClosedYearMonth,
 } from '../isolarMonthlyImport.js';
@@ -186,6 +187,40 @@ test('transaction failure is surfaced and marks the batch failed', async () => {
   );
   assert.equal(repo.state.applied.length, 0);
   assert.equal(repo.state.updates.at(-1).data.status, 'FAILED');
+});
+
+test('Prisma repository bulk-inserts new records in one statement per transaction chunk', async () => {
+  const calls = { createMany: [], create: 0, transactionOptions: null };
+  const tx = {
+    monthlyYield: {
+      async create() { calls.create += 1; },
+      async createMany(args) { calls.createMany.push(args); return { count: args.data.length }; },
+      async updateMany() { return { count: 1 }; },
+    },
+  };
+  const prisma = {
+    async $transaction(callback, options) {
+      calls.transactionOptions = options;
+      return callback(tx);
+    },
+  };
+  const repository = createPrismaMonthlyImportRepository(prisma);
+  const actions = Array.from({ length: 100 }, (_, index) => ({
+    classification: 'NEW',
+    record: record({ psId: index + 1, lineNumber: index + 3, energyKwh: index + 0.5 }),
+  }));
+
+  const result = await repository.applyActions(actions, {
+    batch: { id: 'batch-1' },
+    report: report(actions.map(item => item.record)),
+    now: NOW,
+  });
+
+  assert.equal(calls.create, 0);
+  assert.equal(calls.createMany.length, 1);
+  assert.equal(calls.createMany[0].data.length, 100);
+  assert.equal(calls.transactionOptions.timeout, 30_000);
+  assert.deepEqual(result, { inserted: 100, finalized: 0 });
 });
 
 test('commit refuses reports containing parser errors', async () => {

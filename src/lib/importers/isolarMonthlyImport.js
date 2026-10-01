@@ -253,7 +253,36 @@ export function createPrismaMonthlyImportRepository(prisma) {
       return prisma.$transaction(async tx => {
         let inserted = 0;
         let finalized = 0;
-        for (const action of actions) {
+        const newActions = actions.filter(action => action.classification === 'NEW');
+        if (newActions.length > 0) {
+          const created = await tx.monthlyYield.createMany({
+            data: newActions.map(({ record }) => ({
+              yearMonth: record.storageYearMonth,
+              psId: Number(record.psId),
+              energyKwh: Number(record.energyKwh),
+              source: IMPORT_SOURCE,
+              measurementType: MONTHLY_YIELD_MEASUREMENT,
+              sourceFile: report.filename,
+              sourceRow: record.lineNumber,
+              sourceFileHash: report.hash,
+              importBatchId: batch.id,
+              importedAt: now,
+              qualityStatus: 'FINAL',
+              metadata: {
+                reportYear: report.reportYear,
+                plantNameRaw: record.plantNameRaw,
+                dcId: record.dcId,
+                energyUnit: record.energyUnit,
+              },
+            })),
+          });
+          if (created.count !== newActions.length) {
+            throw new Error(`Monthly-yield bulk insert mismatch: expected ${newActions.length}, inserted ${created.count}`);
+          }
+          inserted = created.count;
+        }
+
+        for (const action of actions.filter(item => item.classification === 'FINALIZE_PARTIAL')) {
           const { record } = action;
           const provenance = {
             measurementType: MONTHLY_YIELD_MEASUREMENT,
@@ -265,56 +294,37 @@ export function createPrismaMonthlyImportRepository(prisma) {
             qualityStatus: 'FINAL',
           };
 
-          if (action.classification === 'NEW') {
-            await tx.monthlyYield.create({
-              data: {
-                yearMonth: record.storageYearMonth,
-                psId: Number(record.psId),
-                energyKwh: Number(record.energyKwh),
-                source: IMPORT_SOURCE,
-                ...provenance,
-                metadata: {
-                  reportYear: report.reportYear,
-                  plantNameRaw: record.plantNameRaw,
-                  dcId: record.dcId,
-                  energyUnit: record.energyUnit,
+          const updated = await tx.monthlyYield.updateMany({
+            where: {
+              yearMonth: record.storageYearMonth,
+              psId: Number(record.psId),
+              source: action.previousSource,
+              energyKwh: action.previousEnergyKwh,
+            },
+            data: {
+              energyKwh: Number(record.energyKwh),
+              source: IMPORT_SOURCE,
+              ...provenance,
+              metadata: {
+                reportYear: report.reportYear,
+                plantNameRaw: record.plantNameRaw,
+                dcId: record.dcId,
+                energyUnit: record.energyUnit,
+                finalizedFrom: {
+                  energyKwh: action.previousEnergyKwh,
+                  source: action.previousSource,
+                  metadata: action.previousMetadata || {},
                 },
               },
-            });
-            inserted += 1;
-          } else if (action.classification === 'FINALIZE_PARTIAL') {
-            const updated = await tx.monthlyYield.updateMany({
-              where: {
-                yearMonth: record.storageYearMonth,
-                psId: Number(record.psId),
-                source: action.previousSource,
-                energyKwh: action.previousEnergyKwh,
-              },
-              data: {
-                energyKwh: Number(record.energyKwh),
-                source: IMPORT_SOURCE,
-                ...provenance,
-                metadata: {
-                  reportYear: report.reportYear,
-                  plantNameRaw: record.plantNameRaw,
-                  dcId: record.dcId,
-                  energyUnit: record.energyUnit,
-                  finalizedFrom: {
-                    energyKwh: action.previousEnergyKwh,
-                    source: action.previousSource,
-                    metadata: action.previousMetadata || {},
-                  },
-                },
-              },
-            });
-            if (updated.count !== 1) {
-              throw new Error(`Concurrent monthly-yield conflict for ${record.storageYearMonth}/${record.psId}`);
-            }
-            finalized += 1;
+            },
+          });
+          if (updated.count !== 1) {
+            throw new Error(`Concurrent monthly-yield conflict for ${record.storageYearMonth}/${record.psId}`);
           }
+          finalized += 1;
         }
         return { inserted, finalized };
-      });
+      }, { timeout: 30_000 });
     },
   };
 }
