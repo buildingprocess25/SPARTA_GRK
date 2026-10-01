@@ -70,13 +70,24 @@ model DailyYield {
 
 /// Monthly yield snapshots per plant
 model MonthlyYield {
-  yearMonth    String   @map("year_month") // YYYY-MM
-  psId         Int      @map("ps_id")
-  energyKwh    Float    @map("energy_kwh")
-  source       String   @default("api_history") // api_history | api_live_partial
-  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  yearMonth       String       @map("year_month") // compact YYYYMM used by existing consumers
+  psId            Int          @map("ps_id")
+  energyKwh       Float        @map("energy_kwh")
+  source          String       @default("api_history") // api_history | api_live_partial | ISOLAR_REPORT_IMPORT
+  measurementType String       @default("MONTHLY_YIELD") @map("measurement_type")
+  sourceFile      String?      @map("source_file")
+  sourceRow       Int?         @map("source_row")
+  sourceFileHash  String?      @map("source_file_hash")
+  importBatchId   String?      @map("import_batch_id")
+  importedAt      DateTime?    @map("imported_at") @db.Timestamptz
+  qualityStatus   String?      @map("quality_status") // FINAL | PARTIAL | CONFLICT
+  metadata        Json         @default("{}")
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  importBatch     ImportBatch? @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
 
   @@id([yearMonth, psId])
+  @@index([importBatchId])
   @@map("monthly_yield")
 }
 
@@ -381,12 +392,17 @@ model ImportBatch {
   filename         String
   sheetName        String?  @map("sheet_name")
   module           String   // PLTS_ENERGY | WATER_RECYCLE | FUEL_BBM | TARGET
+  fileHash         String?  @map("file_hash")
+  importMode       String?  @map("import_mode") // COMMIT; dry-runs are not persisted
   recordCount      Int      @default(0) @map("record_count")
   status           String   @default("SUCCESS") // SUCCESS | PARTIAL | FAILED
   errors           Json     @default("[]")
   metadata         Json     @default("{}")
   importedAt       DateTime @default(now()) @map("imported_at") @db.Timestamptz
 
+  monthlyYields    MonthlyYield[]
+
+  @@unique([module, fileHash])
   @@map("import_batch")
 }
 
@@ -443,4 +459,3 @@ model SnapshotRun30m {
   @@index([slotWib])
   @@map("snapshot_run_30m")
 }
-
