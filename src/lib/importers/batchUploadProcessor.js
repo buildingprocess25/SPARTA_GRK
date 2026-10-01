@@ -9,6 +9,7 @@ import {
   calculateWaterRecycleImpact
 } from '../carbon/carbonEngine.js';
 import { MASTER_FACILITIES, findFacilityById } from '../master/facilityMaster.js';
+import { isSupportedCommitCategory, normalizeWaterPersistence } from './importContracts.js';
 
 export const TEMPLATE_VERSION = 'v2026.1';
 
@@ -423,8 +424,8 @@ export async function parseAndValidateUpload(fileBuffer, { categoryHint = 'AUTO'
 
       if (errors.length === 0) {
         calculatedResult = calculateWaterRecycleImpact({
-          recycledM3: effectiveM3,
-          pdamTariffPerM3: pdamRate
+          volumeM3: effectiveM3,
+          ratePerM3: pdamRate
         });
       }
 
@@ -583,6 +584,12 @@ export async function commitBatchToDatabase({
   allowPartial = false,
   isDraft = false
 }) {
+  if (!isSupportedCommitCategory(category)) {
+    const error = new Error(`Kategori '${category}' belum didukung untuk penyimpanan.`);
+    error.code = 'UNSUPPORTED_COMMIT_CATEGORY';
+    throw error;
+  }
+
   const validRecords = allowPartial ? records.filter(r => r.isValid) : records;
 
   if (!allowPartial && records.some(r => !r.isValid)) {
@@ -743,9 +750,7 @@ export async function commitBatchToDatabase({
       });
       committedCount++;
     } else if (category === 'WATER') {
-      const volumeM3 = categoryData?.volumeM3 || 0;
-      const avoidedTon = calculatedResult ? (calculatedResult.emissionAvoidedTon || 0) : 0;
-      const costSaved = calculatedResult ? (calculatedResult.costSavedRupiah || 0) : 0;
+      const waterValues = normalizeWaterPersistence(categoryData, calculatedResult);
 
       await prisma.waterActivity.upsert({
         where: {
@@ -763,12 +768,12 @@ export async function commitBatchToDatabase({
           activityType: 'RECYCLE',
           meterStart: categoryData?.meterStart,
           meterEnd: categoryData?.meterEnd,
-          volumeM3,
+          volumeM3: waterValues.volumeM3,
           emissionFactor: 0.344,
-          emissionAvoidedKg: avoidedTon * 1000,
-          emissionAvoidedTon: avoidedTon,
-          costSavedRupiah: costSaved,
-          ratePerM3: categoryData?.pdamRate || 8000,
+          emissionAvoidedKg: waterValues.emissionAvoidedKg,
+          emissionAvoidedTon: waterValues.emissionAvoidedTon,
+          costSavedRupiah: waterValues.costSavedRupiah,
+          ratePerM3: waterValues.ratePerM3,
           qualityStatus: finalStatus,
           notes: notes || 'Batch imported via SPARTA Excel/CSV Importer',
           source: 'EXCEL_IMPORT',
@@ -783,10 +788,11 @@ export async function commitBatchToDatabase({
         update: {
           meterStart: categoryData?.meterStart,
           meterEnd: categoryData?.meterEnd,
-          volumeM3,
-          emissionAvoidedKg: avoidedTon * 1000,
-          emissionAvoidedTon: avoidedTon,
-          costSavedRupiah: costSaved,
+          volumeM3: waterValues.volumeM3,
+          emissionAvoidedKg: waterValues.emissionAvoidedKg,
+          emissionAvoidedTon: waterValues.emissionAvoidedTon,
+          costSavedRupiah: waterValues.costSavedRupiah,
+          ratePerM3: waterValues.ratePerM3,
           qualityStatus: finalStatus,
           batchId,
           metadata: {

@@ -43,7 +43,39 @@ async function testGuards() {
   );
 }
 
-const suites = { security: testSecurity, guards: testGuards };
+async function testImports() {
+  const {
+    normalizeWaterPersistence,
+    normalizeImportHistoryLimit,
+    isSupportedCommitCategory,
+  } = await import('../src/lib/importers/importContracts.js');
+
+  assert.deepEqual(
+    normalizeWaterPersistence(
+      { volumeM3: 250, pdamRate: 8000 },
+      { co2AvoidedKg: 86, co2AvoidedTon: 0.086, costSavedJuta: 2 }
+    ),
+    {
+      volumeM3: 250,
+      emissionAvoidedKg: 86,
+      emissionAvoidedTon: 0.086,
+      costSavedRupiah: 2_000_000,
+      ratePerM3: 8000,
+    }
+  );
+  assert.equal(normalizeImportHistoryLimit('1000'), 200);
+  assert.equal(normalizeImportHistoryLimit('-3'), 1);
+  assert.equal(normalizeImportHistoryLimit('invalid'), 50);
+  assert.equal(isSupportedCommitCategory('WATER'), true);
+  assert.equal(isSupportedCommitCategory('EV'), false);
+  assert.equal(isSupportedCommitCategory('EFFICIENCY'), false);
+
+  const route = await readFile(new URL('../src/app/api/import/batch/route.js', import.meta.url), 'utf8');
+  assert.match(route, /orderBy:\s*\{\s*importedAt:\s*'desc'\s*\}/);
+  assert.doesNotMatch(route, /orderBy:\s*\{\s*createdAt:/);
+}
+
+const suites = { security: testSecurity, guards: testGuards, imports: testImports };
 const selected = mode === 'all' ? Object.entries(suites) : [[mode, suites[mode]]];
 
 for (const [name, suite] of selected) {

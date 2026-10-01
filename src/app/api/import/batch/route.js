@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { parseAndValidateUpload, commitBatchToDatabase } from '@/lib/importers/batchUploadProcessor';
 import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
+import { normalizeImportHistoryLimit } from '@/lib/importers/importContracts.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -144,7 +145,7 @@ export async function POST(request) {
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '50', 10);
+    const limit = normalizeImportHistoryLimit(searchParams.get('limit'));
     const moduleFilter = searchParams.get('module');
 
     const where = {};
@@ -154,7 +155,7 @@ export async function GET(request) {
 
     const batches = await prisma.importBatch.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { importedAt: 'desc' },
       take: limit
     });
 
