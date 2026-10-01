@@ -7,8 +7,9 @@ out/
 .env
 .env.*
 !.env.example
+.env.local
 
-# Local runtime state
+# Local runtime stat
 .data/
 *.log
 npm-debug.log*

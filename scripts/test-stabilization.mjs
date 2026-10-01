@@ -5,6 +5,7 @@ const mode = process.argv[2] || 'all';
 
 async function testSecurity() {
   const browserService = await readFile(new URL('../src/services/isolarCloudService.js', import.meta.url), 'utf8');
+  const envExample = await readFile(new URL('../.env.example', import.meta.url), 'utf8');
 
   assert.doesNotMatch(
     browserService,
@@ -17,6 +18,9 @@ async function testSecurity() {
     'browser service must call only the internal API route'
   );
   assert.match(browserService, /\/api\/isolar/, 'browser service should call the internal iSolar API');
+  for (const key of ['DATABASE_URL', 'ISOLAR_APP_KEY', 'ISOLAR_SECRET_KEY', 'ISOLAR_USER_ACCOUNT', 'ISOLAR_USER_PASSWORD', 'CRON_SECRET']) {
+    assert.match(envExample, new RegExp(`^${key}=$`, 'm'), `${key} must be value-free in .env.example`);
+  }
 }
 
 async function testGuards() {
@@ -120,7 +124,20 @@ async function testMigrations() {
   assert.doesNotMatch(baseline, /DROP\s+(?:TABLE|COLUMN)|TRUNCATE|DELETE\s+FROM/i);
 }
 
-const suites = { security: testSecurity, guards: testGuards, imports: testImports, freshness: testFreshness, migrations: testMigrations };
+async function testResponsiveSafety() {
+  const layout = await readFile(new URL('../src/app/layout.js', import.meta.url), 'utf8');
+  const page = await readFile(new URL('../src/app/page.js', import.meta.url), 'utf8');
+  const sidebar = await readFile(new URL('../src/components/Sidebar.jsx', import.meta.url), 'utf8');
+  const header = await readFile(new URL('../src/components/Header.jsx', import.meta.url), 'utf8');
+
+  assert.doesNotMatch(layout, /userScalable:\s*false|maximumScale:\s*1/);
+  assert.match(page, /px-4\s+sm:px-6/);
+  assert.match(sidebar, /document\.body\.style\.overflow\s*=\s*'hidden'/);
+  assert.match(sidebar, /aria-modal=/);
+  assert.doesNotMatch(header, /Password berhasil diperbarui|Email terverifikasi valid/);
+}
+
+const suites = { security: testSecurity, guards: testGuards, imports: testImports, freshness: testFreshness, migrations: testMigrations, responsive: testResponsiveSafety };
 const selected = mode === 'all' ? Object.entries(suites) : [[mode, suites[mode]]];
 
 for (const [name, suite] of selected) {
