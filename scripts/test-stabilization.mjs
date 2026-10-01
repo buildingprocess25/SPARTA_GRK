@@ -75,7 +75,42 @@ async function testImports() {
   assert.doesNotMatch(route, /orderBy:\s*\{\s*createdAt:/);
 }
 
-const suites = { security: testSecurity, guards: testGuards, imports: testImports };
+async function testFreshness() {
+  const { resolveTelemetryFreshness, parseFreshnessThreshold } = await import('../src/lib/solar/freshness.js');
+  const now = new Date('2026-10-01T05:00:00.000Z');
+
+  assert.equal(parseFreshnessThreshold(undefined), 15);
+  assert.equal(parseFreshnessThreshold('invalid'), 15);
+  assert.equal(parseFreshnessThreshold('-1'), 15);
+  assert.equal(parseFreshnessThreshold('20'), 20);
+
+  assert.deepEqual(resolveTelemetryFreshness({ now, plantCount: 0 }), {
+    freshnessStatus: 'NO_DATA', dataAgeMinutes: null, vendorAvailability: 'UNKNOWN'
+  });
+  assert.deepEqual(resolveTelemetryFreshness({
+    now, plantCount: 39,
+    lastSuccessfulSync: new Date('2026-10-01T04:55:00.000Z'),
+    lastSyncAttempt: { status: 'success' }, thresholdMinutes: 15,
+  }), {
+    freshnessStatus: 'FRESH', dataAgeMinutes: 5, vendorAvailability: 'AVAILABLE'
+  });
+  assert.deepEqual(resolveTelemetryFreshness({
+    now, plantCount: 39,
+    lastSuccessfulSync: new Date('2026-10-01T04:30:00.000Z'),
+    lastSyncAttempt: { status: 'success' }, thresholdMinutes: 15,
+  }), {
+    freshnessStatus: 'STALE', dataAgeMinutes: 30, vendorAvailability: 'AVAILABLE'
+  });
+  assert.deepEqual(resolveTelemetryFreshness({
+    now, plantCount: 39,
+    lastSuccessfulSync: new Date('2026-10-01T04:55:00.000Z'),
+    lastSyncAttempt: { status: 'failed' }, thresholdMinutes: 15,
+  }), {
+    freshnessStatus: 'VENDOR_UNAVAILABLE', dataAgeMinutes: 5, vendorAvailability: 'UNAVAILABLE'
+  });
+}
+
+const suites = { security: testSecurity, guards: testGuards, imports: testImports, freshness: testFreshness };
 const selected = mode === 'all' ? Object.entries(suites) : [[mode, suites[mode]]];
 
 for (const [name, suite] of selected) {
