@@ -157,6 +157,10 @@ export default function PLTSTab() {
                     <span className="rounded-full bg-rose-500/20 px-3 py-0.5 text-xs text-rose-300 font-semibold border border-rose-500/30 flex items-center gap-1.5">
                       ⛔ Error Gateway
                     </span>
+                  ) : isolarLiveState?.mode === 'mock' ? (
+                    <span role="status" className="rounded-full bg-blue-500/20 px-3 py-0.5 text-xs text-blue-200 font-semibold border border-blue-500/30 flex items-center gap-1.5">
+                      Mode simulasi
+                    </span>
                   ) : isolarLiveState?.freshnessStatus === 'VENDOR_UNAVAILABLE' ? (
                     <span role="status" className="rounded-full bg-amber-500/20 px-3 py-0.5 text-xs text-amber-200 font-semibold border border-amber-500/30 flex items-center gap-1.5">
                       ⚠ Vendor tidak tersedia · cache {isolarLiveState?.dataAgeMinutes ?? '?'} mnt

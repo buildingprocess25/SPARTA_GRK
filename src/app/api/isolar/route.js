@@ -10,6 +10,7 @@ import { aggregateRawApiIntoCanonicalDCs, calculateNationwideSummary } from '@/l
 import { CANONICAL_DC_ENTITIES } from '@/lib/solar/plantMap.js';
 import { QUOTA_CONFIG } from '@/lib/solar/endpoints.js';
 import aprilDataRaw from '@/data/monitorPltsApril2026.json';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
 
 const MANUAL_COOLDOWN_MS = 60_000;
 const CACHE_TTL_MS = 10_000; // 10s micro-cache to protect DB connection pool
@@ -19,8 +20,6 @@ let cachedResponseTime = 0;
 
 export async function GET(request) {
   const isLive = process.env.ISOLAR_MODE === 'live';
-  const { searchParams } = new URL(request.url);
-  const forceRefresh = searchParams.get('refresh') === 'true';
   const now = new Date();
 
   // ─── MOCK MODE ──────────────────────────────────────────────────────
@@ -40,7 +39,7 @@ export async function GET(request) {
   }
 
   // ─── LIVE MODE: Check Micro-Cache (if not forcing refresh) ──────────
-  if (!forceRefresh && cachedResponse && (now.getTime() - cachedResponseTime < CACHE_TTL_MS)) {
+  if (cachedResponse && (now.getTime() - cachedResponseTime < CACHE_TTL_MS)) {
     return NextResponse.json(cachedResponse, {
       headers: {
         'X-Cache': 'HIT',
@@ -51,26 +50,6 @@ export async function GET(request) {
 
   // ─── LIVE MODE: Read from Database ──────────────────────────────────
   try {
-    // Manual refresh trigger (cooldown 60s)
-    if (forceRefresh) {
-      const sinceLast = now.getTime() - lastManualRefresh;
-      if (sinceLast >= MANUAL_COOLDOWN_MS) {
-        lastManualRefresh = now.getTime();
-        await runSync({ trigger: 'manual' });
-        // Invalidate cache on manual sync
-        cachedResponse = null;
-      }
-    }
-    
-    // Fallback-on-read: if data is stale and within sync window
-    if (process.env.SYNC_FALLBACK_ON_READ === 'true' && !forceRefresh) {
-      const payload = await readDashboardPayload();
-      if (payload.dataAgeMinutes !== null && payload.dataAgeMinutes > 30 && payload.isInSyncWindow) {
-        await runSync({ trigger: 'fallback' });
-        cachedResponse = null;
-      }
-    }
-    
     // Read from DB
     const data = await readDashboardPayload();
     
@@ -288,10 +267,31 @@ export async function GET(request) {
     return NextResponse.json({
       success: false,
       mode: 'live',
-      error: error.message || 'Database read error',
+      error: 'Data telemetri tidak dapat dibaca.',
+      code: error.code || 'DATABASE_UNAVAILABLE',
       gatewayStatus: 'ERROR',
       lastSyncTime: formatWibTime(now),
       stationList: [],
     }, { status: 500 });
+  }
+}
+
+export async function POST(request) {
+  const decision = mutationDecisionForRequest(request);
+  if (!decision.allowed) {
+    return NextResponse.json({ success: false, error: decision.code, code: decision.code }, { status: decision.status });
+  }
+  const now = Date.now();
+  if (now - lastManualRefresh < MANUAL_COOLDOWN_MS) {
+    return NextResponse.json({ success: true, result: 'skipped', code: 'MANUAL_COOLDOWN' });
+  }
+  try {
+    lastManualRefresh = now;
+    const result = await runSync({ trigger: 'manual' });
+    cachedResponse = null;
+    return NextResponse.json({ success: true, result });
+  } catch (error) {
+    console.error('[isolar/route] Manual sync failed:', error?.code || error?.name || 'UNKNOWN');
+    return NextResponse.json({ success: false, error: 'Sinkronisasi manual gagal.', code: error?.code || 'SYNC_FAILED' }, { status: 502 });
   }
 }

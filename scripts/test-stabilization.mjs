@@ -137,7 +137,21 @@ async function testResponsiveSafety() {
   assert.doesNotMatch(header, /Password berhasil diperbarui|Email terverifikasi valid/);
 }
 
-const suites = { security: testSecurity, guards: testGuards, imports: testImports, freshness: testFreshness, migrations: testMigrations, responsive: testResponsiveSafety };
+async function testReviewFixes() {
+  const isolarRoute = await readFile(new URL('../src/app/api/isolar/route.js', import.meta.url), 'utf8');
+  const cronRoute = await readFile(new URL('../src/app/api/cron/isolar-sync/route.js', import.meta.url), 'utf8');
+  const importRoute = await readFile(new URL('../src/app/api/import/batch/route.js', import.meta.url), 'utf8');
+  const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+  const getBody = isolarRoute.split('export async function POST')[0];
+  assert.doesNotMatch(getBody, /await runSync/);
+  assert.match(isolarRoute, /export async function POST/);
+  assert.match(cronRoute, /export async function GET\(request\)\s*\{\s*const authFailure/s);
+  assert.match(importRoute, /JSON_COMMIT_DISABLED/);
+  assert.match(packageJson.scripts.dev, /--hostname 127\.0\.0\.1/);
+  assert.doesNotMatch(isolarRoute, /error:\s*error\.message/);
+}
+
+const suites = { security: testSecurity, guards: testGuards, imports: testImports, freshness: testFreshness, migrations: testMigrations, responsive: testResponsiveSafety, review: testReviewFixes };
 const selected = mode === 'all' ? Object.entries(suites) : [[mode, suites[mode]]];
 
 for (const [name, suite] of selected) {

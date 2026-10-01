@@ -45,12 +45,14 @@ export async function POST(request) {
     console.error('[cron/isolar-sync] Error:', error.message);
     return NextResponse.json({
       success: false,
-      error: error.message,
+      error: 'Scheduler gagal dijalankan.', code: error?.code || 'SCHEDULER_FAILED',
     }, { status: 500 });
   }
 }
 
 export async function GET(request) {
+  const authFailure = cronAuthResponse(request);
+  if (authFailure) return authFailure;
   const url = new URL(request.url);
   const action = url.searchParams.get('action'); // 'status' | 'history' | 'run'
 
@@ -63,7 +65,7 @@ export async function GET(request) {
       const result = await runSchedulerCycle({ trigger: 'cron' });
       return NextResponse.json({ success: true, result });
     } catch (err) {
-      return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: 'Scheduler gagal dijalankan.', code: err?.code || 'SCHEDULER_FAILED' }, { status: 500 });
     }
   }
 

@@ -757,7 +757,10 @@ export async function readDashboardPayload() {
       prisma.monthlyYield?.findMany ? prisma.monthlyYield.findMany({ orderBy: [{ yearMonth: 'asc' }, { psId: 'asc' }] }) : Promise.resolve([]),
     ]);
   } catch (err) {
-    console.warn('[SyncEngine] DB query fallback (database unreachable):', err.message || err);
+    console.error('[SyncEngine] Core database query failed:', err?.code || err?.name || 'UNKNOWN');
+    const publicError = new Error('Database telemetry unavailable');
+    publicError.code = 'DATABASE_UNAVAILABLE';
+    throw publicError;
   }
   
   // Compute month-to-date from DailyYield

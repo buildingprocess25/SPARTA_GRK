@@ -82,48 +82,7 @@ export async function POST(request) {
 
     // Handle JSON payload (for direct commit after client preview)
     if (contentType.includes('application/json')) {
-      const body = await request.json();
-      const { records, category, filename, allowPartial, isDraft, mode } = body;
-
-      if (String(mode).toUpperCase() !== 'COMMIT') {
-        return NextResponse.json(
-          { success: false, error: 'Mode JSON harus COMMIT setelah preview tervalidasi.', code: 'INVALID_IMPORT_MODE' },
-          { status: 400 }
-        );
-      }
-
-      const mutationDecision = mutationDecisionForRequest(request);
-      if (!mutationDecision.allowed) {
-        return NextResponse.json({ success: false, error: mutationDecision.code, code: mutationDecision.code }, { status: mutationDecision.status });
-      }
-
-      if (!records || !Array.isArray(records)) {
-        return NextResponse.json(
-          { success: false, error: 'Array records wajib disertakan dalam format JSON.' },
-          { status: 400 }
-        );
-      }
-
-      if (!category) {
-        return NextResponse.json(
-          { success: false, error: 'Kategori wajib disertakan.' },
-          { status: 400 }
-        );
-      }
-
-      const commitResult = await commitBatchToDatabase({
-        records,
-        category,
-        filename: filename || 'batch_import.xlsx',
-        allowPartial: !!allowPartial,
-        isDraft: !!isDraft
-      });
-
-      return NextResponse.json({
-        success: true,
-        mode: mode || 'COMMIT',
-        ...commitResult
-      });
+      return NextResponse.json({ success: false, error: 'Unggah ulang file agar server menghitung dan memvalidasi data.', code: 'JSON_COMMIT_DISABLED' }, { status: 415 });
     }
 
     return NextResponse.json(
@@ -135,7 +94,7 @@ export async function POST(request) {
     return NextResponse.json(
       {
         success: false,
-        error: err.message || 'Terjadi kesalahan pada server saat memproses batch import.'
+        error: 'Terjadi kesalahan pada server saat memproses batch import.', code: err?.code || 'IMPORT_FAILED'
       },
       { status: 500 }
     );
@@ -166,7 +125,7 @@ export async function GET(request) {
   } catch (err) {
     console.error('[API /api/import/batch GET] Error:', err);
     return NextResponse.json(
-      { success: false, error: err.message || 'Gagal mengambil riwayat import batch.' },
+      { success: false, error: 'Gagal mengambil riwayat import batch.', code: err?.code || 'IMPORT_HISTORY_FAILED' },
       { status: 500 }
     );
   }

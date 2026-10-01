@@ -4,8 +4,8 @@
  */
 export async function fetchLiveIsolarData(forceRefresh = false) {
   try {
-    const res = await fetch(`/api/isolar${forceRefresh ? '?refresh=true' : ''}`, {
-      method: 'GET',
+    const res = await fetch('/api/isolar', {
+      method: forceRefresh ? 'POST' : 'GET',
       headers: {
         'Accept': 'application/json',
       },

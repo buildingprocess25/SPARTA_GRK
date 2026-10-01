@@ -110,7 +110,7 @@ export async function GET(request) {
     });
   } catch (error) {
     console.error('[Facilities API Error]:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Gagal membaca fasilitas.', code: error?.code || 'FACILITY_READ_FAILED' }, { status: 500 });
   }
 }
 
@@ -202,6 +202,6 @@ export async function POST(request) {
     return NextResponse.json({ success: true, data: upserted });
   } catch (error) {
     console.error('[Facilities POST Error]:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Gagal menyimpan fasilitas.', code: error?.code || 'FACILITY_WRITE_FAILED' }, { status: 500 });
   }
 }

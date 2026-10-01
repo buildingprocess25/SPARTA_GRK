@@ -119,7 +119,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
             <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 p-6 text-white shrink-0">
               <button
                 ref={modalCloseRef}
-                className="absolute top-4 right-4 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                className="absolute top-2 right-2 size-11 inline-flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
                 onClick={() => setIsProfileOpen(false)}
                 title="Tutup"
               >

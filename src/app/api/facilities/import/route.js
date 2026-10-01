@@ -169,6 +169,6 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error('[Facilities Import Error]:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Import fasilitas gagal.', code: error?.code || 'FACILITY_IMPORT_FAILED' }, { status: 500 });
   }
 }
