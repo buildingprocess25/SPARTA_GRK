@@ -8,9 +8,11 @@ import {
   calculateWeightedPr,
   buildLikeForLike,
   sumEligibleEmissions,
+  buildPltsDashboardFromRows,
 } from '../src/lib/solar/dashboard.js';
 import { buildTargetMonthlyRows, deriveRkapFactors } from '../src/lib/solar/rkapTargets.js';
 import { importRkapTargets } from '../src/lib/importers/rkapTargetImport.js';
+import { GRID_EMISSION_FACTORS, getGridFactor } from '../src/lib/emission-factors.js';
 
 let passed = 0;
 const tests = [];
@@ -108,6 +110,58 @@ test('RKAP target import is idempotent and dry-run does not write', async () => 
   assert.equal(second.inserted, 0);
   assert.equal(second.identical, 24);
   assert.equal(stored.size, 24);
+});
+
+test('single dashboard aggregation resolves sources, filters, targets, factors, and like-for-like', () => {
+  const data = buildPltsDashboardFromRows({
+    query: { period: '2026-01_2026-01', mode: 'YTD', throughMonth: 1, grid: 'ALL', plant: 'ALL', compareYears: [2025, 2026] },
+    currentYearMonth: '202610',
+    plants: [
+      { dcId: 'A', canonicalName: 'Plant A', grid: 'JAMALI', sungrowPsIds: [1], apiInstalledKwp: 10 },
+      { dcId: 'B', canonicalName: 'Plant B', grid: 'SULUTGO', sungrowPsIds: [2], apiInstalledKwp: 20 },
+    ],
+    observations: [
+      { yearMonth: '202601', psId: 1, energyKwh: 120, source: 'ISOLAR_REPORT_IMPORT' },
+      { yearMonth: '202601', psId: 1, energyKwh: 100, source: 'api_history' },
+      { yearMonth: '202501', psId: 1, energyKwh: 90, source: 'ISOLAR_REPORT_IMPORT' },
+      { yearMonth: '202601', psId: 2, energyKwh: 50, source: 'ISOLAR_REPORT_IMPORT' },
+    ],
+    targets: [{ yearMonth: '202601', metric: 'prod_mwh', value: 0.2, source: 'SUSTAINABILITY_DATA_OWNER' }],
+    climate: [],
+    loads: [],
+    factors: {
+      JAMALI: { cmPlts: 0.83, status: 'resmi' },
+      SULUTGO: { cmPlts: 0.6, status: 'sementara' },
+    },
+  });
+  assert.equal(data.summary.productionKwh, 170);
+  assert.equal(data.summary.targetMwh, 0.2);
+  assert.equal(data.summary.achievementPct, 85);
+  assert.equal(data.summary.emission.emissionTon, 0.0996);
+  assert.equal(data.summary.emission.excludedEnergyMwh, 0.05);
+  assert.equal(data.conflicts.length, 1);
+  assert.equal(data.conflicts[0].differencePct, 20);
+  assert.equal(data.yoy.likeForLike.plantCount, 1);
+  assert.equal(data.summary.pr.valuePct, null);
+  assert.equal(data.support.load.available, false);
+});
+
+test('owner grid table marks factor eligibility explicitly', () => {
+  assert.ok(GRID_EMISSION_FACTORS.every((factor) => ['resmi', 'sementara'].includes(factor.status)));
+  const sulselrabar = GRID_EMISSION_FACTORS.find((factor) => factor.grid === 'SULSELRABAR');
+  assert.equal(sulselrabar.cmExPost, 0.75);
+  assert.equal(sulselrabar.cmPlts, 0.72);
+  assert.equal(sulselrabar.status, 'resmi');
+  assert.equal(GRID_EMISSION_FACTORS.find((factor) => factor.grid === 'SULUTGO').status, 'sementara');
+  assert.equal(getGridFactor('Jawa-Madura-Bali').grid, 'JAMALI');
+});
+
+test('dashboard route has JSON envelopes and contains no vendor call', () => {
+  const source = fs.readFileSync(new URL('../src/app/api/plts/dashboard/route.js', import.meta.url), 'utf8');
+  assert.match(source, /success:\s*true/);
+  assert.match(source, /success:\s*false/);
+  assert.match(source, /code:/);
+  assert.doesNotMatch(source, /getOpenPointInfo|getDevicePointsDayMonthYearDataList|isolarCloudService|apiClient/);
 });
 
 for (const [name, fn] of tests) {
