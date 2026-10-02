@@ -91,6 +91,84 @@ model MonthlyYield {
   @@map("monthly_yield")
 }
 
+/// Source-preserving monthly observations. Multiple sources for one plant-month
+/// remain independently auditable; MonthlyYield stays the legacy canonical view.
+model MonthlyYieldObservation {
+  id              String   @id @default(cuid())
+  yearMonth       String   @map("year_month")
+  psId            Int      @map("ps_id")
+  energyKwh       Float    @map("energy_kwh")
+  measurementType String   @default("MONTHLY_YIELD") @map("measurement_type")
+  source          String
+  sourceFile      String?  @map("source_file")
+  sourceRow       Int?     @map("source_row")
+  sourceFileHash  String?  @map("source_file_hash")
+  importBatchId   String?  @map("import_batch_id")
+  qualityStatus   String?  @map("quality_status")
+  metadata        Json     @default("{}")
+  observedAt      DateTime @default(now()) @map("observed_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@unique([yearMonth, psId, measurementType, source])
+  @@index([yearMonth])
+  @@index([importBatchId])
+  @@map("monthly_yield_observation")
+}
+
+/// Owner-provided national RKAP targets imported from sustainabilityData.
+model TargetMonthly {
+  id         String   @id @default(cuid())
+  yearMonth  String   @map("year_month")
+  metric     String   // prod_mwh | co2_t
+  value      Float
+  unit       String
+  source     String
+  sourceRef  String?  @map("source_ref")
+  sourceHash String?  @map("source_hash")
+  metadata   Json     @default("{}")
+  importedAt DateTime @default(now()) @map("imported_at") @db.Timestamptz
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@unique([yearMonth, metric, source])
+  @@index([yearMonth])
+  @@map("target_monthly")
+}
+
+/// Proven monthly supporting climate measurements from vendor/BMES sources.
+model ClimateMonthly {
+  id               String   @id @default(cuid())
+  yearMonth        String   @map("year_month")
+  psId             Int      @map("ps_id")
+  radiationKwhM2   Float?   @map("radiation_kwh_m2")
+  moduleTempC      Float?   @map("module_temp_c")
+  source           String
+  sourceRef        String?  @map("source_ref")
+  metadata         Json     @default("{}")
+  importedAt       DateTime @default(now()) @map("imported_at") @db.Timestamptz
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@unique([yearMonth, psId, source])
+  @@index([yearMonth])
+  @@map("climate_monthly")
+}
+
+/// Proven monthly load measurements; instantaneous kW values are never integrated here.
+model LoadMonthly {
+  id         String   @id @default(cuid())
+  yearMonth  String   @map("year_month")
+  psId       Int      @map("ps_id")
+  loadKwh    Float?   @map("load_kwh")
+  source     String
+  sourceRef  String?  @map("source_ref")
+  metadata   Json     @default("{}")
+  importedAt DateTime @default(now()) @map("imported_at") @db.Timestamptz
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@unique([yearMonth, psId, source])
+  @@index([yearMonth])
+  @@map("load_monthly")
+}
+
 /// Cached API token (1 row)
 model ApiToken {
   id              Int      @id @default(1)

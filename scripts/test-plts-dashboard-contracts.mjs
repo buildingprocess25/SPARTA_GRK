@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {
   MONTHLY_SOURCE_POLICY,
   parseDashboardQuery,
@@ -8,6 +9,8 @@ import {
   buildLikeForLike,
   sumEligibleEmissions,
 } from '../src/lib/solar/dashboard.js';
+import { buildTargetMonthlyRows, deriveRkapFactors } from '../src/lib/solar/rkapTargets.js';
+import { importRkapTargets } from '../src/lib/importers/rkapTargetImport.js';
 
 let passed = 0;
 const tests = [];
@@ -63,6 +66,48 @@ test('temporary factors and missing energy are excluded from emission totals', (
     { energyMwh: null, factor: 0.8, factorStatus: 'resmi' },
   ]);
   assert.deepEqual(total, { emissionTon: 8, includedPlantCount: 1, excludedPlantCount: 2, excludedEnergyMwh: 20 });
+});
+
+test('schema preserves independent source observations and optional supporting measurements', () => {
+  const schema = fs.readFileSync(new URL('../prisma/schema.prisma', import.meta.url), 'utf8');
+  for (const model of ['MonthlyYieldObservation', 'TargetMonthly', 'ClimateMonthly', 'LoadMonthly']) {
+    assert.match(schema, new RegExp(`model\\s+${model}\\s+\\{`));
+  }
+  assert.match(schema, /@@unique\(\[yearMonth, psId, measurementType, source\]\)/);
+});
+
+test('RKAP target rows come from owner matrix and reconcile expected YTD totals', () => {
+  const rows = buildTargetMonthlyRows();
+  const production = rows.filter((row) => row.metric === 'prod_mwh');
+  assert.equal(production.length, 12);
+  assert.equal(production.slice(0, 8).reduce((sum, row) => sum + row.value, 0), 3960);
+  assert.equal(production.slice(0, 9).reduce((sum, row) => sum + row.value, 0), 4435);
+});
+
+test('RKAP comparison factors are only published when owner table is stable within half percent', () => {
+  const factors = deriveRkapFactors();
+  for (const key of ['co2KgPerKwh', 'coalTonPerMwh', 'treePerMwh']) {
+    assert.equal(factors[key].stable, true);
+    assert.ok(factors[key].spreadPct <= 0.5);
+  }
+});
+
+test('RKAP target import is idempotent and dry-run does not write', async () => {
+  const stored = new Map();
+  const repository = {
+    async find(key) { return stored.get(key) || null; },
+    async upsert(row) { stored.set(`${row.yearMonth}:${row.metric}:${row.source}`, row); },
+  };
+  const dryRun = await importRkapTargets({ repository, commit: false });
+  assert.equal(dryRun.inserted, 0);
+  assert.equal(dryRun.newRecords, 24);
+  assert.equal(stored.size, 0);
+  const first = await importRkapTargets({ repository, commit: true });
+  assert.equal(first.inserted, 24);
+  const second = await importRkapTargets({ repository, commit: true });
+  assert.equal(second.inserted, 0);
+  assert.equal(second.identical, 24);
+  assert.equal(stored.size, 24);
 });
 
 for (const [name, fn] of tests) {

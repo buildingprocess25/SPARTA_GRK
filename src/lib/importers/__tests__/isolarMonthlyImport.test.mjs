@@ -66,6 +66,7 @@ function fakeRepository({ existing = [], priorBatch = null, failApply = false } 
     createdBatches: [],
     updates: [],
     applied: [],
+    observations: [],
   };
   return {
     state,
@@ -84,6 +85,10 @@ function fakeRepository({ existing = [], priorBatch = null, failApply = false } 
       if (failApply) throw new Error('simulated transaction rollback');
       state.applied.push({ actions, context });
       return { inserted: actions.filter(a => a.classification === 'NEW').length, finalized: actions.filter(a => a.classification === 'FINALIZE_PARTIAL').length };
+    },
+    async applyObservations(records, context) {
+      state.observations.push({ records, context });
+      return { recorded: records.length };
     },
   };
 }
@@ -157,12 +162,15 @@ test('dry-run performs no writes and commit applies only mutable classifications
   assert.equal(dryRun.mode, 'DRY_RUN');
   assert.equal(repo.state.createdBatches.length, 0);
   assert.equal(repo.state.applied.length, 0);
+  assert.equal(repo.state.observations.length, 0);
 
   const committed = await importIsolarMonthlyReport({ report: sourceReport, repository: repo, commit: true, now: NOW, batchSize: 1 });
   assert.equal(committed.mode, 'COMMIT');
   assert.equal(committed.batch.module, IMPORT_MODULE);
   assert.equal(repo.state.createdBatches.length, 1);
   assert.equal(repo.state.applied.length, 2);
+  assert.equal(repo.state.observations.length, 1);
+  assert.equal(repo.state.observations[0].records.length, 3);
   assert.deepEqual(repo.state.applied.flatMap(call => call.actions.map(a => a.classification)), ['NEW', 'FINALIZE_PARTIAL']);
   assert.equal(committed.commit.inserted, 1);
   assert.equal(committed.commit.finalized, 1);
@@ -177,6 +185,8 @@ test('same committed file hash is idempotent', async () => {
   assert.equal(result.batch.id, 'existing-batch');
   assert.equal(repo.state.createdBatches.length, 0);
   assert.equal(repo.state.applied.length, 0);
+  assert.equal(repo.state.observations.length, 1);
+  assert.equal(repo.state.observations[0].records.length, 1);
 });
 
 test('transaction failure is surfaced and marks the batch failed', async () => {
@@ -221,6 +231,25 @@ test('Prisma repository bulk-inserts new records in one statement per transactio
   assert.equal(calls.createMany[0].data.length, 100);
   assert.equal(calls.transactionOptions.timeout, 30_000);
   assert.deepEqual(result, { inserted: 100, finalized: 0 });
+});
+
+test('Prisma repository preserves report observations without overwriting API history', async () => {
+  const calls = [];
+  const prisma = {
+    monthlyYieldObservation: {
+      async upsert(args) { calls.push(args); return args.create; },
+    },
+  };
+  const repository = createPrismaMonthlyImportRepository(prisma);
+  const result = await repository.applyObservations([record({ energyKwh: 125 })], {
+    batch: { id: 'batch-1' },
+    report: report([record({ energyKwh: 125 })]),
+    now: NOW,
+  });
+  assert.equal(result.recorded, 1);
+  assert.equal(calls[0].where.yearMonth_psId_measurementType_source.source, 'ISOLAR_REPORT_IMPORT');
+  assert.equal(calls[0].create.energyKwh, 125);
+  assert.deepEqual(calls[0].update, {});
 });
 
 test('commit refuses reports containing parser errors', async () => {

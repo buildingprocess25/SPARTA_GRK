@@ -157,7 +157,7 @@ export async function importIsolarMonthlyReport({
     duplicateFile: false,
     report,
     preview,
-    commit: { inserted: 0, finalized: 0, batches: 0 },
+    commit: { inserted: 0, finalized: 0, observations: 0, batches: 0 },
     batch: null,
   };
 
@@ -168,7 +168,15 @@ export async function importIsolarMonthlyReport({
 
   const priorBatch = await repository.findBatch(IMPORT_MODULE, report.hash);
   if (priorBatch && priorBatch.status !== 'FAILED') {
-    return { ...baseResult, duplicateFile: true, batch: priorBatch };
+    const observationResult = repository.applyObservations
+      ? await repository.applyObservations(validRecords, { batch: priorBatch, report, now })
+      : { recorded: 0 };
+    return {
+      ...baseResult,
+      duplicateFile: true,
+      batch: priorBatch,
+      commit: { ...baseResult.commit, observations: Number(observationResult?.recorded || 0) },
+    };
   }
 
   const initialStatus = 'PROCESSING';
@@ -184,8 +192,12 @@ export async function importIsolarMonthlyReport({
     metadata: initialMetadata,
   });
 
-  const commitSummary = { inserted: 0, finalized: 0, batches: 0 };
+  const commitSummary = { inserted: 0, finalized: 0, observations: 0, batches: 0 };
   try {
+    if (repository.applyObservations) {
+      const observationResult = await repository.applyObservations(validRecords, { batch, report, now });
+      commitSummary.observations = Number(observationResult?.recorded || 0);
+    }
     for (const actions of chunked(preview.mutable, batchSize)) {
       const result = await repository.applyActions(actions, { batch, report, now });
       commitSummary.inserted += Number(result?.inserted || 0);
@@ -247,6 +259,85 @@ export function createPrismaMonthlyImportRepository(prisma) {
 
     async updateBatch(id, data) {
       return prisma.importBatch.update({ where: { id }, data });
+    },
+
+    async applyObservations(records, { batch, report, now }) {
+      if (typeof prisma.$executeRawUnsafe === 'function') {
+        const { randomUUID } = await import('node:crypto');
+        const payload = records.map(record => ({
+          id: randomUUID(),
+          year_month: record.storageYearMonth,
+          ps_id: Number(record.psId),
+          energy_kwh: Number(record.energyKwh),
+          measurement_type: MONTHLY_YIELD_MEASUREMENT,
+          source: IMPORT_SOURCE,
+          source_file: report.filename,
+          source_row: record.lineNumber,
+          source_file_hash: report.hash,
+          import_batch_id: batch.id,
+          quality_status: 'FINAL',
+          metadata: {
+            reportYear: report.reportYear,
+            plantNameRaw: record.plantNameRaw,
+            dcId: record.dcId,
+            energyUnit: record.energyUnit,
+          },
+          observed_at: now.toISOString(),
+        }));
+        await prisma.$executeRawUnsafe(
+          `INSERT INTO "monthly_yield_observation"
+            ("id", "year_month", "ps_id", "energy_kwh", "measurement_type", "source", "source_file", "source_row", "source_file_hash", "import_batch_id", "quality_status", "metadata", "observed_at", "updated_at")
+           SELECT x.id, x.year_month, x.ps_id, x.energy_kwh, x.measurement_type, x.source,
+                  x.source_file, x.source_row, x.source_file_hash, x.import_batch_id,
+                  x.quality_status, x.metadata, x.observed_at, x.observed_at
+           FROM jsonb_to_recordset($1::jsonb) AS x(
+             id text, year_month text, ps_id integer, energy_kwh double precision,
+             measurement_type text, source text, source_file text, source_row integer,
+             source_file_hash text, import_batch_id text, quality_status text,
+             metadata jsonb, observed_at timestamptz
+           )
+           ON CONFLICT ("year_month", "ps_id", "measurement_type", "source") DO NOTHING`,
+          JSON.stringify(payload),
+        );
+        return { recorded: records.length };
+      }
+
+      let recorded = 0;
+      for (const record of records) {
+        const data = {
+            yearMonth: record.storageYearMonth,
+            psId: Number(record.psId),
+            energyKwh: Number(record.energyKwh),
+            measurementType: MONTHLY_YIELD_MEASUREMENT,
+            source: IMPORT_SOURCE,
+            sourceFile: report.filename,
+            sourceRow: record.lineNumber,
+            sourceFileHash: report.hash,
+            importBatchId: batch.id,
+            qualityStatus: 'FINAL',
+            observedAt: now,
+            metadata: {
+              reportYear: report.reportYear,
+              plantNameRaw: record.plantNameRaw,
+              dcId: record.dcId,
+              energyUnit: record.energyUnit,
+            },
+          };
+        await prisma.monthlyYieldObservation.upsert({
+          where: {
+            yearMonth_psId_measurementType_source: {
+              yearMonth: data.yearMonth,
+              psId: data.psId,
+              measurementType: data.measurementType,
+              source: data.source,
+            },
+          },
+          create: data,
+          update: {},
+        });
+        recorded += 1;
+      }
+      return { recorded };
     },
 
     async applyActions(actions, { batch, report, now }) {
