@@ -75,7 +75,7 @@ function round(value, digits = 2) {
   return Number(Number(value).toFixed(digits));
 }
 
-function buildPeriodOptions(availableMonths) {
+function buildPeriodOptions(availableMonths, partialMonths = new Set()) {
   const byYear = new Map();
   for (const ym of availableMonths) {
     const year = ym.slice(0, 4);
@@ -86,7 +86,8 @@ function buildPeriodOptions(availableMonths) {
   const options = [];
   for (const year of [...byYear.keys()].sort((a, b) => b.localeCompare(a))) {
     const months = byYear.get(year).sort();
-    const last = months.at(-1);
+    const finalMonths = months.filter(ym => !partialMonths.has(ym));
+    const last = finalMonths.at(-1) || months.at(-1);
     options.push({
       value: `${year}-01_${formatYearMonth(last)}`,
       label: `Jan-${MONTH_SHORT[Number(last.slice(4)) - 1]} ${year} (YTD)`,
@@ -96,7 +97,7 @@ function buildPeriodOptions(availableMonths) {
     for (const ym of [...months].reverse()) {
       options.push({
         value: `${formatYearMonth(ym)}_${formatYearMonth(ym)}`,
-        label: `${MONTH_SHORT[Number(ym.slice(4)) - 1]} ${year}`,
+        label: `${MONTH_SHORT[Number(ym.slice(4)) - 1]} ${year}${partialMonths.has(ym) ? ' (sebagian)' : ''}`,
         type: 'MONTH',
         year: Number(year),
       });
@@ -239,7 +240,11 @@ export function aggregateMonthlyHistory({
     };
   }
 
-  const periodOptions = buildPeriodOptions(availableMonths);
+  const partialMonths = new Set(availableMonths.filter(ym => (
+    ym === currentYearMonth
+    && allRows.filter(item => item.yearMonth === ym).some(item => qualityOf([item]) === 'PARTIAL')
+  )));
+  const periodOptions = buildPeriodOptions(availableMonths, partialMonths);
   return {
     availableYears,
     availableMonths,
