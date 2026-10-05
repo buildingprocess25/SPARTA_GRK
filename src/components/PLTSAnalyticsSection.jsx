@@ -84,7 +84,7 @@ const ALL_METRIC_OPTIONS = [
     trendLabel: 'Emisi Terhindar Bulanan',
     unit: 'tCO₂e',
     trendUnit: 'tCO₂e',
-    desc: 'Reduksi emisi GRK dari produksi PLTS (Faktor metode aplikasi 0.83 kgCO₂e/kWh / 0.83 tCO₂e/MWh)',
+    desc: 'Reduksi emisi GRK dari produksi PLTS (Faktor metode aplikasi 0.77644 kgCO₂e/kWh / 0.77644 tCO₂e/MWh)',
     sourceType: 'EXCEL_HISTORY',
     chartSourceType: 'EXCEL_HISTORY'
   }

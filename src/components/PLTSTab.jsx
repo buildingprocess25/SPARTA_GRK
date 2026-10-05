@@ -23,6 +23,7 @@ import { useSustainability } from '@/context/SustainabilityContext';
 import { fetchLiveIsolarData } from '@/services/isolarCloudService';
 import { getGridFactor } from '@/lib/emission-factors';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
+import { buildCacheKey } from '@/lib/solar/cacheKey';
 import { SummaryCardsSkeleton, ChartSkeleton, TabContentSkeleton, TableSkeleton } from '@/components/solar/PLTSDashboardSkeletons';
 
 const PLTSSummaryCard = dynamic(() => import('@/components/PLTSSummaryCard'), {
@@ -118,7 +119,7 @@ export default function PLTSTab() {
     });
     if (dashboardFilters.grid && dashboardFilters.grid !== 'ALL') params.set('grid', dashboardFilters.grid);
     if (dashboardFilters.plant && dashboardFilters.plant !== 'ALL') params.set('plant', dashboardFilters.plant);
-    const baseKey = `/api/plts/dashboard/summary?${params.toString()}`;
+    const baseKey = buildCacheKey('/api/plts/dashboard/summary', dashboardFilters);
 
     if (summaryClientCache.has(baseKey)) {
       setDashboardData(summaryClientCache.get(baseKey));
@@ -149,10 +150,9 @@ export default function PLTSTab() {
                 '/api/plts/dashboard/matrix',
               ];
               tabEndpoints.forEach((ep) => {
-                const url = `${ep}?${params.toString()}`;
-                const cacheKey = `${ep}:${year}:${grid}:${plant}`;
+                const cacheKey = buildCacheKey(ep, dashboardFilters);
                 if (window.__PLTS_CLIENT_CACHE__ && window.__PLTS_CLIENT_CACHE__.has(cacheKey)) return;
-                fetch(url, { priority: 'low' })
+                fetch(cacheKey, { priority: 'low' })
                   .then((r) => r.json())
                   .then((res) => {
                     if (res?.success && window.__PLTS_CLIENT_CACHE__) {
