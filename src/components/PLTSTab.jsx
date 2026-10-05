@@ -102,17 +102,23 @@ export default function PLTSTab() {
   const [emissionsError, setEmissionsError] = useState(null);
   const [emissionsLoading, setEmissionsLoading] = useState(false);
   const [refreshError, setRefreshError] = useState(null);
-  const [dashboardData, setDashboardData] = useState(() => summaryClientCache.get('2026:ALL:ALL') || null);
+  const [dashboardData, setDashboardData] = useState(null);
   const [dashboardError, setDashboardError] = useState(null);
-  const [dashboardLoading, setDashboardLoading] = useState(() => !summaryClientCache.has('2026:ALL:ALL'));
+  const [dashboardLoading, setDashboardLoading] = useState(true);
   const totalPlants = dashboardData?.summary?.plantCount || isolarLiveState?.stationList?.length || 39;
 
   useEffect(() => {
     let isCurrent = true;
-    const year = String(dashboardFilters.period || '2026').slice(0, 4);
-    const grid = dashboardFilters.grid && dashboardFilters.grid !== 'ALL' ? dashboardFilters.grid : 'ALL';
-    const plant = dashboardFilters.plant && dashboardFilters.plant !== 'ALL' ? dashboardFilters.plant : 'ALL';
-    const baseKey = `${year}:${grid}:${plant}`;
+    const params = new URLSearchParams({
+      period: dashboardFilters.period || '2026-01_2026-09',
+      mode: dashboardFilters.mode || 'YTD',
+      month: String(dashboardFilters.month || 9),
+      throughMonth: String(dashboardFilters.throughMonth || 9),
+      compare: '2025,2026',
+    });
+    if (dashboardFilters.grid && dashboardFilters.grid !== 'ALL') params.set('grid', dashboardFilters.grid);
+    if (dashboardFilters.plant && dashboardFilters.plant !== 'ALL') params.set('plant', dashboardFilters.plant);
+    const baseKey = `/api/plts/dashboard/summary?${params.toString()}`;
 
     if (summaryClientCache.has(baseKey)) {
       setDashboardData(summaryClientCache.get(baseKey));
@@ -124,17 +130,7 @@ export default function PLTSTab() {
       setDashboardLoading(true);
       setDashboardError(null);
       try {
-        const params = new URLSearchParams({
-          period: dashboardFilters.period || '2026-01_2026-09',
-          mode: dashboardFilters.mode || 'YTD',
-          month: String(dashboardFilters.month || 9),
-          throughMonth: String(dashboardFilters.throughMonth || 9),
-          compare: '2025,2026',
-        });
-        if (dashboardFilters.grid && dashboardFilters.grid !== 'ALL') params.set('grid', dashboardFilters.grid);
-        if (dashboardFilters.plant && dashboardFilters.plant !== 'ALL') params.set('plant', dashboardFilters.plant);
-        
-        const response = await fetch(`/api/plts/dashboard/summary?${params.toString()}`);
+        const response = await fetch(baseKey);
         const payload = await response.json();
         if (!response.ok || !payload.success) throw new Error(payload.error || 'Gagal memuat ringkasan PLTS');
         if (isCurrent) {
@@ -724,6 +720,7 @@ export default function PLTSTab() {
               ============================================================ */}
           <PLTSAnalyticsSection
             stations={isolarLiveState?.stationList || []}
+            historicalPlants={dashboardData?.plants || []}
             lastSyncTime={isolarLiveState?.lastSyncTime || 'Baru saja'}
             quotaStatus={isolarLiveState?.quota?.guardStatus}
           />

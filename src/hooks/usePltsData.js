@@ -20,10 +20,8 @@ function buildQueryString(filters = {}) {
 }
 
 function getBaseCacheKey(endpoint, filters = {}) {
-  const grid = filters.grid && filters.grid !== 'ALL' ? filters.grid : 'ALL';
-  const plant = filters.plant && filters.plant !== 'ALL' ? filters.plant : 'ALL';
-  const year = String(filters.period || '2026').slice(0, 4);
-  return `${endpoint}:${year}:${grid}:${plant}`;
+  const qs = buildQueryString(filters);
+  return `${endpoint}?${qs}`;
 }
 
 export function prefetchPltsEndpoint(endpoint, filters = {}) {
