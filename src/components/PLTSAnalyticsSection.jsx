@@ -103,7 +103,7 @@ const API_MONTHS_2026 = [
   { ym: '202606', label: 'Jun 2026', short: 'Jun', days: 30 },
   { ym: '202607', label: 'Jul 2026', short: 'Jul', days: 31 },
   { ym: '202608', label: 'Agu 2026', short: 'Agu', days: 31 },
-  { ym: '202609', label: 'Sep 2026 (sebagian)', short: 'Sep (sebagian)', days: 30, isLivePartial: true }
+  { ym: '202609', label: 'Sep 2026', short: 'Sep', days: 30 }
 ];
 
 const PALETTE = [
@@ -114,7 +114,11 @@ const PALETTE = [
   '#EC4899', // Pink
   '#F97316', // Orange
   '#14B8A6', // Teal
-  '#6366F1'  // Indigo
+  '#6366F1', // Indigo
+  '#EF4444', // Red
+  '#84CC16', // Lime
+  '#06B6D4', // Cyan
+  '#A855F7'  // Violet
 ];
 
 function SafePrBarTooltip({ active, payload }) {
@@ -151,22 +155,69 @@ function SafePrBarTooltip({ active, payload }) {
   return null;
 }
 
-function SafeTrendTooltip({ active, payload, label, activeMetricUnit }) {
+function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode }) {
   if (active && payload && payload.length) {
+    const rawData = payload[0]?.payload || {};
+    const unit = activeMetricUnit || '';
+    const unitSuffix = unitMode === 'daily' ? `${unit}/hari` : unit;
+
+    const avgVal = rawData.average;
+    const minVal = rawData.min;
+    const maxVal = rawData.max;
+
+    const plantEntries = payload
+      .filter(p => p && p.dataKey && p.dataKey !== 'average' && p.dataKey !== 'min' && p.dataKey !== 'max' && p.dataKey !== 'targetPr' && !p.dataKey.endsWith('_yieldMwh'))
+      .map(p => ({
+        name: p.name,
+        value: p.value,
+        color: p.color || p.stroke || '#38BDF8',
+        dcId: p.dataKey
+      }))
+      .filter(p => p.value !== null && p.value !== undefined && !isNaN(p.value))
+      .sort((a, b) => b.value - a.value);
+
     return (
-      <div className="bg-slate-900 text-white rounded-xl p-3 shadow-xl border border-slate-800 text-xs space-y-1 min-w-[200px]">
-        <p className="font-bold text-slate-200 border-b border-slate-700 pb-1 mb-1.5">{label}</p>
-        {payload.map((entry, idx) => {
-          if (!entry || entry.value === undefined || entry.value === null) return null;
-          const isMwh = entry.name && entry.name.includes('MWh');
-          const unit = isMwh ? 'MWh' : (activeMetricUnit || '');
-          return (
-            <p key={idx} className="font-mono flex justify-between gap-3 text-[11px]" style={{ color: entry.color || '#38BDF8' }}>
-              <span className="text-slate-300 truncate max-w-[140px]">{entry.name}:</span>
-              <strong className="text-white shrink-0">{entry.value} {unit}</strong>
-            </p>
-          );
-        })}
+      <div className="bg-slate-900/95 text-white rounded-xl p-3.5 shadow-2xl border border-slate-700/80 text-xs space-y-2 min-w-[240px] max-w-[320px] backdrop-blur-md">
+        <div className="flex items-center justify-between border-b border-slate-700/80 pb-1.5">
+          <span className="font-bold text-slate-100 text-sm">{label}</span>
+          <span className="text-[10px] text-slate-400 font-mono">{unitMode === 'daily' ? 'Harian (Normalisasi)' : 'Bulanan'}</span>
+        </div>
+
+        {avgVal !== null && avgVal !== undefined && (
+          <div className="bg-blue-950/60 border border-blue-800/60 rounded-lg p-2 space-y-1">
+            <div className="flex justify-between items-center text-slate-200">
+              <span className="font-semibold text-blue-300">Rata-rata Tertimbang:</span>
+              <strong className="text-blue-200 font-mono text-sm">{avgVal} {unitSuffix}</strong>
+            </div>
+            <p className="text-[9px] text-blue-400 italic">Definisi: Total kWh / Total kWp terpasang</p>
+            {minVal !== null && maxVal !== null && (
+              <div className="flex justify-between items-center text-[10px] text-slate-300 pt-1 border-t border-blue-900/60">
+                <span>Rentang Min - Maks:</span>
+                <span className="font-mono text-slate-200">{minVal} – {maxVal} {unitSuffix}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {plantEntries.length > 0 && (
+          <div className="space-y-1 pt-1">
+            <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold border-b border-slate-800 pb-0.5">
+              <span>Plant ({plantEntries.length})</span>
+              <span>Nilai ({unitSuffix})</span>
+            </div>
+            <div className="max-h-[160px] overflow-y-auto space-y-1 pr-1 overscroll-contain">
+              {plantEntries.map((p, idx) => (
+                <div key={idx} className="flex justify-between items-center text-[11px] font-mono">
+                  <div className="flex items-center gap-1.5 truncate max-w-[170px]">
+                    <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
+                    <span className="text-slate-300 truncate">{p.name}</span>
+                  </div>
+                  <strong className="text-white shrink-0">{p.value}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -292,7 +343,7 @@ export function getDCBadges(dc, selectedMetric) {
       id: 'unreliable',
       label: `Kapasitas beda dari audit (${sign}${dc.capacityDiffPct}%)`,
       className: 'bg-amber-50 text-amber-800 border-amber-200/80',
-      tooltip: `Kapasitas API (${dc.installedKwp} kWp) berbeda dari data audit April 2026 (${dc.baselineCapKwp} kWp). Metrik berbasis audit (Proxy PR, PR bulanan) tidak diberi peringkat untuk lokasi ini.`
+      tooltip: `Kapasitas API (${dc.installedKwp} kWp) berbeda dari data audit April 2026 (${dc.baselineCapKwp || '—'} kWp). Metrik berbasis audit (Proxy PR, PR bulanan) tidak diberi peringkat untuk lokasi ini.`
     });
   }
 
@@ -333,6 +384,7 @@ const DCRowItem = React.memo(function DCRowItem({
   dc,
   isSelected,
   isHovered,
+  colorBadge,
   isExcludedFromRanking,
   rankDisplay,
   selectedMetric,
@@ -367,6 +419,9 @@ const DCRowItem = React.memo(function DCRowItem({
         <div className="shrink-0 text-blue-600">
           {isSelected ? <CheckSquare size={16} /> : <Square size={16} className="text-slate-300" />}
         </div>
+        {colorBadge && (
+          <span className="size-2.5 rounded-full shrink-0 shadow-xs" style={{ backgroundColor: colorBadge }} />
+        )}
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className={`font-bold truncate ${!isSelected && isExcludedFromRanking ? 'text-slate-500' : 'text-slate-900'}`}>
@@ -441,6 +496,11 @@ export default function PLTSAnalyticsSection({
   const [isAllSelected, setIsAllSelected] = useState(true);
   const [expandedDCIds, setExpandedDCIds] = useState(new Set()); // for multi-plant row expansion
 
+  // Chart Controls for Bagian D
+  const [showAverage, setShowAverage] = useState(true);
+  const [showMinMax, setShowMinMax] = useState(true);
+  const [unitMode, setUnitMode] = useState('monthly'); // 'monthly' | 'daily'
+
   const toggleExpand = (dcId) => {
     setExpandedDCIds(prev => {
       const next = new Set(prev);
@@ -458,7 +518,6 @@ export default function PLTSAnalyticsSection({
   const [tablePageSize, setTablePageSize] = useState('all'); // 'all' | '10' | '20'
   const [tableSortColumn, setTableSortColumn] = useState('yieldMwh');
   const [tableSortDir, setTableSortDir] = useState('desc');
-  const [trendViewMode, setTrendViewMode] = useState('auto'); // 'auto' | 'average' | 'individual'
   const [hoveredDCId, setHoveredDCId] = useState(null);
 
   // Initialize selectedDCIds from URL on mount
@@ -534,17 +593,17 @@ export default function PLTSAnalyticsSection({
   const rawAllDCItems = analyticsResult.items;
   const activeMetricMeta = METRIC_OPTIONS.find(m => m.id === selectedMetric) || METRIC_OPTIONS[0];
 
-  // Base list of DCs ALWAYS contains all 36 canonical entities / 39 locations
+  // Base list of DCs ALWAYS contains all 39 locations
   const allDCItems = rawAllDCItems;
 
   const unreliableCount = useMemo(() => {
     return isAuditBaselineEnabled ? rawAllDCItems.filter(d => d.requiresManualVerification).length : 0;
   }, [rawAllDCItems, isAuditBaselineEnabled]);
 
-  // Active chosen DCs (for filtering trend, table, and telemetry)
+  // Active chosen DCs (Gorontalo excluded if all selected)
   const activeChosenDCIds = useMemo(() => {
     if (isAllSelected) {
-      return allDCItems.map(d => d.dcId);
+      return allDCItems.filter(d => !d.isUnderConstruction).map(d => d.dcId);
     }
     return selectedDCIds;
   }, [isAllSelected, selectedDCIds, allDCItems]);
@@ -577,7 +636,7 @@ export default function PLTSAnalyticsSection({
 
   const excludedChosenCount = Math.max(0, activeChosenCount - rankedChosenCount);
 
-  // Average metric value of eligible chosen items
+  // Average metric value of eligible chosen items (Weighted average for Specific Yield)
   const computedAverageMetricValue = useMemo(() => {
     const chosenEligible = allDCItems.filter(dc => {
       if (!activeChosenDCIds.includes(dc.dcId)) return false;
@@ -588,7 +647,15 @@ export default function PLTSAnalyticsSection({
       return dc.metricValue !== null && dc.metricValue !== undefined && !isNaN(dc.metricValue);
     });
 
-    if (chosenEligible.length === 0) return null; // Returns null so UI displays "—" instead of "0"
+    if (chosenEligible.length === 0) return null;
+    if (selectedMetric === 'specificYield') {
+      const totalKwh = chosenEligible.reduce((acc, curr) => acc + (curr.productionKwh || (curr.todayYieldKwh ? Number(curr.todayYieldKwh) : 0) || 0), 0);
+      const totalKwp = chosenEligible.reduce((acc, curr) => acc + (curr.installedKwp || 0), 0);
+      if (totalKwp > 0 && totalKwh > 0) {
+        const val = totalKwh / totalKwp;
+        return Number(val.toFixed(1));
+      }
+    }
     const sum = chosenEligible.reduce((acc, curr) => acc + (curr.metricValue || 0), 0);
     return Number((sum / chosenEligible.length).toFixed(1));
   }, [allDCItems, activeChosenDCIds, selectedMetric, isAuditBaselineEnabled]);
@@ -596,7 +663,7 @@ export default function PLTSAnalyticsSection({
   // Handler for selection buttons
   const handleSelectAll = () => {
     setIsAllSelected(true);
-    setSelectedDCIds([]);
+    setSelectedDCIds(allDCItems.filter(d => !d.isUnderConstruction).map(d => d.dcId));
     updateUrlParam('dc', 'all');
   };
 
@@ -609,7 +676,7 @@ export default function PLTSAnalyticsSection({
   const handleToggleDC = (dcId) => {
     let newSelected;
     if (isAllSelected) {
-      newSelected = allDCItems.map(d => d.dcId).filter(id => id !== dcId);
+      newSelected = allDCItems.filter(d => !d.isUnderConstruction).map(d => d.dcId).filter(id => id !== dcId);
       setIsAllSelected(false);
     } else {
       if (selectedDCIds.includes(dcId)) {
@@ -617,19 +684,19 @@ export default function PLTSAnalyticsSection({
       } else {
         newSelected = [...selectedDCIds, dcId];
       }
-      if (newSelected.length === allDCItems.length) {
+      const operationalCount = allDCItems.filter(d => !d.isUnderConstruction).length;
+      if (newSelected.length >= operationalCount) {
         setIsAllSelected(true);
-
-        newSelected = [];
+        newSelected = allDCItems.filter(d => !d.isUnderConstruction).map(d => d.dcId);
       }
     }
     setSelectedDCIds(newSelected);
-    updateUrlParam('dc', newSelected.length === 0 ? (isAllSelected ? 'all' : 'none') : newSelected.join(','));
+    updateUrlParam('dc', newSelected.length === 0 ? 'none' : newSelected.join(','));
   };
 
   // Quick Scope Presets
   const handleSelectTop5 = () => {
-    const sorted = [...allDCItems].sort((a, b) => (b.metricValue || 0) - (a.metricValue || 0));
+    const sorted = [...allDCItems].filter(d => !d.isUnderConstruction).sort((a, b) => (b.metricValue || 0) - (a.metricValue || 0));
     const top5Ids = sorted.slice(0, 5).map(d => d.dcId);
     setIsAllSelected(false);
     setSelectedDCIds(top5Ids);
@@ -637,7 +704,7 @@ export default function PLTSAnalyticsSection({
   };
 
   const handleSelectBottom5 = () => {
-    const sorted = [...allDCItems].sort((a, b) => (a.metricValue || 0) - (b.metricValue || 0));
+    const sorted = [...allDCItems].filter(d => !d.isUnderConstruction).sort((a, b) => (a.metricValue || 0) - (b.metricValue || 0));
     const bot5Ids = sorted.slice(0, 5).map(d => d.dcId);
     setIsAllSelected(false);
     setSelectedDCIds(bot5Ids);
@@ -648,6 +715,7 @@ export default function PLTSAnalyticsSection({
     let regionIds = [];
     if (regionName === 'Jawa') {
       regionIds = allDCItems
+        .filter(d => !d.isUnderConstruction)
         .filter(d => {
           const g = (d.grid || '').toUpperCase();
           const r = (d.region || '').toLowerCase();
@@ -656,6 +724,7 @@ export default function PLTSAnalyticsSection({
         .map(d => d.dcId);
     } else if (regionName === 'Luar Jawa') {
       regionIds = allDCItems
+        .filter(d => !d.isUnderConstruction)
         .filter(d => {
           const g = (d.grid || '').toUpperCase();
           const r = (d.region || '').toLowerCase();
@@ -664,6 +733,7 @@ export default function PLTSAnalyticsSection({
         .map(d => d.dcId);
     } else {
       regionIds = allDCItems
+        .filter(d => !d.isUnderConstruction)
         .filter(d => d.region && d.region.toLowerCase().includes(regionName.toLowerCase()))
         .map(d => d.dcId);
     }
@@ -674,13 +744,24 @@ export default function PLTSAnalyticsSection({
     }
   };
 
-  // Trend Dataset Construction (Monthly 2026 from API History, with April Audit Baseline)
+  // Trend Dataset Construction (Monthly 2026 from Canonical ISOLAR_REPORT_IMPORT)
   const trendDataset = useMemo(() => {
     return API_MONTHS_2026.map(m => {
-      const monthObj = { month: m.label, ym: m.ym };
+      const isDaily = unitMode === 'daily';
+      const monthObj = {
+        month: m.label,
+        shortMonth: m.short,
+        ym: m.ym,
+        days: m.days,
+        unitMode
+      };
+
+      let totalMonthKwh = 0;
+      let totalMonthKwp = 0;
       const valuesInMonth = [];
 
       allDCItems.forEach(dc => {
+        const isGorontalo = (dc.canonicalName || dc.name || '').toLowerCase().includes('gorontalo') || dc.isUnderConstruction;
         if (!activeChosenDCIds.includes(dc.dcId)) return;
 
         let monthlyKwh = null;
@@ -688,46 +769,53 @@ export default function PLTSAnalyticsSection({
         let specificYield = null;
         let equivalentHour = null;
 
-        // Lookup from real monthly history if available
         const hist = Array.isArray(dc.monthlyHistory)
           ? dc.monthlyHistory.find(h => h.yearMonth === m.ym)
           : null;
 
         const installedKwp = (dc.installedKwp && dc.installedKwp > 0) ? dc.installedKwp : null;
 
-        if (hist && hist.energyKwh !== null && hist.energyKwh !== undefined) {
+        if (!isGorontalo && hist && hist.energyKwh !== null && hist.energyKwh !== undefined && hist.energyKwh > 0) {
           monthlyKwh = hist.energyKwh;
           monthlyYieldMwh = hist.energyMwh !== null && hist.energyMwh !== undefined ? hist.energyMwh : Number((monthlyKwh / 1000).toFixed(2));
-          specificYield = hist.specificYieldKwhPerKwp !== undefined && hist.specificYieldKwhPerKwp !== null
-            ? hist.specificYieldKwhPerKwp
-            : (installedKwp !== null && monthlyKwh > 0 ? Number((monthlyKwh / installedKwp).toFixed(1)) : null);
-          equivalentHour = hist.equivalentHour !== undefined && hist.equivalentHour !== null
-            ? hist.equivalentHour
-            : (specificYield !== null && m.days > 0 ? Number((specificYield / m.days).toFixed(2)) : null);
-        } else if (m.ym === '202604' && (dc.monthlyYieldKwh || dc.monthYieldMwh)) {
-          // April audit baseline fallback ONLY for April 2026
+          const baseSpecYield = (installedKwp !== null && installedKwp > 0)
+            ? Number((monthlyKwh / installedKwp).toFixed(2))
+            : null;
+          specificYield = isDaily && baseSpecYield !== null
+            ? Number((baseSpecYield / m.days).toFixed(2))
+            : baseSpecYield;
+          equivalentHour = baseSpecYield !== null && m.days > 0
+            ? Number((baseSpecYield / m.days).toFixed(2))
+            : null;
+        } else if (!isGorontalo && m.ym === '202604' && (dc.monthlyYieldKwh || dc.monthYieldMwh)) {
           monthlyKwh = dc.monthlyYieldKwh || ((dc.monthYieldMwh || 0) * 1000);
           monthlyYieldMwh = Number((monthlyKwh / 1000).toFixed(2));
-          specificYield = (installedKwp !== null && monthlyKwh > 0) ? Number((monthlyKwh / installedKwp).toFixed(1)) : null;
-          equivalentHour = (specificYield !== null && m.days > 0) ? Number((specificYield / m.days).toFixed(2)) : null;
-        } else {
-          monthlyKwh = null;
-          monthlyYieldMwh = null;
-          specificYield = null;
-          equivalentHour = null;
+          const baseSpecYield = (installedKwp !== null && installedKwp > 0)
+            ? Number((monthlyKwh / installedKwp).toFixed(2))
+            : null;
+          specificYield = isDaily && baseSpecYield !== null
+            ? Number((baseSpecYield / m.days).toFixed(2))
+            : baseSpecYield;
+          equivalentHour = baseSpecYield !== null && m.days > 0
+            ? Number((baseSpecYield / m.days).toFixed(2))
+            : null;
         }
 
-        const isGorontalo = (dc.canonicalName || dc.name || '').toLowerCase().includes('gorontalo');
-        const rawPr = (installedKwp !== null && monthlyKwh !== null && monthlyKwh > 0 && specificYield !== null)
-          ? Number(((specificYield / (SOLAR_CONSTANTS.DEFAULT_DAILY_PSH * m.days)) * 100).toFixed(1))
+        if (!isGorontalo && monthlyKwh !== null && installedKwp !== null && installedKwp > 0) {
+          totalMonthKwh += monthlyKwh;
+          totalMonthKwp += installedKwp;
+        }
+
+        const rawPr = (!isGorontalo && installedKwp !== null && monthlyKwh !== null && monthlyKwh > 0 && specificYield !== null)
+          ? Number((((isDaily ? specificYield * m.days : specificYield) / (SOLAR_CONSTANTS.DEFAULT_DAILY_PSH * m.days)) * 100).toFixed(1))
           : null;
         const isValidPr = !isGorontalo && rawPr !== null && rawPr > 0 && rawPr <= 100.0;
         const prPct = isValidPr ? rawPr : null;
-        const capacityFactorPct = (installedKwp !== null && monthlyKwh !== null && monthlyKwh > 0)
+        const capacityFactorPct = (!isGorontalo && installedKwp !== null && monthlyKwh !== null && monthlyKwh > 0)
           ? Number(((monthlyKwh / (installedKwp * m.days * 24)) * 100).toFixed(2))
           : null;
-        const peakPowerKw = dc.peakPower || dc.currentPowerKw || null;
-        const avoidedCo2Ton = monthlyKwh !== null
+        const peakPowerKw = !isGorontalo ? (dc.peakPower || dc.currentPowerKw || null) : null;
+        const avoidedCo2Ton = (!isGorontalo && monthlyKwh !== null)
           ? Number(((monthlyKwh * SOLAR_CONSTANTS.CO2_FACTOR_PLTS) / 1000).toFixed(2))
           : null;
 
@@ -742,16 +830,25 @@ export default function PLTSAnalyticsSection({
 
         monthObj[dc.dcId] = val;
         monthObj[`${dc.dcId}_yieldMwh`] = monthlyYieldMwh;
-        if (val !== null && val !== undefined && !isNaN(val)) valuesInMonth.push(val);
+        if (val !== null && val !== undefined && !isNaN(val)) {
+          valuesInMonth.push(val);
+        }
       });
 
-      if (valuesInMonth.length > 0) {
+      if (totalMonthKwp > 0 && totalMonthKwh > 0 && selectedMetric === 'specificYield') {
+        const weightedMonthly = Number((totalMonthKwh / totalMonthKwp).toFixed(2));
+        monthObj.average = isDaily ? Number((weightedMonthly / m.days).toFixed(2)) : weightedMonthly;
+      } else if (valuesInMonth.length > 0) {
         const sum = valuesInMonth.reduce((a, b) => a + b, 0);
-        monthObj.average = Number((sum / valuesInMonth.length).toFixed(1));
+        monthObj.average = Number((sum / valuesInMonth.length).toFixed(2));
+      } else {
+        monthObj.average = null;
+      }
+
+      if (valuesInMonth.length > 0) {
         monthObj.min = Math.min(...valuesInMonth);
         monthObj.max = Math.max(...valuesInMonth);
       } else {
-        monthObj.average = null;
         monthObj.min = null;
         monthObj.max = null;
       }
@@ -759,7 +856,7 @@ export default function PLTSAnalyticsSection({
       monthObj.targetPr = 80;
       return monthObj;
     });
-  }, [activeChosenDCIds, allDCItems, selectedMetric]);
+  }, [activeChosenDCIds, allDCItems, selectedMetric, unitMode]);
 
   const prBarChartData = useMemo(() => {
     if (selectedMetric !== 'pr') return [];
@@ -789,30 +886,30 @@ export default function PLTSAnalyticsSection({
   }, [allDCItems, activeChosenDCIds, selectedMetric, sortDirection]);
 
   const chosenDCs = useMemo(() => {
-    return allDCItems.filter(d => activeChosenDCIds.includes(d.dcId) && d.isMapped && d.installedKwp !== null);
+    return allDCItems.filter(d => activeChosenDCIds.includes(d.dcId) && !d.isUnderConstruction && d.installedKwp !== null);
   }, [allDCItems, activeChosenDCIds]);
 
   const trendTitle = useMemo(() => {
     if (activeChosenCount === 0) return 'Tidak ada lokasi yang dipilih';
     const label = activeMetricMeta.trendLabel || activeMetricMeta.label;
-    const unit = activeMetricMeta.trendUnit || activeMetricMeta.unit;
+    const unit = selectedMetric === 'specificYield' && unitMode === 'daily'
+      ? `${activeMetricMeta.unit}/hari`
+      : (activeMetricMeta.trendUnit || activeMetricMeta.unit);
+
     if (selectedMetric === 'pr') {
       if (activeChosenCount === 1) {
         return `Komparasi Proxy PR — ${chosenDCs[0]?.canonicalName || chosenDCs[0]?.name || '1 Lokasi'} (April 2026)`;
-      }
-      if (activeChosenCount === allDCItems.length) {
-        return `Komparasi Proxy PR Baseline — Seluruh ${allDCItems.length} Lokasi (April 2026)`;
       }
       return `Komparasi Proxy PR Baseline — ${activeChosenCount} Lokasi Terpilih (April 2026)`;
     }
     if (activeChosenCount === 1) {
       return `Tren ${label} — ${chosenDCs[0]?.canonicalName || chosenDCs[0]?.name || '1 Lokasi'} (${unit})`;
     }
-    if (activeChosenCount === allDCItems.length) {
-      return `Tren ${label} — Rerata Seluruh ${allDCItems.length} Lokasi (${unit})`;
+    if (activeChosenCount >= 38) {
+      return `Tren ${label} — Seluruh ${activeChosenCount} Plant Operasional (${unit})`;
     }
-    return `Tren ${label} — ${activeChosenCount} Lokasi Terpilih (${unit})`;
-  }, [activeChosenCount, activeMetricMeta, chosenDCs, allDCItems.length, selectedMetric]);
+    return `Tren ${label} — ${activeChosenCount} Plant Terpilih (${unit})`;
+  }, [activeChosenCount, activeMetricMeta, chosenDCs, selectedMetric, unitMode]);
 
   // Table Data (filtered by selection + search)
   const tableDisplayItems = useMemo(() => {
@@ -843,6 +940,29 @@ export default function PLTSAnalyticsSection({
     return list;
   }, [allDCItems, activeChosenDCIds, searchQuery, tableSortColumn, tableSortDir, tablePageSize]);
 
+  const handleExportCSV = () => {
+    if (!tableDisplayItems || tableDisplayItems.length === 0) return;
+    const headers = ['Nama DC', 'Wilayah', 'Grid', 'Kapasitas (kWp)', 'Produksi (MWh)', 'Specific Yield (kWh/kWp)', 'Status'];
+    const rows = tableDisplayItems.map(d => [
+      `"${(d.canonicalName || d.name || '').replace(/"/g, '""')}"`,
+      `"${(d.region || '').replace(/"/g, '""')}"`,
+      `"${(d.grid || '').replace(/"/g, '""')}"`,
+      d.installedKwp ?? '',
+      d.monthYieldMwh ?? '',
+      d.specificYieldVal ?? '',
+      `"${(d.status || '').replace(/"/g, '""')}"`
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `PLTS_Kinerja_DC_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Telemetry items filtered by selection and status chip
   const telemetryDisplayItems = useMemo(() => {
     let list = stations && stations.length > 0 ? stations : allDCItems;
@@ -860,78 +980,9 @@ export default function PLTSAnalyticsSection({
     return list;
   }, [stations, allDCItems, activeChosenDCIds, telemetryFilter]);
 
-  // CSV Export Handler (Respects current active filters and sorting)
-  const handleExportCSV = () => {
-    if (!tableDisplayItems || tableDisplayItems.length === 0) return;
-
-    const headers = [
-      'No',
-      'Kode DC',
-      'Nama Distribution Center',
-      'Wilayah',
-      'Grid',
-      'Kapasitas Terpasang (kWp)',
-      'Baseline Audit April (kWp)',
-      'Selisih Kapasitas (%)',
-      'Perlu Verifikasi Manual',
-      'Total Produksi Bulanan (MWh)',
-      'Specific Yield (kWh/kWp)',
-      'Proxy PR (%)',
-      'PR Portal Manual (%)',
-      'Suhu Inverter Max (°C)',
-      'Suhu Inverter Avg (°C)',
-      'Capacity Factor (%)',
-      'Emisi Terhindar (tCO2e)',
-      'Daya Live (kW)',
-      'Yield Hari Ini (kWh)',
-      'Specific Yield Hari Ini (kWh/kWp)',
-      'Status Operasional',
-      'Jumlah Alarm Aktif',
-      'Waktu Update Terakhir',
-      'Sumber Data'
-    ];
-
-    const rows = tableDisplayItems.map((d, idx) => [
-      idx + 1,
-      `"${d.dcId}"`,
-      `"${d.canonicalName || d.name}"`,
-      `"${d.region || '—'}"`,
-      `"${d.grid || '—'}"`,
-      d.installedKwp !== null ? d.installedKwp : '—',
-      d.baselineCapKwp !== null ? d.baselineCapKwp : '—',
-      d.capacityDiffPct !== null ? `${d.capacityDiffPct}%` : '0%',
-      d.requiresManualVerification ? 'YA' : 'TIDAK',
-      d.monthYieldMwh !== null ? d.monthYieldMwh : (d.monthlyYieldMwh || '—'),
-      d.specificYield !== null ? d.specificYield : '—',
-      d.prPct !== null && d.prPct !== undefined ? `${d.prPct}%` : '—',
-      d.portalPrManual ? `${d.portalPrManual.prPercent}% (${d.portalPrManual.formattedDate})` : '—',
-      d.inverterStats?.tempMax !== null && d.inverterStats?.tempMax !== undefined ? d.inverterStats.tempMax : '—',
-      d.inverterStats?.tempAvg !== null && d.inverterStats?.tempAvg !== undefined ? d.inverterStats.tempAvg : '—',
-      d.capacityFactor !== null ? `${d.capacityFactor}%` : '—',
-      d.totalCo2AvoidedTon !== null ? d.totalCo2AvoidedTon : (d.co2Ton || '—'),
-      d.currentPowerKw !== null ? d.currentPowerKw : 'null',
-      d.todayYieldKwh !== null ? d.todayYieldKwh : '—',
-      d.todaySpecificYield !== null ? d.todaySpecificYield : '—',
-      `"${d.status || 'Normal'}"`,
-      d.faultStats?.activeAlarmCount || 0,
-      `"${d.lastUpdate || '—'}"`,
-      `"${d.source || 'api_live'}"`
-    ]);
-
-    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `PLTS_Alfamart_Analytics_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   return (
     <div className="space-y-6 animate-in">
-      {/* 1. MASTER CONTROL & SCOPE FILTER BAR (Light Card Design) */}
+      {/* 1. MASTER CONTROL & SCOPE FILTER BAR */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -944,19 +995,19 @@ export default function PLTSAnalyticsSection({
                   Analisis Multi-DC & Ranking Kinerja PLTS
                 </h2>
                 <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-                  {allDCItems.length} plant independen
+                  38 plant operasional (1 dalam pembangunan)
                 </span>
                 <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-                  Kapasitas API 5.876,12 kWp
+                  Kapasitas Operasional 5.791,42 kWp
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
-                39 plant PLTS independen (termasuk Cilacap 1, 2, 3 & Lombok A, B)
+                39 plant PLTS independen terpetakan (Gorontalo dikecualikan dari ranking & rata-rata)
               </p>
             </div>
           </div>
 
-          {/* Quick Scope Presets (Segmented Control in One Container) */}
+          {/* Quick Scope Presets */}
           <div className="inline-flex items-center gap-1 rounded-full bg-slate-100 p-1 max-w-full overflow-x-auto self-start xl:self-center shrink-0">
             <button
               type="button"
@@ -967,7 +1018,7 @@ export default function PLTSAnalyticsSection({
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Semua ({allDCItems.length})
+              Semua ({allDCItems.filter(d => !d.isUnderConstruction).length})
             </button>
             <button
               type="button"
@@ -1000,7 +1051,7 @@ export default function PLTSAnalyticsSection({
           </div>
         </div>
 
-        {/* Metrik Utama & Sort Controls (Uniform Height h-9) */}
+        {/* Metrik Utama & Sort Controls */}
         <div className="pt-3 border-t border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="inline-flex items-center gap-1 rounded-full bg-slate-100 p-1 max-w-full overflow-x-auto h-9 shrink-0">
             {METRIC_OPTIONS.map(opt => (
@@ -1037,8 +1088,8 @@ export default function PLTSAnalyticsSection({
 
       {/* 2. GRID MASTER-DETAIL (KIRI: CHECKBOX LIST & RANKING, KANAN: TREND CHART) */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
-        {/* KIRI: CHECKBOX LIST & RANKING CARD (xl:col-span-5, xl:h-[560px]) */}
-        <CardBox className="xl:col-span-5 flex flex-col xl:h-[560px] p-4">
+        {/* KIRI: CHECKBOX LIST & RANKING CARD */}
+        <CardBox className="xl:col-span-5 flex flex-col xl:h-[580px] p-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
             <div>
               <h3 className="font-bold text-sm text-slate-900">Daftar Lokasi DC ({allDCItems.length})</h3>
@@ -1064,27 +1115,8 @@ export default function PLTSAnalyticsSection({
             </div>
           </div>
 
-          {/* Toggle Sertakan Baseline Kurang Andal & Search Box */}
+          {/* Search Box */}
           <div className="py-2 space-y-2 shrink-0 border-b border-slate-100/80">
-            {isAuditBaselineEnabled && (
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer select-none text-[11px] font-medium text-slate-700 hover:text-slate-900">
-                  <input
-                    type="checkbox"
-                    checked={includeUnreliableBaseline}
-                    onChange={(e) => setIncludeUnreliableBaseline(e.target.checked)}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5"
-                  />
-                  <span>Sertakan baseline kurang andal ({unreliableCount} lokasi)</span>
-                </label>
-                {!includeUnreliableBaseline && (
-                  <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-semibold border border-amber-200/60">
-                    Default: Dieksklusi
-                  </span>
-                )}
-              </div>
-            )}
-
             <div className="relative">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
@@ -1097,7 +1129,7 @@ export default function PLTSAnalyticsSection({
             </div>
           </div>
 
-          {/* Scrollable DC List (Hanya bagian ini yang scroll, SELALU 36 lokasi) */}
+          {/* Scrollable DC List */}
           <div className="flex-1 overflow-y-auto space-y-1 pr-1 overscroll-contain">
             {(() => {
               const filteredList = allDCItems.filter(dc => matchesFuzzyQuery(dc, searchQuery));
@@ -1125,18 +1157,26 @@ export default function PLTSAnalyticsSection({
                 const isHovered = hoveredDCId === dc.dcId;
                 const isOffline = dc.isOffline || dc.status === 'Offline';
                 const hasValidMetric = dc.metricValue !== null && dc.metricValue !== undefined && !isNaN(dc.metricValue);
-                const isExcludedFromRanking = selectedMetric === 'pr'
+                const isExcludedFromRanking = dc.isUnderConstruction || (selectedMetric === 'pr'
                   ? !dc.isValidPr
                   : isAuditDependentMetric
                   ? (!includeUnreliableBaseline && dc.requiresManualVerification)
-                  : !hasValidMetric;
-                const isRankable = selectedMetric === 'pr' ? (dc.isValidPr && hasValidMetric) : (!isExcludedFromRanking && hasValidMetric);
+                  : !hasValidMetric);
+                const isRankable = !dc.isUnderConstruction && (selectedMetric === 'pr' ? (dc.isValidPr && hasValidMetric) : (!isExcludedFromRanking && hasValidMetric));
 
-                // Calculate rank among eligible ranked items
                 let rankDisplay = '—';
                 if (isRankable) {
                   const rankIdx = eligibleRankedList.findIndex(d => d.dcId === dc.dcId);
                   if (rankIdx >= 0) rankDisplay = String(rankIdx + 1);
+                }
+
+                // Color badge when <= 10 chosen
+                let colorBadge = null;
+                if (isSelected && chosenDCs.length <= 10) {
+                  const chosenIdx = chosenDCs.findIndex(d => d.dcId === dc.dcId);
+                  if (chosenIdx >= 0) {
+                    colorBadge = PALETTE[chosenIdx % PALETTE.length];
+                  }
                 }
 
                 return (
@@ -1145,6 +1185,7 @@ export default function PLTSAnalyticsSection({
                     dc={dc}
                     isSelected={isSelected}
                     isHovered={isHovered}
+                    colorBadge={colorBadge}
                     isExcludedFromRanking={isExcludedFromRanking}
                     rankDisplay={rankDisplay}
                     selectedMetric={selectedMetric}
@@ -1163,38 +1204,24 @@ export default function PLTSAnalyticsSection({
           {/* Bottom Average Footer */}
           <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between text-xs shrink-0 bg-slate-50 p-2.5 rounded-xl mt-2 gap-1.5">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-slate-500 font-medium">Rata-rata Terpilih ({rankedChosenCount} lokasi):</span>
+              <span className="text-slate-500 font-medium">Rata-rata Tertimbang ({rankedChosenCount} plant):</span>
               <strong className="font-mono text-blue-700 font-bold">
                 {computedAverageMetricValue !== null && computedAverageMetricValue !== undefined
                   ? `${computedAverageMetricValue} ${activeMetricMeta.unit}`
                   : '—'}
               </strong>
             </div>
-            {selectedMetric === 'pr' ? (
-              <span className="text-[10px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-medium self-start sm:self-center">
-                {rankedChosenCount} lokasi (sumber: audit_baseline April 2026, tanpa peringkat live)
-              </span>
-            ) : isAuditDependentMetric && excludedChosenCount > 0 ? (
-              <span className="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60 font-medium self-start sm:self-center">
-                {excludedChosenCount} lokasi beda kapasitas dikecualikan dari ranking {activeMetricMeta.label}
-              </span>
-            ) : selectedMetric === 'specificYield' || selectedMetric === 'equivalentHour' || selectedMetric === 'peakPower' ? (
-              <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60 font-medium self-start sm:self-center">
-                {rankedChosenCount} lokasi masuk ranking (telemetri API live hari ini)
-              </span>
-            ) : (
-              <span className="text-[10px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60 font-medium self-start sm:self-center">
-                {rankedChosenCount} lokasi masuk ranking (histori bulanan terverifikasi)
-              </span>
-            )}
+            <span className="text-[10px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60 font-medium self-start sm:self-center">
+              Gorontalo dikeluarkan
+            </span>
           </div>
         </CardBox>
 
-        {/* KANAN: TREND CHART AREA (xl:col-span-7, xl:h-[560px]) */}
-        <CardBox className="xl:col-span-7 flex flex-col xl:h-[560px] p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 shrink-0">
+        {/* KANAN: TREND CHART AREA */}
+        <CardBox className="xl:col-span-7 flex flex-col xl:h-[580px] p-5">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-100 shrink-0">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-bold text-base text-slate-900">{trendTitle}</h3>
                 <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold border ${
                   selectedMetric === 'pr'
@@ -1207,7 +1234,7 @@ export default function PLTSAnalyticsSection({
                     ? 'audit_baseline (April 2026)'
                     : selectedMetric === 'peakPower'
                     ? 'telemetri_live_api'
-                    : 'api_history (Jan–Sep 2026)'}
+                    : 'ISOLAR_REPORT_IMPORT (Jan–Sep 2026)'}
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -1215,36 +1242,60 @@ export default function PLTSAnalyticsSection({
               </p>
             </div>
 
-            {selectedMetric !== 'pr' && activeChosenCount > 6 && (
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-full text-[11px] font-semibold">
-                <button
-                  type="button"
-                  onClick={() => setTrendViewMode('average')}
-                  className={`px-3 py-1 rounded-full transition-all ${
-                    trendViewMode === 'average' || trendViewMode === 'auto'
-                      ? 'bg-white text-slate-900 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Rata-rata & Rentang
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTrendViewMode('individual')}
-                  className={`px-3 py-1 rounded-full transition-all ${
-                    trendViewMode === 'individual'
-                      ? 'bg-white text-slate-900 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Per DC (Maks 8)
-                </button>
-              </div>
-            )}
+            {/* Interactive Controls for Multi-Plant Chart */}
+            <div className="flex flex-wrap items-center gap-2 self-start lg:self-center">
+              {selectedMetric === 'specificYield' && (
+                <div className="inline-flex items-center rounded-full bg-slate-100 p-0.5 text-[11px] font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => setUnitMode('monthly')}
+                    className={`px-2.5 py-1 rounded-full transition-all ${
+                      unitMode === 'monthly' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    kWh/kWp per bulan
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUnitMode('daily')}
+                    className={`px-2.5 py-1 rounded-full transition-all ${
+                      unitMode === 'daily' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    kWh/kWp per hari
+                  </button>
+                </div>
+              )}
+
+              {selectedMetric !== 'pr' && (
+                <div className="inline-flex items-center gap-1 bg-slate-100 p-0.5 rounded-full text-[11px] font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => setShowAverage(!showAverage)}
+                    className={`px-2.5 py-1 rounded-full transition-all ${
+                      showAverage ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Rata-rata
+                  </button>
+                  {showAverage && (
+                    <button
+                      type="button"
+                      onClick={() => setShowMinMax(!showMinMax)}
+                      className={`px-2.5 py-1 rounded-full transition-all ${
+                        showMinMax ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Rentang min-maks
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Chart Canvas Area (Fills remaining height) */}
-          <div className="flex-1 min-h-[300px] w-full pt-3 relative">
+          {/* Chart Canvas Area */}
+          <div className="flex-1 min-h-[320px] w-full pt-3 relative">
             {!isMounted ? (
               <div className="h-full flex items-center justify-center text-slate-400 text-xs">
                 Memuat grafik...
@@ -1255,7 +1306,7 @@ export default function PLTSAnalyticsSection({
                   <CheckSquare size={24} />
                 </div>
                 <div>
-                  <h5 className="font-bold text-slate-700 text-sm">Pilih minimal 1 lokasi DC</h5>
+                  <h5 className="font-bold text-slate-700 text-sm">Pilih minimal satu lokasi</h5>
                   <p className="text-xs text-slate-500 max-w-sm mt-1">
                     Gunakan daftar di sebelah kiri untuk memilih satu atau beberapa lokasi yang ingin dibandingkan.
                   </p>
@@ -1265,7 +1316,7 @@ export default function PLTSAnalyticsSection({
                   onClick={handleSelectAll}
                   className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-all"
                 >
-                  Pilih Semua {allDCItems.length} Lokasi
+                  Pilih Semua 38 Plant Operasional
                 </button>
               </div>
             ) : selectedMetric === 'pr' ? (
@@ -1351,7 +1402,9 @@ export default function PLTSAnalyticsSection({
                     tick={{ fontSize: 11, fill: '#64748B' }}
                     stroke="#E2E8F0"
                     label={{
-                      value: `${activeMetricMeta.trendLabel || activeMetricMeta.label} (${activeMetricMeta.trendUnit || activeMetricMeta.unit})`,
+                      value: selectedMetric === 'specificYield' && unitMode === 'daily'
+                        ? 'Specific Yield (kWh/kWp/hari)'
+                        : `${activeMetricMeta.trendLabel || activeMetricMeta.label} (${activeMetricMeta.trendUnit || activeMetricMeta.unit})`,
                       angle: -90,
                       position: 'insideLeft',
                       style: { fill: '#64748B', fontSize: 10 }
@@ -1359,98 +1412,82 @@ export default function PLTSAnalyticsSection({
                   />
 
                   <Tooltip
-                    content={<SafeTrendTooltip activeMetricUnit={activeMetricMeta.trendUnit || activeMetricMeta.unit} />}
+                    content={
+                      <SafeTrendTooltip
+                        activeMetricUnit={selectedMetric === 'specificYield' && unitMode === 'daily' ? 'kWh/kWp/hari' : (activeMetricMeta.trendUnit || activeMetricMeta.unit)}
+                        unitMode={unitMode}
+                      />
+                    }
                   />
 
-                  {activeChosenCount === 1 && chosenDCs[0] && (
-                    <Area
+                  {/* Multi-Plant Individual Lines (Linear Interpolation) */}
+                  {chosenDCs.map((dc, idx) => {
+                    const isHovered = hoveredDCId === dc.dcId;
+                    const isFew = chosenDCs.length <= 10;
+                    const color = isFew ? PALETTE[idx % PALETTE.length] : (isHovered ? '#0284C7' : '#94A3B8');
+                    const strokeOpacity = isHovered ? 1.0 : (isFew ? 0.9 : (hoveredDCId ? 0.15 : 0.4));
+                    const strokeWidth = isHovered ? 3.5 : (isFew ? 2 : 1);
+
+                    return (
+                      <Line
+                        key={dc.dcId}
+                        yAxisId="primary"
+                        type="linear"
+                        dataKey={dc.dcId}
+                        name={dc.canonicalName || dc.name}
+                        stroke={color}
+                        strokeOpacity={strokeOpacity}
+                        strokeWidth={strokeWidth}
+                        connectNulls={false}
+                        dot={isFew ? { r: isHovered ? 5 : 3, fill: color, fillOpacity: strokeOpacity } : (isHovered ? { r: 4, fill: color } : false)}
+                        activeDot={{ r: 6, fill: color }}
+                      />
+                    );
+                  })}
+
+                  {/* Min-Max Range Lines */}
+                  {showMinMax && showAverage && chosenDCs.length > 1 && (
+                    <>
+                      <Line
+                        yAxisId="primary"
+                        type="linear"
+                        dataKey="max"
+                        name="Rentang Maks"
+                        stroke="#94A3B8"
+                        strokeDasharray="3 3"
+                        strokeWidth={1.5}
+                        strokeOpacity={0.6}
+                        connectNulls={false}
+                        dot={false}
+                      />
+                      <Line
+                        yAxisId="primary"
+                        type="linear"
+                        dataKey="min"
+                        name="Rentang Min"
+                        stroke="#94A3B8"
+                        strokeDasharray="3 3"
+                        strokeWidth={1.5}
+                        strokeOpacity={0.6}
+                        connectNulls={false}
+                        dot={false}
+                      />
+                    </>
+                  )}
+
+                  {/* Weighted Average Line */}
+                  {showAverage && (
+                    <Line
                       yAxisId="primary"
-                      type="monotone"
-                      dataKey={chosenDCs[0].dcId}
-                      name={`${chosenDCs[0].canonicalName || chosenDCs[0].name} (${activeMetricMeta.trendUnit || activeMetricMeta.unit})`}
-                      fill="#0284C715"
+                      type="linear"
+                      dataKey="average"
+                      name={`Rata-rata Tertimbang (${rankedChosenCount} DC)`}
                       stroke="#0284C7"
-                      strokeWidth={2.5}
+                      strokeWidth={3.5}
                       connectNulls={false}
-                      dot={{ r: 4, fill: '#0284C7' }}
+                      dot={{ r: 4.5, fill: '#0284C7' }}
+                      activeDot={{ r: 7, fill: '#0284C7' }}
                     />
-                  )}
-
-                  {activeChosenCount >= 2 && activeChosenCount <= 6 && (
-                    chosenDCs.map((dc, idx) => {
-                      const color = PALETTE[idx % PALETTE.length];
-                      const isHovered = hoveredDCId === dc.dcId;
-                      return (
-                        <Line
-                          key={dc.dcId}
-                          yAxisId="primary"
-                          type="monotone"
-                          dataKey={dc.dcId}
-                          name={dc.canonicalName || dc.name}
-                          stroke={color}
-                          strokeWidth={isHovered ? 4 : 2.5}
-                          connectNulls={false}
-                          dot={{ r: isHovered ? 5 : 3.5, fill: color }}
-                        />
-                      );
-                    })
-                  )}
-
-                  {activeChosenCount > 6 && (
-                    trendViewMode === 'individual' ? (
-                      chosenDCs.slice(0, 8).map((dc, idx) => {
-                        const color = PALETTE[idx % PALETTE.length];
-                        const isHovered = hoveredDCId === dc.dcId;
-                        return (
-                          <Line
-                            key={dc.dcId}
-                            yAxisId="primary"
-                            type="monotone"
-                            dataKey={dc.dcId}
-                            name={dc.canonicalName || dc.name}
-                            stroke={color}
-                            strokeWidth={isHovered ? 4 : 2}
-                            connectNulls={false}
-                            dot={{ r: isHovered ? 4 : 2.5, fill: color }}
-                          />
-                        );
-                      })
-                    ) : (
-                      <>
-                        <Line
-                          yAxisId="primary"
-                          type="monotone"
-                          dataKey="max"
-                          name="Rentang Maks"
-                          stroke="#CBD5E1"
-                          strokeDasharray="3 3"
-                          strokeWidth={1.5}
-                          connectNulls={false}
-                          dot={false}
-                        />
-                        <Line
-                          yAxisId="primary"
-                          type="monotone"
-                          dataKey="min"
-                          name="Rentang Min"
-                          stroke="#CBD5E1"
-                          strokeDasharray="3 3"
-                          strokeWidth={1.5}
-                          connectNulls={false}
-                          dot={false}
-                        />
-                        <Line
-                          yAxisId="primary"
-                          type="monotone"
-                          dataKey="average"
-                          name={`Rata-rata (${activeChosenCount} DC)`}
-                          stroke="#0284C7"
-                          strokeWidth={3.5}
-                          connectNulls={false}
-                          dot={{ r: 4.5, fill: '#0284C7' }}
-                        />
-                      </>
-                    )
                   )}
                 </ComposedChart>
               </ResponsiveContainer>
@@ -1479,18 +1516,22 @@ export default function PLTSAnalyticsSection({
                 Sumber: audit_baseline April 2026 (Titik baseline audit, bukan data realtime)
               </span>
             </div>
-          ) : activeChosenCount > 6 && trendViewMode !== 'individual' && (
+          ) : (
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 shrink-0">
               <div className="flex items-center gap-3">
-                <span className="inline-flex items-center gap-1.5 font-bold text-blue-700">
-                  <span className="w-3.5 h-1 bg-blue-600 rounded-full" /> Garis Rata-rata ({activeChosenCount} DC)
-                </span>
-                <span className="inline-flex items-center gap-1.5 font-medium text-slate-600">
-                  <span className="w-3.5 h-0.5 bg-slate-400 rounded-full border-t border-dashed" /> Rentang Min-Maks
-                </span>
+                {showAverage && (
+                  <span className="inline-flex items-center gap-1.5 font-bold text-blue-700">
+                    <span className="w-3.5 h-1 bg-blue-600 rounded-full" /> Rata-rata Tertimbang ({rankedChosenCount} DC)
+                  </span>
+                )}
+                {showMinMax && showAverage && chosenDCs.length > 1 && (
+                  <span className="inline-flex items-center gap-1.5 font-medium text-slate-600">
+                    <span className="w-3.5 h-0.5 bg-slate-400 rounded-full border-t border-dashed" /> Rentang Min-Maks
+                  </span>
+                )}
               </div>
               <span className="text-[10px] text-slate-400">
-                Data historis 2026
+                Data historis kanonik 2026 (Gorontalo dikecualikan)
               </span>
             </div>
           )}
