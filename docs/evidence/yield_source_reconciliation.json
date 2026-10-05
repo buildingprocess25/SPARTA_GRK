@@ -1,0 +1,3522 @@
+{
+  "metadata": {
+    "generatedAt": "2026-10-05T08:50:52.936Z",
+    "rawSqlQuery": "SELECT \n      COALESCE(rep.year_month, api.year_month) as year_month,\n      COALESCE(rep.ps_id, api.ps_id) as ps_id,\n      COALESCE(pm.canonical_name, pl.name, 'Plant ' || COALESCE(rep.ps_id, api.ps_id)) as plant_name,\n      COALESCE(rep.energy_kwh, 0) as isolar_report_kwh,\n      COALESCE(api.energy_kwh, 0) as api_history_kwh,\n      ROUND((COALESCE(rep.energy_kwh, 0) - COALESCE(api.energy_kwh, 0))::numeric, 2) as diff_kwh,\n      CASE \n        WHEN COALESCE(rep.energy_kwh, 0) > 0 THEN \n          ROUND(((COALESCE(rep.energy_kwh, 0) - COALESCE(api.energy_kwh, 0)) / rep.energy_kwh * 100)::numeric, 2)\n        ELSE 0\n      END as diff_pct\n    FROM (\n      SELECT year_month, ps_id, energy_kwh \n      FROM monthly_yield_observation \n      WHERE source = 'ISOLAR_REPORT_IMPORT' AND year_month LIKE '2026%'\n    ) rep\n    FULL OUTER JOIN (\n      SELECT year_month, ps_id, energy_kwh \n      FROM monthly_yield_observation \n      WHERE source = 'api_history' AND year_month LIKE '2026%'\n    ) api ON rep.year_month = api.year_month AND rep.ps_id = api.ps_id\n    LEFT JOIN plant_master pm ON pm.sungrow_ps_ids @> ARRAY[COALESCE(rep.ps_id, api.ps_id)::integer]\n    LEFT JOIN plant_latest pl ON pl.ps_id = COALESCE(rep.ps_id, api.ps_id)\n    ORDER BY year_month, ps_id;",
+    "note": "Reconciliation of ISOLAR_REPORT_IMPORT vs api_history from raw SQL database observations"
+  },
+  "janAugTotals": {
+    "isolarReportKwh": 4221510.4,
+    "apiHistoryKwh": 4067818.2,
+    "diffKwh": 153692.2,
+    "diffPct": 3.64
+  },
+  "monthlySummary": {
+    "202601": {
+      "yearMonth": "202601",
+      "monthName": "Jan",
+      "isolarReportKwh": 472331.80000000005,
+      "apiHistoryKwh": 456645.4000000001,
+      "diffKwh": 15686.400000000001,
+      "missingOrZeroInApi": [
+        {
+          "psId": 1160041,
+          "plantName": "Parung",
+          "isolarKwh": 3288.8
+        },
+        {
+          "psId": 1247367,
+          "plantName": "Kotabumi",
+          "isolarKwh": 12397.6
+        }
+      ]
+    },
+    "202602": {
+      "yearMonth": "202602",
+      "monthName": "Feb",
+      "isolarReportKwh": 448781.2999999999,
+      "apiHistoryKwh": 434260.4999999999,
+      "diffKwh": 14520.8,
+      "missingOrZeroInApi": [
+        {
+          "psId": 1160041,
+          "plantName": "Parung",
+          "isolarKwh": 2991.4
+        },
+        {
+          "psId": 1247367,
+          "plantName": "Kotabumi",
+          "isolarKwh": 11529.4
+        }
+      ]
+    },
+    "202603": {
+      "yearMonth": "202603",
+      "monthName": "Mar",
+      "isolarReportKwh": 571160.2999999999,
+      "apiHistoryKwh": 542771.7,
+      "diffKwh": 28388.6,
+      "missingOrZeroInApi": [
+        {
+          "psId": 1160041,
+          "plantName": "Parung",
+          "isolarKwh": 14173.4
+        },
+        {
+          "psId": 1247367,
+          "plantName": "Kotabumi",
+          "isolarKwh": 14215.2
+        }
+      ]
+    },
+    "202604": {
+      "yearMonth": "202604",
+      "monthName": "Apr",
+      "isolarReportKwh": 574314.4,
+      "apiHistoryKwh": 543076,
+      "diffKwh": 31238.4,
+      "missingOrZeroInApi": [
+        {
+          "psId": 1160041,
+          "plantName": "Parung",
+          "isolarKwh": 18116.8
+        },
+        {
+          "psId": 1247367,
+          "plantName": "Kotabumi",
+          "isolarKwh": 13121.6
+        }
+      ]
+    },
+    "202605": {
+      "yearMonth": "202605",
+      "monthName": "Mei",
+      "isolarReportKwh": 519293.10000000003,
+      "apiHistoryKwh": 488955.60000000003,
+      "diffKwh": 30337.5,
+      "missingOrZeroInApi": [
+        {
+          "psId": 1160041,
+          "plantName": "Parung",
+          "isolarKwh": 17810.5
+        },
+        {
+          "psId": 1247367,
+          "plantName": "Kotabumi",
+          "isolarKwh": 12527
+        }
+      ]
+    },
+    "202606": {
+      "yearMonth": "202606",
+      "monthName": "Jun",
+      "isolarReportKwh": 526044.7000000001,
+      "apiHistoryKwh": 497961.6000000001,
+      "diffKwh": 28083.1,
+      "missingOrZeroInApi": [
+        {
+          "psId": 1160041,
+          "plantName": "Parung",
+          "isolarKwh": 16685.8
+        },
+        {
+          "psId": 1247367,
+          "plantName": "Kotabumi",
+          "isolarKwh": 11397.3
+        }
+      ]
+    },
+    "202607": {
+      "yearMonth": "202607",
+      "monthName": "Jul",
+      "isolarReportKwh": 540387.4,
+      "apiHistoryKwh": 535737.1,
+      "diffKwh": 4650.3,
+      "missingOrZeroInApi": [
+        {
+          "psId": 1160041,
+          "plantName": "Parung",
+          "isolarKwh": 201.7
+        },
+        {
+          "psId": 1247367,
+          "plantName": "Kotabumi",
+          "isolarKwh": 4448.6
+        }
+      ]
+    },
+    "202608": {
+      "yearMonth": "202608",
+      "monthName": "Agu",
+      "isolarReportKwh": 569197.3999999998,
+      "apiHistoryKwh": 568410.2999999998,
+      "diffKwh": 787.1,
+      "missingOrZeroInApi": [
+        {
+          "psId": 1160041,
+          "plantName": "Parung",
+          "isolarKwh": 787.1
+        }
+      ]
+    },
+    "202609": {
+      "yearMonth": "202609",
+      "monthName": "Sep",
+      "isolarReportKwh": 582828.4000000001,
+      "apiHistoryKwh": 0,
+      "diffKwh": 582828.4000000001,
+      "missingOrZeroInApi": [
+        {
+          "psId": 1092345,
+          "plantName": "Karawang",
+          "isolarKwh": 24026.8
+        },
+        {
+          "psId": 1154267,
+          "plantName": "Banjarmasin",
+          "isolarKwh": 8466.7
+        },
+        {
+          "psId": 1154284,
+          "plantName": "Palembang",
+          "isolarKwh": 24030.2
+        },
+        {
+          "psId": 1157086,
+          "plantName": "Medan",
+          "isolarKwh": 16464.3
+        },
+        {
+          "psId": 1159436,
+          "plantName": "Balaraja",
+          "isolarKwh": 31576.3
+        },
+        {
+          "psId": 1159599,
+          "plantName": "Rembang",
+          "isolarKwh": 18194.4
+        },
+        {
+          "psId": 1159719,
+          "plantName": "Bali",
+          "isolarKwh": 14786.2
+        },
+        {
+          "psId": 1159732,
+          "plantName": "Bandung 1",
+          "isolarKwh": 17346.2
+        },
+        {
+          "psId": 1159761,
+          "plantName": "Malang",
+          "isolarKwh": 14946.4
+        },
+        {
+          "psId": 1160041,
+          "plantName": "Parung",
+          "isolarKwh": 10278.3
+        },
+        {
+          "psId": 1162742,
+          "plantName": "Bogor",
+          "isolarKwh": 13952.5
+        },
+        {
+          "psId": 1218534,
+          "plantName": "Lampung",
+          "isolarKwh": 12365.3
+        },
+        {
+          "psId": 1219715,
+          "plantName": "Lombok B",
+          "isolarKwh": 8169.4
+        },
+        {
+          "psId": 1219736,
+          "plantName": "Lombok A",
+          "isolarKwh": 2152.5
+        },
+        {
+          "psId": 1223413,
+          "plantName": "Pontianak",
+          "isolarKwh": 6883.1
+        },
+        {
+          "psId": 1223464,
+          "plantName": "Jambi",
+          "isolarKwh": 5317.9
+        },
+        {
+          "psId": 1224963,
+          "plantName": "Batam",
+          "isolarKwh": 10761.4
+        },
+        {
+          "psId": 1224999,
+          "plantName": "Pekanbaru",
+          "isolarKwh": 17981.4
+        },
+        {
+          "psId": 1230507,
+          "plantName": "Manado",
+          "isolarKwh": 24003
+        },
+        {
+          "psId": 1231394,
+          "plantName": "Makassar",
+          "isolarKwh": 29101.7
+        },
+        {
+          "psId": 1247367,
+          "plantName": "Kotabumi",
+          "isolarKwh": 11878.6
+        },
+        {
+          "psId": 1284197,
+          "plantName": "Tk. Drive Thru GS",
+          "isolarKwh": 2813.1
+        },
+        {
+          "psId": 1376844,
+          "plantName": "Klaten",
+          "isolarKwh": 13270.6
+        },
+        {
+          "psId": 1377551,
+          "plantName": "Semarang",
+          "isolarKwh": 17138.9
+        },
+        {
+          "psId": 1378278,
+          "plantName": "Cianjur",
+          "isolarKwh": 17092
+        },
+        {
+          "psId": 1386493,
+          "plantName": "Cilacap 1",
+          "isolarKwh": 18862.4
+        },
+        {
+          "psId": 1387109,
+          "plantName": "Cilacap 2",
+          "isolarKwh": 1992.4
+        },
+        {
+          "psId": 1387111,
+          "plantName": "Cilacap 3",
+          "isolarKwh": 2248.6
+        },
+        {
+          "psId": 1389249,
+          "plantName": "Bandung 2",
+          "isolarKwh": 11101.9
+        },
+        {
+          "psId": 1389275,
+          "plantName": "Serang",
+          "isolarKwh": 14134.9
+        },
+        {
+          "psId": 1391178,
+          "plantName": "Madiun",
+          "isolarKwh": 18397.9
+        },
+        {
+          "psId": 1392560,
+          "plantName": "Jember",
+          "isolarKwh": 17568
+        },
+        {
+          "psId": 1393852,
+          "plantName": "Plumbon",
+          "isolarKwh": 19464.4
+        },
+        {
+          "psId": 1410080,
+          "plantName": "Tk. Drive Thru De Mansion",
+          "isolarKwh": 5474.4
+        },
+        {
+          "psId": 1415889,
+          "plantName": "Sidoarjo",
+          "isolarKwh": 23347.8
+        },
+        {
+          "psId": 1456379,
+          "plantName": "Tegal",
+          "isolarKwh": 15379
+        },
+        {
+          "psId": 1459033,
+          "plantName": "Cileungsi",
+          "isolarKwh": 48433
+        },
+        {
+          "psId": 1583524,
+          "plantName": "Luwu",
+          "isolarKwh": 13426.5
+        }
+      ]
+    }
+  },
+  "detailedRows": [
+    {
+      "year_month": "202601",
+      "ps_id": 1092345,
+      "plant_name": "Karawang",
+      "isolar_report_kwh": 17090.1,
+      "api_history_kwh": 17090.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1154267,
+      "plant_name": "Banjarmasin",
+      "isolar_report_kwh": 11081.6,
+      "api_history_kwh": 11081.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1154284,
+      "plant_name": "Palembang",
+      "isolar_report_kwh": 21223.2,
+      "api_history_kwh": 21223.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1157086,
+      "plant_name": "Medan",
+      "isolar_report_kwh": 16403.9,
+      "api_history_kwh": 16403.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1159436,
+      "plant_name": "Balaraja",
+      "isolar_report_kwh": 31770.2,
+      "api_history_kwh": 31770.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1159599,
+      "plant_name": "Rembang",
+      "isolar_report_kwh": 11233.2,
+      "api_history_kwh": 11233.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1159719,
+      "plant_name": "Bali",
+      "isolar_report_kwh": 12057.6,
+      "api_history_kwh": 12057.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1159732,
+      "plant_name": "Bandung 1",
+      "isolar_report_kwh": 15736.1,
+      "api_history_kwh": 15736.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1159761,
+      "plant_name": "Malang",
+      "isolar_report_kwh": 11922,
+      "api_history_kwh": 11922,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1160041,
+      "plant_name": "Parung",
+      "isolar_report_kwh": 3288.8,
+      "api_history_kwh": 0,
+      "diff_kwh": "3288.8",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1162742,
+      "plant_name": "Bogor",
+      "isolar_report_kwh": 10818.6,
+      "api_history_kwh": 10818.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1218534,
+      "plant_name": "Lampung",
+      "isolar_report_kwh": 9593.1,
+      "api_history_kwh": 9593.099999999999,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1219715,
+      "plant_name": "Lombok B",
+      "isolar_report_kwh": 7129.1,
+      "api_history_kwh": 7129.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1219736,
+      "plant_name": "Lombok A",
+      "isolar_report_kwh": 1826.8,
+      "api_history_kwh": 1826.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1223413,
+      "plant_name": "Pontianak",
+      "isolar_report_kwh": 11807,
+      "api_history_kwh": 11807,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1223464,
+      "plant_name": "Jambi",
+      "isolar_report_kwh": 6261.9,
+      "api_history_kwh": 6261.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1224963,
+      "plant_name": "Batam",
+      "isolar_report_kwh": 11650.7,
+      "api_history_kwh": 11650.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1224999,
+      "plant_name": "Pekanbaru",
+      "isolar_report_kwh": 18053.8,
+      "api_history_kwh": 18053.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1230507,
+      "plant_name": "Manado",
+      "isolar_report_kwh": 20189,
+      "api_history_kwh": 20189,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1231394,
+      "plant_name": "Makassar",
+      "isolar_report_kwh": 20770.6,
+      "api_history_kwh": 20770.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1247367,
+      "plant_name": "Kotabumi",
+      "isolar_report_kwh": 12397.6,
+      "api_history_kwh": 0,
+      "diff_kwh": "12397.6",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1284197,
+      "plant_name": "Tk. Drive Thru GS",
+      "isolar_report_kwh": 3114.5,
+      "api_history_kwh": 3114.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1376844,
+      "plant_name": "Klaten",
+      "isolar_report_kwh": 10691.2,
+      "api_history_kwh": 10691.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1377551,
+      "plant_name": "Semarang",
+      "isolar_report_kwh": 12687.9,
+      "api_history_kwh": 12687.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1378278,
+      "plant_name": "Cianjur",
+      "isolar_report_kwh": 11157.1,
+      "api_history_kwh": 11157.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1386493,
+      "plant_name": "Cilacap 1",
+      "isolar_report_kwh": 15786.4,
+      "api_history_kwh": 15786.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1387109,
+      "plant_name": "Cilacap 2",
+      "isolar_report_kwh": 2080.8,
+      "api_history_kwh": 2080.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1387111,
+      "plant_name": "Cilacap 3",
+      "isolar_report_kwh": 1506,
+      "api_history_kwh": 1506,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1389249,
+      "plant_name": "Bandung 2",
+      "isolar_report_kwh": 10535.7,
+      "api_history_kwh": 10535.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1389275,
+      "plant_name": "Serang",
+      "isolar_report_kwh": 12938.9,
+      "api_history_kwh": 12938.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1391178,
+      "plant_name": "Madiun",
+      "isolar_report_kwh": 17574.8,
+      "api_history_kwh": 17574.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1392560,
+      "plant_name": "Jember",
+      "isolar_report_kwh": 14325.2,
+      "api_history_kwh": 14325.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1393852,
+      "plant_name": "Plumbon",
+      "isolar_report_kwh": 14266.8,
+      "api_history_kwh": 14266.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1410080,
+      "plant_name": "Tk. Drive Thru De Mansion",
+      "isolar_report_kwh": 4558.7,
+      "api_history_kwh": 4558.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1415889,
+      "plant_name": "Sidoarjo",
+      "isolar_report_kwh": 3099.4,
+      "api_history_kwh": 3099.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1456379,
+      "plant_name": "Tegal",
+      "isolar_report_kwh": 10327.3,
+      "api_history_kwh": 10327.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1459033,
+      "plant_name": "Cileungsi",
+      "isolar_report_kwh": 34409.2,
+      "api_history_kwh": 34409.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1583524,
+      "plant_name": "Luwu",
+      "isolar_report_kwh": 10967,
+      "api_history_kwh": 10967,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202601",
+      "ps_id": 1585267,
+      "plant_name": "Gorontalo",
+      "isolar_report_kwh": 0,
+      "api_history_kwh": 0,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1092345,
+      "plant_name": "Karawang",
+      "isolar_report_kwh": 16084.7,
+      "api_history_kwh": 16084.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1154267,
+      "plant_name": "Banjarmasin",
+      "isolar_report_kwh": 8827,
+      "api_history_kwh": 8827,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1154284,
+      "plant_name": "Palembang",
+      "isolar_report_kwh": 20253.8,
+      "api_history_kwh": 20253.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1157086,
+      "plant_name": "Medan",
+      "isolar_report_kwh": 15435.7,
+      "api_history_kwh": 15435.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1159436,
+      "plant_name": "Balaraja",
+      "isolar_report_kwh": 31369.8,
+      "api_history_kwh": 31369.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1159599,
+      "plant_name": "Rembang",
+      "isolar_report_kwh": 12454.7,
+      "api_history_kwh": 12454.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1159719,
+      "plant_name": "Bali",
+      "isolar_report_kwh": 11385.6,
+      "api_history_kwh": 11385.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1159732,
+      "plant_name": "Bandung 1",
+      "isolar_report_kwh": 14575.8,
+      "api_history_kwh": 14575.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1159761,
+      "plant_name": "Malang",
+      "isolar_report_kwh": 10202.8,
+      "api_history_kwh": 10202.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1160041,
+      "plant_name": "Parung",
+      "isolar_report_kwh": 2991.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "2991.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1162742,
+      "plant_name": "Bogor",
+      "isolar_report_kwh": 10095.6,
+      "api_history_kwh": 10095.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1218534,
+      "plant_name": "Lampung",
+      "isolar_report_kwh": 9334.2,
+      "api_history_kwh": 9334.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1219715,
+      "plant_name": "Lombok B",
+      "isolar_report_kwh": 6508.5,
+      "api_history_kwh": 6508.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1219736,
+      "plant_name": "Lombok A",
+      "isolar_report_kwh": 1706.4,
+      "api_history_kwh": 1706.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1223413,
+      "plant_name": "Pontianak",
+      "isolar_report_kwh": 9426.8,
+      "api_history_kwh": 9426.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1223464,
+      "plant_name": "Jambi",
+      "isolar_report_kwh": 6446.6,
+      "api_history_kwh": 6446.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1224963,
+      "plant_name": "Batam",
+      "isolar_report_kwh": 10539.5,
+      "api_history_kwh": 10539.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1224999,
+      "plant_name": "Pekanbaru",
+      "isolar_report_kwh": 15960.3,
+      "api_history_kwh": 15960.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1230507,
+      "plant_name": "Manado",
+      "isolar_report_kwh": 16451.9,
+      "api_history_kwh": 16451.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1231394,
+      "plant_name": "Makassar",
+      "isolar_report_kwh": 18606,
+      "api_history_kwh": 18606,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1247367,
+      "plant_name": "Kotabumi",
+      "isolar_report_kwh": 11529.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "11529.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1284197,
+      "plant_name": "Tk. Drive Thru GS",
+      "isolar_report_kwh": 2990,
+      "api_history_kwh": 2990,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1376844,
+      "plant_name": "Klaten",
+      "isolar_report_kwh": 8306.1,
+      "api_history_kwh": 8306.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1377551,
+      "plant_name": "Semarang",
+      "isolar_report_kwh": 11638,
+      "api_history_kwh": 11638,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1378278,
+      "plant_name": "Cianjur",
+      "isolar_report_kwh": 10694,
+      "api_history_kwh": 10694,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1386493,
+      "plant_name": "Cilacap 1",
+      "isolar_report_kwh": 14225.1,
+      "api_history_kwh": 14225.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1387109,
+      "plant_name": "Cilacap 2",
+      "isolar_report_kwh": 1947.2,
+      "api_history_kwh": 1947.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1387111,
+      "plant_name": "Cilacap 3",
+      "isolar_report_kwh": 1350.1,
+      "api_history_kwh": 1350.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1389249,
+      "plant_name": "Bandung 2",
+      "isolar_report_kwh": 10348.3,
+      "api_history_kwh": 10348.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1389275,
+      "plant_name": "Serang",
+      "isolar_report_kwh": 12874.7,
+      "api_history_kwh": 12874.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1391178,
+      "plant_name": "Madiun",
+      "isolar_report_kwh": 15326.2,
+      "api_history_kwh": 15326.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1392560,
+      "plant_name": "Jember",
+      "isolar_report_kwh": 12509.5,
+      "api_history_kwh": 12509.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1393852,
+      "plant_name": "Plumbon",
+      "isolar_report_kwh": 12764.3,
+      "api_history_kwh": 12764.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1410080,
+      "plant_name": "Tk. Drive Thru De Mansion",
+      "isolar_report_kwh": 4279.8,
+      "api_history_kwh": 4279.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1415889,
+      "plant_name": "Sidoarjo",
+      "isolar_report_kwh": 15066.8,
+      "api_history_kwh": 15066.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1456379,
+      "plant_name": "Tegal",
+      "isolar_report_kwh": 10012.8,
+      "api_history_kwh": 10012.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1459033,
+      "plant_name": "Cileungsi",
+      "isolar_report_kwh": 34588.1,
+      "api_history_kwh": 34588.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1583524,
+      "plant_name": "Luwu",
+      "isolar_report_kwh": 9673.8,
+      "api_history_kwh": 9673.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202602",
+      "ps_id": 1585267,
+      "plant_name": "Gorontalo",
+      "isolar_report_kwh": 0,
+      "api_history_kwh": 0,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1092345,
+      "plant_name": "Karawang",
+      "isolar_report_kwh": 23388,
+      "api_history_kwh": 23388,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1154267,
+      "plant_name": "Banjarmasin",
+      "isolar_report_kwh": 10213.1,
+      "api_history_kwh": 10213.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1154284,
+      "plant_name": "Palembang",
+      "isolar_report_kwh": 24749,
+      "api_history_kwh": 24749,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1157086,
+      "plant_name": "Medan",
+      "isolar_report_kwh": 18572.4,
+      "api_history_kwh": 18572.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1159436,
+      "plant_name": "Balaraja",
+      "isolar_report_kwh": 40154.7,
+      "api_history_kwh": 40154.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1159599,
+      "plant_name": "Rembang",
+      "isolar_report_kwh": 16351.1,
+      "api_history_kwh": 16351.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1159719,
+      "plant_name": "Bali",
+      "isolar_report_kwh": 14089.9,
+      "api_history_kwh": 14089.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1159732,
+      "plant_name": "Bandung 1",
+      "isolar_report_kwh": 17967.6,
+      "api_history_kwh": 17967.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1159761,
+      "plant_name": "Malang",
+      "isolar_report_kwh": 12500.9,
+      "api_history_kwh": 12500.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1160041,
+      "plant_name": "Parung",
+      "isolar_report_kwh": 14173.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "14173.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1162742,
+      "plant_name": "Bogor",
+      "isolar_report_kwh": 13475.7,
+      "api_history_kwh": 13475.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1218534,
+      "plant_name": "Lampung",
+      "isolar_report_kwh": 11378.5,
+      "api_history_kwh": 11378.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1219715,
+      "plant_name": "Lombok B",
+      "isolar_report_kwh": 8244.5,
+      "api_history_kwh": 8244.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1219736,
+      "plant_name": "Lombok A",
+      "isolar_report_kwh": 2162.3,
+      "api_history_kwh": 2162.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1223413,
+      "plant_name": "Pontianak",
+      "isolar_report_kwh": 11263.4,
+      "api_history_kwh": 11263.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1223464,
+      "plant_name": "Jambi",
+      "isolar_report_kwh": 7043.4,
+      "api_history_kwh": 7043.400000000001,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1224963,
+      "plant_name": "Batam",
+      "isolar_report_kwh": 14430.6,
+      "api_history_kwh": 14430.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1224999,
+      "plant_name": "Pekanbaru",
+      "isolar_report_kwh": 18540.8,
+      "api_history_kwh": 18540.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1230507,
+      "plant_name": "Manado",
+      "isolar_report_kwh": 18723.8,
+      "api_history_kwh": 18723.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1231394,
+      "plant_name": "Makassar",
+      "isolar_report_kwh": 22673.8,
+      "api_history_kwh": 22673.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1247367,
+      "plant_name": "Kotabumi",
+      "isolar_report_kwh": 14215.2,
+      "api_history_kwh": 0,
+      "diff_kwh": "14215.2",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1284197,
+      "plant_name": "Tk. Drive Thru GS",
+      "isolar_report_kwh": 4140.4,
+      "api_history_kwh": 4140.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1376844,
+      "plant_name": "Klaten",
+      "isolar_report_kwh": 11410,
+      "api_history_kwh": 11410,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1377551,
+      "plant_name": "Semarang",
+      "isolar_report_kwh": 15259.9,
+      "api_history_kwh": 15259.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1378278,
+      "plant_name": "Cianjur",
+      "isolar_report_kwh": 12352.9,
+      "api_history_kwh": 12352.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1386493,
+      "plant_name": "Cilacap 1",
+      "isolar_report_kwh": 17822.1,
+      "api_history_kwh": 17822.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1387109,
+      "plant_name": "Cilacap 2",
+      "isolar_report_kwh": 2078.9,
+      "api_history_kwh": 2078.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1387111,
+      "plant_name": "Cilacap 3",
+      "isolar_report_kwh": 1557.1,
+      "api_history_kwh": 1557.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1389249,
+      "plant_name": "Bandung 2",
+      "isolar_report_kwh": 10447.7,
+      "api_history_kwh": 10447.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1389275,
+      "plant_name": "Serang",
+      "isolar_report_kwh": 16352.5,
+      "api_history_kwh": 16352.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1391178,
+      "plant_name": "Madiun",
+      "isolar_report_kwh": 17600.2,
+      "api_history_kwh": 17600.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1392560,
+      "plant_name": "Jember",
+      "isolar_report_kwh": 14588.8,
+      "api_history_kwh": 14588.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1393852,
+      "plant_name": "Plumbon",
+      "isolar_report_kwh": 14851.3,
+      "api_history_kwh": 14851.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1410080,
+      "plant_name": "Tk. Drive Thru De Mansion",
+      "isolar_report_kwh": 5909,
+      "api_history_kwh": 5909,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1415889,
+      "plant_name": "Sidoarjo",
+      "isolar_report_kwh": 21350.1,
+      "api_history_kwh": 21350.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1456379,
+      "plant_name": "Tegal",
+      "isolar_report_kwh": 14449.7,
+      "api_history_kwh": 14449.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1459033,
+      "plant_name": "Cileungsi",
+      "isolar_report_kwh": 46106,
+      "api_history_kwh": 46106,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1583524,
+      "plant_name": "Luwu",
+      "isolar_report_kwh": 10571.6,
+      "api_history_kwh": 10571.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202603",
+      "ps_id": 1585267,
+      "plant_name": "Gorontalo",
+      "isolar_report_kwh": 0,
+      "api_history_kwh": 0,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1092345,
+      "plant_name": "Karawang",
+      "isolar_report_kwh": 25938.5,
+      "api_history_kwh": 25938.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1154267,
+      "plant_name": "Banjarmasin",
+      "isolar_report_kwh": 9528.1,
+      "api_history_kwh": 9528.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1154284,
+      "plant_name": "Palembang",
+      "isolar_report_kwh": 24973.8,
+      "api_history_kwh": 24973.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1157086,
+      "plant_name": "Medan",
+      "isolar_report_kwh": 17633.5,
+      "api_history_kwh": 17633.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1159436,
+      "plant_name": "Balaraja",
+      "isolar_report_kwh": 38903.1,
+      "api_history_kwh": 38903.10000000001,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1159599,
+      "plant_name": "Rembang",
+      "isolar_report_kwh": 17669.1,
+      "api_history_kwh": 17669.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1159719,
+      "plant_name": "Bali",
+      "isolar_report_kwh": 13534.8,
+      "api_history_kwh": 13534.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1159732,
+      "plant_name": "Bandung 1",
+      "isolar_report_kwh": 15921.5,
+      "api_history_kwh": 15921.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1159761,
+      "plant_name": "Malang",
+      "isolar_report_kwh": 13870.5,
+      "api_history_kwh": 13870.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1160041,
+      "plant_name": "Parung",
+      "isolar_report_kwh": 18116.8,
+      "api_history_kwh": 0,
+      "diff_kwh": "18116.8",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1162742,
+      "plant_name": "Bogor",
+      "isolar_report_kwh": 13378.1,
+      "api_history_kwh": 13378.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1218534,
+      "plant_name": "Lampung",
+      "isolar_report_kwh": 11515.8,
+      "api_history_kwh": 11515.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1219715,
+      "plant_name": "Lombok B",
+      "isolar_report_kwh": 6846.3,
+      "api_history_kwh": 6846.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1219736,
+      "plant_name": "Lombok A",
+      "isolar_report_kwh": 1812.1,
+      "api_history_kwh": 1812.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1223413,
+      "plant_name": "Pontianak",
+      "isolar_report_kwh": 9647.1,
+      "api_history_kwh": 9647.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1223464,
+      "plant_name": "Jambi",
+      "isolar_report_kwh": 4514.7,
+      "api_history_kwh": 4514.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1224963,
+      "plant_name": "Batam",
+      "isolar_report_kwh": 11302.5,
+      "api_history_kwh": 11302.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1224999,
+      "plant_name": "Pekanbaru",
+      "isolar_report_kwh": 17926.5,
+      "api_history_kwh": 17926.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1230507,
+      "plant_name": "Manado",
+      "isolar_report_kwh": 19785.3,
+      "api_history_kwh": 19785.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1231394,
+      "plant_name": "Makassar",
+      "isolar_report_kwh": 27626.5,
+      "api_history_kwh": 27626.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1247367,
+      "plant_name": "Kotabumi",
+      "isolar_report_kwh": 13121.6,
+      "api_history_kwh": 0,
+      "diff_kwh": "13121.6",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1284197,
+      "plant_name": "Tk. Drive Thru GS",
+      "isolar_report_kwh": 3965.6,
+      "api_history_kwh": 3965.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1376844,
+      "plant_name": "Klaten",
+      "isolar_report_kwh": 12374,
+      "api_history_kwh": 12374,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1377551,
+      "plant_name": "Semarang",
+      "isolar_report_kwh": 15757.8,
+      "api_history_kwh": 15757.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1378278,
+      "plant_name": "Cianjur",
+      "isolar_report_kwh": 13122.1,
+      "api_history_kwh": 13122.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1386493,
+      "plant_name": "Cilacap 1",
+      "isolar_report_kwh": 16678.9,
+      "api_history_kwh": 16678.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1387109,
+      "plant_name": "Cilacap 2",
+      "isolar_report_kwh": 2157.4,
+      "api_history_kwh": 2157.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1387111,
+      "plant_name": "Cilacap 3",
+      "isolar_report_kwh": 1734.9,
+      "api_history_kwh": 1734.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1389249,
+      "plant_name": "Bandung 2",
+      "isolar_report_kwh": 9179.9,
+      "api_history_kwh": 9179.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1389275,
+      "plant_name": "Serang",
+      "isolar_report_kwh": 17370.9,
+      "api_history_kwh": 17370.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1391178,
+      "plant_name": "Madiun",
+      "isolar_report_kwh": 18408.2,
+      "api_history_kwh": 18408.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1392560,
+      "plant_name": "Jember",
+      "isolar_report_kwh": 14771.6,
+      "api_history_kwh": 14771.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1393852,
+      "plant_name": "Plumbon",
+      "isolar_report_kwh": 17463.1,
+      "api_history_kwh": 17463.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1410080,
+      "plant_name": "Tk. Drive Thru De Mansion",
+      "isolar_report_kwh": 5865.5,
+      "api_history_kwh": 5865.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1415889,
+      "plant_name": "Sidoarjo",
+      "isolar_report_kwh": 21575.1,
+      "api_history_kwh": 21575.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1456379,
+      "plant_name": "Tegal",
+      "isolar_report_kwh": 13500.3,
+      "api_history_kwh": 13500.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1459033,
+      "plant_name": "Cileungsi",
+      "isolar_report_kwh": 47721.5,
+      "api_history_kwh": 47721.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1583524,
+      "plant_name": "Luwu",
+      "isolar_report_kwh": 9101.4,
+      "api_history_kwh": 9101.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202604",
+      "ps_id": 1585267,
+      "plant_name": "Gorontalo",
+      "isolar_report_kwh": 0,
+      "api_history_kwh": 0,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1092345,
+      "plant_name": "Karawang",
+      "isolar_report_kwh": 22883.4,
+      "api_history_kwh": 22883.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1154267,
+      "plant_name": "Banjarmasin",
+      "isolar_report_kwh": 9271.2,
+      "api_history_kwh": 9271.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1154284,
+      "plant_name": "Palembang",
+      "isolar_report_kwh": 23838.2,
+      "api_history_kwh": 23838.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1157086,
+      "plant_name": "Medan",
+      "isolar_report_kwh": 16442.3,
+      "api_history_kwh": 16442.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1159436,
+      "plant_name": "Balaraja",
+      "isolar_report_kwh": 38806.6,
+      "api_history_kwh": 38806.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1159599,
+      "plant_name": "Rembang",
+      "isolar_report_kwh": 17150.8,
+      "api_history_kwh": 17150.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1159719,
+      "plant_name": "Bali",
+      "isolar_report_kwh": 13157.5,
+      "api_history_kwh": 13157.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1159732,
+      "plant_name": "Bandung 1",
+      "isolar_report_kwh": 527.4,
+      "api_history_kwh": 527.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1159761,
+      "plant_name": "Malang",
+      "isolar_report_kwh": 12450.8,
+      "api_history_kwh": 12450.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1160041,
+      "plant_name": "Parung",
+      "isolar_report_kwh": 17810.5,
+      "api_history_kwh": 0,
+      "diff_kwh": "17810.5",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1162742,
+      "plant_name": "Bogor",
+      "isolar_report_kwh": 12177.7,
+      "api_history_kwh": 12177.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1218534,
+      "plant_name": "Lampung",
+      "isolar_report_kwh": 10676.9,
+      "api_history_kwh": 10676.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1219715,
+      "plant_name": "Lombok B",
+      "isolar_report_kwh": 7415.9,
+      "api_history_kwh": 7415.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1219736,
+      "plant_name": "Lombok A",
+      "isolar_report_kwh": 1998.4,
+      "api_history_kwh": 1998.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1223413,
+      "plant_name": "Pontianak",
+      "isolar_report_kwh": 10036.9,
+      "api_history_kwh": 10036.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1223464,
+      "plant_name": "Jambi",
+      "isolar_report_kwh": 4901.5,
+      "api_history_kwh": 4901.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1224963,
+      "plant_name": "Batam",
+      "isolar_report_kwh": 9073.7,
+      "api_history_kwh": 9073.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1224999,
+      "plant_name": "Pekanbaru",
+      "isolar_report_kwh": 18391.7,
+      "api_history_kwh": 18391.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1230507,
+      "plant_name": "Manado",
+      "isolar_report_kwh": 18425,
+      "api_history_kwh": 18425,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1231394,
+      "plant_name": "Makassar",
+      "isolar_report_kwh": 24178.6,
+      "api_history_kwh": 24178.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1247367,
+      "plant_name": "Kotabumi",
+      "isolar_report_kwh": 12527,
+      "api_history_kwh": 0,
+      "diff_kwh": "12527",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1284197,
+      "plant_name": "Tk. Drive Thru GS",
+      "isolar_report_kwh": 1941.7,
+      "api_history_kwh": 1941.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1376844,
+      "plant_name": "Klaten",
+      "isolar_report_kwh": 12123.7,
+      "api_history_kwh": 12123.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1377551,
+      "plant_name": "Semarang",
+      "isolar_report_kwh": 10670.2,
+      "api_history_kwh": 10670.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1378278,
+      "plant_name": "Cianjur",
+      "isolar_report_kwh": 12124.6,
+      "api_history_kwh": 12124.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1386493,
+      "plant_name": "Cilacap 1",
+      "isolar_report_kwh": 16517.8,
+      "api_history_kwh": 16517.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1387109,
+      "plant_name": "Cilacap 2",
+      "isolar_report_kwh": 2118.7,
+      "api_history_kwh": 2118.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1387111,
+      "plant_name": "Cilacap 3",
+      "isolar_report_kwh": 1515.7,
+      "api_history_kwh": 1515.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1389249,
+      "plant_name": "Bandung 2",
+      "isolar_report_kwh": 9755.3,
+      "api_history_kwh": 9755.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1389275,
+      "plant_name": "Serang",
+      "isolar_report_kwh": 16000.4,
+      "api_history_kwh": 16000.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1391178,
+      "plant_name": "Madiun",
+      "isolar_report_kwh": 17656.4,
+      "api_history_kwh": 17656.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1392560,
+      "plant_name": "Jember",
+      "isolar_report_kwh": 14299,
+      "api_history_kwh": 14299,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1393852,
+      "plant_name": "Plumbon",
+      "isolar_report_kwh": 15913.7,
+      "api_history_kwh": 15913.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1410080,
+      "plant_name": "Tk. Drive Thru De Mansion",
+      "isolar_report_kwh": 4748.4,
+      "api_history_kwh": 4748.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1415889,
+      "plant_name": "Sidoarjo",
+      "isolar_report_kwh": 21105.6,
+      "api_history_kwh": 21105.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1456379,
+      "plant_name": "Tegal",
+      "isolar_report_kwh": 13188.6,
+      "api_history_kwh": 13188.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1459033,
+      "plant_name": "Cileungsi",
+      "isolar_report_kwh": 41748.5,
+      "api_history_kwh": 41748.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1583524,
+      "plant_name": "Luwu",
+      "isolar_report_kwh": 5722.8,
+      "api_history_kwh": 5722.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202605",
+      "ps_id": 1585267,
+      "plant_name": "Gorontalo",
+      "isolar_report_kwh": 0,
+      "api_history_kwh": 0,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1092345,
+      "plant_name": "Karawang",
+      "isolar_report_kwh": 21706.9,
+      "api_history_kwh": 21706.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1154267,
+      "plant_name": "Banjarmasin",
+      "isolar_report_kwh": 8771.9,
+      "api_history_kwh": 8771.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1154284,
+      "plant_name": "Palembang",
+      "isolar_report_kwh": 20643.2,
+      "api_history_kwh": 20643.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1157086,
+      "plant_name": "Medan",
+      "isolar_report_kwh": 15695.2,
+      "api_history_kwh": 15695.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1159436,
+      "plant_name": "Balaraja",
+      "isolar_report_kwh": 32998.4,
+      "api_history_kwh": 32998.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1159599,
+      "plant_name": "Rembang",
+      "isolar_report_kwh": 17005.9,
+      "api_history_kwh": 17005.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1159719,
+      "plant_name": "Bali",
+      "isolar_report_kwh": 11439.6,
+      "api_history_kwh": 11439.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1159732,
+      "plant_name": "Bandung 1",
+      "isolar_report_kwh": 12922.5,
+      "api_history_kwh": 12922.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1159761,
+      "plant_name": "Malang",
+      "isolar_report_kwh": 13218.7,
+      "api_history_kwh": 13218.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1160041,
+      "plant_name": "Parung",
+      "isolar_report_kwh": 16685.8,
+      "api_history_kwh": 0,
+      "diff_kwh": "16685.8",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1162742,
+      "plant_name": "Bogor",
+      "isolar_report_kwh": 12260.8,
+      "api_history_kwh": 12260.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1218534,
+      "plant_name": "Lampung",
+      "isolar_report_kwh": 10382.7,
+      "api_history_kwh": 10382.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1219715,
+      "plant_name": "Lombok B",
+      "isolar_report_kwh": 7357.5,
+      "api_history_kwh": 7357.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1219736,
+      "plant_name": "Lombok A",
+      "isolar_report_kwh": 1955.6,
+      "api_history_kwh": 1955.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1223413,
+      "plant_name": "Pontianak",
+      "isolar_report_kwh": 10133.8,
+      "api_history_kwh": 10133.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1223464,
+      "plant_name": "Jambi",
+      "isolar_report_kwh": 5009.1,
+      "api_history_kwh": 5009.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1224963,
+      "plant_name": "Batam",
+      "isolar_report_kwh": 9668.4,
+      "api_history_kwh": 9668.400000000001,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1224999,
+      "plant_name": "Pekanbaru",
+      "isolar_report_kwh": 18479,
+      "api_history_kwh": 18479,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1230507,
+      "plant_name": "Manado",
+      "isolar_report_kwh": 20501.2,
+      "api_history_kwh": 20501.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1231394,
+      "plant_name": "Makassar",
+      "isolar_report_kwh": 26011.4,
+      "api_history_kwh": 26011.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1247367,
+      "plant_name": "Kotabumi",
+      "isolar_report_kwh": 11397.3,
+      "api_history_kwh": 0,
+      "diff_kwh": "11397.3",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1284197,
+      "plant_name": "Tk. Drive Thru GS",
+      "isolar_report_kwh": 3373.5,
+      "api_history_kwh": 3373.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1376844,
+      "plant_name": "Klaten",
+      "isolar_report_kwh": 11720.9,
+      "api_history_kwh": 11720.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1377551,
+      "plant_name": "Semarang",
+      "isolar_report_kwh": 14634.4,
+      "api_history_kwh": 14634.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1378278,
+      "plant_name": "Cianjur",
+      "isolar_report_kwh": 13164.4,
+      "api_history_kwh": 13164.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1386493,
+      "plant_name": "Cilacap 1",
+      "isolar_report_kwh": 15305.5,
+      "api_history_kwh": 15305.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1387109,
+      "plant_name": "Cilacap 2",
+      "isolar_report_kwh": 2084.1,
+      "api_history_kwh": 2084.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1387111,
+      "plant_name": "Cilacap 3",
+      "isolar_report_kwh": 1689.3,
+      "api_history_kwh": 1689.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1389249,
+      "plant_name": "Bandung 2",
+      "isolar_report_kwh": 9613.1,
+      "api_history_kwh": 9613.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1389275,
+      "plant_name": "Serang",
+      "isolar_report_kwh": 14789.6,
+      "api_history_kwh": 14789.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1391178,
+      "plant_name": "Madiun",
+      "isolar_report_kwh": 16520,
+      "api_history_kwh": 16520,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1392560,
+      "plant_name": "Jember",
+      "isolar_report_kwh": 14976.4,
+      "api_history_kwh": 14976.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1393852,
+      "plant_name": "Plumbon",
+      "isolar_report_kwh": 16631,
+      "api_history_kwh": 16631,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1410080,
+      "plant_name": "Tk. Drive Thru De Mansion",
+      "isolar_report_kwh": 5012.2,
+      "api_history_kwh": 5012.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1415889,
+      "plant_name": "Sidoarjo",
+      "isolar_report_kwh": 22301.5,
+      "api_history_kwh": 22301.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1456379,
+      "plant_name": "Tegal",
+      "isolar_report_kwh": 12831.5,
+      "api_history_kwh": 12831.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1459033,
+      "plant_name": "Cileungsi",
+      "isolar_report_kwh": 41488.4,
+      "api_history_kwh": 41488.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1583524,
+      "plant_name": "Luwu",
+      "isolar_report_kwh": 5664,
+      "api_history_kwh": 5664,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202606",
+      "ps_id": 1585267,
+      "plant_name": "Gorontalo",
+      "isolar_report_kwh": 0,
+      "api_history_kwh": 0,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1092345,
+      "plant_name": "Karawang",
+      "isolar_report_kwh": 23678.4,
+      "api_history_kwh": 23678.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1154267,
+      "plant_name": "Banjarmasin",
+      "isolar_report_kwh": 9117.8,
+      "api_history_kwh": 9117.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1154284,
+      "plant_name": "Palembang",
+      "isolar_report_kwh": 22639.6,
+      "api_history_kwh": 22639.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1157086,
+      "plant_name": "Medan",
+      "isolar_report_kwh": 17227.3,
+      "api_history_kwh": 17227.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1159436,
+      "plant_name": "Balaraja",
+      "isolar_report_kwh": 33982.2,
+      "api_history_kwh": 33982.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1159599,
+      "plant_name": "Rembang",
+      "isolar_report_kwh": 18295.7,
+      "api_history_kwh": 18295.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1159719,
+      "plant_name": "Bali",
+      "isolar_report_kwh": 11260.8,
+      "api_history_kwh": 11260.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1159732,
+      "plant_name": "Bandung 1",
+      "isolar_report_kwh": 15450.2,
+      "api_history_kwh": 15450.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1159761,
+      "plant_name": "Malang",
+      "isolar_report_kwh": 15195.5,
+      "api_history_kwh": 15195.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1160041,
+      "plant_name": "Parung",
+      "isolar_report_kwh": 201.7,
+      "api_history_kwh": 0,
+      "diff_kwh": "201.7",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1162742,
+      "plant_name": "Bogor",
+      "isolar_report_kwh": 13872.9,
+      "api_history_kwh": 13872.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1218534,
+      "plant_name": "Lampung",
+      "isolar_report_kwh": 12041.4,
+      "api_history_kwh": 12041.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1219715,
+      "plant_name": "Lombok B",
+      "isolar_report_kwh": 7901.1,
+      "api_history_kwh": 7901.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1219736,
+      "plant_name": "Lombok A",
+      "isolar_report_kwh": 2099.1,
+      "api_history_kwh": 2099.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1223413,
+      "plant_name": "Pontianak",
+      "isolar_report_kwh": 11419.3,
+      "api_history_kwh": 11419.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1223464,
+      "plant_name": "Jambi",
+      "isolar_report_kwh": 5223.2,
+      "api_history_kwh": 5223.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1224963,
+      "plant_name": "Batam",
+      "isolar_report_kwh": 10469.1,
+      "api_history_kwh": 10469.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1224999,
+      "plant_name": "Pekanbaru",
+      "isolar_report_kwh": 18729.2,
+      "api_history_kwh": 18729.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1230507,
+      "plant_name": "Manado",
+      "isolar_report_kwh": 21569.1,
+      "api_history_kwh": 21569.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1231394,
+      "plant_name": "Makassar",
+      "isolar_report_kwh": 28180.3,
+      "api_history_kwh": 28180.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1247367,
+      "plant_name": "Kotabumi",
+      "isolar_report_kwh": 4448.6,
+      "api_history_kwh": 0,
+      "diff_kwh": "4448.6",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1284197,
+      "plant_name": "Tk. Drive Thru GS",
+      "isolar_report_kwh": 3914.5,
+      "api_history_kwh": 3914.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1376844,
+      "plant_name": "Klaten",
+      "isolar_report_kwh": 12520.3,
+      "api_history_kwh": 12520.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1377551,
+      "plant_name": "Semarang",
+      "isolar_report_kwh": 15690.2,
+      "api_history_kwh": 15690.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1378278,
+      "plant_name": "Cianjur",
+      "isolar_report_kwh": 15650.7,
+      "api_history_kwh": 15650.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1386493,
+      "plant_name": "Cilacap 1",
+      "isolar_report_kwh": 17336.7,
+      "api_history_kwh": 17336.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1387109,
+      "plant_name": "Cilacap 2",
+      "isolar_report_kwh": 2055.8,
+      "api_history_kwh": 2055.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1387111,
+      "plant_name": "Cilacap 3",
+      "isolar_report_kwh": 2415.8,
+      "api_history_kwh": 2415.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1389249,
+      "plant_name": "Bandung 2",
+      "isolar_report_kwh": 10324.5,
+      "api_history_kwh": 10324.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1389275,
+      "plant_name": "Serang",
+      "isolar_report_kwh": 13986.1,
+      "api_history_kwh": 13986.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1391178,
+      "plant_name": "Madiun",
+      "isolar_report_kwh": 17347.2,
+      "api_history_kwh": 17347.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1392560,
+      "plant_name": "Jember",
+      "isolar_report_kwh": 15148.2,
+      "api_history_kwh": 15148.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1393852,
+      "plant_name": "Plumbon",
+      "isolar_report_kwh": 18502.4,
+      "api_history_kwh": 18502.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1410080,
+      "plant_name": "Tk. Drive Thru De Mansion",
+      "isolar_report_kwh": 5596.7,
+      "api_history_kwh": 5596.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1415889,
+      "plant_name": "Sidoarjo",
+      "isolar_report_kwh": 22607.5,
+      "api_history_kwh": 22607.5,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1456379,
+      "plant_name": "Tegal",
+      "isolar_report_kwh": 14223.3,
+      "api_history_kwh": 14223.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1459033,
+      "plant_name": "Cileungsi",
+      "isolar_report_kwh": 44999.8,
+      "api_history_kwh": 44999.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1583524,
+      "plant_name": "Luwu",
+      "isolar_report_kwh": 5065.2,
+      "api_history_kwh": 5065.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202607",
+      "ps_id": 1585267,
+      "plant_name": "Gorontalo",
+      "isolar_report_kwh": 0,
+      "api_history_kwh": 0,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1092345,
+      "plant_name": "Karawang",
+      "isolar_report_kwh": 23270.9,
+      "api_history_kwh": 23270.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1154267,
+      "plant_name": "Banjarmasin",
+      "isolar_report_kwh": 9663.8,
+      "api_history_kwh": 9663.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1154284,
+      "plant_name": "Palembang",
+      "isolar_report_kwh": 25378.8,
+      "api_history_kwh": 25378.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1157086,
+      "plant_name": "Medan",
+      "isolar_report_kwh": 18013.6,
+      "api_history_kwh": 18013.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1159436,
+      "plant_name": "Balaraja",
+      "isolar_report_kwh": 27680.2,
+      "api_history_kwh": 27680.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1159599,
+      "plant_name": "Rembang",
+      "isolar_report_kwh": 17110.3,
+      "api_history_kwh": 17110.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1159719,
+      "plant_name": "Bali",
+      "isolar_report_kwh": 14198.8,
+      "api_history_kwh": 14198.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1159732,
+      "plant_name": "Bandung 1",
+      "isolar_report_kwh": 16824.8,
+      "api_history_kwh": 16824.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1159761,
+      "plant_name": "Malang",
+      "isolar_report_kwh": 15117.7,
+      "api_history_kwh": 15117.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1160041,
+      "plant_name": "Parung",
+      "isolar_report_kwh": 787.1,
+      "api_history_kwh": 0,
+      "diff_kwh": "787.1",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1162742,
+      "plant_name": "Bogor",
+      "isolar_report_kwh": 14090.9,
+      "api_history_kwh": 14090.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1218534,
+      "plant_name": "Lampung",
+      "isolar_report_kwh": 12881.6,
+      "api_history_kwh": 12881.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1219715,
+      "plant_name": "Lombok B",
+      "isolar_report_kwh": 8306.8,
+      "api_history_kwh": 8306.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1219736,
+      "plant_name": "Lombok A",
+      "isolar_report_kwh": 2199.8,
+      "api_history_kwh": 2199.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1223413,
+      "plant_name": "Pontianak",
+      "isolar_report_kwh": 10343.3,
+      "api_history_kwh": 10343.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1223464,
+      "plant_name": "Jambi",
+      "isolar_report_kwh": 6216.2,
+      "api_history_kwh": 6216.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1224963,
+      "plant_name": "Batam",
+      "isolar_report_kwh": 12988.1,
+      "api_history_kwh": 12988.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1224999,
+      "plant_name": "Pekanbaru",
+      "isolar_report_kwh": 20362.3,
+      "api_history_kwh": 20362.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1230507,
+      "plant_name": "Manado",
+      "isolar_report_kwh": 24172.1,
+      "api_history_kwh": 24172.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1231394,
+      "plant_name": "Makassar",
+      "isolar_report_kwh": 29098.2,
+      "api_history_kwh": 29098.2,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1247367,
+      "plant_name": "Kotabumi",
+      "isolar_report_kwh": 7411.3,
+      "api_history_kwh": 7411.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1284197,
+      "plant_name": "Tk. Drive Thru GS",
+      "isolar_report_kwh": 3452.6,
+      "api_history_kwh": 3452.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1376844,
+      "plant_name": "Klaten",
+      "isolar_report_kwh": 12562.4,
+      "api_history_kwh": 12562.4,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1377551,
+      "plant_name": "Semarang",
+      "isolar_report_kwh": 16623.3,
+      "api_history_kwh": 16623.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1378278,
+      "plant_name": "Cianjur",
+      "isolar_report_kwh": 15505.7,
+      "api_history_kwh": 15505.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1386493,
+      "plant_name": "Cilacap 1",
+      "isolar_report_kwh": 17942.8,
+      "api_history_kwh": 17942.8,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1387109,
+      "plant_name": "Cilacap 2",
+      "isolar_report_kwh": 1928.3,
+      "api_history_kwh": 1928.3,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1387111,
+      "plant_name": "Cilacap 3",
+      "isolar_report_kwh": 2283.6,
+      "api_history_kwh": 2283.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1389249,
+      "plant_name": "Bandung 2",
+      "isolar_report_kwh": 11019.1,
+      "api_history_kwh": 11019.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1389275,
+      "plant_name": "Serang",
+      "isolar_report_kwh": 14183.6,
+      "api_history_kwh": 14183.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1391178,
+      "plant_name": "Madiun",
+      "isolar_report_kwh": 17616.7,
+      "api_history_kwh": 17616.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1392560,
+      "plant_name": "Jember",
+      "isolar_report_kwh": 16752.6,
+      "api_history_kwh": 16752.6,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1393852,
+      "plant_name": "Plumbon",
+      "isolar_report_kwh": 18148.1,
+      "api_history_kwh": 18148.1,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1410080,
+      "plant_name": "Tk. Drive Thru De Mansion",
+      "isolar_report_kwh": 5842.9,
+      "api_history_kwh": 5842.9,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1415889,
+      "plant_name": "Sidoarjo",
+      "isolar_report_kwh": 22487,
+      "api_history_kwh": 22487,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1456379,
+      "plant_name": "Tegal",
+      "isolar_report_kwh": 14934,
+      "api_history_kwh": 14934,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1459033,
+      "plant_name": "Cileungsi",
+      "isolar_report_kwh": 46949.4,
+      "api_history_kwh": 46949.39999999999,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1583524,
+      "plant_name": "Luwu",
+      "isolar_report_kwh": 10316,
+      "api_history_kwh": 10316,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202608",
+      "ps_id": 1585267,
+      "plant_name": "Gorontalo",
+      "isolar_report_kwh": 4532.7,
+      "api_history_kwh": 4532.7,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1092345,
+      "plant_name": "Karawang",
+      "isolar_report_kwh": 24026.8,
+      "api_history_kwh": 0,
+      "diff_kwh": "24026.8",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1154267,
+      "plant_name": "Banjarmasin",
+      "isolar_report_kwh": 8466.7,
+      "api_history_kwh": 0,
+      "diff_kwh": "8466.7",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1154284,
+      "plant_name": "Palembang",
+      "isolar_report_kwh": 24030.2,
+      "api_history_kwh": 0,
+      "diff_kwh": "24030.2",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1157086,
+      "plant_name": "Medan",
+      "isolar_report_kwh": 16464.3,
+      "api_history_kwh": 0,
+      "diff_kwh": "16464.3",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1159436,
+      "plant_name": "Balaraja",
+      "isolar_report_kwh": 31576.3,
+      "api_history_kwh": 0,
+      "diff_kwh": "31576.3",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1159599,
+      "plant_name": "Rembang",
+      "isolar_report_kwh": 18194.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "18194.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1159719,
+      "plant_name": "Bali",
+      "isolar_report_kwh": 14786.2,
+      "api_history_kwh": 0,
+      "diff_kwh": "14786.2",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1159732,
+      "plant_name": "Bandung 1",
+      "isolar_report_kwh": 17346.2,
+      "api_history_kwh": 0,
+      "diff_kwh": "17346.2",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1159761,
+      "plant_name": "Malang",
+      "isolar_report_kwh": 14946.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "14946.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1160041,
+      "plant_name": "Parung",
+      "isolar_report_kwh": 10278.3,
+      "api_history_kwh": 0,
+      "diff_kwh": "10278.3",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1162742,
+      "plant_name": "Bogor",
+      "isolar_report_kwh": 13952.5,
+      "api_history_kwh": 0,
+      "diff_kwh": "13952.5",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1218534,
+      "plant_name": "Lampung",
+      "isolar_report_kwh": 12365.3,
+      "api_history_kwh": 0,
+      "diff_kwh": "12365.3",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1219715,
+      "plant_name": "Lombok B",
+      "isolar_report_kwh": 8169.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "8169.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1219736,
+      "plant_name": "Lombok A",
+      "isolar_report_kwh": 2152.5,
+      "api_history_kwh": 0,
+      "diff_kwh": "2152.5",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1223413,
+      "plant_name": "Pontianak",
+      "isolar_report_kwh": 6883.1,
+      "api_history_kwh": 0,
+      "diff_kwh": "6883.1",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1223464,
+      "plant_name": "Jambi",
+      "isolar_report_kwh": 5317.9,
+      "api_history_kwh": 0,
+      "diff_kwh": "5317.9",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1224963,
+      "plant_name": "Batam",
+      "isolar_report_kwh": 10761.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "10761.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1224999,
+      "plant_name": "Pekanbaru",
+      "isolar_report_kwh": 17981.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "17981.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1230507,
+      "plant_name": "Manado",
+      "isolar_report_kwh": 24003,
+      "api_history_kwh": 0,
+      "diff_kwh": "24003",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1231394,
+      "plant_name": "Makassar",
+      "isolar_report_kwh": 29101.7,
+      "api_history_kwh": 0,
+      "diff_kwh": "29101.7",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1247367,
+      "plant_name": "Kotabumi",
+      "isolar_report_kwh": 11878.6,
+      "api_history_kwh": 0,
+      "diff_kwh": "11878.6",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1284197,
+      "plant_name": "Tk. Drive Thru GS",
+      "isolar_report_kwh": 2813.1,
+      "api_history_kwh": 0,
+      "diff_kwh": "2813.1",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1376844,
+      "plant_name": "Klaten",
+      "isolar_report_kwh": 13270.6,
+      "api_history_kwh": 0,
+      "diff_kwh": "13270.6",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1377551,
+      "plant_name": "Semarang",
+      "isolar_report_kwh": 17138.9,
+      "api_history_kwh": 0,
+      "diff_kwh": "17138.9",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1378278,
+      "plant_name": "Cianjur",
+      "isolar_report_kwh": 17092,
+      "api_history_kwh": 0,
+      "diff_kwh": "17092",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1386493,
+      "plant_name": "Cilacap 1",
+      "isolar_report_kwh": 18862.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "18862.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1387109,
+      "plant_name": "Cilacap 2",
+      "isolar_report_kwh": 1992.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "1992.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1387111,
+      "plant_name": "Cilacap 3",
+      "isolar_report_kwh": 2248.6,
+      "api_history_kwh": 0,
+      "diff_kwh": "2248.6",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1389249,
+      "plant_name": "Bandung 2",
+      "isolar_report_kwh": 11101.9,
+      "api_history_kwh": 0,
+      "diff_kwh": "11101.9",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1389275,
+      "plant_name": "Serang",
+      "isolar_report_kwh": 14134.9,
+      "api_history_kwh": 0,
+      "diff_kwh": "14134.9",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1391178,
+      "plant_name": "Madiun",
+      "isolar_report_kwh": 18397.9,
+      "api_history_kwh": 0,
+      "diff_kwh": "18397.9",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1392560,
+      "plant_name": "Jember",
+      "isolar_report_kwh": 17568,
+      "api_history_kwh": 0,
+      "diff_kwh": "17568",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1393852,
+      "plant_name": "Plumbon",
+      "isolar_report_kwh": 19464.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "19464.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1410080,
+      "plant_name": "Tk. Drive Thru De Mansion",
+      "isolar_report_kwh": 5474.4,
+      "api_history_kwh": 0,
+      "diff_kwh": "5474.4",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1415889,
+      "plant_name": "Sidoarjo",
+      "isolar_report_kwh": 23347.8,
+      "api_history_kwh": 0,
+      "diff_kwh": "23347.8",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1456379,
+      "plant_name": "Tegal",
+      "isolar_report_kwh": 15379,
+      "api_history_kwh": 0,
+      "diff_kwh": "15379",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1459033,
+      "plant_name": "Cileungsi",
+      "isolar_report_kwh": 48433,
+      "api_history_kwh": 0,
+      "diff_kwh": "48433",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1583524,
+      "plant_name": "Luwu",
+      "isolar_report_kwh": 13426.5,
+      "api_history_kwh": 0,
+      "diff_kwh": "13426.5",
+      "diff_pct": "100"
+    },
+    {
+      "year_month": "202609",
+      "ps_id": 1585267,
+      "plant_name": "Gorontalo",
+      "isolar_report_kwh": 0,
+      "api_history_kwh": 0,
+      "diff_kwh": "0",
+      "diff_pct": "0"
+    }
+  ]
+}

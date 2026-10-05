@@ -1,0 +1,3395 @@
+{
+  "Alfamart DC Gorontalo": {
+    "plantName": "Alfamart DC Gorontalo",
+    "installedKwp": 84.7,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 0,
+        "irradKwhM2": 167,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 0,
+        "officialPr": 0,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 0,
+        "irradKwhM2": 134.32,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 0,
+        "officialPr": 0,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 0,
+        "irradKwhM2": 167.71,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 0,
+        "officialPr": 0,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 0,
+        "irradKwhM2": 166.65,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 0,
+        "officialPr": 0,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 0,
+        "irradKwhM2": 140.73,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 0,
+        "officialPr": 0,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 0,
+        "irradKwhM2": 154.47,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 0,
+        "officialPr": 0,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 0,
+        "irradKwhM2": 162.29,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 0,
+        "officialPr": 0,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 4532.7,
+        "irradKwhM2": 187.06,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 28.61,
+        "officialPr": 28.61,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 0,
+        "irradKwhM2": 188.74,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 0,
+        "officialPr": 0,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Luwu": {
+    "plantName": "Alfamart DC Luwu",
+    "installedKwp": 96.8,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 10967,
+        "irradKwhM2": 152.96,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 74.07,
+        "officialPr": 74.07,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 9673.8,
+        "irradKwhM2": 131.47,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 76.01,
+        "officialPr": 76.01,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 10571.6,
+        "irradKwhM2": 153.7,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 71.05,
+        "officialPr": 87.01,
+        "diff": -15.96
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 9101.4,
+        "irradKwhM2": 173.63,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 54.15,
+        "officialPr": 54.15,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 5722.8,
+        "irradKwhM2": 139.13,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 42.49,
+        "officialPr": 42.49,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 5664,
+        "irradKwhM2": 136.22,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 42.95,
+        "officialPr": 84.86,
+        "diff": -41.91
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 5065.2,
+        "irradKwhM2": 149.33,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 35.04,
+        "officialPr": 35.04,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 10316,
+        "irradKwhM2": 189.51,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 56.23,
+        "officialPr": 56.23,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 13426.5,
+        "irradKwhM2": 165.78,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 83.67,
+        "officialPr": 83.67,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Cileungsi": {
+    "plantName": "Alfamart DC Cileungsi",
+    "installedKwp": 479.5,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 34409.2,
+        "irradKwhM2": 98.18,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 73.09,
+        "officialPr": 73.09,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 34588.1,
+        "irradKwhM2": 100.74,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 71.6,
+        "officialPr": 71.6,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 46106,
+        "irradKwhM2": 141.74,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 67.84,
+        "officialPr": 67.84,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 47721.5,
+        "irradKwhM2": 148.98,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 66.8,
+        "officialPr": 66.8,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 41748.5,
+        "irradKwhM2": 131.32,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 66.3,
+        "officialPr": 66.3,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 41488.4,
+        "irradKwhM2": 133.04,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 65.04,
+        "officialPr": 65.04,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 44999.8,
+        "irradKwhM2": 143.68,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 65.32,
+        "officialPr": 65.32,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 46949.4,
+        "irradKwhM2": 150.58,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 65.02,
+        "officialPr": 65.03,
+        "diff": -0.01
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 48433,
+        "irradKwhM2": 146.99,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 68.72,
+        "officialPr": 68.72,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Tegal": {
+    "plantName": "Alfamart DC Tegal",
+    "installedKwp": 119.88,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 10327.3,
+        "irradKwhM2": 114.64,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.15,
+        "officialPr": 75.14,
+        "diff": 0.01
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 10012.8,
+        "irradKwhM2": 109.8,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 76.07,
+        "officialPr": 76.07,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 14449.7,
+        "irradKwhM2": 157,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 76.77,
+        "officialPr": 76.77,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 13500.3,
+        "irradKwhM2": 146.53,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 76.85,
+        "officialPr": 76.85,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 13188.6,
+        "irradKwhM2": 144.15,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 76.32,
+        "officialPr": 76.32,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 12831.5,
+        "irradKwhM2": 138.93,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 77.04,
+        "officialPr": 77.04,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 14223.3,
+        "irradKwhM2": 155.17,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 76.46,
+        "officialPr": 76.46,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 14934,
+        "irradKwhM2": 165.76,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.15,
+        "officialPr": 75.15,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 15379,
+        "irradKwhM2": 165.02,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 77.74,
+        "officialPr": 77.74,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Sidoarjo": {
+    "plantName": "Alfamart DC Sidoarjo",
+    "installedKwp": 265.29,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 3099.4,
+        "irradKwhM2": 38.18,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 30.6,
+        "officialPr": 30.6,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 15066.8,
+        "irradKwhM2": 128.3,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 44.27,
+        "officialPr": 44.27,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 21350.1,
+        "irradKwhM2": 156.81,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 51.32,
+        "officialPr": 51.32,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 21575.1,
+        "irradKwhM2": 153.21,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 53.08,
+        "officialPr": 53.08,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 21105.6,
+        "irradKwhM2": 143.45,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 55.46,
+        "officialPr": 55.46,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 22301.5,
+        "irradKwhM2": 146.76,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 57.28,
+        "officialPr": 57.28,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 22607.5,
+        "irradKwhM2": 149.96,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 56.83,
+        "officialPr": 56.83,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 22487,
+        "irradKwhM2": 172.78,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 49.06,
+        "officialPr": 49.06,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 23347.8,
+        "irradKwhM2": 169.69,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 51.86,
+        "officialPr": 51.86,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart Dhrive Thru De Mansion": {
+    "plantName": "Alfamart Dhrive Thru De Mansion",
+    "installedKwp": 57.72,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 4558.7,
+        "irradKwhM2": 103.27,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 76.48,
+        "officialPr": 76.48,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 4279.8,
+        "irradKwhM2": 97.67,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.92,
+        "officialPr": 78.36,
+        "diff": -2.44
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 5909,
+        "irradKwhM2": 140.53,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 72.85,
+        "officialPr": 72.85,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 5865.5,
+        "irradKwhM2": 137.47,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 73.92,
+        "officialPr": 73.92,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 4748.4,
+        "irradKwhM2": 115.15,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 71.44,
+        "officialPr": 71.44,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 5012.2,
+        "irradKwhM2": 114.98,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.52,
+        "officialPr": 75.52,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 5596.7,
+        "irradKwhM2": 132.46,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 73.2,
+        "officialPr": 73.2,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 5842.9,
+        "irradKwhM2": 142.49,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 71.04,
+        "officialPr": 71.04,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 5474.4,
+        "irradKwhM2": 137.55,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 68.95,
+        "officialPr": 68.95,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Plumbon": {
+    "plantName": "Alfamart DC Plumbon",
+    "installedKwp": 215.9,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 14266.8,
+        "irradKwhM2": 113.57,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 58.18,
+        "officialPr": 58.18,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 12764.3,
+        "irradKwhM2": 104.44,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 56.61,
+        "officialPr": 56.61,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 14851.3,
+        "irradKwhM2": 149.59,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 45.98,
+        "officialPr": 45.98,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 17463.1,
+        "irradKwhM2": 160.92,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 50.26,
+        "officialPr": 50.26,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 15913.7,
+        "irradKwhM2": 147.43,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 50,
+        "officialPr": 50,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 16631,
+        "irradKwhM2": 148.28,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 51.95,
+        "officialPr": 51.95,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 18502.4,
+        "irradKwhM2": 169.92,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 50.43,
+        "officialPr": 50.43,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 18148.1,
+        "irradKwhM2": 173.5,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 48.45,
+        "officialPr": 48.45,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 19464.4,
+        "irradKwhM2": 176.1,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 51.2,
+        "officialPr": 51.2,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Jember": {
+    "plantName": "Alfamart DC Jember",
+    "installedKwp": 157.62,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 14325.2,
+        "irradKwhM2": 143.5,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 63.33,
+        "officialPr": 63.34,
+        "diff": -0.01
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 12509.5,
+        "irradKwhM2": 122.81,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 64.62,
+        "officialPr": 64.63,
+        "diff": -0.01
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 14588.8,
+        "irradKwhM2": 159.95,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 57.87,
+        "officialPr": 57.87,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 14771.6,
+        "irradKwhM2": 155.16,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 60.4,
+        "officialPr": 60.4,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 14299,
+        "irradKwhM2": 149.82,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 60.55,
+        "officialPr": 60.55,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 14976.4,
+        "irradKwhM2": 148.53,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 63.97,
+        "officialPr": 63.97,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 15148.2,
+        "irradKwhM2": 152.24,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 63.13,
+        "officialPr": 63.13,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 16752.6,
+        "irradKwhM2": 175.2,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 60.66,
+        "officialPr": 60.66,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 17568,
+        "irradKwhM2": 174.46,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 63.89,
+        "officialPr": 63.89,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Madiun": {
+    "plantName": "Alfamart DC Madiun",
+    "installedKwp": 250.86,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 17574.8,
+        "irradKwhM2": 144.21,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 48.58,
+        "officialPr": 48.58,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 15326.2,
+        "irradKwhM2": 123.36,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 49.53,
+        "officialPr": 49.53,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 17600.2,
+        "irradKwhM2": 171.75,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 40.85,
+        "officialPr": 40.85,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 18408.2,
+        "irradKwhM2": 158.66,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 46.25,
+        "officialPr": 46.25,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 17656.4,
+        "irradKwhM2": 149.53,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 47.07,
+        "officialPr": 47.07,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 16520,
+        "irradKwhM2": 134.47,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 48.97,
+        "officialPr": 48.97,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 17347.2,
+        "irradKwhM2": 146.93,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 47.06,
+        "officialPr": 47.06,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 17616.7,
+        "irradKwhM2": 152.5,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 46.05,
+        "officialPr": 46.05,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 18397.9,
+        "irradKwhM2": 172.92,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 42.41,
+        "officialPr": 42.41,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Serang": {
+    "plantName": "Alfamart DC Serang",
+    "installedKwp": 169.83,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 12938.9,
+        "irradKwhM2": 109.13,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 69.81,
+        "officialPr": 69.82,
+        "diff": -0.01
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 12874.7,
+        "irradKwhM2": 104.76,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 72.36,
+        "officialPr": 72.37,
+        "diff": -0.01
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 16352.5,
+        "irradKwhM2": 153.1,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 62.89,
+        "officialPr": 62.89,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 17370.9,
+        "irradKwhM2": 148.71,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 68.78,
+        "officialPr": 68.78,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 16000.4,
+        "irradKwhM2": 131.43,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 71.68,
+        "officialPr": 71.68,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 14789.6,
+        "irradKwhM2": 119.31,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 72.99,
+        "officialPr": 72.99,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 13986.1,
+        "irradKwhM2": 127.6,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 64.54,
+        "officialPr": 64.54,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 14183.6,
+        "irradKwhM2": 144.78,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 57.69,
+        "officialPr": 57.69,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 14134.9,
+        "irradKwhM2": 139.6,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 59.62,
+        "officialPr": 59.62,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Bandung 2": {
+    "plantName": "Alfamart DC Bandung 2",
+    "installedKwp": 168.72,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 10535.7,
+        "irradKwhM2": 127.91,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 48.82,
+        "officialPr": 48.82,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 10348.3,
+        "irradKwhM2": 120.41,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 50.94,
+        "officialPr": 50.94,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 10447.7,
+        "irradKwhM2": 165.83,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 37.34,
+        "officialPr": 37.34,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 9179.9,
+        "irradKwhM2": 127.22,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 42.77,
+        "officialPr": 42.77,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 9755.3,
+        "irradKwhM2": 135.56,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 42.65,
+        "officialPr": 42.65,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 9613.1,
+        "irradKwhM2": 128.84,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 44.22,
+        "officialPr": 44.22,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 10324.5,
+        "irradKwhM2": 150.69,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 40.61,
+        "officialPr": 40.61,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 11019.1,
+        "irradKwhM2": 166.88,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 39.14,
+        "officialPr": 39.14,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 11101.9,
+        "irradKwhM2": 160.42,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 41.02,
+        "officialPr": 41.02,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Cilacap 3": {
+    "plantName": "Alfamart DC Cilacap 3",
+    "installedKwp": 30.52,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 1506,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 1350.1,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 1557.1,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 1734.9,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 1515.7,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 1689.3,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 2415.8,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 2283.6,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 2248.6,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      }
+    }
+  },
+  "Alfamart DC Cilacap 2": {
+    "plantName": "Alfamart DC Cilacap 2",
+    "installedKwp": 47.73,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 2080.8,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 1947.2,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 2078.9,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 2157.4,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 2118.7,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 2084.1,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 2055.8,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 1928.3,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 1992.4,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Cilacap 1 (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      }
+    }
+  },
+  "Alfamart DC Cilacap 1": {
+    "plantName": "Alfamart DC Cilacap 1",
+    "installedKwp": 137.1,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 15786.4,
+        "irradKwhM2": 134.54,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 85.58,
+        "officialPr": 85.59,
+        "diff": -0.01
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 14225.1,
+        "irradKwhM2": 125.22,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 82.86,
+        "officialPr": 82.86,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 17822.1,
+        "irradKwhM2": 165.1,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 78.74,
+        "officialPr": 78.74,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 16678.9,
+        "irradKwhM2": 160.1,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.99,
+        "officialPr": 86.8,
+        "diff": -10.81
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 16517.8,
+        "irradKwhM2": 164.73,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 73.14,
+        "officialPr": 73.14,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 15305.5,
+        "irradKwhM2": 152.75,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 73.09,
+        "officialPr": 73.08,
+        "diff": 0.01
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 17336.7,
+        "irradKwhM2": 172.81,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 73.17,
+        "officialPr": 73.18,
+        "diff": -0.01
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 17942.8,
+        "irradKwhM2": 176,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 74.36,
+        "officialPr": 74.36,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 18862.4,
+        "irradKwhM2": 176.87,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 77.79,
+        "officialPr": 77.79,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Cianjur": {
+    "plantName": "Alfamart DC Cianjur",
+    "installedKwp": 197.54,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 11157.1,
+        "irradKwhM2": 109.72,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 51.48,
+        "officialPr": 51.48,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 10694,
+        "irradKwhM2": 93.48,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 57.91,
+        "officialPr": 57.91,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 12352.9,
+        "irradKwhM2": 144.89,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 43.16,
+        "officialPr": 43.16,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 13122.1,
+        "irradKwhM2": 142.42,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 46.64,
+        "officialPr": 46.64,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 12124.6,
+        "irradKwhM2": 129.89,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 47.25,
+        "officialPr": 47.25,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 13164.4,
+        "irradKwhM2": 129.5,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 51.46,
+        "officialPr": 51.46,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 15650.7,
+        "irradKwhM2": 137.01,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 57.83,
+        "officialPr": 57.83,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 15505.7,
+        "irradKwhM2": 148.78,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 52.76,
+        "officialPr": 52.76,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 17092,
+        "irradKwhM2": 160.01,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 54.07,
+        "officialPr": 54.08,
+        "diff": -0.01
+      }
+    }
+  },
+  "Alfamart DC Semarang": {
+    "plantName": "Alfamart DC Semarang",
+    "installedKwp": 143.2,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 12687.9,
+        "irradKwhM2": 121.26,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 73.07,
+        "officialPr": 73.07,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 11638,
+        "irradKwhM2": 119.73,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 67.88,
+        "officialPr": 67.88,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 15259.9,
+        "irradKwhM2": 169.46,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 62.88,
+        "officialPr": 62.88,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 15757.8,
+        "irradKwhM2": 159.47,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 69,
+        "officialPr": 69.01,
+        "diff": -0.01
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 10670.2,
+        "irradKwhM2": 108.54,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 68.65,
+        "officialPr": 68.65,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 14634.4,
+        "irradKwhM2": 146.22,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 69.89,
+        "officialPr": 69.89,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 15690.2,
+        "irradKwhM2": 149.1,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 73.49,
+        "officialPr": 73.48,
+        "diff": 0.01
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 16623.3,
+        "irradKwhM2": 171.34,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 67.75,
+        "officialPr": 67.75,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 17138.9,
+        "irradKwhM2": 168.49,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 71.03,
+        "officialPr": 71.04,
+        "diff": -0.01
+      }
+    }
+  },
+  "Alfamart DC Klaten": {
+    "plantName": "Alfamart DC Klaten",
+    "installedKwp": 102.12,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 10691.2,
+        "irradKwhM2": 134.39,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 77.9,
+        "officialPr": 77.9,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 8306.1,
+        "irradKwhM2": 105.15,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 77.35,
+        "officialPr": 77.35,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 11410,
+        "irradKwhM2": 147.53,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.73,
+        "officialPr": 75.73,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 12374,
+        "irradKwhM2": 160.56,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.47,
+        "officialPr": 75.47,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 12123.7,
+        "irradKwhM2": 157.28,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.48,
+        "officialPr": 75.49,
+        "diff": -0.01
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 11720.9,
+        "irradKwhM2": 152.18,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.42,
+        "officialPr": 75.42,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 12520.3,
+        "irradKwhM2": 162.47,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.46,
+        "officialPr": 75.46,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 12562.4,
+        "irradKwhM2": 169.24,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 72.69,
+        "officialPr": 72.69,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 13270.6,
+        "irradKwhM2": 174.03,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 74.67,
+        "officialPr": 74.67,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart Store Drive Thru": {
+    "plantName": "Alfamart Store Drive Thru",
+    "installedKwp": 39.6,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 3114.5,
+        "irradKwhM2": 100.49,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 78.27,
+        "officialPr": 78.26,
+        "diff": 0.01
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 2990,
+        "irradKwhM2": 97.06,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 77.79,
+        "officialPr": 77.79,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 4140.4,
+        "irradKwhM2": 138.23,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.64,
+        "officialPr": 75.64,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 3965.6,
+        "irradKwhM2": 131.45,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 76.18,
+        "officialPr": 76.18,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 1941.7,
+        "irradKwhM2": 63.58,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 77.12,
+        "officialPr": 77.12,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 3373.5,
+        "irradKwhM2": 113.68,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 74.94,
+        "officialPr": 74.94,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 3914.5,
+        "irradKwhM2": 130.74,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 75.61,
+        "officialPr": 75.61,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 3452.6,
+        "irradKwhM2": 136.6,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 63.83,
+        "officialPr": 63.83,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 2813.1,
+        "irradKwhM2": 140.48,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 50.57,
+        "officialPr": 50.57,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Kotabumi": {
+    "plantName": "Alfamart DC Kotabumi",
+    "installedKwp": 123,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 12397.6,
+        "irradKwhM2": 104.19,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 96.74,
+        "officialPr": 90,
+        "diff": 6.74
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 11529.4,
+        "irradKwhM2": 96.87,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 96.76,
+        "officialPr": 90,
+        "diff": 6.76
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 14215.2,
+        "irradKwhM2": 124.06,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 93.16,
+        "officialPr": 90,
+        "diff": 3.16
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 13121.6,
+        "irradKwhM2": 114.01,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 93.57,
+        "officialPr": 90,
+        "diff": 3.57
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 12527,
+        "irradKwhM2": 107.05,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 95.14,
+        "officialPr": 90,
+        "diff": 5.14
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 11397.3,
+        "irradKwhM2": 98.71,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 93.87,
+        "officialPr": 90,
+        "diff": 3.87
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 4448.6,
+        "irradKwhM2": 103.82,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 34.84,
+        "officialPr": 34.84,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 7411.3,
+        "irradKwhM2": 115.21,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 52.3,
+        "officialPr": 52.3,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 11878.6,
+        "irradKwhM2": 121.75,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 79.32,
+        "officialPr": 79.32,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Makassar": {
+    "plantName": "Alfamart DC Makassar",
+    "installedKwp": 231,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 20770.6,
+        "irradKwhM2": 75.47,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 119.14,
+        "officialPr": 90,
+        "diff": 29.14
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 18606,
+        "irradKwhM2": 62.26,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 129.37,
+        "officialPr": 90,
+        "diff": 39.37
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 22673.8,
+        "irradKwhM2": 81.04,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 121.12,
+        "officialPr": 90,
+        "diff": 31.12
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 27626.5,
+        "irradKwhM2": 90.21,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 132.57,
+        "officialPr": 90,
+        "diff": 42.57
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 24178.6,
+        "irradKwhM2": 115.52,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 90.61,
+        "officialPr": 90,
+        "diff": 0.61
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 26011.4,
+        "irradKwhM2": 129.65,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 86.85,
+        "officialPr": 86.85,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 28180.3,
+        "irradKwhM2": 145.46,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 83.87,
+        "officialPr": 83.87,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 29098.2,
+        "irradKwhM2": 151.69,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 83.04,
+        "officialPr": 83.04,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 29101.7,
+        "irradKwhM2": 151.29,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 83.27,
+        "officialPr": 83.27,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Manado": {
+    "plantName": "Alfamart DC Manado",
+    "installedKwp": 200.2,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 20189,
+        "irradKwhM2": 26.4,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 381.99,
+        "officialPr": 90,
+        "diff": 291.99
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 16451.9,
+        "irradKwhM2": 17.56,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 467.98,
+        "officialPr": 90,
+        "diff": 377.98
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 18723.8,
+        "irradKwhM2": 45.86,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 203.94,
+        "officialPr": 90,
+        "diff": 113.94
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 19785.3,
+        "irradKwhM2": 119.53,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 82.68,
+        "officialPr": 82.68,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 18425,
+        "irradKwhM2": 87.69,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 104.95,
+        "officialPr": 90,
+        "diff": 14.95
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 20501.2,
+        "irradKwhM2": 18.86,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 542.97,
+        "officialPr": 90,
+        "diff": 452.97
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 21569.1,
+        "irradKwhM2": 22.48,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 479.26,
+        "officialPr": 90,
+        "diff": 389.26
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 24172.1,
+        "irradKwhM2": 41.56,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 290.52,
+        "officialPr": 90,
+        "diff": 200.52
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 24003,
+        "irradKwhM2": 10.35,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 1158.41,
+        "officialPr": 90,
+        "diff": 1068.41
+      }
+    }
+  },
+  "Alfamart DC Pekanbaru": {
+    "plantName": "Alfamart DC Pekanbaru",
+    "installedKwp": 168.3,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 18053.8,
+        "irradKwhM2": 108.44,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 98.92,
+        "officialPr": 90,
+        "diff": 8.92
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 15960.3,
+        "irradKwhM2": 97.35,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 97.41,
+        "officialPr": 90,
+        "diff": 7.41
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 18540.8,
+        "irradKwhM2": 117.83,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 93.5,
+        "officialPr": 90,
+        "diff": 3.5
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 17926.5,
+        "irradKwhM2": 111.25,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 95.74,
+        "officialPr": 90,
+        "diff": 5.74
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 18391.7,
+        "irradKwhM2": 118.57,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 92.16,
+        "officialPr": 90,
+        "diff": 2.16
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 18479,
+        "irradKwhM2": 111.13,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 98.8,
+        "officialPr": 90,
+        "diff": 8.8
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 18729.2,
+        "irradKwhM2": 108.56,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 102.51,
+        "officialPr": 90,
+        "diff": 12.51
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 20362.3,
+        "irradKwhM2": 121.7,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 99.42,
+        "officialPr": 90,
+        "diff": 9.42
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 17981.4,
+        "irradKwhM2": 102.01,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 104.74,
+        "officialPr": 90,
+        "diff": 14.74
+      }
+    }
+  },
+  "Alfamart DC Batam": {
+    "plantName": "Alfamart DC Batam",
+    "installedKwp": 99,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 11650.7,
+        "irradKwhM2": 140.13,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 83.98,
+        "officialPr": 83.98,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 10539.5,
+        "irradKwhM2": 125.01,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 85.16,
+        "officialPr": 85.16,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 14430.6,
+        "irradKwhM2": 177.25,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 82.24,
+        "officialPr": 82.24,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 11302.5,
+        "irradKwhM2": 143.59,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 79.51,
+        "officialPr": 79.51,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 9073.7,
+        "irradKwhM2": 108.77,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 84.26,
+        "officialPr": 90,
+        "diff": -5.74
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 9668.4,
+        "irradKwhM2": 111.67,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 87.45,
+        "officialPr": 87.45,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 10469.1,
+        "irradKwhM2": 121.82,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 86.81,
+        "officialPr": 86.81,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 12988.1,
+        "irradKwhM2": 158.17,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 82.94,
+        "officialPr": 86.98,
+        "diff": -4.04
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 10761.4,
+        "irradKwhM2": 133.33,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 81.53,
+        "officialPr": 81.53,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Jambi": {
+    "plantName": "Alfamart DC Jambi",
+    "installedKwp": 88,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 6261.9,
+        "irradKwhM2": 83.5,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 85.22,
+        "officialPr": 85.22,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 6446.6,
+        "irradKwhM2": 69.26,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 105.77,
+        "officialPr": 90,
+        "diff": 15.77
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 7043.4,
+        "irradKwhM2": 78.79,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 101.58,
+        "officialPr": 90,
+        "diff": 11.58
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 4514.7,
+        "irradKwhM2": 84.99,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 60.36,
+        "officialPr": 60.37,
+        "diff": -0.01
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 4901.5,
+        "irradKwhM2": 69.09,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 80.62,
+        "officialPr": 80.62,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 5009.1,
+        "irradKwhM2": 63.18,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 90.09,
+        "officialPr": 90,
+        "diff": 0.09
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 5223.2,
+        "irradKwhM2": 45.1,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 131.61,
+        "officialPr": 90,
+        "diff": 41.61
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 6216.2,
+        "irradKwhM2": 55.8,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 126.59,
+        "officialPr": 90,
+        "diff": 36.59
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 5317.9,
+        "irradKwhM2": 59.6,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 101.39,
+        "officialPr": 90,
+        "diff": 11.39
+      }
+    }
+  },
+  "Alfamart DC Pontianak": {
+    "plantName": "Alfamart DC Pontianak",
+    "installedKwp": 105.6,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 11807,
+        "irradKwhM2": 126.68,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 88.26,
+        "officialPr": 90,
+        "diff": -1.74
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 9426.8,
+        "irradKwhM2": 105.61,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 84.53,
+        "officialPr": 90,
+        "diff": -5.47
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 11263.4,
+        "irradKwhM2": 134.56,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 79.27,
+        "officialPr": 86.07,
+        "diff": -6.8
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 9647.1,
+        "irradKwhM2": 115.08,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 79.38,
+        "officialPr": 90,
+        "diff": -10.62
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 10036.9,
+        "irradKwhM2": 126.89,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 74.9,
+        "officialPr": 90,
+        "diff": -15.1
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 10133.8,
+        "irradKwhM2": 125.48,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 76.48,
+        "officialPr": 90,
+        "diff": -13.52
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 11419.3,
+        "irradKwhM2": 140.35,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 77.05,
+        "officialPr": 86,
+        "diff": -8.95
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 10343.3,
+        "irradKwhM2": 130.66,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 74.96,
+        "officialPr": 82.27,
+        "diff": -7.31
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 6883.1,
+        "irradKwhM2": 84.23,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 77.38,
+        "officialPr": 77.39,
+        "diff": -0.01
+      }
+    }
+  },
+  "Alfamart DC Lombok A": {
+    "plantName": "Alfamart DC Lombok A",
+    "installedKwp": 12,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 1826.8,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Lombok B (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 1706.4,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Lombok B (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 2162.3,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Lombok B (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 1812.1,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Lombok B (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 1998.4,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Lombok B (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 1955.6,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Lombok B (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 2099.1,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Lombok B (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 2199.8,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Lombok B (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 2152.5,
+        "irradKwhM2": null,
+        "irradSource": "Dipinjam dari Lombok B (Co-located)",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      }
+    }
+  },
+  "Alfamart DC Lombok B": {
+    "plantName": "Alfamart DC Lombok B",
+    "installedKwp": 57.75,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 7129.1,
+        "irradKwhM2": 115.78,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 106.62,
+        "officialPr": 90,
+        "diff": 16.62
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 6508.5,
+        "irradKwhM2": 107.32,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 105.01,
+        "officialPr": 90,
+        "diff": 15.01
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 8244.5,
+        "irradKwhM2": 140.76,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 101.42,
+        "officialPr": 90,
+        "diff": 11.42
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 6846.3,
+        "irradKwhM2": 120.62,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 98.28,
+        "officialPr": 90,
+        "diff": 8.28
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 7415.9,
+        "irradKwhM2": 124.16,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 103.43,
+        "officialPr": 90,
+        "diff": 13.43
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 7357.5,
+        "irradKwhM2": 126.73,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 100.53,
+        "officialPr": 90,
+        "diff": 10.53
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 7901.1,
+        "irradKwhM2": 131.01,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 104.43,
+        "officialPr": 90,
+        "diff": 14.43
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 8306.8,
+        "irradKwhM2": 134.44,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 106.99,
+        "officialPr": 90,
+        "diff": 16.99
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 8169.4,
+        "irradKwhM2": 138.15,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 102.4,
+        "officialPr": 90,
+        "diff": 12.4
+      }
+    }
+  },
+  "Alfamart DC Lampung": {
+    "plantName": "Alfamart DC Lampung",
+    "installedKwp": 108.9,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 9593.1,
+        "irradKwhM2": 92.81,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 94.92,
+        "officialPr": 90,
+        "diff": 4.92
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 9334.2,
+        "irradKwhM2": 90.26,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 94.96,
+        "officialPr": 90,
+        "diff": 4.96
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 11378.5,
+        "irradKwhM2": 122.48,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 85.31,
+        "officialPr": 85.31,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 11515.8,
+        "irradKwhM2": 118.24,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 89.43,
+        "officialPr": 89.43,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 10676.9,
+        "irradKwhM2": 111.78,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 87.71,
+        "officialPr": 87.71,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 10382.7,
+        "irradKwhM2": 109.69,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 86.92,
+        "officialPr": 86.92,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 12041.4,
+        "irradKwhM2": 122.13,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 90.54,
+        "officialPr": 90,
+        "diff": 0.54
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 12881.6,
+        "irradKwhM2": 134,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 88.27,
+        "officialPr": 88.28,
+        "diff": -0.01
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 12365.3,
+        "irradKwhM2": 130.37,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 87.1,
+        "officialPr": 87.1,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Bogor": {
+    "plantName": "Alfamart DC Bogor",
+    "installedKwp": 106,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 10818.6,
+        "irradKwhM2": null,
+        "irradSource": "Sensor Offline / Tidak Ada Sensor",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 10095.6,
+        "irradKwhM2": null,
+        "irradSource": "Sensor Offline / Tidak Ada Sensor",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 13475.7,
+        "irradKwhM2": null,
+        "irradSource": "Sensor Offline / Tidak Ada Sensor",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 13378.1,
+        "irradKwhM2": null,
+        "irradSource": "Sensor Offline / Tidak Ada Sensor",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 12177.7,
+        "irradKwhM2": null,
+        "irradSource": "Sensor Offline / Tidak Ada Sensor",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 12260.8,
+        "irradKwhM2": null,
+        "irradSource": "Sensor Offline / Tidak Ada Sensor",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 13872.9,
+        "irradKwhM2": null,
+        "irradSource": "Sensor Offline / Tidak Ada Sensor",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 14090.9,
+        "irradKwhM2": null,
+        "irradSource": "Sensor Offline / Tidak Ada Sensor",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 13952.5,
+        "irradKwhM2": null,
+        "irradSource": "Sensor Offline / Tidak Ada Sensor",
+        "calculatedPr": null,
+        "officialPr": null,
+        "diff": null
+      }
+    }
+  },
+  "Alfamart DC Parung": {
+    "plantName": "Alfamart DC Parung",
+    "installedKwp": 195,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 3288.8,
+        "irradKwhM2": 63.45,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 26.58,
+        "officialPr": 21.22,
+        "diff": 5.36
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 2991.4,
+        "irradKwhM2": 36.95,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 41.52,
+        "officialPr": 90,
+        "diff": -48.48
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 14173.4,
+        "irradKwhM2": 40.6,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 179.02,
+        "officialPr": 90,
+        "diff": 89.02
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 18116.8,
+        "irradKwhM2": 56.46,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 164.55,
+        "officialPr": 90,
+        "diff": 74.55
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 17810.5,
+        "irradKwhM2": 16.49,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 553.89,
+        "officialPr": 90,
+        "diff": 463.89
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 16685.8,
+        "irradKwhM2": 41.31,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 207.14,
+        "officialPr": 90,
+        "diff": 117.14
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 201.7,
+        "irradKwhM2": 8.03,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 12.88,
+        "officialPr": 10.28,
+        "diff": 2.6
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 787.1,
+        "irradKwhM2": 17.46,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 23.12,
+        "officialPr": 18.46,
+        "diff": 4.66
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 10278.3,
+        "irradKwhM2": 24.02,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 219.44,
+        "officialPr": 90,
+        "diff": 129.44
+      }
+    }
+  },
+  "Alfamart DC Malang": {
+    "plantName": "Alfamart DC Malang",
+    "installedKwp": 107.84,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 11922,
+        "irradKwhM2": 73.47,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 150.47,
+        "officialPr": 90,
+        "diff": 60.47
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 10202.8,
+        "irradKwhM2": 65.63,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 144.16,
+        "officialPr": 90,
+        "diff": 54.16
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 12500.9,
+        "irradKwhM2": 89.08,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 130.13,
+        "officialPr": 90,
+        "diff": 40.13
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 13870.5,
+        "irradKwhM2": 99.47,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 129.31,
+        "officialPr": 90,
+        "diff": 39.31
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 12450.8,
+        "irradKwhM2": 88.56,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 130.37,
+        "officialPr": 90,
+        "diff": 40.37
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 13218.7,
+        "irradKwhM2": 96.02,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 127.66,
+        "officialPr": 90,
+        "diff": 37.66
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 15195.5,
+        "irradKwhM2": 104.21,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 135.22,
+        "officialPr": 90,
+        "diff": 45.22
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 15117.7,
+        "irradKwhM2": 110.91,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 126.4,
+        "officialPr": 90,
+        "diff": 36.4
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 14946.4,
+        "irradKwhM2": 114.88,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 120.65,
+        "officialPr": 90,
+        "diff": 30.65
+      }
+    }
+  },
+  "Alfamart DC Bandung 1": {
+    "plantName": "Alfamart DC Bandung 1",
+    "installedKwp": 140,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 15736.1,
+        "irradKwhM2": 132.81,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 84.63,
+        "officialPr": 84.64,
+        "diff": -0.01
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 14575.8,
+        "irradKwhM2": 122.71,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 84.84,
+        "officialPr": 84.85,
+        "diff": -0.01
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 17967.6,
+        "irradKwhM2": 150.94,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 85.03,
+        "officialPr": 85.03,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 15921.5,
+        "irradKwhM2": 128.85,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 88.26,
+        "officialPr": 88.26,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 527.4,
+        "irradKwhM2": 4.2,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 89.69,
+        "officialPr": 89.66,
+        "diff": 0.03
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 12922.5,
+        "irradKwhM2": 101,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 91.39,
+        "officialPr": 90,
+        "diff": 1.39
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 15450.2,
+        "irradKwhM2": 125.48,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 87.95,
+        "officialPr": 87.95,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 16824.8,
+        "irradKwhM2": 140.33,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 85.64,
+        "officialPr": 85.64,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 17346.2,
+        "irradKwhM2": 148.72,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 83.31,
+        "officialPr": 83.31,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Bali": {
+    "plantName": "Alfamart DC Bali",
+    "installedKwp": 88,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 12057.6,
+        "irradKwhM2": 116.29,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 117.82,
+        "officialPr": 90,
+        "diff": 27.82
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 11385.6,
+        "irradKwhM2": 105.64,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 122.47,
+        "officialPr": 90,
+        "diff": 32.47
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 14089.9,
+        "irradKwhM2": 108.51,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 147.56,
+        "officialPr": 90,
+        "diff": 57.56
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 13534.8,
+        "irradKwhM2": 120.01,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 128.16,
+        "officialPr": 90,
+        "diff": 38.16
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 13157.5,
+        "irradKwhM2": 125.49,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 119.15,
+        "officialPr": 90,
+        "diff": 29.15
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 11439.6,
+        "irradKwhM2": 120.03,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 108.3,
+        "officialPr": 90,
+        "diff": 18.3
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 11260.8,
+        "irradKwhM2": 117.64,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 108.78,
+        "officialPr": 90,
+        "diff": 18.78
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 14198.8,
+        "irradKwhM2": 136.48,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 118.22,
+        "officialPr": 90,
+        "diff": 28.22
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 14786.2,
+        "irradKwhM2": 122.23,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 137.47,
+        "officialPr": 90,
+        "diff": 47.47
+      }
+    }
+  },
+  "Alfamart DC Rembang": {
+    "plantName": "Alfamart DC Rembang",
+    "installedKwp": 155,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 11233.2,
+        "irradKwhM2": 89.15,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 81.29,
+        "officialPr": 81.29,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 12454.7,
+        "irradKwhM2": 88.51,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 90.78,
+        "officialPr": 90,
+        "diff": 0.78
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 16351.1,
+        "irradKwhM2": 124.69,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 84.6,
+        "officialPr": 84.61,
+        "diff": -0.01
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 17669.1,
+        "irradKwhM2": 126.31,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 90.25,
+        "officialPr": 90,
+        "diff": 0.25
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 17150.8,
+        "irradKwhM2": 124.73,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 88.71,
+        "officialPr": 88.71,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 17005.9,
+        "irradKwhM2": 121.25,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 90.49,
+        "officialPr": 90,
+        "diff": 0.49
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 18295.7,
+        "irradKwhM2": 132.6,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 89.02,
+        "officialPr": 89.02,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 17110.3,
+        "irradKwhM2": 136.08,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 81.12,
+        "officialPr": 81.12,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 18194.4,
+        "irradKwhM2": 138.4,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 84.81,
+        "officialPr": 84.82,
+        "diff": -0.01
+      }
+    }
+  },
+  "Alfamart DC Balaraja": {
+    "plantName": "Alfamart DC Balaraja",
+    "installedKwp": 399.73,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 31770.2,
+        "irradKwhM2": 64.12,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 123.95,
+        "officialPr": 90,
+        "diff": 33.95
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 31369.8,
+        "irradKwhM2": 57.41,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 136.7,
+        "officialPr": 90,
+        "diff": 46.7
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 40154.7,
+        "irradKwhM2": 67.48,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 148.87,
+        "officialPr": 90,
+        "diff": 58.87
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 38903.1,
+        "irradKwhM2": 59.12,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 164.62,
+        "officialPr": 90,
+        "diff": 74.62
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 38806.6,
+        "irradKwhM2": 62.14,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 156.23,
+        "officialPr": 90,
+        "diff": 66.23
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 32998.4,
+        "irradKwhM2": 58.21,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 141.82,
+        "officialPr": 90,
+        "diff": 51.82
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 33982.2,
+        "irradKwhM2": 66.32,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 128.19,
+        "officialPr": 90,
+        "diff": 38.19
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 27680.2,
+        "irradKwhM2": 72.11,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 96.03,
+        "officialPr": 90,
+        "diff": 6.03
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 31576.3,
+        "irradKwhM2": 71.87,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 109.91,
+        "officialPr": 90,
+        "diff": 19.91
+      }
+    }
+  },
+  "Alfamart DC Medan": {
+    "plantName": "Alfamart DC Medan",
+    "installedKwp": 162,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 16403.9,
+        "irradKwhM2": 96.79,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 104.62,
+        "officialPr": 90,
+        "diff": 14.62
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 15435.7,
+        "irradKwhM2": 85.93,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 110.88,
+        "officialPr": 90,
+        "diff": 20.88
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 18572.4,
+        "irradKwhM2": 121.37,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 94.46,
+        "officialPr": 90,
+        "diff": 4.46
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 17633.5,
+        "irradKwhM2": 115.96,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 93.87,
+        "officialPr": 90,
+        "diff": 3.87
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 16442.3,
+        "irradKwhM2": 105.9,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 95.84,
+        "officialPr": 90,
+        "diff": 5.84
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 15695.2,
+        "irradKwhM2": 103.65,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 93.47,
+        "officialPr": 90,
+        "diff": 3.47
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 17227.3,
+        "irradKwhM2": 116.73,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 91.1,
+        "officialPr": 90,
+        "diff": 1.1
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 18013.6,
+        "irradKwhM2": 127.31,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 87.34,
+        "officialPr": 87.34,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 16464.3,
+        "irradKwhM2": 108.5,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 93.67,
+        "officialPr": 90,
+        "diff": 3.67
+      }
+    }
+  },
+  "Alfamart DC Palembang": {
+    "plantName": "Alfamart DC Palembang",
+    "installedKwp": 236.57,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 21223.2,
+        "irradKwhM2": 101.83,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 88.1,
+        "officialPr": 88.1,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 20253.8,
+        "irradKwhM2": 97.62,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 87.7,
+        "officialPr": 87.7,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 24749,
+        "irradKwhM2": 119.19,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 87.77,
+        "officialPr": 87.77,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 24973.8,
+        "irradKwhM2": 122.48,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 86.19,
+        "officialPr": 86.19,
+        "diff": 0
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 23838.2,
+        "irradKwhM2": 117.34,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 85.88,
+        "officialPr": 85.87,
+        "diff": 0.01
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 20643.2,
+        "irradKwhM2": 103.48,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 84.33,
+        "officialPr": 84.32,
+        "diff": 0.01
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 22639.6,
+        "irradKwhM2": 119.63,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 80,
+        "officialPr": 80,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 25378.8,
+        "irradKwhM2": 132.67,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 80.86,
+        "officialPr": 80.86,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 24030.2,
+        "irradKwhM2": 123.84,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 82.02,
+        "officialPr": 82.02,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Banjarmasin": {
+    "plantName": "Alfamart DC Banjarmasin",
+    "installedKwp": 129.6,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 11081.6,
+        "irradKwhM2": 115.86,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 73.8,
+        "officialPr": 73.8,
+        "diff": 0
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 8827,
+        "irradKwhM2": 93.4,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 72.92,
+        "officialPr": 72.92,
+        "diff": 0
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 10213.1,
+        "irradKwhM2": 120.77,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 65.25,
+        "officialPr": 65.25,
+        "diff": 0
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 9528.1,
+        "irradKwhM2": 127.76,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 57.54,
+        "officialPr": 57.55,
+        "diff": -0.01
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 9271.2,
+        "irradKwhM2": 112.87,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 63.38,
+        "officialPr": 63.38,
+        "diff": 0
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 8771.9,
+        "irradKwhM2": 111.75,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 60.57,
+        "officialPr": 60.57,
+        "diff": 0
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 9117.8,
+        "irradKwhM2": 126.91,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 55.44,
+        "officialPr": 55.44,
+        "diff": 0
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 9663.8,
+        "irradKwhM2": 154.19,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 48.36,
+        "officialPr": 48.36,
+        "diff": 0
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 8466.7,
+        "irradKwhM2": 134.36,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 48.62,
+        "officialPr": 48.62,
+        "diff": 0
+      }
+    }
+  },
+  "Alfamart DC Karawang": {
+    "plantName": "Alfamart DC Karawang",
+    "installedKwp": 198,
+    "records": {
+      "2026-01": {
+        "month": "2026-01",
+        "yieldKwh": 17090.1,
+        "irradKwhM2": 68.98,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 125.13,
+        "officialPr": 95,
+        "diff": 30.13
+      },
+      "2026-02": {
+        "month": "2026-02",
+        "yieldKwh": 16084.7,
+        "irradKwhM2": 62.88,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 129.19,
+        "officialPr": 95,
+        "diff": 34.19
+      },
+      "2026-03": {
+        "month": "2026-03",
+        "yieldKwh": 23388,
+        "irradKwhM2": 54.38,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 217.21,
+        "officialPr": 95,
+        "diff": 122.21
+      },
+      "2026-04": {
+        "month": "2026-04",
+        "yieldKwh": 25938.5,
+        "irradKwhM2": 56.95,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 230.03,
+        "officialPr": 95,
+        "diff": 135.03
+      },
+      "2026-05": {
+        "month": "2026-05",
+        "yieldKwh": 22883.4,
+        "irradKwhM2": 47.16,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 245.07,
+        "officialPr": 95,
+        "diff": 150.07
+      },
+      "2026-06": {
+        "month": "2026-06",
+        "yieldKwh": 21706.9,
+        "irradKwhM2": 53.3,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 205.69,
+        "officialPr": 95,
+        "diff": 110.69
+      },
+      "2026-07": {
+        "month": "2026-07",
+        "yieldKwh": 23678.4,
+        "irradKwhM2": 47.1,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 253.9,
+        "officialPr": 95,
+        "diff": 158.9
+      },
+      "2026-08": {
+        "month": "2026-08",
+        "yieldKwh": 23270.9,
+        "irradKwhM2": 68.34,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 171.98,
+        "officialPr": 95,
+        "diff": 76.98
+      },
+      "2026-09": {
+        "month": "2026-09",
+        "yieldKwh": 24026.8,
+        "irradKwhM2": 87.56,
+        "irradSource": "Meteo Sensor / Pyranometer",
+        "calculatedPr": 138.59,
+        "officialPr": 95,
+        "diff": 43.59
+      }
+    }
+  }
+}
