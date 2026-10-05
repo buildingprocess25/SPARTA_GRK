@@ -1,9 +1,21 @@
 import prisma from '../src/lib/prisma.js';
 
 async function main() {
-  const g = await prisma.plantLatest.findUnique({ where: { psId: 1585267 } });
-  console.log('Gorontalo raw keys & values:');
-  console.log(JSON.stringify(g.raw, null, 2));
-  await prisma.$disconnect();
+  const gorontalo = await prisma.plantMaster.findFirst({
+    where: { OR: [{ dcId: 'DC-GORONTALO' }, { canonicalName: { contains: 'Gorontalo' } }] }
+  });
+  console.log('Gorontalo record:', JSON.stringify(gorontalo, null, 2));
+
+  if (gorontalo) {
+    const updated = await prisma.plantMaster.update({
+      where: { dcId: gorontalo.dcId },
+      data: {
+        operationalStatus: 'Dalam Pembangunan',
+        codDate: null
+      }
+    });
+    console.log('Updated Gorontalo record:', JSON.stringify(updated, null, 2));
+  }
 }
-main().catch(console.error);
+
+main().catch(console.error).finally(() => prisma.$disconnect());
