@@ -543,10 +543,15 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
     const isOnline = onlineSubCount > 0;
     const isWaiting = !isAllOffline && subPlantTelemetry.every(sp => !sp.isOnline || sp.isWaiting);
 
+    const isUnderConstruction = dc.dcId === 'DC-GORONTALO' || dc.canonicalName?.toLowerCase().includes('gorontalo') || Boolean(dc.isUnderConstruction);
+
     let status = 'Normal Producing';
     let statusColor = '#059669';
 
-    if (isAllOffline) {
+    if (isUnderConstruction) {
+      status = 'Dalam Pembangunan';
+      statusColor = '#94A3B8';
+    } else if (isAllOffline) {
       status = 'Offline';
       statusColor = '#E11D48';
     } else if (anyAlarm) {
@@ -567,16 +572,20 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
 
     // Intraday Specific Yield (kWh / kWp): calculate as long as capacity and yield exist
     let todaySpecificYield = null;
-    if (installedKwp > 0 && totalTodayKwh > 0) {
+    if (isUnderConstruction) {
+      todaySpecificYield = null;
+    } else if (installedKwp > 0 && totalTodayKwh > 0) {
       todaySpecificYield = Number((totalTodayKwh / installedKwp).toFixed(2));
     } else if (installedKwp > 0 && totalTodayKwh === 0) {
       todaySpecificYield = 0.0;
     }
 
     // Equivalent Hour from API (weighted average for multi-plant)
-    const equivalentHour = installedKwp > 0 && totalEqHoursWeighted > 0
-      ? Number((totalEqHoursWeighted / installedKwp).toFixed(2))
-      : (todaySpecificYield !== null ? todaySpecificYield : 0);
+    const equivalentHour = isUnderConstruction
+      ? null
+      : (installedKwp > 0 && totalEqHoursWeighted > 0
+          ? Number((totalEqHoursWeighted / installedKwp).toFixed(2))
+          : (todaySpecificYield !== null ? todaySpecificYield : 0));
 
     // Historical PR from Baseline Audit
     let historicalMonthlyPr = null;
@@ -612,6 +621,7 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
       hasAlarm: anyAlarm,
       alarmCount: totalAlarms,
       isWaiting,
+      isUnderConstruction,
       onlineCount: onlineSubCount,
       totalSubPlants: dc.sungrowPsIds.length,
       inverterTemp: 'Belum tersedia',
@@ -664,6 +674,7 @@ export function calculateNationwideSummary(canonicalDCs = []) {
  */
 export function processAllDCAnalytics({
   stations = [],
+  historicalPlants = [],
   baselineData = [],
   selectedMetric = 'specificYield',
   sortDirection = 'desc',
@@ -679,51 +690,90 @@ export function processAllDCAnalytics({
       ? baselineData.find(b => lookupPlantMetadata(b).canonicalName === dc.canonicalName)
       : null;
 
-    const monthlyYieldMwh = baselineRef?.monthlyYieldMwh ?? dc.monthYieldMwh ?? 0;
-    const monthlyYieldKwh = monthlyYieldMwh * 1000;
+    const histPlant = Array.isArray(historicalPlants)
+      ? historicalPlants.find(p => p.dcId === dc.dcId || p.canonicalName?.toLowerCase() === dc.canonicalName?.toLowerCase())
+      : null;
+
+    const isGorontalo = dc.canonicalName.toLowerCase().includes('gorontalo') || histPlant?.isUnderConstruction === true;
+    const isUnderConstruction = isGorontalo;
+
     const installedKwp = (dc.installedKwp && dc.installedKwp > 0)
       ? dc.installedKwp
-      : ((dc.apiInstalledKwp && dc.apiInstalledKwp > 0) ? dc.apiInstalledKwp : null);
+      : ((dc.apiInstalledKwp && dc.apiInstalledKwp > 0) ? dc.apiInstalledKwp : (histPlant?.installedKwp || null));
 
-    const todaySpecificYield = dc.todaySpecificYield !== undefined
-      ? dc.todaySpecificYield
-      : (installedKwp !== null && installedKwp > 0 && dc.todayYieldKwh !== null && dc.todayYieldKwh !== undefined
-          ? Number(((dc.todayYieldKwh || 0) / installedKwp).toFixed(2))
-          : null);
+    const productionKwh = histPlant?.productionKwh ?? (dc.todayYieldKwh ? Number(dc.todayYieldKwh) : 0);
+    const productionMwh = histPlant?.productionMwh ?? (histPlant?.productionKwh ? Number((histPlant.productionKwh / 1000).toFixed(2)) : (dc.monthYieldMwh ?? 0));
+    const emissionTon = (histPlant && histPlant.emissionTon !== undefined)
+      ? histPlant.emissionTon
+      : (histPlant?.productionKwh ? Number(((histPlant.productionKwh * SOLAR_CONSTANTS.CO2_FACTOR_PLTS) / 1000).toFixed(2)) : 0);
+    const monthlyHistory = histPlant?.monthly || dc.monthlyHistory || [];
 
-    const equivalentHour = dc.equivalentHour !== undefined ? dc.equivalentHour : todaySpecificYield;
-    const specificYield = (installedKwp !== null && installedKwp > 0 && monthlyYieldKwh > 0)
-      ? Number((monthlyYieldKwh / installedKwp).toFixed(1))
-      : null;
-    const isGorontalo = dc.canonicalName.toLowerCase().includes('gorontalo') || (monthlyYieldKwh === 0 && (dc.todayYieldKwh || 0) === 0);
-    const isOffline = dc.isOffline || dc.status === 'Offline';
+    const monthlyYieldMwh = productionMwh > 0 ? productionMwh : (baselineRef?.monthlyYieldMwh ?? dc.monthYieldMwh ?? 0);
+    const monthlyYieldKwh = monthlyYieldMwh * 1000;
+
+    const todaySpecificYield = isUnderConstruction
+      ? null
+      : (dc.todaySpecificYield !== undefined
+          ? dc.todaySpecificYield
+          : (installedKwp !== null && installedKwp > 0 && dc.todayYieldKwh !== null && dc.todayYieldKwh !== undefined
+              ? Number(((dc.todayYieldKwh || 0) / installedKwp).toFixed(2))
+              : null));
+
+    const specificYield = isUnderConstruction
+      ? null
+      : (histPlant?.specificYield !== undefined && histPlant?.specificYield !== null
+          ? histPlant.specificYield
+          : ((installedKwp !== null && installedKwp > 0 && monthlyYieldKwh > 0)
+              ? Number((monthlyYieldKwh / installedKwp).toFixed(1))
+              : null));
+
+    const equivalentHour = isUnderConstruction ? null : (dc.equivalentHour !== undefined ? dc.equivalentHour : todaySpecificYield);
+    const isOffline = !isUnderConstruction && (dc.isOffline || dc.status === 'Offline');
     
     // Unified Proxy PR normalization (Single Source of Truth)
     const proxyPrNorm = normalizeProxyPr(dc, baselineRef);
-    const prPct = proxyPrNorm.proxyPrPercent;
-    const rawPrPct = proxyPrNorm.rawPrPct;
-    const isValidPr = proxyPrNorm.isValid;
-    const prStatus = proxyPrNorm.statusLabel;
+    const prPct = isUnderConstruction ? null : proxyPrNorm.proxyPrPercent;
+    const rawPrPct = isUnderConstruction ? null : proxyPrNorm.rawPrPct;
+    const isValidPr = !isUnderConstruction && proxyPrNorm.isValid;
+    const prStatus = isUnderConstruction ? 'Dalam Pembangunan' : proxyPrNorm.statusLabel;
 
-    const capacityFactor = (installedKwp !== null && installedKwp > 0 && monthlyYieldKwh > 0)
-      ? Number(((monthlyYieldKwh / (installedKwp * 24 * 30)) * 100).toFixed(1))
-      : (dc.todayYieldKwh !== null && dc.todayYieldKwh !== undefined && installedKwp !== null && installedKwp > 0
-          ? Number(((dc.todayYieldKwh / (installedKwp * 24)) * 100).toFixed(1))
-          : null);
+    const capacityFactor = isUnderConstruction
+      ? null
+      : ((installedKwp !== null && installedKwp > 0 && monthlyYieldKwh > 0)
+          ? Number(((monthlyYieldKwh / (installedKwp * 24 * 30)) * 100).toFixed(1))
+          : (dc.todayYieldKwh !== null && dc.todayYieldKwh !== undefined && installedKwp !== null && installedKwp > 0
+              ? Number(((dc.todayYieldKwh / (installedKwp * 24)) * 100).toFixed(1))
+              : null));
 
-    const peakPower = dc.currentPowerKw !== null && dc.currentPowerKw !== undefined ? dc.currentPowerKw : null;
-    const co2Ton = monthlyYieldMwh > 0
-      ? Number(((monthlyYieldMwh * 1000 * SOLAR_CONSTANTS.CO2_FACTOR_PLTS) / 1000).toFixed(2))
-      : (dc.todayYieldKwh ? Number(((dc.todayYieldKwh * SOLAR_CONSTANTS.CO2_FACTOR_PLTS) / 1000).toFixed(2)) : 0);
+    const peakPower = isUnderConstruction ? null : (dc.currentPowerKw !== null && dc.currentPowerKw !== undefined ? dc.currentPowerKw : null);
+    const co2Ton = isUnderConstruction
+      ? null
+      : (histPlant !== null && histPlant !== undefined && 'emissionTon' in histPlant
+          ? histPlant.emissionTon
+          : (emissionTon !== null && emissionTon !== undefined
+              ? emissionTon
+              : (monthlyYieldMwh > 0
+                  ? Number(((monthlyYieldMwh * 1000 * SOLAR_CONSTANTS.CO2_FACTOR_PLTS) / 1000).toFixed(2))
+                  : (dc.todayYieldKwh ? Number(((dc.todayYieldKwh * SOLAR_CONSTANTS.CO2_FACTOR_PLTS) / 1000).toFixed(2)) : 0))));
 
     let metricValue = null;
-    if (selectedMetric === 'specificYield') metricValue = todaySpecificYield;
-    else if (selectedMetric === 'equivalentHour') metricValue = equivalentHour;
-    else if (selectedMetric === 'pr') metricValue = prPct;
-    else if (selectedMetric === 'yieldMwh') metricValue = monthlyYieldMwh;
-    else if (selectedMetric === 'capacityFactor') metricValue = capacityFactor;
-    else if (selectedMetric === 'peakPower') metricValue = peakPower;
-    else if (selectedMetric === 'co2') metricValue = co2Ton;
+    if (isUnderConstruction) {
+      metricValue = null;
+    } else if (selectedMetric === 'specificYield') {
+      metricValue = todaySpecificYield;
+    } else if (selectedMetric === 'equivalentHour') {
+      metricValue = equivalentHour;
+    } else if (selectedMetric === 'pr') {
+      metricValue = prPct;
+    } else if (selectedMetric === 'yieldMwh') {
+      metricValue = monthlyYieldMwh;
+    } else if (selectedMetric === 'capacityFactor') {
+      metricValue = capacityFactor;
+    } else if (selectedMetric === 'peakPower') {
+      metricValue = peakPower;
+    } else if (selectedMetric === 'co2') {
+      metricValue = co2Ton;
+    }
 
     return {
       ...dc,
@@ -732,6 +782,10 @@ export function processAllDCAnalytics({
       installedKwp,
       monthlyYieldMwh,
       monthlyYieldKwh,
+      productionKwh,
+      productionMwh,
+      emissionTon,
+      monthlyHistory,
       specificYield,
       todaySpecificYield,
       equivalentHour,
@@ -739,6 +793,9 @@ export function processAllDCAnalytics({
       prPct,
       isValidPr,
       isOffline,
+      isUnderConstruction,
+      status: isUnderConstruction ? 'Dalam Pembangunan' : dc.status,
+      statusColor: isUnderConstruction ? '#94A3B8' : dc.statusColor,
       prStatus,
       capacityFactor,
       peakPower,
@@ -757,7 +814,7 @@ export function processAllDCAnalytics({
     ? items.filter(d => activeDCIdSet.has(d.dcId.toUpperCase()) || activeDCIdSet.has(d.canonicalName.toUpperCase()))
     : items;
 
-  // Sorting: place null/invalid metric values at the bottom
+  // Sorting: place null/invalid/under construction metric values at the bottom
   const sortedItems = [...items].sort((a, b) => {
     if (sortDirection === 'alpha') return a.name.localeCompare(b.name);
     const valA = a.metricValue;
@@ -768,7 +825,7 @@ export function processAllDCAnalytics({
     return valB - valA;
   });
 
-  const validMetricItems = filteredItems.filter(d => d.metricValue !== null && !isNaN(d.metricValue));
+  const validMetricItems = filteredItems.filter(d => !d.isUnderConstruction && d.metricValue !== null && !isNaN(d.metricValue));
   const averageMetricValue = validMetricItems.length > 0
     ? Number((validMetricItems.reduce((acc, curr) => acc + curr.metricValue, 0) / validMetricItems.length).toFixed(1))
     : null;
@@ -782,3 +839,4 @@ export function processAllDCAnalytics({
     averageMetricValue
   };
 }
+

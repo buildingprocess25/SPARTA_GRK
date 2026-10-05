@@ -50,7 +50,7 @@ export const CARBON_FACTORS = {
       factor: 0.761,
       label: 'Sumatera Interkoneksi',
       sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)',
-      auditNotes: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)'
+      auditNotes: 'Faktor grid Sumatera 0.761 kgCO2e/kWh (pembulatan audit historis 0.77)'
     },
     LOMBOK: { factor: 0.87, label: 'Lombok (NTB)', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
     NTB_LOMBOK: { factor: 0.87, label: 'Lombok (NTB)', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },

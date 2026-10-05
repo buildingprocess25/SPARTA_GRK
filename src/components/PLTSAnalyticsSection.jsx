@@ -224,14 +224,26 @@ export function formatWibTime(dateStr) {
 
 // Multi-badge priority builder: max 2 visible, remainder in tooltip
 export function getDCBadges(dc, selectedMetric) {
+  const isAuditBaselineEnabled = isFeatureEnabled('auditBaseline');
   const badges = [];
-  const isOffline = dc.isOffline || dc.status === 'Offline';
-  const hasAlarm = dc.hasAlarm || (dc.alarmCount && dc.alarmCount > 0) || dc.status === 'Alarm' || (dc.status || '').startsWith('Alarm');
-  const isWaiting = (dc.isWaiting || dc.status === 'Menunggu Data' || (dc.currentPowerKw === 0 && dc.todayYieldKwh === 0)) && !isOffline && !hasAlarm;
+  const isUnderConstruction = dc.isUnderConstruction || (dc.canonicalName || dc.name || '').toLowerCase().includes('gorontalo');
+  const isOffline = !isUnderConstruction && (dc.isOffline || dc.status === 'Offline');
+  const hasAlarm = !isUnderConstruction && (dc.hasAlarm || (dc.alarmCount && dc.alarmCount > 0) || dc.status === 'Alarm' || (dc.status || '').startsWith('Alarm'));
+  const isWaiting = !isUnderConstruction && (dc.isWaiting || dc.status === 'Menunggu Data' || (dc.currentPowerKw === 0 && dc.todayYieldKwh === 0)) && !isOffline && !hasAlarm;
   const isStale = dc.isDataStale;
-  const isUnreliable = dc.requiresManualVerification;
-  const isPrInvalid = selectedMetric === 'pr' && !dc.isValidPr && !isOffline && !isWaiting && !hasAlarm;
-  const isHighYield = (dc.todaySpecificYield || 0) > 6.0;
+  const isUnreliable = isAuditBaselineEnabled && dc.requiresManualVerification;
+  const isPrInvalid = isAuditBaselineEnabled && selectedMetric === 'pr' && !dc.isValidPr && !isOffline && !isWaiting && !hasAlarm;
+  const isHighYield = !isUnderConstruction && (dc.todaySpecificYield || 0) > 6.0;
+
+  // 0. Project Status: Under Construction
+  if (isUnderConstruction) {
+    badges.push({
+      id: 'under_construction',
+      label: 'Dalam Pembangunan',
+      className: 'bg-slate-100 text-slate-700 border-slate-300 font-semibold',
+      tooltip: 'Status proyek: Plant PLTS sedang dalam tahap pembangunan (dikecualikan dari ranking & rata-rata)'
+    });
+  }
 
   // 1. Dimension 1: Vendor Status (Offline)
   if (isOffline) {
@@ -314,7 +326,7 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-    return badges;
+  return badges;
 }
 
 const DCRowItem = React.memo(function DCRowItem({
@@ -331,6 +343,7 @@ const DCRowItem = React.memo(function DCRowItem({
   onMouseEnter,
   onMouseLeave
 }) {
+  const isAuditBaselineEnabled = isFeatureEnabled('auditBaseline');
   const name = dc.canonicalName || dc.name;
   const badges = getDCBadges(dc, selectedMetric);
   const visibleBadges = badges.slice(0, 2);
@@ -348,7 +361,7 @@ const DCRowItem = React.memo(function DCRowItem({
           ? 'opacity-75 bg-slate-50/70 border-dashed border-slate-200 text-slate-600'
           : 'bg-white border-transparent text-slate-600 hover:bg-slate-50'
       } ${isHovered ? 'ring-1 ring-blue-400' : ''}`}
-      title={`Kapasitas API: ${dc.installedKwp} kWp (Baseline: ${dc.baselineCapKwp || '—'} kWp${dc.capacityDiffPct ? `, Selisih: ${dc.capacityDiffPct}%` : ''})${selectedMetric === 'pr' ? ' • Proxy PR perkiraan berbasis audit April 2026' : isExcludedFromRanking ? ' • Dikecualikan dari ranking' : ''}`}
+      title={`Kapasitas API: ${dc.installedKwp} kWp${isAuditBaselineEnabled ? ` (Baseline: ${dc.baselineCapKwp || '—'} kWp${dc.capacityDiffPct ? `, Selisih: ${dc.capacityDiffPct}%` : ''})` : ''}${selectedMetric === 'pr' ? ' • Proxy PR perkiraan berbasis audit April 2026' : isExcludedFromRanking ? ' • Dikecualikan dari ranking' : ''}`}
     >
       <div className="flex items-center gap-2 min-w-0">
         <div className="shrink-0 text-blue-600">
@@ -387,7 +400,9 @@ const DCRowItem = React.memo(function DCRowItem({
 
       <div className="text-right shrink-0 pl-2">
         <span className="font-mono font-bold text-slate-800">
-          {isExcludedFromRanking && selectedMetric !== 'pr' ? (
+          {dc.isUnderConstruction ? (
+            <span className="text-slate-400 font-normal italic text-[11px]">Dalam Pembangunan</span>
+          ) : isExcludedFromRanking && selectedMetric !== 'pr' ? (
             <span className="text-slate-400" title="Dikecualikan dari ranking & rata-rata">
               {hasValidMetric ? `${dc.metricValue} ${activeMetricUnit}` : '—'}
             </span>
@@ -411,11 +426,13 @@ const DCRowItem = React.memo(function DCRowItem({
 
 export default function PLTSAnalyticsSection({
   stations = [],
+  historicalPlants = [],
   baselineData = [],
   lastSyncTime = 'Baru saja',
   quotaStatus = null
 }) {
   const [isMounted, setIsMounted] = useState(false);
+  const isAuditBaselineEnabled = isFeatureEnabled('auditBaseline');
 
   // Query param / master selection states
   const [selectedMetric, setSelectedMetric] = useState('specificYield');
@@ -506,22 +523,23 @@ export default function PLTSAnalyticsSection({
   const analyticsResult = useMemo(() => {
     return processAllDCAnalytics({
       stations,
+      historicalPlants,
       baselineData,
       selectedMetric,
       sortDirection,
       selectedDCIds: isAllSelected ? 'all' : selectedDCIds
     });
-  }, [stations, baselineData, selectedMetric, sortDirection, selectedDCIds, isAllSelected]);
+  }, [stations, historicalPlants, baselineData, selectedMetric, sortDirection, selectedDCIds, isAllSelected]);
 
   const rawAllDCItems = analyticsResult.items;
   const activeMetricMeta = METRIC_OPTIONS.find(m => m.id === selectedMetric) || METRIC_OPTIONS[0];
 
-  // Base list of DCs ALWAYS contains all 36 locations
+  // Base list of DCs ALWAYS contains all 36 canonical entities / 39 locations
   const allDCItems = rawAllDCItems;
 
   const unreliableCount = useMemo(() => {
-    return rawAllDCItems.filter(d => d.requiresManualVerification).length;
-  }, [rawAllDCItems]);
+    return isAuditBaselineEnabled ? rawAllDCItems.filter(d => d.requiresManualVerification).length : 0;
+  }, [rawAllDCItems, isAuditBaselineEnabled]);
 
   // Active chosen DCs (for filtering trend, table, and telemetry)
   const activeChosenDCIds = useMemo(() => {
@@ -535,25 +553,27 @@ export default function PLTSAnalyticsSection({
 
   const isAuditDependentMetric = selectedMetric === 'pr';
 
-  // Items eligible for ranking and average calculation
+  // Items eligible for ranking and average calculation (Exclude Gorontalo / Under Construction)
   const eligibleRankedList = useMemo(() => {
     return allDCItems.filter(dc => {
+      if (dc.isUnderConstruction) return false;
       if (selectedMetric === 'pr') {
-        return dc.isValidPr && dc.metricValue !== null && dc.metricValue !== undefined && !isNaN(dc.metricValue);
+        return isAuditBaselineEnabled && dc.isValidPr && dc.metricValue !== null && dc.metricValue !== undefined && !isNaN(dc.metricValue);
       }
       return dc.metricValue !== null && dc.metricValue !== undefined && !isNaN(dc.metricValue);
     });
-  }, [allDCItems, selectedMetric]);
+  }, [allDCItems, selectedMetric, isAuditBaselineEnabled]);
 
   const rankedChosenCount = useMemo(() => {
     return allDCItems.filter(dc => {
       if (!activeChosenDCIds.includes(dc.dcId)) return false;
+      if (dc.isUnderConstruction) return false;
       if (selectedMetric === 'pr') {
-        return dc.isValidPr && dc.metricValue !== null && dc.metricValue !== undefined && !isNaN(dc.metricValue);
+        return isAuditBaselineEnabled && dc.isValidPr && dc.metricValue !== null && dc.metricValue !== undefined && !isNaN(dc.metricValue);
       }
       return dc.metricValue !== null && dc.metricValue !== undefined && !isNaN(dc.metricValue);
     }).length;
-  }, [allDCItems, activeChosenDCIds, selectedMetric]);
+  }, [allDCItems, activeChosenDCIds, selectedMetric, isAuditBaselineEnabled]);
 
   const excludedChosenCount = Math.max(0, activeChosenCount - rankedChosenCount);
 
@@ -561,8 +581,9 @@ export default function PLTSAnalyticsSection({
   const computedAverageMetricValue = useMemo(() => {
     const chosenEligible = allDCItems.filter(dc => {
       if (!activeChosenDCIds.includes(dc.dcId)) return false;
+      if (dc.isUnderConstruction) return false;
       if (selectedMetric === 'pr') {
-        return dc.isValidPr && dc.metricValue !== null && dc.metricValue !== undefined && !isNaN(dc.metricValue);
+        return isAuditBaselineEnabled && dc.isValidPr && dc.metricValue !== null && dc.metricValue !== undefined && !isNaN(dc.metricValue);
       }
       return dc.metricValue !== null && dc.metricValue !== undefined && !isNaN(dc.metricValue);
     });
@@ -570,7 +591,7 @@ export default function PLTSAnalyticsSection({
     if (chosenEligible.length === 0) return null; // Returns null so UI displays "—" instead of "0"
     const sum = chosenEligible.reduce((acc, curr) => acc + (curr.metricValue || 0), 0);
     return Number((sum / chosenEligible.length).toFixed(1));
-  }, [allDCItems, activeChosenDCIds, selectedMetric]);
+  }, [allDCItems, activeChosenDCIds, selectedMetric, isAuditBaselineEnabled]);
 
   // Handler for selection buttons
   const handleSelectAll = () => {
@@ -598,6 +619,7 @@ export default function PLTSAnalyticsSection({
       }
       if (newSelected.length === allDCItems.length) {
         setIsAllSelected(true);
+
         newSelected = [];
       }
     }
@@ -1044,22 +1066,24 @@ export default function PLTSAnalyticsSection({
 
           {/* Toggle Sertakan Baseline Kurang Andal & Search Box */}
           <div className="py-2 space-y-2 shrink-0 border-b border-slate-100/80">
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer select-none text-[11px] font-medium text-slate-700 hover:text-slate-900">
-                <input
-                  type="checkbox"
-                  checked={includeUnreliableBaseline}
-                  onChange={(e) => setIncludeUnreliableBaseline(e.target.checked)}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5"
-                />
-                <span>Sertakan baseline kurang andal ({unreliableCount} lokasi)</span>
-              </label>
-              {!includeUnreliableBaseline && (
-                <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-semibold border border-amber-200/60">
-                  Default: Dieksklusi
-                </span>
-              )}
-            </div>
+            {isAuditBaselineEnabled && (
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer select-none text-[11px] font-medium text-slate-700 hover:text-slate-900">
+                  <input
+                    type="checkbox"
+                    checked={includeUnreliableBaseline}
+                    onChange={(e) => setIncludeUnreliableBaseline(e.target.checked)}
+                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 size-3.5"
+                  />
+                  <span>Sertakan baseline kurang andal ({unreliableCount} lokasi)</span>
+                </label>
+                {!includeUnreliableBaseline && (
+                  <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-semibold border border-amber-200/60">
+                    Default: Dieksklusi
+                  </span>
+                )}
+              </div>
+            )}
 
             <div className="relative">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -1685,18 +1709,20 @@ export default function PLTSAnalyticsSection({
                   >
                     Specific Yield
                   </th>
-                  <th
-                    onClick={() => {
-                      setTableSortColumn('historicalMonthlyPr');
-                      setTableSortDir(tableSortDir === 'asc' ? 'desc' : 'asc');
-                    }}
-                    className="text-right px-3 py-3 font-semibold cursor-pointer hover:bg-slate-800"
-                  >
-                    <div className="flex flex-col items-end">
-                      <span>Proxy PR (%)</span>
-                      <span className="text-[9px] text-slate-400 font-normal lowercase">audit apr 2026</span>
-                    </div>
-                  </th>
+                  {isAuditBaselineEnabled && (
+                    <th
+                      onClick={() => {
+                        setTableSortColumn('historicalMonthlyPr');
+                        setTableSortDir(tableSortDir === 'asc' ? 'desc' : 'asc');
+                      }}
+                      className="text-right px-3 py-3 font-semibold cursor-pointer hover:bg-slate-800"
+                    >
+                      <div className="flex flex-col items-end">
+                        <span>Proxy PR (%)</span>
+                        <span className="text-[9px] text-slate-400 font-normal lowercase">audit apr 2026</span>
+                      </div>
+                    </th>
+                  )}
                   <th className="text-right px-3 py-3 font-semibold">
                     <div className="flex flex-col items-end">
                       <span>PR Portal (Manual)</span>
@@ -1734,7 +1760,7 @@ export default function PLTSAnalyticsSection({
               <tbody className="divide-y divide-slate-100 bg-white">
                 {tableDisplayItems.length === 0 ? (
                   <tr>
-                    <td colSpan={12} className="p-10 text-center text-slate-400 text-xs">
+                    <td colSpan={isAuditBaselineEnabled ? 12 : 11} className="p-10 text-center text-slate-400 text-xs">
                       Tidak ada data yang cocok dengan pilihan filter saat ini.
                     </td>
                   </tr>
@@ -1765,6 +1791,11 @@ export default function PLTSAnalyticsSection({
                               <div className="flex flex-col">
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <span className="font-bold text-slate-900">{name}</span>
+                                  {d.isUnderConstruction && (
+                                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 font-bold border border-slate-300">
+                                      Dalam Pembangunan
+                                    </span>
+                                  )}
                                   {d.isMultiPlant && (
                                     <span className="text-[9px] px-1.5 py-0.2 rounded bg-purple-50 text-purple-700 font-bold border border-purple-200">
                                       Gabungan ({d.subPlants?.length || 2} Sub)
@@ -1775,7 +1806,7 @@ export default function PLTSAnalyticsSection({
                                       {d.inverterStats.totalCount} Inv
                                     </span>
                                   )}
-                                  {d.requiresManualVerification && (
+                                  {isAuditBaselineEnabled && d.requiresManualVerification && (
                                     <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 font-bold border border-amber-200" title={`Kapasitas API (${d.installedKwp} kWp) beda dari Baseline (${d.baselineCapKwp} kWp)`}>
                                       Kapasitas Beda ({d.capacityDiffPct}%)
                                     </span>
@@ -1792,27 +1823,37 @@ export default function PLTSAnalyticsSection({
                             {d.installedKwp !== null && d.installedKwp !== undefined ? `${d.installedKwp} kWp` : '—'}
                           </td>
                           <td className="px-3 py-3 font-mono text-right text-slate-900 font-bold">
-                            {d.monthYieldMwh !== null && d.monthYieldMwh !== undefined ? `${d.monthYieldMwh} MWh` : (d.monthlyYieldMwh ? `${d.monthlyYieldMwh} MWh` : '—')}
-                          </td>
-                          <td className="px-3 py-3 font-mono text-right text-blue-700 font-bold">
-                            {d.specificYield !== null && d.specificYield !== undefined ? d.specificYield : '—'}
-                          </td>
-                          {/* Proxy PR */}
-                          <td className="px-3 py-3 font-mono text-right">
-                            {d.prPct !== null && d.prPct !== undefined ? (
-                              <span
-                                className="inline-flex items-center gap-1 font-bold text-slate-700"
-                                title="Proxy PR perkiraan berbasis audit April 2026. Bisa berbeda dari Plant PR resmi iSolarCloud."
-                              >
-                                {d.prPct}%
-                                <span className="text-[9px] px-1 bg-slate-100 text-slate-500 rounded font-normal border border-slate-200">
-                                  Proxy
-                                </span>
-                              </span>
+                            {d.isUnderConstruction ? (
+                              <span className="text-slate-400 font-normal italic text-[11px]">Dalam Pembangunan</span>
+                            ) : d.productionMwh !== null && d.productionMwh !== undefined ? (
+                              `${formatNum(d.productionMwh, 2)} MWh`
+                            ) : d.monthYieldMwh !== null && d.monthYieldMwh !== undefined ? (
+                              `${formatNum(d.monthYieldMwh, 2)} MWh`
                             ) : (
-                              <span className="text-slate-400" title="Data Proxy PR tidak tersedia">—</span>
+                              '—'
                             )}
                           </td>
+                          <td className="px-3 py-3 font-mono text-right text-blue-700 font-bold">
+                            {d.isUnderConstruction ? '—' : (d.specificYield !== null && d.specificYield !== undefined ? formatNum(d.specificYield, 1) : '—')}
+                          </td>
+                          {/* Proxy PR */}
+                          {isAuditBaselineEnabled && (
+                            <td className="px-3 py-3 font-mono text-right">
+                              {d.prPct !== null && d.prPct !== undefined ? (
+                                <span
+                                  className="inline-flex items-center gap-1 font-bold text-slate-700"
+                                  title="Proxy PR perkiraan berbasis audit April 2026. Bisa berbeda dari Plant PR resmi iSolarCloud."
+                                >
+                                  {d.prPct}%
+                                  <span className="text-[9px] px-1 bg-slate-100 text-slate-500 rounded font-normal border border-slate-200">
+                                    Proxy
+                                  </span>
+                                </span>
+                              ) : (
+                                <span className="text-slate-400" title="Data Proxy PR tidak tersedia">—</span>
+                              )}
+                            </td>
+                          )}
                           {/* Portal PR Manual */}
                           <td className="px-3 py-3 font-mono text-right">
                             {d.portalPrManual ? (
@@ -1854,16 +1895,26 @@ export default function PLTSAnalyticsSection({
                             )}
                           </td>
                           <td className="px-3 py-3 font-mono text-right text-slate-600">
-                            {d.capacityFactor !== null && d.capacityFactor !== undefined ? `${d.capacityFactor}%` : '—'}
+                            {d.isUnderConstruction ? '—' : (d.capacityFactor !== null && d.capacityFactor !== undefined ? `${d.capacityFactor}%` : '—')}
                           </td>
                           <td className="px-3 py-3 font-mono text-right text-emerald-700 font-semibold">
-                            {d.totalCo2AvoidedTon !== null && d.totalCo2AvoidedTon !== undefined ? `${d.totalCo2AvoidedTon} t` : (d.co2Ton ? `${d.co2Ton} t` : '—')}
+                            {d.isUnderConstruction ? (
+                              '—'
+                            ) : d.emissionTon !== null && d.emissionTon !== undefined ? (
+                              `${formatNum(d.emissionTon, 2)} t`
+                            ) : d.co2Ton ? (
+                              `${formatNum(d.co2Ton, 2)} t`
+                            ) : (
+                              '—'
+                            )}
                           </td>
                           <td className="px-3 py-3 text-center">
                             <div className="flex flex-col items-center gap-1">
                               <span
                                 className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
-                                  (d.status || '').includes('Normal') || (d.status || '').includes('Peak')
+                                  d.isUnderConstruction
+                                    ? 'bg-slate-100 text-slate-600 border-slate-300'
+                                    : (d.status || '').includes('Normal') || (d.status || '').includes('Peak')
                                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                     : (d.status || '').includes('Offline')
                                     ? 'bg-slate-100 text-slate-600 border-slate-200'
@@ -1890,7 +1941,7 @@ export default function PLTSAnalyticsSection({
                         {/* EXPANDABLE SUB-PLANTS ROW (Cilacap 1/2/3, Lombok A/B) */}
                         {d.isMultiPlant && isExpanded && d.subPlants && d.subPlants.length > 0 && (
                           <tr className="bg-slate-50/80 border-b border-slate-200">
-                            <td colSpan={12} className="px-6 py-3">
+                            <td colSpan={isAuditBaselineEnabled ? 12 : 11} className="px-6 py-3">
                               <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-xs space-y-2">
                                 <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
                                   <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
@@ -1922,7 +1973,7 @@ export default function PLTSAnalyticsSection({
                                           <span>Yield Hari Ini: <strong className="text-emerald-700">{sp.todayYieldKwh || 0} kWh</strong></span>
                                         </div>
                                       )}
-                                      {sp.diffPct !== undefined && sp.diffPct > 10 && (
+                                      {isAuditBaselineEnabled && sp.diffPct !== undefined && sp.diffPct > 10 && (
                                         <div className="text-[9px] text-amber-700 font-medium">
                                           Baseline: {sp.baselineKwp} kWp (Selisih {sp.diffPct}%)
                                         </div>
@@ -1950,14 +2001,16 @@ export default function PLTSAnalyticsSection({
                     {formatNum(tableDisplayItems.reduce((acc, d) => acc + (d.installedKwp || 0), 0), 2)} kWp
                   </td>
                   <td className="px-3 py-3 font-mono text-right text-emerald-300 font-bold">
-                    {formatNum(tableDisplayItems.reduce((acc, d) => acc + (d.monthYieldMwh || d.monthlyYieldMwh || 0), 0), 2)} MWh
+                    {formatNum(tableDisplayItems.reduce((acc, d) => acc + (d.productionMwh || d.monthYieldMwh || d.monthlyYieldMwh || 0), 0), 2)} MWh
                   </td>
                   <td className="px-3 py-3 font-mono text-right text-blue-300 font-bold">
-                    {Number((tableDisplayItems.reduce((acc, d) => acc + (d.specificYield || 0), 0) / Math.max(1, tableDisplayItems.length)).toFixed(1))}
+                    {Number((tableDisplayItems.filter(d => !d.isUnderConstruction && d.specificYield > 0).reduce((acc, d) => acc + d.specificYield, 0) / Math.max(1, tableDisplayItems.filter(d => !d.isUnderConstruction && d.specificYield > 0).length)).toFixed(1))}
                   </td>
-                  <td className="px-3 py-3 font-mono text-right text-emerald-300 font-bold">
-                    {Number((tableDisplayItems.reduce((acc, d) => acc + (d.historicalMonthlyPr || d.prPct || 0), 0) / Math.max(1, tableDisplayItems.filter(d => (d.historicalMonthlyPr || d.prPct) > 0).length)).toFixed(1))}%
-                  </td>
+                  {isAuditBaselineEnabled && (
+                    <td className="px-3 py-3 font-mono text-right text-emerald-300 font-bold">
+                      {Number((tableDisplayItems.reduce((acc, d) => acc + (d.historicalMonthlyPr || d.prPct || 0), 0) / Math.max(1, tableDisplayItems.filter(d => (d.historicalMonthlyPr || d.prPct) > 0).length)).toFixed(1))}%
+                    </td>
+                  )}
                   <td className="px-3 py-3 font-mono text-right text-slate-400">
                     —
                   </td>
@@ -1965,10 +2018,10 @@ export default function PLTSAnalyticsSection({
                     —
                   </td>
                   <td className="px-3 py-3 font-mono text-right text-slate-300">
-                    {Number((tableDisplayItems.reduce((acc, d) => acc + (d.capacityFactor || 0), 0) / Math.max(1, tableDisplayItems.length)).toFixed(2))}%
+                    {Number((tableDisplayItems.filter(d => !d.isUnderConstruction && d.capacityFactor > 0).reduce((acc, d) => acc + d.capacityFactor, 0) / Math.max(1, tableDisplayItems.filter(d => !d.isUnderConstruction && d.capacityFactor > 0).length)).toFixed(2))}%
                   </td>
                   <td className="px-3 py-3 font-mono text-right text-emerald-300 font-bold">
-                    {formatNum(tableDisplayItems.reduce((acc, d) => acc + (d.totalCo2AvoidedTon || d.co2Ton || 0), 0), 2)} t
+                    {formatNum(tableDisplayItems.filter(d => !d.isUnderConstruction).reduce((acc, d) => acc + (d.emissionTon || d.co2Ton || 0), 0), 2)} t
                   </td>
                   <td className="px-3 py-3 text-center text-[10px] text-slate-400">
                     {tableDisplayItems.filter(d => (d.status || '').includes('Normal') || (d.status || '').includes('Peak')).length} Normal
