@@ -1,0 +1,2798 @@
+{
+  "filters": {
+    "period": "2026-09_2026-09",
+    "mode": "MONTH",
+    "month": 9,
+    "throughMonth": 9,
+    "grid": "ALL",
+    "plant": "ALL",
+    "compareYears": [
+      2025,
+      2026
+    ]
+  },
+  "selectedYear": 2026,
+  "selectedMonths": [
+    "202609"
+  ],
+  "summary": {
+    "plantCount": 39,
+    "capacityKwp": 5876.12,
+    "productionKwh": 582828.4,
+    "productionMwh": 582.8284,
+    "savingsKwh": 582828.4,
+    "costSavings": {
+      "totalIdr": 842012191,
+      "ratePerKwh": 1444.7,
+      "currency": "IDR",
+      "method": "canonical",
+      "formattedIdr": "Rp 842.012.191"
+    },
+    "targetMwh": 475,
+    "achievementPct": 122.70071578947368,
+    "emission": {
+      "emissionTon": 451.504164,
+      "includedPlantCount": 37,
+      "excludedPlantCount": 2,
+      "excludedEnergyMwh": 24.003
+    },
+    "rkap": {
+      "factorKgPerKwh": 0.997894737,
+      "actualCo2Ton": 581.601393,
+      "targetCo2Ton": 474,
+      "achievementPct": 122.70071582278482
+    },
+    "pr": {
+      "valuePct": 77.971705,
+      "activePlantCount": 34,
+      "invalid": false
+    },
+    "specificYield": {
+      "value": 99.185925,
+      "coveredPlantCount": 39,
+      "totalPlantCount": 39
+    },
+    "totalLoadKwh": 1937216.46,
+    "totalLoadMwh": 1937.22,
+    "energyMix": {
+      "pltsSharePct": 30.1,
+      "plnSharePct": 69.9,
+      "targetSharePct": 20
+    },
+    "climate": {
+      "avgRadiationKwhM2": 132.1,
+      "avgModuleTempC": null,
+      "totalMeasurements": 35
+    },
+    "targetYtdMwh": 475,
+    "targetYtdKwh": 475000,
+    "targetEoyMwh": 5858,
+    "targetEoyKwh": 5858000,
+    "achievementYtdPct": 122.7,
+    "progressEoyPct": 9.95
+  },
+  "monthly": [
+    {
+      "yearMonth": "202609",
+      "actualMwh": 582.8284,
+      "targetMwh": 475,
+      "achievementPct": 122.70071578947368,
+      "loadKwh": 1937216.46,
+      "loadMwh": 1937.22,
+      "radiationKwhM2": 132.1,
+      "prValuePct": 77.971705,
+      "partial": false,
+      "source": "ISOLAR_REPORT_IMPORT"
+    }
+  ],
+  "fullYearMonthly": [
+    {
+      "month": 1,
+      "yearMonth": "202601",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 515000,
+      "targetMwh": 515,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 2,
+      "yearMonth": "202602",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 535000,
+      "targetMwh": 535,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 3,
+      "yearMonth": "202603",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 535000,
+      "targetMwh": 535,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 4,
+      "yearMonth": "202604",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 475000,
+      "targetMwh": 475,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 5,
+      "yearMonth": "202605",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 475000,
+      "targetMwh": 475,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 6,
+      "yearMonth": "202606",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 475000,
+      "targetMwh": 475,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 7,
+      "yearMonth": "202607",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 475000,
+      "targetMwh": 475,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 8,
+      "yearMonth": "202608",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 475000,
+      "targetMwh": 475,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 9,
+      "yearMonth": "202609",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 475000,
+      "targetMwh": 475,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 10,
+      "yearMonth": "202610",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 475000,
+      "targetMwh": 475,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": true,
+      "isFuture": false,
+      "isWithinYtd": false
+    },
+    {
+      "month": 11,
+      "yearMonth": "202611",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 474000,
+      "targetMwh": 474,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": true,
+      "isWithinYtd": false
+    },
+    {
+      "month": 12,
+      "yearMonth": "202612",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": 474000,
+      "targetMwh": 474,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": true,
+      "isWithinYtd": false
+    }
+  ],
+  "plants": [
+    {
+      "dcId": "DC-BALARAJA",
+      "canonicalName": "Balaraja",
+      "grid": "JAMALI",
+      "psIds": [
+        1159436
+      ],
+      "capacityKwp": 399.73,
+      "productionKwh": 31576.3,
+      "productionMwh": 31.5763,
+      "specificYield": 78.994071,
+      "costSavings": {
+        "savingsIdr": 45618281,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 26.208329,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 1,
+        "invalid": true
+      },
+      "loadKwh": 95552.54,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 31576.3,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1159436,
+              "energyKwh": 31576.3,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 31576.3,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-BALI",
+      "canonicalName": "Bali",
+      "grid": "JAMALI",
+      "psIds": [
+        1159719
+      ],
+      "capacityKwp": 88,
+      "productionKwh": 14786.2,
+      "productionMwh": 14.7862,
+      "specificYield": 168.025,
+      "costSavings": {
+        "savingsIdr": 21361623,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 12.272546,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 1,
+        "invalid": true
+      },
+      "loadKwh": 39402.45,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 14786.2,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1159719,
+              "energyKwh": 14786.2,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 14786.2,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-BANDUNG1",
+      "canonicalName": "Bandung 1",
+      "grid": "JAMALI",
+      "psIds": [
+        1159732
+      ],
+      "capacityKwp": 140,
+      "productionKwh": 17346.2,
+      "productionMwh": 17.3462,
+      "specificYield": 123.901429,
+      "costSavings": {
+        "savingsIdr": 25060055,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 14.397346,
+      "pr": {
+        "valuePct": 83.314256,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 59948.41,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 17346.2,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1159732,
+              "energyKwh": 17346.2,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 17346.2,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-BANDUNG2",
+      "canonicalName": "Bandung 2",
+      "grid": "JAMALI",
+      "psIds": [
+        1389249
+      ],
+      "capacityKwp": 168.72,
+      "productionKwh": 11101.9,
+      "productionMwh": 11.1019,
+      "specificYield": 65.800735,
+      "costSavings": {
+        "savingsIdr": 16038915,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 9.214577,
+      "pr": {
+        "valuePct": 41.01822,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 28467.61,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 11101.9,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1389249,
+              "energyKwh": 11101.9,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 11101.9,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-BANJARMASIN",
+      "canonicalName": "Banjarmasin",
+      "grid": "KALBAR",
+      "psIds": [
+        1154267
+      ],
+      "capacityKwp": 129.6,
+      "productionKwh": 8466.7,
+      "productionMwh": 8.4667,
+      "specificYield": 65.329475,
+      "costSavings": {
+        "savingsIdr": 12231841,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "KALBAR",
+        "name": "Kalimantan Barat",
+        "aliases": [
+          "kalbar",
+          "kalimantan barat"
+        ],
+        "provinces": "Kalimantan Barat",
+        "status": "resmi",
+        "cmExPost": 0.95,
+        "cmExAnte": 0.95,
+        "cmPlts": 0.84
+      },
+      "emissionTon": 7.112028,
+      "pr": {
+        "valuePct": 48.621959,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 66266.57,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 8466.7,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1154267,
+              "energyKwh": 8466.7,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 8466.7,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-BATAM",
+      "canonicalName": "Batam",
+      "grid": "BATAM",
+      "psIds": [
+        1224963
+      ],
+      "capacityKwp": 99,
+      "productionKwh": 10761.4,
+      "productionMwh": 10.7614,
+      "specificYield": 108.70101,
+      "costSavings": {
+        "savingsIdr": 15546995,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "BATAM",
+        "name": "Sistem Batam-Bintan",
+        "aliases": [
+          "batam",
+          "batam-bintan"
+        ],
+        "provinces": "Kepulauan Riau",
+        "status": "resmi",
+        "cmExPost": 0.76,
+        "cmExAnte": 0.76,
+        "cmPlts": 0.76
+      },
+      "emissionTon": 8.178664,
+      "pr": {
+        "valuePct": 81.525167,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 52839.7,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 10761.4,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1224963,
+              "energyKwh": 10761.4,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 10761.4,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-BOGOR",
+      "canonicalName": "Bogor",
+      "grid": "JAMALI",
+      "psIds": [
+        1162742
+      ],
+      "capacityKwp": 106,
+      "productionKwh": 13952.5,
+      "productionMwh": 13.9525,
+      "specificYield": 131.627358,
+      "costSavings": {
+        "savingsIdr": 20157177,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 11.580575,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 0,
+        "invalid": false
+      },
+      "loadKwh": 61168.8,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 13952.5,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1162742,
+              "energyKwh": 13952.5,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 13952.5,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-CIANJUR",
+      "canonicalName": "Cianjur",
+      "grid": "JAMALI",
+      "psIds": [
+        1378278
+      ],
+      "capacityKwp": 197.54,
+      "productionKwh": 17092,
+      "productionMwh": 17.092,
+      "specificYield": 86.524248,
+      "costSavings": {
+        "savingsIdr": 24692812,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 14.18636,
+      "pr": {
+        "valuePct": 54.075644,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 48422.98,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 17092,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1378278,
+              "energyKwh": 17092,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 17092,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-CILACAP-1",
+      "canonicalName": "Cilacap 1",
+      "grid": "JAMALI",
+      "psIds": [
+        1386493
+      ],
+      "capacityKwp": 137.1,
+      "productionKwh": 18862.4,
+      "productionMwh": 18.8624,
+      "specificYield": 137.581327,
+      "costSavings": {
+        "savingsIdr": 27250509,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 15.655792,
+      "pr": {
+        "valuePct": 77.78794,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 37749.17,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 18862.4,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1386493,
+              "energyKwh": 18862.4,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 18862.4,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-CILACAP-2",
+      "canonicalName": "Cilacap 2",
+      "grid": "JAMALI",
+      "psIds": [
+        1387109
+      ],
+      "capacityKwp": 47.73,
+      "productionKwh": 1992.4,
+      "productionMwh": 1.9924,
+      "specificYield": 41.743138,
+      "costSavings": {
+        "savingsIdr": 2878420,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 1.653692,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 0,
+        "invalid": false
+      },
+      "loadKwh": 8974.38,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 1992.4,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1387109,
+              "energyKwh": 1992.4,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 1992.4,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-CILACAP-3",
+      "canonicalName": "Cilacap 3",
+      "grid": "JAMALI",
+      "psIds": [
+        1387111
+      ],
+      "capacityKwp": 30.52,
+      "productionKwh": 2248.6,
+      "productionMwh": 2.2486,
+      "specificYield": 73.676278,
+      "costSavings": {
+        "savingsIdr": 3248552,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 1.866338,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 0,
+        "invalid": false
+      },
+      "loadKwh": 7970.21,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 2248.6,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1387111,
+              "energyKwh": 2248.6,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 2248.6,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-CILEUNGSI",
+      "canonicalName": "Cileungsi",
+      "grid": "JAMALI",
+      "psIds": [
+        1459033
+      ],
+      "capacityKwp": 479.5,
+      "productionKwh": 48433,
+      "productionMwh": 48.433,
+      "specificYield": 101.007299,
+      "costSavings": {
+        "savingsIdr": 69971155,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 40.19939,
+      "pr": {
+        "valuePct": 68.716226,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 203126.42,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 48433,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1459033,
+              "energyKwh": 48433,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 48433,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-GORONTALO",
+      "canonicalName": "Gorontalo",
+      "grid": "SULUTGO",
+      "psIds": [
+        1585267
+      ],
+      "capacityKwp": 84.7,
+      "productionKwh": 0,
+      "productionMwh": 0,
+      "specificYield": 0,
+      "costSavings": {
+        "savingsIdr": null,
+        "ratePerKwh": 0,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "SULUTGO",
+        "name": "Sulawesi Utara & Gorontalo",
+        "aliases": [
+          "sulutgo",
+          "sulutenggo",
+          "gorontalo",
+          "manado"
+        ],
+        "provinces": "Sulawesi Utara, Gorontalo",
+        "status": "sementara",
+        "cmExPost": 0.6,
+        "cmExAnte": 0.6,
+        "cmPlts": 0.6
+      },
+      "emissionTon": null,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 0,
+        "invalid": false
+      },
+      "loadKwh": 25132.03,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 0,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1585267,
+              "energyKwh": 0,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 0,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-JAMBI",
+      "canonicalName": "Jambi",
+      "grid": "SUMATERA",
+      "psIds": [
+        1223464
+      ],
+      "capacityKwp": 88,
+      "productionKwh": 5317.9,
+      "productionMwh": 5.3179,
+      "specificYield": 60.430682,
+      "costSavings": {
+        "savingsIdr": 7682770,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "SUMATERA",
+        "name": "Sistem Sumatera Interkoneksi",
+        "aliases": [
+          "sumatera",
+          "sumatra"
+        ],
+        "provinces": "Aceh, Sumut, Sumbar, Riau, Jambi, Sumsel, Bengkulu, Lampung, Babel",
+        "status": "resmi",
+        "cmExPost": 0.761,
+        "cmExAnte": 0.761,
+        "cmPlts": 0.75
+      },
+      "emissionTon": 3.988425,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 1,
+        "invalid": true
+      },
+      "loadKwh": 2903.32,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 5317.9,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1223464,
+              "energyKwh": 5317.9,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 5317.9,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-JEMBER",
+      "canonicalName": "Jember",
+      "grid": "JAMALI",
+      "psIds": [
+        1392560
+      ],
+      "capacityKwp": 157.62,
+      "productionKwh": 17568,
+      "productionMwh": 17.568,
+      "specificYield": 111.457937,
+      "costSavings": {
+        "savingsIdr": 25380490,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 14.58144,
+      "pr": {
+        "valuePct": 63.885839,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 40673.49,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 17568,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1392560,
+              "energyKwh": 17568,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 17568,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-KARAWANG",
+      "canonicalName": "Karawang",
+      "grid": "JAMALI",
+      "psIds": [
+        1092345
+      ],
+      "capacityKwp": 198,
+      "productionKwh": 24026.8,
+      "productionMwh": 24.0268,
+      "specificYield": 121.347475,
+      "costSavings": {
+        "savingsIdr": 34711518,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 19.942244,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 1,
+        "invalid": true
+      },
+      "loadKwh": 67275.05,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 24026.8,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1092345,
+              "energyKwh": 24026.8,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 24026.8,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-KLATEN",
+      "canonicalName": "Klaten",
+      "grid": "JAMALI",
+      "psIds": [
+        1376844
+      ],
+      "capacityKwp": 102.12,
+      "productionKwh": 13270.6,
+      "productionMwh": 13.2706,
+      "specificYield": 129.951038,
+      "costSavings": {
+        "savingsIdr": 19172036,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 11.014598,
+      "pr": {
+        "valuePct": 74.671356,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 50641.91,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 13270.6,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1376844,
+              "energyKwh": 13270.6,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 13270.6,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-KOTABUMI",
+      "canonicalName": "Kotabumi",
+      "grid": "SUMATERA",
+      "psIds": [
+        1247367
+      ],
+      "capacityKwp": 123,
+      "productionKwh": 11878.6,
+      "productionMwh": 11.8786,
+      "specificYield": 96.573984,
+      "costSavings": {
+        "savingsIdr": 17161013,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "SUMATERA",
+        "name": "Sistem Sumatera Interkoneksi",
+        "aliases": [
+          "sumatera",
+          "sumatra"
+        ],
+        "provinces": "Aceh, Sumut, Sumbar, Riau, Jambi, Sumsel, Bengkulu, Lampung, Babel",
+        "status": "resmi",
+        "cmExPost": 0.761,
+        "cmExAnte": 0.761,
+        "cmPlts": 0.75
+      },
+      "emissionTon": 8.90895,
+      "pr": {
+        "valuePct": 79.318616,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 38494.76,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 11878.6,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1247367,
+              "energyKwh": 11878.6,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 11878.6,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-LAMPUNG",
+      "canonicalName": "Lampung",
+      "grid": "SUMATERA",
+      "psIds": [
+        1218534
+      ],
+      "capacityKwp": 108.9,
+      "productionKwh": 12365.3,
+      "productionMwh": 12.3653,
+      "specificYield": 113.547291,
+      "costSavings": {
+        "savingsIdr": 17864149,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "SUMATERA",
+        "name": "Sistem Sumatera Interkoneksi",
+        "aliases": [
+          "sumatera",
+          "sumatra"
+        ],
+        "provinces": "Aceh, Sumut, Sumbar, Riau, Jambi, Sumsel, Bengkulu, Lampung, Babel",
+        "status": "resmi",
+        "cmExPost": 0.761,
+        "cmExAnte": 0.761,
+        "cmPlts": 0.75
+      },
+      "emissionTon": 9.273975,
+      "pr": {
+        "valuePct": 87.097918,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 22547.23,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 12365.3,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1218534,
+              "energyKwh": 12365.3,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 12365.3,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-LOMBOK-A",
+      "canonicalName": "Lombok A",
+      "grid": "NTB_LOMBOK",
+      "psIds": [
+        1219736
+      ],
+      "capacityKwp": 12,
+      "productionKwh": 2152.5,
+      "productionMwh": 2.1525,
+      "specificYield": 179.375,
+      "costSavings": {
+        "savingsIdr": 3109717,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "NTB_LOMBOK",
+        "name": "Sistem Lombok (NTB)",
+        "aliases": [
+          "ntb_lombok",
+          "lombok",
+          "ntb",
+          "nusa tenggara barat"
+        ],
+        "provinces": "Nusa Tenggara Barat",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 1.786575,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 0,
+        "invalid": false
+      },
+      "loadKwh": 10401.29,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 2152.5,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1219736,
+              "energyKwh": 2152.5,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 2152.5,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-LOMBOK-B",
+      "canonicalName": "Lombok B",
+      "grid": "NTB_LOMBOK",
+      "psIds": [
+        1219715
+      ],
+      "capacityKwp": 57.75,
+      "productionKwh": 8169.4,
+      "productionMwh": 8.1694,
+      "specificYield": 141.461472,
+      "costSavings": {
+        "savingsIdr": 11802332,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "NTB_LOMBOK",
+        "name": "Sistem Lombok (NTB)",
+        "aliases": [
+          "ntb_lombok",
+          "lombok",
+          "ntb",
+          "nusa tenggara barat"
+        ],
+        "provinces": "Nusa Tenggara Barat",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 6.780602,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 1,
+        "invalid": true
+      },
+      "loadKwh": 26737.63,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 8169.4,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1219715,
+              "energyKwh": 8169.4,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 8169.4,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-LUWU",
+      "canonicalName": "Luwu",
+      "grid": "SULSELRABAR",
+      "psIds": [
+        1583524
+      ],
+      "capacityKwp": 96.8,
+      "productionKwh": 13426.5,
+      "productionMwh": 13.4265,
+      "specificYield": 138.703512,
+      "costSavings": {
+        "savingsIdr": 19397265,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "SULSELRABAR",
+        "name": "Sulawesi Bagian Selatan, Tenggara, dan Barat",
+        "aliases": [
+          "sulselrabar",
+          "sulawesi selatan",
+          "sulawesi"
+        ],
+        "provinces": "Sulsel, Sulbar, Sultra",
+        "status": "resmi",
+        "cmExPost": 0.75,
+        "cmExAnte": 0.75,
+        "cmPlts": 0.72
+      },
+      "emissionTon": 9.66708,
+      "pr": {
+        "valuePct": 83.665284,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 30098.23,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 13426.5,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1583524,
+              "energyKwh": 13426.5,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 13426.5,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-MADIUN",
+      "canonicalName": "Madiun",
+      "grid": "JAMALI",
+      "psIds": [
+        1391178
+      ],
+      "capacityKwp": 250.86,
+      "productionKwh": 18397.9,
+      "productionMwh": 18.3979,
+      "specificYield": 73.339313,
+      "costSavings": {
+        "savingsIdr": 26579446,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 15.270257,
+      "pr": {
+        "valuePct": 42.411298,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 44865.38,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 18397.9,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1391178,
+              "energyKwh": 18397.9,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 18397.9,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-MAKASSAR",
+      "canonicalName": "Makassar",
+      "grid": "SULSELRABAR",
+      "psIds": [
+        1231394
+      ],
+      "capacityKwp": 231,
+      "productionKwh": 29101.7,
+      "productionMwh": 29.1017,
+      "specificYield": 125.981385,
+      "costSavings": {
+        "savingsIdr": 42043226,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "SULSELRABAR",
+        "name": "Sulawesi Bagian Selatan, Tenggara, dan Barat",
+        "aliases": [
+          "sulselrabar",
+          "sulawesi selatan",
+          "sulawesi"
+        ],
+        "provinces": "Sulsel, Sulbar, Sultra",
+        "status": "resmi",
+        "cmExPost": 0.75,
+        "cmExAnte": 0.75,
+        "cmPlts": 0.72
+      },
+      "emissionTon": 20.953224,
+      "pr": {
+        "valuePct": 83.26943,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 56270.23,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 29101.7,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1231394,
+              "energyKwh": 29101.7,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 29101.7,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-MALANG",
+      "canonicalName": "Malang",
+      "grid": "JAMALI",
+      "psIds": [
+        1159761
+      ],
+      "capacityKwp": 107.84,
+      "productionKwh": 14946.4,
+      "productionMwh": 14.9464,
+      "specificYield": 138.597923,
+      "costSavings": {
+        "savingsIdr": 21593064,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 12.405512,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 1,
+        "invalid": true
+      },
+      "loadKwh": 46789.76,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 14946.4,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1159761,
+              "energyKwh": 14946.4,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 14946.4,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-MANADO",
+      "canonicalName": "Manado",
+      "grid": "SULUTGO",
+      "psIds": [
+        1230507
+      ],
+      "capacityKwp": 200.2,
+      "productionKwh": 24003,
+      "productionMwh": 24.003,
+      "specificYield": 119.895105,
+      "costSavings": {
+        "savingsIdr": 34677134,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "SULUTGO",
+        "name": "Sulawesi Utara & Gorontalo",
+        "aliases": [
+          "sulutgo",
+          "sulutenggo",
+          "gorontalo",
+          "manado"
+        ],
+        "provinces": "Sulawesi Utara, Gorontalo",
+        "status": "sementara",
+        "cmExPost": 0.6,
+        "cmExAnte": 0.6,
+        "cmPlts": 0.6
+      },
+      "emissionTon": null,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 1,
+        "invalid": true
+      },
+      "loadKwh": 64197.31,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 24003,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1230507,
+              "energyKwh": 24003,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 24003,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-MEDAN",
+      "canonicalName": "Medan",
+      "grid": "SUMATERA",
+      "psIds": [
+        1157086
+      ],
+      "capacityKwp": 162,
+      "productionKwh": 16464.3,
+      "productionMwh": 16.4643,
+      "specificYield": 101.631481,
+      "costSavings": {
+        "savingsIdr": 23785974,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "SUMATERA",
+        "name": "Sistem Sumatera Interkoneksi",
+        "aliases": [
+          "sumatera",
+          "sumatra"
+        ],
+        "provinces": "Aceh, Sumut, Sumbar, Riau, Jambi, Sumsel, Bengkulu, Lampung, Babel",
+        "status": "resmi",
+        "cmExPost": 0.761,
+        "cmExAnte": 0.761,
+        "cmPlts": 0.75
+      },
+      "emissionTon": 12.348225,
+      "pr": {
+        "valuePct": 93.672512,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 76324.76,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 16464.3,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1157086,
+              "energyKwh": 16464.3,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 16464.3,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-PALEMBANG",
+      "canonicalName": "Palembang",
+      "grid": "SUMATERA",
+      "psIds": [
+        1154284
+      ],
+      "capacityKwp": 236.57,
+      "productionKwh": 24030.2,
+      "productionMwh": 24.0302,
+      "specificYield": 101.577546,
+      "costSavings": {
+        "savingsIdr": 34716430,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "SUMATERA",
+        "name": "Sistem Sumatera Interkoneksi",
+        "aliases": [
+          "sumatera",
+          "sumatra"
+        ],
+        "provinces": "Aceh, Sumut, Sumbar, Riau, Jambi, Sumsel, Bengkulu, Lampung, Babel",
+        "status": "resmi",
+        "cmExPost": 0.761,
+        "cmExAnte": 0.761,
+        "cmPlts": 0.75
+      },
+      "emissionTon": 18.02265,
+      "pr": {
+        "valuePct": 82.021265,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 107215.44,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 24030.2,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1154284,
+              "energyKwh": 24030.2,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 24030.2,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-PARUNG",
+      "canonicalName": "Parung",
+      "grid": "JAMALI",
+      "psIds": [
+        1160041
+      ],
+      "capacityKwp": 195,
+      "productionKwh": 10278.3,
+      "productionMwh": 10.2783,
+      "specificYield": 52.709231,
+      "costSavings": {
+        "savingsIdr": 14849060,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 8.530989,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 1,
+        "invalid": true
+      },
+      "loadKwh": 22085.45,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 10278.3,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1160041,
+              "energyKwh": 10278.3,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 10278.3,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-PEKANBARU",
+      "canonicalName": "Pekanbaru",
+      "grid": "SUMATERA",
+      "psIds": [
+        1224999
+      ],
+      "capacityKwp": 168.3,
+      "productionKwh": 17981.4,
+      "productionMwh": 17.9814,
+      "specificYield": 106.841355,
+      "costSavings": {
+        "savingsIdr": 25977729,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "SUMATERA",
+        "name": "Sistem Sumatera Interkoneksi",
+        "aliases": [
+          "sumatera",
+          "sumatra"
+        ],
+        "provinces": "Aceh, Sumut, Sumbar, Riau, Jambi, Sumsel, Bengkulu, Lampung, Babel",
+        "status": "resmi",
+        "cmExPost": 0.761,
+        "cmExAnte": 0.761,
+        "cmPlts": 0.75
+      },
+      "emissionTon": 13.48605,
+      "pr": {
+        "valuePct": null,
+        "activePlantCount": 1,
+        "invalid": true
+      },
+      "loadKwh": 70948.24,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 17981.4,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1224999,
+              "energyKwh": 17981.4,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 17981.4,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-PLUMBON",
+      "canonicalName": "Plumbon",
+      "grid": "JAMALI",
+      "psIds": [
+        1393852
+      ],
+      "capacityKwp": 215.9,
+      "productionKwh": 19464.4,
+      "productionMwh": 19.4644,
+      "specificYield": 90.154701,
+      "costSavings": {
+        "savingsIdr": 28120219,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 16.155452,
+      "pr": {
+        "valuePct": 51.196267,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 44038.74,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 19464.4,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1393852,
+              "energyKwh": 19464.4,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 19464.4,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-PONTIANAK",
+      "canonicalName": "Pontianak",
+      "grid": "KALBAR",
+      "psIds": [
+        1223413
+      ],
+      "capacityKwp": 105.6,
+      "productionKwh": 6883.1,
+      "productionMwh": 6.8831,
+      "specificYield": 65.180871,
+      "costSavings": {
+        "savingsIdr": 9944015,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "KALBAR",
+        "name": "Kalimantan Barat",
+        "aliases": [
+          "kalbar",
+          "kalimantan barat"
+        ],
+        "provinces": "Kalimantan Barat",
+        "status": "resmi",
+        "cmExPost": 0.95,
+        "cmExAnte": 0.95,
+        "cmPlts": 0.84
+      },
+      "emissionTon": 5.781804,
+      "pr": {
+        "valuePct": 77.386594,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 46605.91,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 6883.1,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1223413,
+              "energyKwh": 6883.1,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 6883.1,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-REMBANG",
+      "canonicalName": "Rembang",
+      "grid": "JAMALI",
+      "psIds": [
+        1159599
+      ],
+      "capacityKwp": 155,
+      "productionKwh": 18194.4,
+      "productionMwh": 18.1944,
+      "specificYield": 117.383226,
+      "costSavings": {
+        "savingsIdr": 26285450,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 15.101352,
+      "pr": {
+        "valuePct": 84.815144,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 48831.15,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 18194.4,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1159599,
+              "energyKwh": 18194.4,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 18194.4,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-SEMARANG",
+      "canonicalName": "Semarang",
+      "grid": "JAMALI",
+      "psIds": [
+        1377551
+      ],
+      "capacityKwp": 143.2,
+      "productionKwh": 17138.9,
+      "productionMwh": 17.1389,
+      "specificYield": 119.685056,
+      "costSavings": {
+        "savingsIdr": 24760569,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 14.225287,
+      "pr": {
+        "valuePct": 71.035238,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 44376.71,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 17138.9,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1377551,
+              "energyKwh": 17138.9,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 17138.9,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-SERANG",
+      "canonicalName": "Serang",
+      "grid": "JAMALI",
+      "psIds": [
+        1389275
+      ],
+      "capacityKwp": 169.83,
+      "productionKwh": 14134.9,
+      "productionMwh": 14.1349,
+      "specificYield": 83.2297,
+      "costSavings": {
+        "savingsIdr": 20420690,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 11.731967,
+      "pr": {
+        "valuePct": 59.622171,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 40764.77,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 14134.9,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1389275,
+              "energyKwh": 14134.9,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 14134.9,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-SIDOARJO",
+      "canonicalName": "Sidoarjo",
+      "grid": "JAMALI",
+      "psIds": [
+        1415889
+      ],
+      "capacityKwp": 265.29,
+      "productionKwh": 23347.8,
+      "productionMwh": 23.3478,
+      "specificYield": 88.008594,
+      "costSavings": {
+        "savingsIdr": 33730567,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 19.378674,
+      "pr": {
+        "valuePct": 51.862962,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 55898.13,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 23347.8,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1415889,
+              "energyKwh": 23347.8,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 23347.8,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-TEGAL",
+      "canonicalName": "Tegal",
+      "grid": "JAMALI",
+      "psIds": [
+        1456379
+      ],
+      "capacityKwp": 119.88,
+      "productionKwh": 15379,
+      "productionMwh": 15.379,
+      "specificYield": 128.28662,
+      "costSavings": {
+        "savingsIdr": 22218041,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 12.76457,
+      "pr": {
+        "valuePct": 77.74011,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 81292.08,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 15379,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1456379,
+              "energyKwh": 15379,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 15379,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-DEMANSION",
+      "canonicalName": "Tk. Drive Thru De Mansion",
+      "grid": "JAMALI",
+      "psIds": [
+        1410080
+      ],
+      "capacityKwp": 57.72,
+      "productionKwh": 5474.4,
+      "productionMwh": 5.4744,
+      "specificYield": 94.844075,
+      "costSavings": {
+        "savingsIdr": 7908866,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 4.543752,
+      "pr": {
+        "valuePct": 68.95407,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 41218.53,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 5474.4,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1410080,
+              "energyKwh": 5474.4,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 5474.4,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    },
+    {
+      "dcId": "DC-DRIVETHRUGS",
+      "canonicalName": "Tk. Drive Thru GS",
+      "grid": "JAMALI",
+      "psIds": [
+        1284197
+      ],
+      "capacityKwp": 39.6,
+      "productionKwh": 2813.1,
+      "productionMwh": 2.8131,
+      "specificYield": 71.037879,
+      "costSavings": {
+        "savingsIdr": 4064086,
+        "ratePerKwh": 1444.7,
+        "currency": "IDR",
+        "method": "canonical"
+      },
+      "fullCoverage": true,
+      "monthsAvailable": 1,
+      "monthsExpected": 1,
+      "factor": {
+        "grid": "JAMALI",
+        "name": "Jawa-Madura-Bali",
+        "aliases": [
+          "jamali",
+          "jawa",
+          "madura",
+          "bali"
+        ],
+        "provinces": "Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali",
+        "status": "resmi",
+        "cmExPost": 0.87,
+        "cmExAnte": 0.87,
+        "cmPlts": 0.83
+      },
+      "emissionTon": 2.334873,
+      "pr": {
+        "valuePct": 50.569363,
+        "activePlantCount": 1,
+        "invalid": false
+      },
+      "loadKwh": 20699.69,
+      "monthly": [
+        {
+          "yearMonth": "202609",
+          "energyKwh": 2813.1,
+          "source": "ISOLAR_REPORT_IMPORT",
+          "partial": false,
+          "conflict": false,
+          "parts": [
+            {
+              "psId": 1284197,
+              "energyKwh": 2813.1,
+              "source": "ISOLAR_REPORT_IMPORT",
+              "reportKwh": 2813.1,
+              "apiHistoryKwh": null,
+              "differencePct": null,
+              "differenceDirection": null,
+              "conflict": false
+            }
+          ]
+        }
+      ],
+      "hasConflict": false
+    }
+  ],
+  "conflicts": [],
+  "yoy": {
+    "years": [
+      2025,
+      2026
+    ],
+    "likeForLike": {
+      "plantCount": 39,
+      "currentKwh": 582828.4000000001,
+      "previousKwh": 579591.4999999999,
+      "excludedPlantCount": 0
+    }
+  },
+  "support": {
+    "climate": {
+      "available": true,
+      "requiredInput": null
+    },
+    "load": {
+      "available": true,
+      "requiredInput": null
+    }
+  }
+}

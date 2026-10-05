@@ -1,0 +1,386 @@
+{
+  "filters": {
+    "period": "2026-01_2026-09",
+    "mode": "YTD",
+    "month": 9,
+    "throughMonth": 9,
+    "grid": "ALL",
+    "plant": "DC_CIKOKOL",
+    "compareYears": [
+      2025,
+      2026
+    ]
+  },
+  "selectedYear": 2026,
+  "selectedMonths": [
+    "202601",
+    "202602",
+    "202603",
+    "202604",
+    "202605",
+    "202606",
+    "202607",
+    "202608",
+    "202609"
+  ],
+  "summary": {
+    "plantCount": 0,
+    "capacityKwp": 0,
+    "productionKwh": null,
+    "productionMwh": null,
+    "savingsKwh": null,
+    "costSavings": {
+      "totalIdr": null,
+      "ratePerKwh": 0,
+      "currency": "IDR",
+      "method": "canonical",
+      "formattedIdr": null
+    },
+    "targetMwh": null,
+    "achievementPct": null,
+    "emission": {
+      "emissionTon": 0,
+      "includedPlantCount": 0,
+      "excludedPlantCount": 0,
+      "excludedEnergyMwh": 0
+    },
+    "rkap": {
+      "factorKgPerKwh": null,
+      "actualCo2Ton": null,
+      "targetCo2Ton": null,
+      "achievementPct": null
+    },
+    "pr": {
+      "valuePct": null,
+      "activePlantCount": 0,
+      "invalid": false
+    },
+    "specificYield": {
+      "value": null,
+      "coveredPlantCount": 0,
+      "totalPlantCount": 0
+    },
+    "totalLoadKwh": null,
+    "totalLoadMwh": null,
+    "energyMix": {
+      "pltsSharePct": null,
+      "plnSharePct": null,
+      "targetSharePct": 20
+    },
+    "climate": {
+      "avgRadiationKwhM2": null,
+      "avgModuleTempC": null,
+      "totalMeasurements": 0
+    },
+    "targetYtdMwh": null,
+    "targetYtdKwh": null,
+    "targetEoyMwh": null,
+    "targetEoyKwh": null,
+    "achievementYtdPct": null,
+    "progressEoyPct": null
+  },
+  "monthly": [
+    {
+      "yearMonth": "202601",
+      "actualMwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "loadKwh": null,
+      "loadMwh": null,
+      "radiationKwhM2": null,
+      "prValuePct": null,
+      "partial": false,
+      "source": null
+    },
+    {
+      "yearMonth": "202602",
+      "actualMwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "loadKwh": null,
+      "loadMwh": null,
+      "radiationKwhM2": null,
+      "prValuePct": null,
+      "partial": false,
+      "source": null
+    },
+    {
+      "yearMonth": "202603",
+      "actualMwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "loadKwh": null,
+      "loadMwh": null,
+      "radiationKwhM2": null,
+      "prValuePct": null,
+      "partial": false,
+      "source": null
+    },
+    {
+      "yearMonth": "202604",
+      "actualMwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "loadKwh": null,
+      "loadMwh": null,
+      "radiationKwhM2": null,
+      "prValuePct": null,
+      "partial": false,
+      "source": null
+    },
+    {
+      "yearMonth": "202605",
+      "actualMwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "loadKwh": null,
+      "loadMwh": null,
+      "radiationKwhM2": null,
+      "prValuePct": null,
+      "partial": false,
+      "source": null
+    },
+    {
+      "yearMonth": "202606",
+      "actualMwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "loadKwh": null,
+      "loadMwh": null,
+      "radiationKwhM2": null,
+      "prValuePct": null,
+      "partial": false,
+      "source": null
+    },
+    {
+      "yearMonth": "202607",
+      "actualMwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "loadKwh": null,
+      "loadMwh": null,
+      "radiationKwhM2": null,
+      "prValuePct": null,
+      "partial": false,
+      "source": null
+    },
+    {
+      "yearMonth": "202608",
+      "actualMwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "loadKwh": null,
+      "loadMwh": null,
+      "radiationKwhM2": null,
+      "prValuePct": null,
+      "partial": false,
+      "source": null
+    },
+    {
+      "yearMonth": "202609",
+      "actualMwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "loadKwh": null,
+      "loadMwh": null,
+      "radiationKwhM2": null,
+      "prValuePct": null,
+      "partial": false,
+      "source": null
+    }
+  ],
+  "fullYearMonthly": [
+    {
+      "month": 1,
+      "yearMonth": "202601",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 2,
+      "yearMonth": "202602",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 3,
+      "yearMonth": "202603",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 4,
+      "yearMonth": "202604",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 5,
+      "yearMonth": "202605",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 6,
+      "yearMonth": "202606",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 7,
+      "yearMonth": "202607",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 8,
+      "yearMonth": "202608",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 9,
+      "yearMonth": "202609",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": false,
+      "isWithinYtd": true
+    },
+    {
+      "month": 10,
+      "yearMonth": "202610",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": true,
+      "isFuture": false,
+      "isWithinYtd": false
+    },
+    {
+      "month": 11,
+      "yearMonth": "202611",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": true,
+      "isWithinYtd": false
+    },
+    {
+      "month": 12,
+      "yearMonth": "202612",
+      "actualKwh": null,
+      "actualMwh": null,
+      "targetKwh": null,
+      "targetMwh": null,
+      "achievementPct": null,
+      "prValuePct": null,
+      "isCompleted": false,
+      "isCurrent": false,
+      "isFuture": true,
+      "isWithinYtd": false
+    }
+  ],
+  "plants": [],
+  "conflicts": [],
+  "yoy": {
+    "years": [
+      2025,
+      2026
+    ],
+    "likeForLike": {
+      "plantCount": 0,
+      "currentKwh": 0,
+      "previousKwh": 0,
+      "excludedPlantCount": 0
+    }
+  },
+  "support": {
+    "climate": {
+      "available": true,
+      "requiredInput": null
+    },
+    "load": {
+      "available": true,
+      "requiredInput": null
+    }
+  }
+}

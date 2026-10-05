@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-10-02T10:42:26.968Z",
+  "resumeState": {
+    "hasCapacity": true,
+    "hasGeneration": true,
+    "hasPr": true,
+    "hasStatusCard": true,
+    "hasChart": true,
+    "hasEnergyComp": true,
+    "hasSummaryCard": false,
+    "hasMatrixTable": false
+  },
+  "liveTabEvaluation": {
+    "hasGateway": true,
+    "hasDayaRealtime": true,
+    "hasProduksiHariIni": true,
+    "hasBulanBerjalan": true,
+    "hasEmisiHariIni": true,
+    "trendStatusText": "DAYA REALTIME (OUTPUT)\napi_live\n21,6\nkW\n38 Online • 1 Menunggu • 0 Offline",
+    "hasAnalyticsSection": true,
+    "hasTableRows": 39,
+    "tableRowTexts": [
+      "Bali\n4 Inv\nDC-BALI\n\tBali\t88 kWp\t—\t—\t—\t—\t\n48.3 ℃\navg 45.8 ℃\n\t25.6%\t357.1 t\t\nNormal Producing\n\tapi_live",
+      "Lombok A\n1 Inv\nDC-LOMBOK-A\n\tNusa Tenggara Barat\t12 kWp\t—\t—\t—\t—\t\n46.3 ℃\navg 46.3 ℃\n\t24.1%\t63.3 t\t\nNormal Producing\n\tapi_live",
+      "Malang\n3 Inv\nDC-MALANG\n\tJawa Timur\t107.84 kWp\t—\t—\t—\t—\t\n44.4 ℃\navg 44.3 ℃\n\t24%\t411 t\t\nNormal Producing\n\tapi_live",
+      "Luwu\n1 Inv\nDC-LUWU\n\tSulawesi Selatan\t96.8 kWp\t—\t—\t—\t—\t\n0 ℃\navg 0 ℃\n\t22.8%\t139.1 t\t\nNormal Producing\n\tapi_live",
+      "Cilacap 1\n1 Inv\nDC-CILACAP-1\n\tJawa Tengah\t137.1 kWp\t—\t—\t—\t—\t\n46.1 ℃\navg 46.1 ℃\n\t20.5%\t266 t\t\nNormal Producing\n\tapi_live"
+    ],
+    "hasGorontalo": true,
+    "hasCilacap": true,
+    "hasMedan": true
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "errors": [],
+  "screenshots": [
+    "01_resume_target_rkap_top.png",
+    "02_subtab_produksi_vs_target.png",
+    "03_subtab_performance_ratio_pr.png",
+    "04_subtab_parameter_cuaca.png",
+    "05_subtab_beban_vs_plts.png",
+    "06_monthly_matrix_table.png",
+    "07_live_isolar_tab_top.png",
+    "08_live_isolar_analytics_section.png",
+    "09_live_isolar_detail_dc_table.png",
+    "10_live_isolar_full_page.png"
+  ]
+}

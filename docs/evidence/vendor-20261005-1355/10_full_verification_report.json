@@ -1,0 +1,2537 @@
+{
+  "evidenceFolder": "docs/evidence/vendor-20261005-1355",
+  "callTimestamp": "2026-10-05T06:53:49.991Z",
+  "totalStations": 39,
+  "psStatusDistribution": {
+    "1": 39
+  },
+  "psFaultStatusDistribution": {
+    "2": 1,
+    "3": 38
+  },
+  "faultMap": {
+    "2": [
+      {
+        "ps_id": 1223464,
+        "name": "Alfamart DC Jambi",
+        "alarm_count": 1,
+        "fault_count": 0
+      }
+    ],
+    "3": [
+      {
+        "ps_id": 1585267,
+        "name": "Alfamart DC Gorontalo",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1583524,
+        "name": "Alfamart DC Luwu",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1459033,
+        "name": "Alfamart DC Cileungsi",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1456379,
+        "name": "Alfamart DC Tegal",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1415889,
+        "name": "Alfamart DC Sidoarjo",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1410080,
+        "name": "Alfamart Dhrive Thru De Mansion",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1393852,
+        "name": "Alfamart DC Plumbon",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1392560,
+        "name": "Alfamart DC Jember",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1391178,
+        "name": "Alfamart DC Madiun",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1389275,
+        "name": "Alfamart DC Serang",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1389249,
+        "name": "Alfamart DC Bandung 2",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1387111,
+        "name": "Alfamart DC Cilacap 3",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1387109,
+        "name": "Alfamart DC Cilacap 2",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1386493,
+        "name": "Alfamart DC Cilacap 1",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1378278,
+        "name": "Alfamart DC Cianjur",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1377551,
+        "name": "Alfamart DC Semarang",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1376844,
+        "name": "Alfamart DC Klaten",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1284197,
+        "name": "Alfamart Store Drive Thru",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1247367,
+        "name": "Alfamart DC Kotabumi",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1231394,
+        "name": "Alfamart DC Makassar",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1230507,
+        "name": "Alfamart DC Manado",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1224999,
+        "name": "Alfamart DC Pekanbaru",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1224963,
+        "name": "Alfamart DC Batam",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1223413,
+        "name": "Alfamart DC Pontianak",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1219736,
+        "name": "Alfamart DC Lombok A",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1219715,
+        "name": "Alfamart DC Lombok B",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1218534,
+        "name": "Alfamart DC Lampung",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1162742,
+        "name": "Alfamart DC Bogor",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1160041,
+        "name": "Alfamart DC Parung",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1159761,
+        "name": "Alfamart DC Malang",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1159732,
+        "name": "Alfamart DC Bandung 1",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1159719,
+        "name": "Alfamart DC Bali",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1159599,
+        "name": "Alfamart DC Rembang",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1159436,
+        "name": "Alfamart DC Balaraja",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1157086,
+        "name": "Alfamart DC Medan",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1154284,
+        "name": "Alfamart DC Palembang",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1154267,
+        "name": "Alfamart DC Banjarmasin",
+        "alarm_count": 0,
+        "fault_count": 0
+      },
+      {
+        "ps_id": 1092345,
+        "name": "Alfamart DC Karawang",
+        "alarm_count": 0,
+        "fault_count": 0
+      }
+    ]
+  },
+  "quotaBefore": {
+    "per_day_access_times_config": "48000",
+    "curr_hour_accessed_times": "32",
+    "today_accessed_times": "32",
+    "per_hour_access_times_config": [
+      {
+        "hour": "0",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "1",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "2",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "3",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "4",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "5",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "6",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "7",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "8",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "9",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "10",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "11",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "12",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "13",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "14",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "15",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "16",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "17",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "18",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "19",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "20",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "21",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "22",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "23",
+        "max_call_times": 2000
+      }
+    ],
+    "per_hour_residue_times": [
+      {
+        "times": "2000",
+        "hour": "00"
+      },
+      {
+        "times": "2000",
+        "hour": "01"
+      },
+      {
+        "times": "2000",
+        "hour": "02"
+      },
+      {
+        "times": "2000",
+        "hour": "03"
+      },
+      {
+        "times": "2000",
+        "hour": "04"
+      },
+      {
+        "times": "2000",
+        "hour": "05"
+      },
+      {
+        "times": "2000",
+        "hour": "06"
+      },
+      {
+        "times": "2000",
+        "hour": "07"
+      },
+      {
+        "times": "2000",
+        "hour": "08"
+      },
+      {
+        "times": "2000",
+        "hour": "09"
+      },
+      {
+        "times": "2000",
+        "hour": "10"
+      },
+      {
+        "times": "2000",
+        "hour": "11"
+      },
+      {
+        "times": "2000",
+        "hour": "12"
+      },
+      {
+        "times": "2000",
+        "hour": "13"
+      },
+      {
+        "times": "1968",
+        "hour": "14"
+      },
+      {
+        "times": "2000",
+        "hour": "15"
+      },
+      {
+        "times": "2000",
+        "hour": "16"
+      },
+      {
+        "times": "2000",
+        "hour": "17"
+      },
+      {
+        "times": "2000",
+        "hour": "18"
+      },
+      {
+        "times": "2000",
+        "hour": "19"
+      },
+      {
+        "times": "2000",
+        "hour": "20"
+      },
+      {
+        "times": "2000",
+        "hour": "21"
+      },
+      {
+        "times": "2000",
+        "hour": "22"
+      },
+      {
+        "times": "2000",
+        "hour": "23"
+      }
+    ]
+  },
+  "quotaAfter": {
+    "per_day_access_times_config": "48000",
+    "curr_hour_accessed_times": "38",
+    "today_accessed_times": "38",
+    "per_hour_access_times_config": [
+      {
+        "hour": "0",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "1",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "2",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "3",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "4",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "5",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "6",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "7",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "8",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "9",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "10",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "11",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "12",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "13",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "14",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "15",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "16",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "17",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "18",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "19",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "20",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "21",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "22",
+        "max_call_times": 2000
+      },
+      {
+        "hour": "23",
+        "max_call_times": 2000
+      }
+    ],
+    "per_hour_residue_times": [
+      {
+        "times": "2000",
+        "hour": "00"
+      },
+      {
+        "times": "2000",
+        "hour": "01"
+      },
+      {
+        "times": "2000",
+        "hour": "02"
+      },
+      {
+        "times": "2000",
+        "hour": "03"
+      },
+      {
+        "times": "2000",
+        "hour": "04"
+      },
+      {
+        "times": "2000",
+        "hour": "05"
+      },
+      {
+        "times": "2000",
+        "hour": "06"
+      },
+      {
+        "times": "2000",
+        "hour": "07"
+      },
+      {
+        "times": "2000",
+        "hour": "08"
+      },
+      {
+        "times": "2000",
+        "hour": "09"
+      },
+      {
+        "times": "2000",
+        "hour": "10"
+      },
+      {
+        "times": "2000",
+        "hour": "11"
+      },
+      {
+        "times": "2000",
+        "hour": "12"
+      },
+      {
+        "times": "2000",
+        "hour": "13"
+      },
+      {
+        "times": "1962",
+        "hour": "14"
+      },
+      {
+        "times": "2000",
+        "hour": "15"
+      },
+      {
+        "times": "2000",
+        "hour": "16"
+      },
+      {
+        "times": "2000",
+        "hour": "17"
+      },
+      {
+        "times": "2000",
+        "hour": "18"
+      },
+      {
+        "times": "2000",
+        "hour": "19"
+      },
+      {
+        "times": "2000",
+        "hour": "20"
+      },
+      {
+        "times": "2000",
+        "hour": "21"
+      },
+      {
+        "times": "2000",
+        "hour": "22"
+      },
+      {
+        "times": "2000",
+        "hour": "23"
+      }
+    ]
+  },
+  "devices": {
+    "Kotabumi": [
+      {
+        "chnnl_id": 2,
+        "type_name": "Inverter",
+        "ps_key": "1247367_1_7_2",
+        "rel_time": "2026-08-03 12:13:17",
+        "device_sn": "A2140605666",
+        "dev_status": "1",
+        "device_type": 1,
+        "factory_name": "SUNGROW",
+        "uuid": 5378709,
+        "grid_connection_date": "2026-08-03 12:13:17",
+        "device_name": "Inverter1",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 7,
+        "ps_id": 1247367,
+        "device_model_id": 666,
+        "communication_dev_sn": "B2342401856",
+        "device_model_code": "SG110CX"
+      },
+      {
+        "chnnl_id": 2,
+        "type_name": "Meteo station",
+        "ps_key": "1247367_5_3_2",
+        "rel_time": "2023-10-18 12:59:12",
+        "device_sn": null,
+        "dev_status": "1",
+        "device_type": 5,
+        "factory_name": "SUNGROW",
+        "uuid": 2947282,
+        "grid_connection_date": "2023-10-18 12:59:12",
+        "device_name": "Meteo Station1",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 3,
+        "ps_id": 1247367,
+        "device_model_id": 411686,
+        "communication_dev_sn": "B2342401856",
+        "device_model_code": "PVMET75/200"
+      },
+      {
+        "chnnl_id": 2,
+        "type_name": "Meter",
+        "ps_key": "1247367_7_6_2",
+        "rel_time": "2026-07-10 16:56:56",
+        "device_sn": null,
+        "dev_status": "0",
+        "device_type": 7,
+        "factory_name": "SUNGROW",
+        "uuid": 5297605,
+        "grid_connection_date": "2026-07-10 16:56:56",
+        "device_name": "Meter",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 6,
+        "ps_id": 1247367,
+        "device_model_id": 366510,
+        "communication_dev_sn": "B2342401856",
+        "device_model_code": "IEM3255"
+      },
+      {
+        "chnnl_id": 2,
+        "type_name": "Data logger",
+        "ps_key": "1247367_9_247_2",
+        "rel_time": "2023-10-18 12:59:12",
+        "device_sn": "B2342401856",
+        "dev_status": "1",
+        "device_type": 9,
+        "factory_name": "SUNGROW",
+        "uuid": 2947284,
+        "grid_connection_date": "2023-10-18 12:59:12",
+        "device_name": "Communication Device1",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 247,
+        "ps_id": 1247367,
+        "device_model_id": 692,
+        "communication_dev_sn": "B2342401856",
+        "device_model_code": "Logger1000"
+      }
+    ],
+    "Bogor": [
+      {
+        "chnnl_id": 1,
+        "type_name": "Inverter",
+        "ps_key": "1162742_1_1_1",
+        "rel_time": "2022-09-11 15:42:06",
+        "device_sn": "A2170703381",
+        "dev_status": "1",
+        "device_type": 1,
+        "factory_name": "SUNGROW",
+        "uuid": 1817252,
+        "grid_connection_date": "2022-09-11 15:42:06",
+        "device_name": "Inverter 4",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 1,
+        "ps_id": 1162742,
+        "device_model_id": 740,
+        "communication_dev_sn": "B21C1408043",
+        "device_model_code": "SG6.0RT"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Inverter",
+        "ps_key": "1162742_1_2_1",
+        "rel_time": "2022-09-11 15:42:07",
+        "device_sn": "A2011190823",
+        "dev_status": "1",
+        "device_type": 1,
+        "factory_name": "SUNGROW",
+        "uuid": 1817253,
+        "grid_connection_date": "2022-09-11 15:42:07",
+        "device_name": "Inverter 1",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 2,
+        "ps_id": 1162742,
+        "device_model_id": 661,
+        "communication_dev_sn": "B21C1408043",
+        "device_model_code": "SG40CX"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Inverter",
+        "ps_key": "1162742_1_6_1",
+        "rel_time": "2024-08-22 14:07:55",
+        "device_sn": "A2260505896",
+        "dev_status": "1",
+        "device_type": 1,
+        "factory_name": "SUNGROW",
+        "uuid": 3518932,
+        "grid_connection_date": "2024-08-22 14:07:55",
+        "device_name": "Inverter 3",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 6,
+        "ps_id": 1162742,
+        "device_model_id": 661,
+        "communication_dev_sn": "B21C1408043",
+        "device_model_code": "SG40CX"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Inverter",
+        "ps_key": "1162742_1_7_1",
+        "rel_time": "2024-08-22 14:07:55",
+        "device_sn": "A2262486791",
+        "dev_status": "1",
+        "device_type": 1,
+        "factory_name": "SUNGROW",
+        "uuid": 3518933,
+        "grid_connection_date": "2024-08-22 14:07:55",
+        "device_name": "Inverter 2",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 7,
+        "ps_id": 1162742,
+        "device_model_id": 746,
+        "communication_dev_sn": "B21C1408043",
+        "device_model_code": "SG20RT"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Meteo station",
+        "ps_key": "1162742_5_4_1",
+        "rel_time": "2022-09-11 22:01:33",
+        "device_sn": null,
+        "dev_status": "0",
+        "device_type": 5,
+        "factory_name": null,
+        "uuid": 1818365,
+        "grid_connection_date": "2022-09-11 22:01:33",
+        "device_name": "PVMET75/200(COM3-060)_001_004",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 4,
+        "ps_id": 1162742,
+        "device_model_id": 0,
+        "communication_dev_sn": "B21C1408043",
+        "device_model_code": null
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Meter",
+        "ps_key": "1162742_7_5_1",
+        "rel_time": "2022-09-11 22:26:53",
+        "device_sn": null,
+        "dev_status": "1",
+        "device_type": 7,
+        "factory_name": "SUNGROW",
+        "uuid": 1818439,
+        "grid_connection_date": "2022-09-11 22:26:53",
+        "device_name": "IEM3255(COM2-001)_001_005",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 5,
+        "ps_id": 1162742,
+        "device_model_id": 366510,
+        "communication_dev_sn": "B21C1408043",
+        "device_model_code": "IEM3255"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Data logger",
+        "ps_key": "1162742_9_247_1",
+        "rel_time": "2022-09-11 15:42:06",
+        "device_sn": "B21C1408043",
+        "dev_status": "1",
+        "device_type": 9,
+        "factory_name": "SUNGROW",
+        "uuid": 1817251,
+        "grid_connection_date": "2022-09-11 15:42:06",
+        "device_name": "Logger1000_001_247",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 247,
+        "ps_id": 1162742,
+        "device_model_id": 692,
+        "communication_dev_sn": "B21C1408043",
+        "device_model_code": "Logger1000"
+      }
+    ],
+    "Karawang": [
+      {
+        "chnnl_id": 1,
+        "type_name": "Inverter",
+        "ps_key": "1092345_1_2_1",
+        "rel_time": "2021-09-14 16:29:36",
+        "device_sn": "A20C2200554",
+        "dev_status": "1",
+        "device_type": 1,
+        "factory_name": "SUNGROW",
+        "uuid": 721833,
+        "grid_connection_date": "2021-09-14 16:29:36",
+        "device_name": "Inverter 2",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 2,
+        "ps_id": 1092345,
+        "device_model_id": 662,
+        "communication_dev_sn": "B2120317395",
+        "device_model_code": "SG50CX"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Inverter",
+        "ps_key": "1092345_1_5_1",
+        "rel_time": "2023-10-26 14:42:47",
+        "device_sn": "A2140203834",
+        "dev_status": "1",
+        "device_type": 1,
+        "factory_name": "SUNGROW",
+        "uuid": 2955514,
+        "grid_connection_date": "2023-10-26 14:42:47",
+        "device_name": "Inverter 1",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 5,
+        "ps_id": 1092345,
+        "device_model_id": 666,
+        "communication_dev_sn": "B2120317395",
+        "device_model_code": "SG110CX"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Meteo station",
+        "ps_key": "1092345_5_4_1",
+        "rel_time": "2021-09-14 20:36:37",
+        "device_sn": null,
+        "dev_status": "1",
+        "device_type": 5,
+        "factory_name": "SUNGROW",
+        "uuid": 721899,
+        "grid_connection_date": "2021-09-14 20:36:37",
+        "device_name": "PVMET75/200(COM3-060)_001_004",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 4,
+        "ps_id": 1092345,
+        "device_model_id": 411686,
+        "communication_dev_sn": "B2120317395",
+        "device_model_code": "PVMET75/200"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Meter",
+        "ps_key": "1092345_7_1_1",
+        "rel_time": "2021-09-14 16:29:36",
+        "device_sn": null,
+        "dev_status": "1",
+        "device_type": 7,
+        "factory_name": "Acrel",
+        "uuid": 721832,
+        "grid_connection_date": "2021-09-14 16:29:36",
+        "device_name": "DTSD1352(COM2-254)_001_001",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 1,
+        "ps_id": 1092345,
+        "device_model_id": 411632,
+        "communication_dev_sn": "B2120317395",
+        "device_model_code": "DTSD1352-A"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Data logger",
+        "ps_key": "1092345_9_247_1",
+        "rel_time": "2021-09-14 16:29:33",
+        "device_sn": "B2120317395",
+        "dev_status": "1",
+        "device_type": 9,
+        "factory_name": "SUNGROW",
+        "uuid": 721830,
+        "grid_connection_date": "2021-09-14 16:29:33",
+        "device_name": "Logger1000_001_247",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 247,
+        "ps_id": 1092345,
+        "device_model_id": 692,
+        "communication_dev_sn": "B2120317395",
+        "device_model_code": "Logger1000"
+      }
+    ],
+    "Medan": [
+      {
+        "chnnl_id": 1,
+        "type_name": "Inverter",
+        "ps_key": "1157086_1_6_1",
+        "rel_time": "2022-08-01 13:20:37",
+        "device_sn": "A21B1804316",
+        "dev_status": "1",
+        "device_type": 1,
+        "factory_name": "SUNGROW",
+        "uuid": 1619927,
+        "grid_connection_date": "2022-08-01 13:20:37",
+        "device_name": "SG110CX(COM2-004)_001_006",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 6,
+        "ps_id": 1157086,
+        "device_model_id": 666,
+        "communication_dev_sn": "B21C1407918",
+        "device_model_code": "SG110CX"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Inverter",
+        "ps_key": "1157086_1_5_1",
+        "rel_time": "2022-08-01 13:20:38",
+        "device_sn": "A2142204777",
+        "dev_status": "1",
+        "device_type": 1,
+        "factory_name": "SUNGROW",
+        "uuid": 1619928,
+        "grid_connection_date": "2022-08-01 13:20:38",
+        "device_name": "SG33CX(COM2-001)_001_005",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 5,
+        "ps_id": 1157086,
+        "device_model_id": 660,
+        "communication_dev_sn": "B21C1407918",
+        "device_model_code": "SG33CX"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Meteo station",
+        "ps_key": "1157086_5_7_1",
+        "rel_time": "2022-08-01 15:22:55",
+        "device_sn": null,
+        "dev_status": "1",
+        "device_type": 5,
+        "factory_name": "SUNGROW",
+        "uuid": 1620331,
+        "grid_connection_date": "2022-08-01 15:22:55",
+        "device_name": "PVMET75/200(COM3-060)_001_007",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 7,
+        "ps_id": 1157086,
+        "device_model_id": 411686,
+        "communication_dev_sn": "B21C1407918",
+        "device_model_code": "PVMET75/200"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Meter",
+        "ps_key": "1157086_7_3_1",
+        "rel_time": "2022-08-01 13:20:38",
+        "device_sn": null,
+        "dev_status": "1",
+        "device_type": 7,
+        "factory_name": "SUNGROW",
+        "uuid": 1619929,
+        "grid_connection_date": "2022-08-01 13:20:38",
+        "device_name": "IEM3255(COM1-001)_001_003",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 3,
+        "ps_id": 1157086,
+        "device_model_id": 366510,
+        "communication_dev_sn": "B21C1407918",
+        "device_model_code": "IEM3255"
+      },
+      {
+        "chnnl_id": 1,
+        "type_name": "Data logger",
+        "ps_key": "1157086_9_247_1",
+        "rel_time": "2022-08-01 13:20:39",
+        "device_sn": "B21C1407918",
+        "dev_status": "1",
+        "device_type": 9,
+        "factory_name": "SUNGROW",
+        "uuid": 1619930,
+        "grid_connection_date": "2022-08-01 13:20:39",
+        "device_name": "Logger1000_001_247",
+        "dev_fault_status": 4,
+        "rel_state": 1,
+        "device_code": 247,
+        "ps_id": 1157086,
+        "device_model_id": 692,
+        "communication_dev_sn": "B21C1407918",
+        "device_model_code": "Logger1000"
+      }
+    ]
+  },
+  "bogorClimate": {
+    "count": 4,
+    "records": [
+      {
+        "id": "cmuqecq5o00hunayrhlcd76fx",
+        "yearMonth": "202501",
+        "psId": 1162742,
+        "radiationKwhM2": 59.44849,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 339,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:49.165Z",
+        "updatedAt": "2026-10-02T09:50:33.451Z"
+      },
+      {
+        "id": "cmuqecq6700hvnayr2siamgmd",
+        "yearMonth": "202502",
+        "psId": 1162742,
+        "radiationKwhM2": 25.93874,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 340,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:49.184Z",
+        "updatedAt": "2026-10-02T09:50:33.471Z"
+      },
+      {
+        "id": "cmuqecq6q00hwnayrfjdpnle4",
+        "yearMonth": "202503",
+        "psId": 1162742,
+        "radiationKwhM2": 52.42849,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 341,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:49.203Z",
+        "updatedAt": "2026-10-02T09:50:33.492Z"
+      },
+      {
+        "id": "cmuqecq7d00hxnayr3a4us9ty",
+        "yearMonth": "202504",
+        "psId": 1162742,
+        "radiationKwhM2": 40.55579,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 342,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:49.226Z",
+        "updatedAt": "2026-10-02T09:50:33.512Z"
+      }
+    ]
+  },
+  "kotaClimate": {
+    "count": 22,
+    "records": [
+      {
+        "id": "cmuqeckfj00eunayrs2zdri21",
+        "yearMonth": "202501",
+        "psId": 1247367,
+        "radiationKwhM2": 108.33813,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 219,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.743Z",
+        "updatedAt": "2026-10-02T09:50:28.752Z"
+      },
+      {
+        "id": "cmuqeckg200evnayrzjgu6xpp",
+        "yearMonth": "202502",
+        "psId": 1247367,
+        "radiationKwhM2": 103.53675,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 220,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.763Z",
+        "updatedAt": "2026-10-02T09:50:28.783Z"
+      },
+      {
+        "id": "cmuqeckgl00ewnayrmhkd0mfm",
+        "yearMonth": "202503",
+        "psId": 1247367,
+        "radiationKwhM2": 118.06248,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 221,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.782Z",
+        "updatedAt": "2026-10-02T09:50:28.813Z"
+      },
+      {
+        "id": "cmuqeckh900exnayrqtothygi",
+        "yearMonth": "202504",
+        "psId": 1247367,
+        "radiationKwhM2": 110.24814,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 222,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.806Z",
+        "updatedAt": "2026-10-02T09:50:28.842Z"
+      },
+      {
+        "id": "cmuqeckhs00eynayr10n6rcz3",
+        "yearMonth": "202505",
+        "psId": 1247367,
+        "radiationKwhM2": 110.68708,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 223,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.825Z",
+        "updatedAt": "2026-10-02T09:50:28.885Z"
+      },
+      {
+        "id": "cmuqeckid00eznayr602jzeko",
+        "yearMonth": "202506",
+        "psId": 1247367,
+        "radiationKwhM2": 96.12112,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 224,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.846Z",
+        "updatedAt": "2026-10-02T09:50:28.948Z"
+      },
+      {
+        "id": "cmuqeckiw00f0nayr09me8c6c",
+        "yearMonth": "202507",
+        "psId": 1247367,
+        "radiationKwhM2": 110.20276,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 225,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.865Z",
+        "updatedAt": "2026-10-02T09:50:28.981Z"
+      },
+      {
+        "id": "cmuqeckjn00f1nayruz67h3ts",
+        "yearMonth": "202508",
+        "psId": 1247367,
+        "radiationKwhM2": 110.41453,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 226,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.891Z",
+        "updatedAt": "2026-10-02T09:50:29.002Z"
+      },
+      {
+        "id": "cmuqeckk900f2nayrtpwj234v",
+        "yearMonth": "202509",
+        "psId": 1247367,
+        "radiationKwhM2": 113.80634,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 227,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.914Z",
+        "updatedAt": "2026-10-02T09:50:29.028Z"
+      },
+      {
+        "id": "cmuqeckku00f3nayran06xw16",
+        "yearMonth": "202510",
+        "psId": 1247367,
+        "radiationKwhM2": 126.40221,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 228,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.935Z",
+        "updatedAt": "2026-10-02T09:50:29.049Z"
+      },
+      {
+        "id": "cmuqecklf00f4nayrerjkg3v5",
+        "yearMonth": "202511",
+        "psId": 1247367,
+        "radiationKwhM2": 123.03779,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 229,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.955Z",
+        "updatedAt": "2026-10-02T09:50:29.099Z"
+      },
+      {
+        "id": "cmuqeckly00f5nayrn9h0plj4",
+        "yearMonth": "202512",
+        "psId": 1247367,
+        "radiationKwhM2": 113.52768,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100242.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100242.csv",
+          "sourceRow": 230,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:41.974Z",
+        "updatedAt": "2026-10-02T09:50:29.121Z"
+      },
+      {
+        "id": "cmuqecby8004gnayrwljvskwa",
+        "yearMonth": "202601",
+        "psId": 1247367,
+        "radiationKwhM2": 104.19382,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100124.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100124.csv",
+          "sourceRow": 219,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:30.752Z",
+        "updatedAt": "2026-10-02T09:50:16.050Z"
+      },
+      {
+        "id": "cmuqecbys004hnayr7id8jxmu",
+        "yearMonth": "202602",
+        "psId": 1247367,
+        "radiationKwhM2": 96.86835,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100124.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100124.csv",
+          "sourceRow": 220,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:30.772Z",
+        "updatedAt": "2026-10-02T09:50:16.109Z"
+      },
+      {
+        "id": "cmuqecbzb004inayr3yc4bkmo",
+        "yearMonth": "202603",
+        "psId": 1247367,
+        "radiationKwhM2": 124.05506,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100124.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100124.csv",
+          "sourceRow": 221,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:30.792Z",
+        "updatedAt": "2026-10-02T09:50:16.194Z"
+      },
+      {
+        "id": "cmuqecbzu004jnayr02c80hk9",
+        "yearMonth": "202604",
+        "psId": 1247367,
+        "radiationKwhM2": 114.00559,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100124.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100124.csv",
+          "sourceRow": 222,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:30.810Z",
+        "updatedAt": "2026-10-02T09:50:16.254Z"
+      },
+      {
+        "id": "cmuqecc0e004knayrgbd2ktnb",
+        "yearMonth": "202605",
+        "psId": 1247367,
+        "radiationKwhM2": 107.05462,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100124.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100124.csv",
+          "sourceRow": 223,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:30.830Z",
+        "updatedAt": "2026-10-02T09:50:16.486Z"
+      },
+      {
+        "id": "cmuqecc0x004lnayrxt9q9j5s",
+        "yearMonth": "202606",
+        "psId": 1247367,
+        "radiationKwhM2": 98.71344,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100124.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100124.csv",
+          "sourceRow": 224,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:30.850Z",
+        "updatedAt": "2026-10-02T09:50:16.711Z"
+      },
+      {
+        "id": "cmuqecc1g004mnayro6d4ixkv",
+        "yearMonth": "202607",
+        "psId": 1247367,
+        "radiationKwhM2": 103.81696,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100124.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100124.csv",
+          "sourceRow": 225,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:30.869Z",
+        "updatedAt": "2026-10-02T09:50:16.730Z"
+      },
+      {
+        "id": "cmuqecc21004nnayrohz4ccw7",
+        "yearMonth": "202608",
+        "psId": 1247367,
+        "radiationKwhM2": 115.21343,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100124.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100124.csv",
+          "sourceRow": 226,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:30.889Z",
+        "updatedAt": "2026-10-02T09:50:16.751Z"
+      },
+      {
+        "id": "cmuqecc2j004onayrth2n8b37",
+        "yearMonth": "202609",
+        "psId": 1247367,
+        "radiationKwhM2": 121.7545,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100124.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100124.csv",
+          "sourceRow": 227,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:30.908Z",
+        "updatedAt": "2026-10-02T09:50:16.773Z"
+      },
+      {
+        "id": "cmuqecc63004pnayrds6p0zpd",
+        "yearMonth": "202610",
+        "psId": 1247367,
+        "radiationKwhM2": 4.8258,
+        "moduleTempC": null,
+        "source": "ISOLAR_ANNUAL_REPORT",
+        "sourceRef": "Data Radiasi_Annual report_20261002100124.csv",
+        "metadata": {
+          "filename": "Data Radiasi_Annual report_20261002100124.csv",
+          "sourceRow": 228,
+          "periodType": "MONTHLY",
+          "originalUnit": "Wh/m2",
+          "radiationType": "ISOLAR_PLANT_IRRADIATION_UNSPECIFIED",
+          "normalizedUnit": "kWh/m2",
+          "conversionFactor": 0.001
+        },
+        "importedAt": "2026-10-02T03:21:31.035Z",
+        "updatedAt": "2026-10-02T09:50:16.792Z"
+      }
+    ]
+  },
+  "allClimateDistinctPlants": 36,
+  "quotaCountersInDb": [
+    {
+      "kind": "monthly",
+      "bucketKey": "2026-10",
+      "count": 192,
+      "updatedAt": "2026-10-05T06:08:14.950Z"
+    },
+    {
+      "kind": "hourly",
+      "bucketKey": "2026-10-05_13",
+      "count": 11,
+      "updatedAt": "2026-10-05T06:08:14.949Z"
+    },
+    {
+      "kind": "hourly",
+      "bucketKey": "2026-10-04_11",
+      "count": 6,
+      "updatedAt": "2026-10-04T04:10:29.211Z"
+    },
+    {
+      "kind": "hourly",
+      "bucketKey": "2026-10-02_17",
+      "count": 13,
+      "updatedAt": "2026-10-02T10:43:23.550Z"
+    },
+    {
+      "kind": "hourly",
+      "bucketKey": "2026-10-02_16",
+      "count": 2,
+      "updatedAt": "2026-10-02T09:30:03.041Z"
+    },
+    {
+      "kind": "hourly",
+      "bucketKey": "2026-10-02_15",
+      "count": 16,
+      "updatedAt": "2026-10-02T08:59:39.667Z"
+    },
+    {
+      "kind": "hourly",
+      "bucketKey": "2026-10-02_14",
+      "count": 11,
+      "updatedAt": "2026-10-02T07:58:59.034Z"
+    },
+    {
+      "kind": "hourly",
+      "bucketKey": "2026-10-02_13",
+      "count": 6,
+      "updatedAt": "2026-10-02T06:43:21.477Z"
+    },
+    {
+      "kind": "hourly",
+      "bucketKey": "2026-10-02_11",
+      "count": 5,
+      "updatedAt": "2026-10-02T04:26:16.355Z"
+    },
+    {
+      "kind": "hourly",
+      "bucketKey": "2026-10-02_09",
+      "count": 10,
+      "updatedAt": "2026-10-02T02:53:43.007Z"
+    }
+  ],
+  "table39": [
+    {
+      "no": 1,
+      "psId": 1585267,
+      "psName": "Alfamart DC Gorontalo",
+      "dcId": "DC-GORONTALO",
+      "currPowerKw": {
+        "unit": "W",
+        "value": "0"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "0"
+      },
+      "updateTime": "2026-10-05T14:50:45+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "STANDBY (Menunggu / Konstruksi)",
+      "match": false
+    },
+    {
+      "no": 2,
+      "psId": 1583524,
+      "psName": "Alfamart DC Luwu",
+      "dcId": "DC-LUWU",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "51.301"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "439.3"
+      },
+      "updateTime": "2026-10-05T14:50:41+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 3,
+      "psId": 1459033,
+      "psName": "Alfamart DC Cileungsi",
+      "dcId": "DC-CILEUNGSI",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "211.022"
+      },
+      "todayEnergyKwh": {
+        "unit": "MWh",
+        "value": "1.334"
+      },
+      "updateTime": "2026-10-05T14:50:49+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 4,
+      "psId": 1456379,
+      "psName": "Alfamart DC Tegal",
+      "dcId": "DC-TEGAL",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "66.041"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "377.1"
+      },
+      "updateTime": "2026-10-05T14:50:50+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 5,
+      "psId": 1415889,
+      "psName": "Alfamart DC Sidoarjo",
+      "dcId": "DC-SIDOARJO",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "108.887"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "660.3"
+      },
+      "updateTime": "2026-10-05T14:50:44+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 6,
+      "psId": 1410080,
+      "psName": "Alfamart Dhrive Thru De Mansion",
+      "dcId": "DC-DEMANSION",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "24.798"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "158.6"
+      },
+      "updateTime": "2026-10-05T14:50:53+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 7,
+      "psId": 1393852,
+      "psName": "Alfamart DC Plumbon",
+      "dcId": "DC-PLUMBON",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "86.419"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "524.3"
+      },
+      "updateTime": "2026-10-05T14:50:55+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 8,
+      "psId": 1392560,
+      "psName": "Alfamart DC Jember",
+      "dcId": "DC-JEMBER",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "75.069"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "569"
+      },
+      "updateTime": "2026-10-05T14:50:52+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 9,
+      "psId": 1391178,
+      "psName": "Alfamart DC Madiun",
+      "dcId": "DC-MADIUN",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "75.545"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "434.9"
+      },
+      "updateTime": "2026-10-05T14:50:51+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 10,
+      "psId": 1389275,
+      "psName": "Alfamart DC Serang",
+      "dcId": "DC-SERANG",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "49.558"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "336.8"
+      },
+      "updateTime": "2026-10-05T14:50:54+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 11,
+      "psId": 1389249,
+      "psName": "Alfamart DC Bandung 2",
+      "dcId": "DC-BANDUNG2",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "31.942"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "215.2"
+      },
+      "updateTime": "2026-10-05T14:50:49+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 12,
+      "psId": 1387111,
+      "psName": "Alfamart DC Cilacap 3",
+      "dcId": "DC-CILACAP-3",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "5.849"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "39.4"
+      },
+      "updateTime": "2026-10-05T14:50:45+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 13,
+      "psId": 1387109,
+      "psName": "Alfamart DC Cilacap 2",
+      "dcId": "DC-CILACAP-2",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "6.26"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "46.1"
+      },
+      "updateTime": "2026-10-05T14:50:42+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 14,
+      "psId": 1386493,
+      "psName": "Alfamart DC Cilacap 1",
+      "dcId": "DC-CILACAP-1",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "80.737"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "556.4"
+      },
+      "updateTime": "2026-10-05T14:50:43+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 15,
+      "psId": 1378278,
+      "psName": "Alfamart DC Cianjur",
+      "dcId": "DC-CIANJUR",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "1.734"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "401.5"
+      },
+      "updateTime": "2026-10-05T14:50:45+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 16,
+      "psId": 1377551,
+      "psName": "Alfamart DC Semarang",
+      "dcId": "DC-SEMARANG",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "80.055"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "522.4"
+      },
+      "updateTime": "2026-10-05T14:50:51+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 17,
+      "psId": 1376844,
+      "psName": "Alfamart DC Klaten",
+      "dcId": "DC-KLATEN",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "56.86"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "368.2"
+      },
+      "updateTime": "2026-10-05T14:50:45+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 18,
+      "psId": 1284197,
+      "psName": "Alfamart Store Drive Thru",
+      "dcId": "DC-DRIVETHRUGS",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "12.456"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "90.4"
+      },
+      "updateTime": "2026-10-05T14:50:45+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 19,
+      "psId": 1247367,
+      "psName": "Alfamart DC Kotabumi",
+      "dcId": "DC-KOTABUMI",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "34.683"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "376.3"
+      },
+      "updateTime": "2026-10-05T14:50:53+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Offline (1 dev offline)",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": false
+    },
+    {
+      "no": 20,
+      "psId": 1231394,
+      "psName": "Alfamart DC Makassar",
+      "dcId": "DC-MAKASSAR",
+      "currPowerKw": {
+        "unit": "",
+        "value": "--"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "764.3"
+      },
+      "updateTime": "2026-10-05T14:50:47+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 21,
+      "psId": 1230507,
+      "psName": "Alfamart DC Manado",
+      "dcId": "DC-MANADO",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "86.468"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "666.4"
+      },
+      "updateTime": "2026-10-05T14:50:46+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 22,
+      "psId": 1224999,
+      "psName": "Alfamart DC Pekanbaru",
+      "dcId": "DC-PEKANBARU",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "94.11"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "401.7"
+      },
+      "updateTime": "2026-10-05T14:50:42+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 23,
+      "psId": 1224963,
+      "psName": "Alfamart DC Batam",
+      "dcId": "DC-BATAM",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "60.27"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "312.2"
+      },
+      "updateTime": "2026-10-05T14:50:42+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 24,
+      "psId": 1223464,
+      "psName": "Alfamart DC Jambi",
+      "dcId": "DC-JAMBI",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "30.112"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "152"
+      },
+      "updateTime": "2026-10-05T14:50:43+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 2,
+      "alarmCount": 1,
+      "faultCount": 0,
+      "portalCategory": "Abnormal (1)",
+      "dashCategory": "ALARM (Gangguan)",
+      "match": true
+    },
+    {
+      "no": 25,
+      "psId": 1223413,
+      "psName": "Alfamart DC Pontianak",
+      "dcId": "DC-PONTIANAK",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "35.672"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "201.6"
+      },
+      "updateTime": "2026-10-05T14:50:48+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 26,
+      "psId": 1219736,
+      "psName": "Alfamart DC Lombok A",
+      "dcId": "DC-LOMBOK-A",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "3.166"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "59.3"
+      },
+      "updateTime": "2026-10-05T14:50:43+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 27,
+      "psId": 1219715,
+      "psName": "Alfamart DC Lombok B",
+      "dcId": "DC-LOMBOK-B",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "18.121"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "222.9"
+      },
+      "updateTime": "2026-10-05T14:50:55+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 28,
+      "psId": 1218534,
+      "psName": "Alfamart DC Lampung",
+      "dcId": "DC-LAMPUNG",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "70.512"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "423.2"
+      },
+      "updateTime": "2026-10-05T14:50:43+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 29,
+      "psId": 1162742,
+      "psName": "Alfamart DC Bogor",
+      "dcId": "DC-BOGOR",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "40.73"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "389.7"
+      },
+      "updateTime": "2026-10-05T14:50:52+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Offline (1 dev offline)",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": false
+    },
+    {
+      "no": 30,
+      "psId": 1160041,
+      "psName": "Alfamart DC Parung",
+      "dcId": "DC-PARUNG",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "65.892"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "732"
+      },
+      "updateTime": "2026-10-05T14:50:44+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 31,
+      "psId": 1159761,
+      "psName": "Alfamart DC Malang",
+      "dcId": "DC-MALANG",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "60.484"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "460.7"
+      },
+      "updateTime": "2026-10-05T14:50:45+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 32,
+      "psId": 1159732,
+      "psName": "Alfamart DC Bandung 1",
+      "dcId": "DC-BANDUNG1",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "9.124"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "469.2"
+      },
+      "updateTime": "2026-10-05T14:50:49+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 33,
+      "psId": 1159719,
+      "psName": "Alfamart DC Bali",
+      "dcId": "DC-BALI",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "57.546"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "473.5"
+      },
+      "updateTime": "2026-10-05T14:50:44+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 34,
+      "psId": 1159599,
+      "psName": "Alfamart DC Rembang",
+      "dcId": "DC-REMBANG",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "89.52"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "533.8"
+      },
+      "updateTime": "2026-10-05T14:50:55+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 35,
+      "psId": 1159436,
+      "psName": "Alfamart DC Balaraja",
+      "dcId": "DC-BALARAJA",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "151.371"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "962"
+      },
+      "updateTime": "2026-10-05T14:50:51+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 36,
+      "psId": 1157086,
+      "psName": "Alfamart DC Medan",
+      "dcId": "DC-MEDAN",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "43.043"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "404.3"
+      },
+      "updateTime": "2026-10-05T14:50:47+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 37,
+      "psId": 1154284,
+      "psName": "Alfamart DC Palembang",
+      "dcId": "DC-PALEMBANG",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "68.973"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "674.2"
+      },
+      "updateTime": "2026-10-05T14:50:51+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 38,
+      "psId": 1154267,
+      "psName": "Alfamart DC Banjarmasin",
+      "dcId": "DC-BANJARMASIN",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "29.698"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "206.9"
+      },
+      "updateTime": "2026-10-05T14:50:51+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    },
+    {
+      "no": 39,
+      "psId": 1092345,
+      "psName": "Alfamart DC Karawang",
+      "dcId": "DC-KARAWANG",
+      "currPowerKw": {
+        "unit": "kW",
+        "value": "105.887"
+      },
+      "todayEnergyKwh": {
+        "unit": "kWh",
+        "value": "673.1"
+      },
+      "updateTime": "2026-10-05T14:50:44+08:00",
+      "psStatus": 1,
+      "psFaultStatus": 3,
+      "alarmCount": 0,
+      "faultCount": 0,
+      "portalCategory": "Normal",
+      "dashCategory": "ONLINE (Producing / Normal)",
+      "match": true
+    }
+  ]
+}

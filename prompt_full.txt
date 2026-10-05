@@ -1,0 +1,71 @@
+<USER_REQUEST>
+Satu tugas, tiga bagian: (A) perbaiki error dan bug tab "Live iSolarCloud API", (B) ubah kartu
+"Ringkasan PLTS (iSolarCloud)" di Overview, (C) perbaiki tampilan dan hitungan kuota di banner
+gateway. Jangan ubah halaman atau tab lain, file baseline, allowlist API, atau rumus kartu
+emisi Scope 2. Tidak ada call vendor baru kecuali satu getOpenApiCallInfo di C.6. Tidak ada
+secret di output. Semua angka dicetak script, bukan diketik. Jangan menulis "selesai"
+sebelum build, test, dan output di bagian D ditempel.
+
+## A. ERROR DAN BUG TAB iSOLARCLOUD
+
+A.1 Error "Failed to execute 'json' on 'Response': Unexpected end of JSON input" di
+PLTSTab.jsx baris 47 (loadActualEmissions -> fetch /api/emissions?period=...).
+a. Reproduksi dari script untuk periode yang dikirim UI (termasuk periode kosong) dan cetak:
+   status HTTP, content-type, panjang body, dan error dari log server. Sebutkan penyebab
+   berdasarkan bukti, bukan dugaan. Kandidat: serialisasi BigInt/Decimal dari Prisma
+   groupBy, parameter period kosong, route tidak membungkus try/catch.
+b. Server: route SELALU membalas JSON ({success, data} atau {success:false, error, code})
+   dengan status yang benar. Bungkus try/catch, ubah BigInt/Decimal ke Number, validasi
+   period (format YYYY-MM_YYYY-MM, atau tolak dengan 400 dan pesan jelas), dan jangan
+   mengirim period kosong.
+c. Client: periksa res.ok, baca res.text() lalu parse hanya jika tidak kosong, tampilkan
+   state error di UI (bukan console error), dan sediakan tombol "Coba lagi".
+d. Periode tidak boleh di-hardcode ('Jan-Aug 2026'). Daftar periode dibuat dari bulan yang
+   benar-benar ada di MonthlyYield (Jan sampai bulan lengkap terakhir), plus
+   "bulan berjalan (sebagian)".
+
+A.2 State memuat/kosong/gagal. Saat data belum termuat atau gagal, tampilkan skeleton atau
+error, BUKAN "39 Offline". Status "Offline" hanya dari ps_status = 0 pada data nyata.
+Pill "Live Online" turunan dari SyncRun terakhir: Live (sukses, umur < 60 menit),
+"Snapshot di luar jam sinkron", "Sin
+<truncated 6906 bytes>
+nyebabnya
+(mis. dev server mati) dan jangan menyembunyikannya di banner.
+
+C.6 Validasi ke vendor: 1 call getOpenApiCallInfo. Bandingkan today_accessed_times dan
+curr_hour_accessed_times vendor dengan counter lokal (tambahkan counter harian lokal). Cetak
+selisihnya. Hitungan bulanan tetap perkiraan lokal; tulis itu di tooltip.
+
+C.7 Proyeksi: "Belum cukup data" hanya jika data bulan ini kurang dari 24 jam. Pada awal
+bulan tampilkan "Bulan lalu: N call". Setelah itu proyeksi dari rata-rata harian bulan
+berjalan.
+
+## D. VERIFIKASI DAN LAPORAN (tempel output, bukan klaim)
+1. Hasil reproduksi dan penyebab A.1; build dan semua test lolos (tambahkan test: route
+   selalu JSON, period kosong ditolak, Offline hanya dari ps_status, jumlah lokasi 36).
+2. Seri tren A.4 per bulan; label jumlah A.3.
+3. Tabel B.7 (selisih per plant) dan 5 lokasi "Perhatian" B.5.
+4. Output C.1 sampai C.6.
+5. Ukuran: tinggi kartu Overview dan tinggi dokumen di 1440 dan 375; scrollHeight vs
+   clientHeight container tabel dengan 36 baris (harus scroll internal).
+6. File yang diubah dan hal yang belum terbukti.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-01T13:34:30+07:00.
+
+The user's current state is as follows:
+Active Document: c:\ALfa\Test\src\app\api\audit\route.js (LANGUAGE_JAVASCRIPT)
+Cursor is on line: 1
+Other open documents:
+- c:\ALfa\Test\.gitignore (LANGUAGE_UNSPECIFIED)
+- c:\ALfa\Test\.env.example (LANGUAGE_UNSPECIFIED)
+- c:\ALfa\Test\src\lib\solar\sync.js (LANGUAGE_JAVASCRIPT)
+- c:\ALfa\Test\README.md (LANGUAGE_MARKDOWN)
+- c:\ALfa\Test\scripts\audit-doc-fields.mjs (LANGUAGE_JAVASCRIPT)
+Running terminal commands:
+- npm run dev
+ (in c:\ALfa\Test, running for 8m16s)
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from Gemini 3.1 Pro (High) to Claude Opus 4.6 (Thinking). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>

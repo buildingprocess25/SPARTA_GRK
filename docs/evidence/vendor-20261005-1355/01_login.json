@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-10-05T06:53:43.114Z",
+  "endpoint": "/openapi/login",
+  "httpStatus": 200,
+  "durationMs": 605,
+  "requestParams": {
+    "appkey": "[REDACTED]",
+    "user_account": "plts_technician_ho@smtp.sat.co.id",
+    "user_password": "[REDACTED]"
+  },
+  "response": {
+    "req_serial_num": "202610058f0d46c08e7193b12a404c0c",
+    "result_code": "1",
+    "result_msg": "success",
+    "result_data": {
+      "user_master_org_id": "418626",
+      "mobile_tel": null,
+      "user_name": "Teknisi Head Office",
+      "language": "English",
+      "token": "[REDACTED]",
+      "err_times": "0",
+      "user_id": "333796",
+      "login_state": "1",
+      "disable_time": null,
+      "country_name": "印度尼西亚",
+      "user_account": "teknisi_ho",
+      "user_master_org_name": "org-hkv9ebxarv",
+      "email": "plts_technician_ho@smtp.sat.co.id",
+      "country_id": "230"
+    }
+  }
+}

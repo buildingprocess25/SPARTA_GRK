@@ -1,0 +1,423 @@
+{
+  "timestamp": "2026-10-05T06:53:48.899Z",
+  "endpoint": "/openapi/getOpenApiCallInfo",
+  "httpStatus": 200,
+  "durationMs": 5778,
+  "requestParams": {
+    "appkey": "[REDACTED]",
+    "token": "[REDACTED]",
+    "lang": "_en_US"
+  },
+  "response": {
+    "req_serial_num": "20261005888c4f12ab15316ef3fde971",
+    "result_code": "1",
+    "result_msg": "success",
+    "result_data": {
+      "per_day_access_times_config": "48000",
+      "curr_hour_accessed_times": "32",
+      "today_accessed_times": "32",
+      "per_hour_access_times_config": [
+        {
+          "hour": "0",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "1",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "2",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "3",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "4",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "5",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "6",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "7",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "8",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "9",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "10",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "11",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "12",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "13",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "14",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "15",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "16",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "17",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "18",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "19",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "20",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "21",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "22",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "23",
+          "max_call_times": 2000
+        }
+      ],
+      "per_hour_residue_times": [
+        {
+          "times": "2000",
+          "hour": "00"
+        },
+        {
+          "times": "2000",
+          "hour": "01"
+        },
+        {
+          "times": "2000",
+          "hour": "02"
+        },
+        {
+          "times": "2000",
+          "hour": "03"
+        },
+        {
+          "times": "2000",
+          "hour": "04"
+        },
+        {
+          "times": "2000",
+          "hour": "05"
+        },
+        {
+          "times": "2000",
+          "hour": "06"
+        },
+        {
+          "times": "2000",
+          "hour": "07"
+        },
+        {
+          "times": "2000",
+          "hour": "08"
+        },
+        {
+          "times": "2000",
+          "hour": "09"
+        },
+        {
+          "times": "2000",
+          "hour": "10"
+        },
+        {
+          "times": "2000",
+          "hour": "11"
+        },
+        {
+          "times": "2000",
+          "hour": "12"
+        },
+        {
+          "times": "2000",
+          "hour": "13"
+        },
+        {
+          "times": "1968",
+          "hour": "14"
+        },
+        {
+          "times": "2000",
+          "hour": "15"
+        },
+        {
+          "times": "2000",
+          "hour": "16"
+        },
+        {
+          "times": "2000",
+          "hour": "17"
+        },
+        {
+          "times": "2000",
+          "hour": "18"
+        },
+        {
+          "times": "2000",
+          "hour": "19"
+        },
+        {
+          "times": "2000",
+          "hour": "20"
+        },
+        {
+          "times": "2000",
+          "hour": "21"
+        },
+        {
+          "times": "2000",
+          "hour": "22"
+        },
+        {
+          "times": "2000",
+          "hour": "23"
+        }
+      ]
+    }
+  },
+  "_rawResponse": {
+    "req_serial_num": "20261005888c4f12ab15316ef3fde971",
+    "result_code": "1",
+    "result_msg": "success",
+    "result_data": {
+      "per_day_access_times_config": "48000",
+      "curr_hour_accessed_times": "32",
+      "today_accessed_times": "32",
+      "per_hour_access_times_config": [
+        {
+          "hour": "0",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "1",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "2",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "3",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "4",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "5",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "6",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "7",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "8",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "9",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "10",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "11",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "12",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "13",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "14",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "15",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "16",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "17",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "18",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "19",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "20",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "21",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "22",
+          "max_call_times": 2000
+        },
+        {
+          "hour": "23",
+          "max_call_times": 2000
+        }
+      ],
+      "per_hour_residue_times": [
+        {
+          "times": "2000",
+          "hour": "00"
+        },
+        {
+          "times": "2000",
+          "hour": "01"
+        },
+        {
+          "times": "2000",
+          "hour": "02"
+        },
+        {
+          "times": "2000",
+          "hour": "03"
+        },
+        {
+          "times": "2000",
+          "hour": "04"
+        },
+        {
+          "times": "2000",
+          "hour": "05"
+        },
+        {
+          "times": "2000",
+          "hour": "06"
+        },
+        {
+          "times": "2000",
+          "hour": "07"
+        },
+        {
+          "times": "2000",
+          "hour": "08"
+        },
+        {
+          "times": "2000",
+          "hour": "09"
+        },
+        {
+          "times": "2000",
+          "hour": "10"
+        },
+        {
+          "times": "2000",
+          "hour": "11"
+        },
+        {
+          "times": "2000",
+          "hour": "12"
+        },
+        {
+          "times": "2000",
+          "hour": "13"
+        },
+        {
+          "times": "1968",
+          "hour": "14"
+        },
+        {
+          "times": "2000",
+          "hour": "15"
+        },
+        {
+          "times": "2000",
+          "hour": "16"
+        },
+        {
+          "times": "2000",
+          "hour": "17"
+        },
+        {
+          "times": "2000",
+          "hour": "18"
+        },
+        {
+          "times": "2000",
+          "hour": "19"
+        },
+        {
+          "times": "2000",
+          "hour": "20"
+        },
+        {
+          "times": "2000",
+          "hour": "21"
+        },
+        {
+          "times": "2000",
+          "hour": "22"
+        },
+        {
+          "times": "2000",
+          "hour": "23"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,1070 @@
+{
+  "timestamp": "2026-10-05T06:53:56.271Z",
+  "dbReport": {
+    "bogorClimateCount": 4,
+    "allClimateCountSummary": [
+      {
+        "_count": {
+          "id": 4
+        },
+        "psId": 1162742
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1391178
+      },
+      {
+        "_count": {
+          "id": 18
+        },
+        "psId": 1583524
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1459033
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1410080
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1389249
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1218534
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1154267
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1159599
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1284197
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1376844
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1231394
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1219715
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1393852
+      },
+      {
+        "_count": {
+          "id": 18
+        },
+        "psId": 1585267
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1154284
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1160041
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1378278
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1223464
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1456379
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1392560
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1159719
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1157086
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1223413
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1092345
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1247367
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1159732
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1230507
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1415889
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1159761
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1386493
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1389275
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1377551
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1224963
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1159436
+      },
+      {
+        "_count": {
+          "id": 22
+        },
+        "psId": 1224999
+      }
+    ],
+    "plantMasters": [
+      {
+        "dcId": "DC-BALARAJA",
+        "canonicalName": "Balaraja",
+        "sungrowPsIds": [
+          1159436
+        ],
+        "baselineInstalledKwp": 399.74,
+        "apiInstalledKwp": 399.73
+      },
+      {
+        "dcId": "DC-BALI",
+        "canonicalName": "Bali",
+        "sungrowPsIds": [
+          1159719
+        ],
+        "baselineInstalledKwp": 101.19,
+        "apiInstalledKwp": 88
+      },
+      {
+        "dcId": "DC-BANDUNG1",
+        "canonicalName": "Bandung 1",
+        "sungrowPsIds": [
+          1159732
+        ],
+        "baselineInstalledKwp": 148.77,
+        "apiInstalledKwp": 140
+      },
+      {
+        "dcId": "DC-BANDUNG2",
+        "canonicalName": "Bandung 2",
+        "sungrowPsIds": [
+          1389249
+        ],
+        "baselineInstalledKwp": 90,
+        "apiInstalledKwp": 168.72
+      },
+      {
+        "dcId": "DC-BANJARMASIN",
+        "canonicalName": "Banjarmasin",
+        "sungrowPsIds": [
+          1154267
+        ],
+        "baselineInstalledKwp": 129.6,
+        "apiInstalledKwp": 129.6
+      },
+      {
+        "dcId": "DC-BATAM",
+        "canonicalName": "Batam",
+        "sungrowPsIds": [
+          1224963
+        ],
+        "baselineInstalledKwp": 115,
+        "apiInstalledKwp": 99
+      },
+      {
+        "dcId": "DC-BOGOR",
+        "canonicalName": "Bogor",
+        "sungrowPsIds": [
+          1162742
+        ],
+        "baselineInstalledKwp": 131.55,
+        "apiInstalledKwp": 106
+      },
+      {
+        "dcId": "DC-CIANJUR",
+        "canonicalName": "Cianjur",
+        "sungrowPsIds": [
+          1378278
+        ],
+        "baselineInstalledKwp": 130,
+        "apiInstalledKwp": 197.54
+      },
+      {
+        "dcId": "DC-CILACAP-1",
+        "canonicalName": "Cilacap 1",
+        "sungrowPsIds": [
+          1386493
+        ],
+        "baselineInstalledKwp": 165,
+        "apiInstalledKwp": 137.1
+      },
+      {
+        "dcId": "DC-CILACAP-2",
+        "canonicalName": "Cilacap 2",
+        "sungrowPsIds": [
+          1387109
+        ],
+        "baselineInstalledKwp": 22,
+        "apiInstalledKwp": 47.73
+      },
+      {
+        "dcId": "DC-CILACAP-3",
+        "canonicalName": "Cilacap 3",
+        "sungrowPsIds": [
+          1387111
+        ],
+        "baselineInstalledKwp": 18,
+        "apiInstalledKwp": 30.52
+      },
+      {
+        "dcId": "DC-CILEUNGSI",
+        "canonicalName": "Cileungsi",
+        "sungrowPsIds": [
+          1459033
+        ],
+        "baselineInstalledKwp": 473.5,
+        "apiInstalledKwp": 479.5
+      },
+      {
+        "dcId": "DC-DEMANSION",
+        "canonicalName": "Tk. Drive Thru De Mansion",
+        "sungrowPsIds": [
+          1410080
+        ],
+        "baselineInstalledKwp": 58,
+        "apiInstalledKwp": 57.72
+      },
+      {
+        "dcId": "DC-DRIVETHRUGS",
+        "canonicalName": "Tk. Drive Thru GS",
+        "sungrowPsIds": [
+          1284197
+        ],
+        "baselineInstalledKwp": 40,
+        "apiInstalledKwp": 39.6
+      },
+      {
+        "dcId": "DC-GORONTALO",
+        "canonicalName": "Gorontalo",
+        "sungrowPsIds": [
+          1585267
+        ],
+        "baselineInstalledKwp": 100,
+        "apiInstalledKwp": 84.7
+      },
+      {
+        "dcId": "DC-JAMBI",
+        "canonicalName": "Jambi",
+        "sungrowPsIds": [
+          1223464
+        ],
+        "baselineInstalledKwp": 45,
+        "apiInstalledKwp": 88
+      },
+      {
+        "dcId": "DC-JEMBER",
+        "canonicalName": "Jember",
+        "sungrowPsIds": [
+          1392560
+        ],
+        "baselineInstalledKwp": 150,
+        "apiInstalledKwp": 157.62
+      },
+      {
+        "dcId": "DC-KARAWANG",
+        "canonicalName": "Karawang",
+        "sungrowPsIds": [
+          1092345
+        ],
+        "baselineInstalledKwp": 198,
+        "apiInstalledKwp": 198
+      },
+      {
+        "dcId": "DC-KLATEN",
+        "canonicalName": "Klaten",
+        "sungrowPsIds": [
+          1376844
+        ],
+        "baselineInstalledKwp": 125,
+        "apiInstalledKwp": 102.12
+      },
+      {
+        "dcId": "DC-KOTABUMI",
+        "canonicalName": "Kotabumi",
+        "sungrowPsIds": [
+          1247367
+        ],
+        "baselineInstalledKwp": 130,
+        "apiInstalledKwp": 123
+      },
+      {
+        "dcId": "DC-LAMPUNG",
+        "canonicalName": "Lampung",
+        "sungrowPsIds": [
+          1218534
+        ],
+        "baselineInstalledKwp": 115,
+        "apiInstalledKwp": 108.9
+      },
+      {
+        "dcId": "DC-LOMBOK-A",
+        "canonicalName": "Lombok A",
+        "sungrowPsIds": [
+          1219736
+        ],
+        "baselineInstalledKwp": 18,
+        "apiInstalledKwp": 12
+      },
+      {
+        "dcId": "DC-LOMBOK-B",
+        "canonicalName": "Lombok B",
+        "sungrowPsIds": [
+          1219715
+        ],
+        "baselineInstalledKwp": 68,
+        "apiInstalledKwp": 57.75
+      },
+      {
+        "dcId": "DC-LUWU",
+        "canonicalName": "Luwu",
+        "sungrowPsIds": [
+          1583524
+        ],
+        "baselineInstalledKwp": 90,
+        "apiInstalledKwp": 96.8
+      },
+      {
+        "dcId": "DC-MADIUN",
+        "canonicalName": "Madiun",
+        "sungrowPsIds": [
+          1391178
+        ],
+        "baselineInstalledKwp": 180,
+        "apiInstalledKwp": 250.86
+      },
+      {
+        "dcId": "DC-MAKASSAR",
+        "canonicalName": "Makassar",
+        "sungrowPsIds": [
+          1231394
+        ],
+        "baselineInstalledKwp": 180,
+        "apiInstalledKwp": 231
+      },
+      {
+        "dcId": "DC-MALANG",
+        "canonicalName": "Malang",
+        "sungrowPsIds": [
+          1159761
+        ],
+        "baselineInstalledKwp": 114.9,
+        "apiInstalledKwp": 107.84
+      },
+      {
+        "dcId": "DC-MANADO",
+        "canonicalName": "Manado",
+        "sungrowPsIds": [
+          1230507
+        ],
+        "baselineInstalledKwp": 195,
+        "apiInstalledKwp": 200.2
+      },
+      {
+        "dcId": "DC-MEDAN",
+        "canonicalName": "Medan",
+        "sungrowPsIds": [
+          1157086
+        ],
+        "baselineInstalledKwp": 162,
+        "apiInstalledKwp": 162
+      },
+      {
+        "dcId": "DC-PALEMBANG",
+        "canonicalName": "Palembang",
+        "sungrowPsIds": [
+          1154284
+        ],
+        "baselineInstalledKwp": 236.57,
+        "apiInstalledKwp": 236.57
+      },
+      {
+        "dcId": "DC-PARUNG",
+        "canonicalName": "Parung",
+        "sungrowPsIds": [
+          1160041
+        ],
+        "baselineInstalledKwp": 244.23,
+        "apiInstalledKwp": 195
+      },
+      {
+        "dcId": "DC-PEKANBARU",
+        "canonicalName": "Pekanbaru",
+        "sungrowPsIds": [
+          1224999
+        ],
+        "baselineInstalledKwp": 175,
+        "apiInstalledKwp": 168.3
+      },
+      {
+        "dcId": "DC-PLUMBON",
+        "canonicalName": "Plumbon",
+        "sungrowPsIds": [
+          1393852
+        ],
+        "baselineInstalledKwp": 170,
+        "apiInstalledKwp": 215.9
+      },
+      {
+        "dcId": "DC-PONTIANAK",
+        "canonicalName": "Pontianak",
+        "sungrowPsIds": [
+          1223413
+        ],
+        "baselineInstalledKwp": 95,
+        "apiInstalledKwp": 105.6
+      },
+      {
+        "dcId": "DC-REMBANG",
+        "canonicalName": "Rembang",
+        "sungrowPsIds": [
+          1159599
+        ],
+        "baselineInstalledKwp": 174.3,
+        "apiInstalledKwp": 155
+      },
+      {
+        "dcId": "DC-SEMARANG",
+        "canonicalName": "Semarang",
+        "sungrowPsIds": [
+          1377551
+        ],
+        "baselineInstalledKwp": 200,
+        "apiInstalledKwp": 143.2
+      },
+      {
+        "dcId": "DC-SERANG",
+        "canonicalName": "Serang",
+        "sungrowPsIds": [
+          1389275
+        ],
+        "baselineInstalledKwp": 175,
+        "apiInstalledKwp": 169.83
+      },
+      {
+        "dcId": "DC-SIDOARJO",
+        "canonicalName": "Sidoarjo",
+        "sungrowPsIds": [
+          1415889
+        ],
+        "baselineInstalledKwp": 250,
+        "apiInstalledKwp": 265.29
+      },
+      {
+        "dcId": "DC-TEGAL",
+        "canonicalName": "Tegal",
+        "sungrowPsIds": [
+          1456379
+        ],
+        "baselineInstalledKwp": 135,
+        "apiInstalledKwp": 119.88
+      }
+    ],
+    "plantLatests": [
+      {
+        "psId": 1092345,
+        "name": "Alfamart DC Karawang",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 120.028,
+        "todayEnergyKwh": 588.6,
+        "vendorUpdateTime": "2026-10-05T06:05:39.000Z"
+      },
+      {
+        "psId": 1154267,
+        "name": "Alfamart DC Banjarmasin",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 31.812,
+        "todayEnergyKwh": 184.5,
+        "vendorUpdateTime": "2026-10-05T06:05:42.000Z"
+      },
+      {
+        "psId": 1154284,
+        "name": "Alfamart DC Palembang",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 147.146,
+        "todayEnergyKwh": 607.7,
+        "vendorUpdateTime": "2026-10-05T06:05:43.000Z"
+      },
+      {
+        "psId": 1157086,
+        "name": "Alfamart DC Medan",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 35.316,
+        "todayEnergyKwh": 369.6,
+        "vendorUpdateTime": "2026-10-05T06:05:38.000Z"
+      },
+      {
+        "psId": 1159436,
+        "name": "Alfamart DC Balaraja",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 142.212,
+        "todayEnergyKwh": 844.7,
+        "vendorUpdateTime": "2026-10-05T06:05:42.000Z"
+      },
+      {
+        "psId": 1159599,
+        "name": "Alfamart DC Rembang",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 75.276,
+        "todayEnergyKwh": 470.2,
+        "vendorUpdateTime": "2026-10-05T06:05:45.000Z"
+      },
+      {
+        "psId": 1159719,
+        "name": "Alfamart DC Bali",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 66.397,
+        "todayEnergyKwh": 427.3,
+        "vendorUpdateTime": "2026-10-05T06:05:35.000Z"
+      },
+      {
+        "psId": 1159732,
+        "name": "Alfamart DC Bandung 1",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 43.788,
+        "todayEnergyKwh": 441.3,
+        "vendorUpdateTime": "2026-10-05T06:05:45.000Z"
+      },
+      {
+        "psId": 1159761,
+        "name": "Alfamart DC Malang",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 70.666,
+        "todayEnergyKwh": 411.7,
+        "vendorUpdateTime": "2026-10-05T06:05:37.000Z"
+      },
+      {
+        "psId": 1160041,
+        "name": "Alfamart DC Parung",
+        "psStatus": 1,
+        "psFaultStatus": 2,
+        "alarmCount": 1,
+        "faultCount": 0,
+        "currPowerKw": 130.487,
+        "todayEnergyKwh": 679.2,
+        "vendorUpdateTime": "2026-10-05T06:05:37.000Z"
+      },
+      {
+        "psId": 1162742,
+        "name": "Alfamart DC Bogor",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 41.67,
+        "todayEnergyKwh": 351,
+        "vendorUpdateTime": "2026-10-05T06:05:43.000Z"
+      },
+      {
+        "psId": 1218534,
+        "name": "Alfamart DC Lampung",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 77.004,
+        "todayEnergyKwh": 368.4,
+        "vendorUpdateTime": "2026-10-05T06:05:35.000Z"
+      },
+      {
+        "psId": 1219715,
+        "name": "Alfamart DC Lombok B",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 32.707,
+        "todayEnergyKwh": 208.9,
+        "vendorUpdateTime": "2026-10-05T06:05:46.000Z"
+      },
+      {
+        "psId": 1219736,
+        "name": "Alfamart DC Lombok A",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 3.649,
+        "todayEnergyKwh": 55.6,
+        "vendorUpdateTime": "2026-10-05T06:05:35.000Z"
+      },
+      {
+        "psId": 1223413,
+        "name": "Alfamart DC Pontianak",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 29.679,
+        "todayEnergyKwh": 175.8,
+        "vendorUpdateTime": "2026-10-05T06:05:37.000Z"
+      },
+      {
+        "psId": 1223464,
+        "name": "Alfamart DC Jambi",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 32.257,
+        "todayEnergyKwh": 129.4,
+        "vendorUpdateTime": "2026-10-05T06:05:34.000Z"
+      },
+      {
+        "psId": 1224963,
+        "name": "Alfamart DC Batam",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 61.646,
+        "todayEnergyKwh": 271.9,
+        "vendorUpdateTime": "2026-10-05T06:05:35.000Z"
+      },
+      {
+        "psId": 1224999,
+        "name": "Alfamart DC Pekanbaru",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 98.498,
+        "todayEnergyKwh": 345.3,
+        "vendorUpdateTime": "2026-10-05T06:05:34.000Z"
+      },
+      {
+        "psId": 1230507,
+        "name": "Alfamart DC Manado",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 53.218,
+        "todayEnergyKwh": 593.4,
+        "vendorUpdateTime": "2026-10-05T06:05:41.000Z"
+      },
+      {
+        "psId": 1231394,
+        "name": "Alfamart DC Makassar",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 121.967,
+        "todayEnergyKwh": 698.3,
+        "vendorUpdateTime": "2026-10-05T06:05:40.000Z"
+      },
+      {
+        "psId": 1247367,
+        "name": "Alfamart DC Kotabumi",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 53.265,
+        "todayEnergyKwh": 332.8,
+        "vendorUpdateTime": "2026-10-05T06:05:45.000Z"
+      },
+      {
+        "psId": 1284197,
+        "name": "Alfamart Store Drive Thru",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 11.861,
+        "todayEnergyKwh": 80.1,
+        "vendorUpdateTime": "2026-10-05T06:05:36.000Z"
+      },
+      {
+        "psId": 1376844,
+        "name": "Alfamart DC Klaten",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 62.129,
+        "todayEnergyKwh": 322.7,
+        "vendorUpdateTime": "2026-10-05T06:05:38.000Z"
+      },
+      {
+        "psId": 1377551,
+        "name": "Alfamart DC Semarang",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 81.899,
+        "todayEnergyKwh": 458.7,
+        "vendorUpdateTime": "2026-10-05T06:05:45.000Z"
+      },
+      {
+        "psId": 1378278,
+        "name": "Alfamart DC Cianjur",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 57.102,
+        "todayEnergyKwh": 383.7,
+        "vendorUpdateTime": "2026-10-05T06:05:43.000Z"
+      },
+      {
+        "psId": 1386493,
+        "name": "Alfamart DC Cilacap 1",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 90.605,
+        "todayEnergyKwh": 491.9,
+        "vendorUpdateTime": "2026-10-05T06:05:34.000Z"
+      },
+      {
+        "psId": 1387109,
+        "name": "Alfamart DC Cilacap 2",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 7.016,
+        "todayEnergyKwh": 41.1,
+        "vendorUpdateTime": "2026-10-05T06:05:35.000Z"
+      },
+      {
+        "psId": 1387111,
+        "name": "Alfamart DC Cilacap 3",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 4.932,
+        "todayEnergyKwh": 35.7,
+        "vendorUpdateTime": "2026-10-05T06:05:36.000Z"
+      },
+      {
+        "psId": 1389249,
+        "name": "Alfamart DC Bandung 2",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 30.099,
+        "todayEnergyKwh": 193.1,
+        "vendorUpdateTime": "2026-10-05T06:05:41.000Z"
+      },
+      {
+        "psId": 1389275,
+        "name": "Alfamart DC Serang",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 52.376,
+        "todayEnergyKwh": 297.4,
+        "vendorUpdateTime": "2026-10-05T06:05:45.000Z"
+      },
+      {
+        "psId": 1391178,
+        "name": "Alfamart DC Madiun",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 59.224,
+        "todayEnergyKwh": 379.1,
+        "vendorUpdateTime": "2026-10-05T06:05:43.000Z"
+      },
+      {
+        "psId": 1392560,
+        "name": "Alfamart DC Jember",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 90.485,
+        "todayEnergyKwh": 508.2,
+        "vendorUpdateTime": "2026-10-05T06:05:45.000Z"
+      },
+      {
+        "psId": 1393852,
+        "name": "Alfamart DC Plumbon",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 55.719,
+        "todayEnergyKwh": 467.3,
+        "vendorUpdateTime": "2026-10-05T06:05:46.000Z"
+      },
+      {
+        "psId": 1410080,
+        "name": "Alfamart Dhrive Thru De Mansion",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 23.999,
+        "todayEnergyKwh": 140.6,
+        "vendorUpdateTime": "2026-10-05T06:05:43.000Z"
+      },
+      {
+        "psId": 1415889,
+        "name": "Alfamart DC Sidoarjo",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 67.904,
+        "todayEnergyKwh": 581.4,
+        "vendorUpdateTime": "2026-10-05T06:05:37.000Z"
+      },
+      {
+        "psId": 1456379,
+        "name": "Alfamart DC Tegal",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 79.282,
+        "todayEnergyKwh": 324.5,
+        "vendorUpdateTime": "2026-10-05T06:05:45.000Z"
+      },
+      {
+        "psId": 1459033,
+        "name": "Alfamart DC Cileungsi",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 83.439,
+        "todayEnergyKwh": 1199,
+        "vendorUpdateTime": "2026-10-05T06:05:42.000Z"
+      },
+      {
+        "psId": 1583524,
+        "name": "Alfamart DC Luwu",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 61.06,
+        "todayEnergyKwh": 397.6,
+        "vendorUpdateTime": "2026-10-05T06:05:35.000Z"
+      },
+      {
+        "psId": 1585267,
+        "name": "Alfamart DC Gorontalo",
+        "psStatus": 1,
+        "psFaultStatus": 3,
+        "alarmCount": 0,
+        "faultCount": 0,
+        "currPowerKw": 0,
+        "todayEnergyKwh": 0,
+        "vendorUpdateTime": "2026-10-05T06:05:40.000Z"
+      }
+    ],
+    "quotaCounters": [
+      {
+        "kind": "monthly",
+        "bucketKey": "2026-10",
+        "count": 192,
+        "updatedAt": "2026-10-05T06:08:14.950Z"
+      },
+      {
+        "kind": "hourly",
+        "bucketKey": "2026-10-05_13",
+        "count": 11,
+        "updatedAt": "2026-10-05T06:08:14.949Z"
+      },
+      {
+        "kind": "hourly",
+        "bucketKey": "2026-10-04_11",
+        "count": 6,
+        "updatedAt": "2026-10-04T04:10:29.211Z"
+      },
+      {
+        "kind": "hourly",
+        "bucketKey": "2026-10-02_17",
+        "count": 13,
+        "updatedAt": "2026-10-02T10:43:23.550Z"
+      },
+      {
+        "kind": "hourly",
+        "bucketKey": "2026-10-02_16",
+        "count": 2,
+        "updatedAt": "2026-10-02T09:30:03.041Z"
+      },
+      {
+        "kind": "hourly",
+        "bucketKey": "2026-10-02_15",
+        "count": 16,
+        "updatedAt": "2026-10-02T08:59:39.667Z"
+      },
+      {
+        "kind": "hourly",
+        "bucketKey": "2026-10-02_14",
+        "count": 11,
+        "updatedAt": "2026-10-02T07:58:59.034Z"
+      },
+      {
+        "kind": "hourly",
+        "bucketKey": "2026-10-02_13",
+        "count": 6,
+        "updatedAt": "2026-10-02T06:43:21.477Z"
+      },
+      {
+        "kind": "hourly",
+        "bucketKey": "2026-10-02_11",
+        "count": 5,
+        "updatedAt": "2026-10-02T04:26:16.355Z"
+      },
+      {
+        "kind": "hourly",
+        "bucketKey": "2026-10-02_09",
+        "count": 10,
+        "updatedAt": "2026-10-02T02:53:43.007Z"
+      }
+    ]
+  }
+}
