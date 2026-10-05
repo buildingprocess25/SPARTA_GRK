@@ -106,20 +106,14 @@ const API_MONTHS_2026 = [
   { ym: '202609', label: 'Sep 2026', short: 'Sep', days: 30 }
 ];
 
-const PALETTE = [
-  '#0284C7', // Sky Blue
-  '#059669', // Emerald
-  '#D97706', // Amber
-  '#8B5CF6', // Purple
-  '#EC4899', // Pink
-  '#F97316', // Orange
-  '#14B8A6', // Teal
-  '#6366F1', // Indigo
-  '#EF4444', // Red
-  '#84CC16', // Lime
-  '#06B6D4', // Cyan
-  '#A855F7'  // Violet
-];
+export function getPlantColor(idx, total = 39) {
+  const hue = Math.round((idx * 137.508) % 360);
+  const sat = 68;
+  const light = 48 + (idx % 3) * 4;
+  return `hsl(${hue}, ${sat}%, ${light}%)`;
+}
+
+const PALETTE = Array.from({ length: 39 }, (_, i) => getPlantColor(i, 39));
 
 function SafePrBarTooltip({ active, payload }) {
   if (active && payload && payload.length) {
@@ -155,7 +149,7 @@ function SafePrBarTooltip({ active, payload }) {
   return null;
 }
 
-function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode }) {
+function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, chartViewMode, hoveredDCId }) {
   if (active && payload && payload.length) {
     const rawData = payload[0]?.payload || {};
     const unit = activeMetricUnit || '';
@@ -165,6 +159,62 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode }
     const minVal = rawData.min;
     const maxVal = rawData.max;
 
+    if (chartViewMode === 'average') {
+      return (
+        <div className="bg-slate-900/95 text-white rounded-xl p-3.5 shadow-2xl border border-slate-700/80 text-xs space-y-2 min-w-[210px] backdrop-blur-md">
+          <div className="flex items-center justify-between border-b border-slate-700/80 pb-1.5">
+            <span className="font-bold text-slate-100 text-sm">{label}</span>
+            <span className="text-[10px] text-blue-300 font-semibold px-2 py-0.5 rounded bg-blue-900/50">Rata-rata</span>
+          </div>
+          <div className="bg-blue-950/60 border border-blue-800/60 rounded-lg p-2 space-y-1">
+            <div className="flex justify-between items-center text-slate-200">
+              <span className="text-xs text-blue-300">Rata-rata Tertimbang:</span>
+              <strong className="text-blue-100 font-mono text-sm">{avgVal !== null && avgVal !== undefined ? avgVal : '—'} {unitSuffix}</strong>
+            </div>
+            <p className="text-[9px] text-blue-400 italic">Definisi: Total energi / Total kapasitas terpasang</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (chartViewMode === 'minmax') {
+      const rangeDiff = (minVal !== null && maxVal !== null && !isNaN(minVal) && !isNaN(maxVal))
+        ? Number((maxVal - minVal).toFixed(2))
+        : null;
+
+      return (
+        <div className="bg-slate-900/95 text-white rounded-xl p-3.5 shadow-2xl border border-slate-700/80 text-xs space-y-2 min-w-[230px] backdrop-blur-md">
+          <div className="flex items-center justify-between border-b border-slate-700/80 pb-1.5">
+            <span className="font-bold text-slate-100 text-sm">{label}</span>
+            <span className="text-[10px] text-amber-300 font-semibold px-2 py-0.5 rounded bg-amber-900/50">Rentang Min–Maks</span>
+          </div>
+          <div className="space-y-1 bg-slate-800/60 rounded-lg p-2 border border-slate-700/50">
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-slate-400">Maksimum:</span>
+              <strong className="text-emerald-400 font-mono">{maxVal !== null && maxVal !== undefined ? maxVal : '—'} {unitSuffix}</strong>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-slate-400">Minimum:</span>
+              <strong className="text-rose-400 font-mono">{minVal !== null && minVal !== undefined ? minVal : '—'} {unitSuffix}</strong>
+            </div>
+            {rangeDiff !== null && (
+              <div className="flex justify-between items-center text-[10px] text-slate-300 pt-1 border-t border-slate-700/60">
+                <span className="text-slate-400">Selisih Rentang:</span>
+                <span className="font-mono text-slate-200 font-semibold">{rangeDiff} {unitSuffix}</span>
+              </div>
+            )}
+          </div>
+          {avgVal !== null && avgVal !== undefined && (
+            <div className="flex justify-between items-center text-[11px] text-blue-300 px-1 pt-0.5">
+              <span>Rata-rata Referensi:</span>
+              <strong className="font-mono">{avgVal} {unitSuffix}</strong>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Mode "individual" (Semua PLTS)
     const plantEntries = payload
       .filter(p => p && p.dataKey && p.dataKey !== 'average' && p.dataKey !== 'min' && p.dataKey !== 'max' && p.dataKey !== 'targetPr' && !p.dataKey.endsWith('_yieldMwh'))
       .map(p => ({
@@ -174,47 +224,60 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode }
         dcId: p.dataKey
       }))
       .filter(p => p.value !== null && p.value !== undefined && !isNaN(p.value))
-      .sort((a, b) => b.value - a.value);
+      .sort((a, b) => {
+        if (hoveredDCId) {
+          if (a.dcId === hoveredDCId) return -1;
+          if (b.dcId === hoveredDCId) return 1;
+        }
+        return b.value - a.value;
+      });
+
+    const hoveredEntry = plantEntries.find(p => p.dcId === hoveredDCId);
 
     return (
       <div className="bg-slate-900/95 text-white rounded-xl p-3.5 shadow-2xl border border-slate-700/80 text-xs space-y-2 min-w-[240px] max-w-[320px] backdrop-blur-md">
         <div className="flex items-center justify-between border-b border-slate-700/80 pb-1.5">
           <span className="font-bold text-slate-100 text-sm">{label}</span>
-          <span className="text-[10px] text-slate-400 font-mono">{unitMode === 'daily' ? 'Harian (Normalisasi)' : 'Bulanan'}</span>
+          <span className="text-[10px] text-slate-400 font-mono">{plantEntries.length} PLTS</span>
         </div>
 
-        {avgVal !== null && avgVal !== undefined && (
-          <div className="bg-blue-950/60 border border-blue-800/60 rounded-lg p-2 space-y-1">
-            <div className="flex justify-between items-center text-slate-200">
-              <span className="font-semibold text-blue-300">Rata-rata Tertimbang:</span>
-              <strong className="text-blue-200 font-mono text-sm">{avgVal} {unitSuffix}</strong>
-            </div>
-            <p className="text-[9px] text-blue-400 italic">Definisi: Total kWh / Total kWp terpasang</p>
-            {minVal !== null && maxVal !== null && (
-              <div className="flex justify-between items-center text-[10px] text-slate-300 pt-1 border-t border-blue-900/60">
-                <span>Rentang Min - Maks:</span>
-                <span className="font-mono text-slate-200">{minVal} – {maxVal} {unitSuffix}</span>
+        {hoveredEntry && (
+          <div className="bg-blue-900/50 border border-blue-400/60 rounded-lg p-2 space-y-0.5">
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1.5 truncate max-w-[150px]">
+                <span className="size-2.5 rounded-full shrink-0 shadow-xs" style={{ backgroundColor: hoveredEntry.color }} />
+                <span className="font-bold text-white truncate">{hoveredEntry.name}</span>
               </div>
-            )}
+              <strong className="text-blue-200 font-mono text-sm">{hoveredEntry.value} {unitSuffix}</strong>
+            </div>
+            <span className="text-[9px] text-blue-300 font-semibold block">★ Lokasi Disorot</span>
           </div>
         )}
 
         {plantEntries.length > 0 && (
-          <div className="space-y-1 pt-1">
+          <div className="space-y-1">
             <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold border-b border-slate-800 pb-0.5">
-              <span>Plant ({plantEntries.length})</span>
+              <span>PLTS</span>
               <span>Nilai ({unitSuffix})</span>
             </div>
             <div className="max-h-[160px] overflow-y-auto space-y-1 pr-1 overscroll-contain">
-              {plantEntries.map((p, idx) => (
-                <div key={idx} className="flex justify-between items-center text-[11px] font-mono">
-                  <div className="flex items-center gap-1.5 truncate max-w-[170px]">
-                    <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
-                    <span className="text-slate-300 truncate">{p.name}</span>
+              {plantEntries.map((p, idx) => {
+                const isThisHovered = p.dcId === hoveredDCId;
+                return (
+                  <div
+                    key={idx}
+                    className={`flex justify-between items-center text-[11px] font-mono py-0.5 px-1.5 rounded transition-colors ${
+                      isThisHovered ? 'bg-blue-500/25 text-white font-bold' : 'text-slate-300 hover:bg-slate-800/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 truncate max-w-[170px]">
+                      <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
+                      <span className="truncate">{p.name}</span>
+                    </div>
+                    <strong className="text-white shrink-0">{p.value}</strong>
                   </div>
-                  <strong className="text-white shrink-0">{p.value}</strong>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -496,10 +559,14 @@ export default function PLTSAnalyticsSection({
   const [isAllSelected, setIsAllSelected] = useState(true);
   const [expandedDCIds, setExpandedDCIds] = useState(new Set()); // for multi-plant row expansion
 
-  // Chart Controls for Bagian D
-  const [showAverage, setShowAverage] = useState(true);
-  const [showMinMax, setShowMinMax] = useState(true);
+  // Unified Chart Visualization Mode across ALL metrics ('individual' | 'average' | 'minmax')
+  const [chartViewMode, setChartViewMode] = useState('individual'); // default 'individual' (Semua PLTS)
   const [unitMode, setUnitMode] = useState('monthly'); // 'monthly' | 'daily'
+
+  const handleChartViewModeChange = (mode) => {
+    setChartViewMode(mode);
+    updateUrlParam('view', mode);
+  };
 
   const toggleExpand = (dcId) => {
     setExpandedDCIds(prev => {
@@ -528,12 +595,16 @@ export default function PLTSAnalyticsSection({
       const metricParam = params.get('metric');
       const sortParam = params.get('sort');
       const dcParam = params.get('dc');
+      const viewParam = params.get('view');
 
       if (metricParam && METRIC_OPTIONS.some(m => m.id === metricParam)) {
         setSelectedMetric(metricParam);
       }
       if (sortParam && ['desc', 'asc', 'alpha'].includes(sortParam)) {
         setSortDirection(sortParam);
+      }
+      if (viewParam && ['individual', 'average', 'minmax'].includes(viewParam)) {
+        setChartViewMode(viewParam);
       }
       if (dcParam) {
         if (dcParam === 'all') {
@@ -1170,12 +1241,14 @@ export default function PLTSAnalyticsSection({
                   if (rankIdx >= 0) rankDisplay = String(rankIdx + 1);
                 }
 
-                // Color badge when <= 10 chosen
+                // Color badge when individual mode is active
                 let colorBadge = null;
-                if (isSelected && chosenDCs.length <= 10) {
+                if (isSelected) {
                   const chosenIdx = chosenDCs.findIndex(d => d.dcId === dc.dcId);
                   if (chosenIdx >= 0) {
-                    colorBadge = PALETTE[chosenIdx % PALETTE.length];
+                    colorBadge = chartViewMode === 'individual'
+                      ? getPlantColor(chosenIdx, chosenDCs.length)
+                      : (chosenDCs.length <= 10 ? PALETTE[chosenIdx % PALETTE.length] : null);
                   }
                 }
 
@@ -1268,27 +1341,40 @@ export default function PLTSAnalyticsSection({
               )}
 
               {selectedMetric !== 'pr' && (
-                <div className="inline-flex items-center gap-1 bg-slate-100 p-0.5 rounded-full text-[11px] font-semibold">
+                <div className="inline-flex items-center rounded-full bg-slate-100 p-0.5 text-[11px] font-semibold">
                   <button
                     type="button"
-                    onClick={() => setShowAverage(!showAverage)}
+                    onClick={() => handleChartViewModeChange('individual')}
                     className={`px-2.5 py-1 rounded-full transition-all ${
-                      showAverage ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                      chartViewMode === 'individual'
+                        ? 'bg-white text-slate-900 shadow-xs font-bold'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Semua PLTS
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleChartViewModeChange('average')}
+                    className={`px-2.5 py-1 rounded-full transition-all ${
+                      chartViewMode === 'average'
+                        ? 'bg-blue-600 text-white shadow-xs font-bold'
+                        : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     Rata-rata
                   </button>
-                  {showAverage && (
-                    <button
-                      type="button"
-                      onClick={() => setShowMinMax(!showMinMax)}
-                      className={`px-2.5 py-1 rounded-full transition-all ${
-                        showMinMax ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      Rentang min-maks
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleChartViewModeChange('minmax')}
+                    className={`px-2.5 py-1 rounded-full transition-all ${
+                      chartViewMode === 'minmax'
+                        ? 'bg-white text-slate-900 shadow-xs font-bold'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Rentang Min-Maks
+                  </button>
                 </div>
               )}
             </div>
@@ -1416,17 +1502,18 @@ export default function PLTSAnalyticsSection({
                       <SafeTrendTooltip
                         activeMetricUnit={selectedMetric === 'specificYield' && unitMode === 'daily' ? 'kWh/kWp/hari' : (activeMetricMeta.trendUnit || activeMetricMeta.unit)}
                         unitMode={unitMode}
+                        chartViewMode={chartViewMode}
+                        hoveredDCId={hoveredDCId}
                       />
                     }
                   />
 
-                  {/* Multi-Plant Individual Lines (Linear Interpolation) */}
-                  {chosenDCs.map((dc, idx) => {
+                  {/* Mode 'individual': Render ALL chosen DCs with distinct soft colors, NO average line, NO min-max lines */}
+                  {chartViewMode === 'individual' && chosenDCs.map((dc, idx) => {
                     const isHovered = hoveredDCId === dc.dcId;
-                    const isFew = chosenDCs.length <= 10;
-                    const color = isFew ? PALETTE[idx % PALETTE.length] : (isHovered ? '#0284C7' : '#94A3B8');
-                    const strokeOpacity = isHovered ? 1.0 : (isFew ? 0.9 : (hoveredDCId ? 0.15 : 0.4));
-                    const strokeWidth = isHovered ? 3.5 : (isFew ? 2 : 1);
+                    const color = getPlantColor(idx, chosenDCs.length);
+                    const strokeOpacity = isHovered ? 1.0 : (hoveredDCId ? 0.12 : 0.65);
+                    const strokeWidth = isHovered ? 3.5 : 1.5;
 
                     return (
                       <Line
@@ -1439,44 +1526,56 @@ export default function PLTSAnalyticsSection({
                         strokeOpacity={strokeOpacity}
                         strokeWidth={strokeWidth}
                         connectNulls={false}
-                        dot={isFew ? { r: isHovered ? 5 : 3, fill: color, fillOpacity: strokeOpacity } : (isHovered ? { r: 4, fill: color } : false)}
+                        dot={isHovered ? { r: 4.5, fill: color } : false}
                         activeDot={{ r: 6, fill: color }}
                       />
                     );
                   })}
 
-                  {/* Min-Max Range Lines */}
-                  {showMinMax && showAverage && chosenDCs.length > 1 && (
+                  {/* Mode 'minmax': Hide individual lines, render ONLY Max boundary, Min boundary, and thin reference average */}
+                  {chartViewMode === 'minmax' && (
                     <>
                       <Line
                         yAxisId="primary"
                         type="linear"
                         dataKey="max"
-                        name="Rentang Maks"
-                        stroke="#94A3B8"
-                        strokeDasharray="3 3"
-                        strokeWidth={1.5}
-                        strokeOpacity={0.6}
+                        name="Batas Maksimum"
+                        stroke="#10B981"
+                        strokeWidth={2}
+                        strokeDasharray="4 4"
                         connectNulls={false}
-                        dot={false}
+                        dot={{ r: 3.5, fill: '#10B981' }}
+                        activeDot={{ r: 5, fill: '#10B981' }}
                       />
                       <Line
                         yAxisId="primary"
                         type="linear"
                         dataKey="min"
-                        name="Rentang Min"
-                        stroke="#94A3B8"
-                        strokeDasharray="3 3"
+                        name="Batas Minimum"
+                        stroke="#F43F5E"
+                        strokeWidth={2}
+                        strokeDasharray="4 4"
+                        connectNulls={false}
+                        dot={{ r: 3.5, fill: '#F43F5E' }}
+                        activeDot={{ r: 5, fill: '#F43F5E' }}
+                      />
+                      <Line
+                        yAxisId="primary"
+                        type="linear"
+                        dataKey="average"
+                        name="Rata-rata Referensi"
+                        stroke="#0284C7"
                         strokeWidth={1.5}
-                        strokeOpacity={0.6}
+                        strokeDasharray="2 2"
+                        strokeOpacity={0.7}
                         connectNulls={false}
                         dot={false}
                       />
                     </>
                   )}
 
-                  {/* Weighted Average Line */}
-                  {showAverage && (
+                  {/* Mode 'average': Hide individual lines, render ONLY 1 prominent Weighted Average line */}
+                  {chartViewMode === 'average' && (
                     <Line
                       yAxisId="primary"
                       type="linear"
@@ -1519,16 +1618,32 @@ export default function PLTSAnalyticsSection({
           ) : (
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 shrink-0">
               <div className="flex items-center gap-3">
-                {showAverage && (
+                {chartViewMode === 'individual' && (
+                  <span className="inline-flex items-center gap-1.5 font-bold text-slate-700">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500" /> {chosenDCs.length} PLTS ditampilkan
+                  </span>
+                )}
+                {chartViewMode === 'average' && (
                   <span className="inline-flex items-center gap-1.5 font-bold text-blue-700">
-                    <span className="w-3.5 h-1 bg-blue-600 rounded-full" /> Rata-rata Tertimbang ({rankedChosenCount} DC)
+                    <span className="w-3.5 h-1 bg-blue-600 rounded-full" /> Rata-rata Tertimbang ({chosenDCs.length} PLTS):{' '}
+                    {computedAverageMetricValue !== null && computedAverageMetricValue !== undefined
+                      ? `${computedAverageMetricValue} ${selectedMetric === 'specificYield' && unitMode === 'daily' ? 'kWh/kWp/hari' : activeMetricMeta.unit}`
+                      : '—'}
                   </span>
                 )}
-                {showMinMax && showAverage && chosenDCs.length > 1 && (
-                  <span className="inline-flex items-center gap-1.5 font-medium text-slate-600">
-                    <span className="w-3.5 h-0.5 bg-slate-400 rounded-full border-t border-dashed" /> Rentang Min-Maks
-                  </span>
-                )}
+                {chartViewMode === 'minmax' && (() => {
+                  const validMinValues = trendDataset.map(d => d.min).filter(v => v !== null && v !== undefined && !isNaN(v));
+                  const validMaxValues = trendDataset.map(d => d.max).filter(v => v !== null && v !== undefined && !isNaN(v));
+                  const overallMin = validMinValues.length > 0 ? Math.min(...validMinValues) : null;
+                  const overallMax = validMaxValues.length > 0 ? Math.max(...validMaxValues) : null;
+                  const unitSuffix = selectedMetric === 'specificYield' && unitMode === 'daily' ? 'kWh/kWp/hari' : activeMetricMeta.unit;
+                  return (
+                    <span className="inline-flex items-center gap-1.5 font-bold text-slate-700">
+                      <span className="w-3.5 h-0.5 bg-slate-400 rounded-full border-t border-dashed" /> Rentang ({chosenDCs.length} PLTS):{' '}
+                      {overallMin !== null && overallMax !== null ? `${overallMin} – ${overallMax} ${unitSuffix}` : '—'}
+                    </span>
+                  );
+                })()}
               </div>
               <span className="text-[10px] text-slate-400">
                 Data historis kanonik 2026 (Gorontalo dikecualikan)
