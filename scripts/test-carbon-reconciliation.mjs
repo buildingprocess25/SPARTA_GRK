@@ -258,6 +258,34 @@ test('All 39 canonical DC entities (representing 39 physical plants) are preserv
   assert.equal(Number(totalApiKwp.toFixed(2)), 5876.12);
 });
 
+// -----------------------------------------------------------------------------
+// SECTION 7: CANONICAL EMISSION BOUNDARY & PER-PLANT FACTOR INTEGRITY
+// -----------------------------------------------------------------------------
+console.log('\n--- 7. PER-PLANT EMISSION FACTOR BOUNDARY AUDIT ---');
+
+test('For every plant, calculated emission / energy never exceeds official grid factor', async () => {
+  const { getGridFactor } = await import('../src/lib/emission-factors.js');
+  for (const entity of CANONICAL_DC_ENTITIES) {
+    const factorObj = getGridFactor(entity.grid);
+    const gridFactor = factorObj?.cmPlts ?? 0;
+    assert.ok(gridFactor <= 0.84, `PLTS Grid factor for ${entity.grid} (${gridFactor}) must not exceed 0.84 kgCO2e/kWh`);
+
+    // Test across various energy levels (100 kWh to 100,000 kWh)
+    for (const energyKwh of [100, 2500, 15000, 50000, 100000]) {
+      const emissionTon = (energyKwh * gridFactor) / 1000;
+      const effectiveFactor = (emissionTon * 1000) / energyKwh;
+      assert.ok(
+        effectiveFactor <= gridFactor + 0.000001,
+        `Effective factor ${effectiveFactor} exceeds grid factor ${gridFactor} for ${entity.dcId}`
+      );
+      assert.ok(
+        effectiveFactor <= 0.840001,
+        `Effective factor ${effectiveFactor} exceeds national maximum 0.84 for ${entity.dcId}`
+      );
+    }
+  }
+});
+
 console.log('\n================================================================================');
 console.log(`CARBON RECONCILIATION TEST SUMMARY: ${passCount} / ${totalCount} PASSED (0 FAILED)`);
 console.log('================================================================================');

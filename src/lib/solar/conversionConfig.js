@@ -3,12 +3,20 @@
  * Single source of truth untuk seluruh metrik turunan energi & lingkungan PLTS
  */
 
+export const EMISSION_CONSTANTS = {
+  CORPORATE_TARGET_FACTOR_TON_PER_MWH: 0.99729425,
+  GRID_WEIGHTED_AVERAGE_FACTOR_TON_PER_MWH: 0.77644,
+  COAL_FACTOR_TON_PER_MWH: 0.404,
+  TREE_FACTOR_PER_MWH: 54,
+};
+
 export const CONVERSION_CONFIG = {
   // 1. Emisi Karbon Terhindar (tCO2e)
   emission: {
     // Faktor rata-rata tertimbang nasional grid PLTS
-    factorKgPerKwh: 0.77644,
-    factorTonPerMwh: 0.77644,
+    factorKgPerKwh: EMISSION_CONSTANTS.GRID_WEIGHTED_AVERAGE_FACTOR_TON_PER_MWH,
+    factorTonPerMwh: EMISSION_CONSTANTS.GRID_WEIGHTED_AVERAGE_FACTOR_TON_PER_MWH,
+    corporateTargetFactor: EMISSION_CONSTANTS.CORPORATE_TARGET_FACTOR_TON_PER_MWH,
     unit: 'tCO₂e',
     name: 'Emisi Terhindar',
     source: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)',

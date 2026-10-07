@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { buildCacheKey, buildQueryString } from '../src/lib/solar/cacheKey.js';
+import { buildCacheKey, buildQueryString, isValidPltsHistoryPeriod } from '../src/lib/solar/cacheKey.js';
 
 console.log('=== UNIT TEST: CACHE KEY BUILDER ===\n');
 
@@ -44,5 +44,12 @@ const keyLive = buildCacheKey('/api/plts/dashboard/summary', { mode: 'live' });
 
 assert.notEqual(keyMonthly, keyYearly, 'Monthly and Yearly must have distinct cache keys');
 assert.notEqual(keyMonthly, keyLive, 'Historical and Live must have distinct cache keys');
+
+assert.equal(isValidPltsHistoryPeriod('2026-01_2026-09'), true);
+assert.equal(isValidPltsHistoryPeriod('2026-09_2026-09'), true);
+assert.equal(isValidPltsHistoryPeriod('ytd'), false);
+assert.equal(isValidPltsHistoryPeriod('month'), false);
+assert.equal(isValidPltsHistoryPeriod('range'), false);
+assert.equal(isValidPltsHistoryPeriod('2026-13_2026-13'), false);
 
 console.log('\n✔ SEMUA 4 ASSERTION UNIT TEST CACHE KEY LOLOS (0 ERROR)\n');

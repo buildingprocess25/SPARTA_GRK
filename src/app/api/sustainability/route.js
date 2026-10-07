@@ -10,7 +10,6 @@ import {
   calculateWaterRecycleImpact,
   getGridEmissionFactor
 } from '@/lib/carbon/carbonEngine';
-import { getGridFactor } from '@/lib/emission-factors.js';
 
 // Micro-cache (10 seconds) for performance
 let cachedPayload = null;
@@ -107,22 +106,9 @@ export async function GET(request) {
     const totalPltsCostSavedJuta = (pltsMonthlyTrend.reduce((acc, m) => acc + m.pltsGen, 0) * CARBON_FACTORS.TARIFFS.ELECTRICITY_PLN_PER_KWH) / 1_000_000;
     const totalWaterCostSavedJuta = waterMonthlyTrend.reduce((acc, m) => acc + m.costSavedJuta, 0);
 
-    // Sum purchased electricity for Scope 2 dengan faktor per grid (bukan 0.87 flat).
-    // Setiap baris energyMeasurement dicocokan dengan grid DC-nya via getGridFactor.
-    // Faktor yang digunakan: cmExPost (location-based, sesuai ESDM per wilayah).
-    const scope2ByRecord = energyRecords
-      .filter(r => !r.isAggregateRow)
-      .map(r => {
-        const gridObj = r.gridZone ? getGridFactor(r.gridZone) : null;
-        // Fallback ke JAMALI (0.87) hanya bila grid tidak diketahui, dengan label 'sementara'
-        const factor = gridObj?.cmExPost ?? 0.87;
-        const factorStatus = gridObj ? gridObj.status : 'fallback_jamali';
-        const emissionTon = (r.purchasedKwh * factor) / 1000;
-        return { purchasedKwh: r.purchasedKwh, factor, factorStatus, emissionTon, dcId: r.dcId, gridZone: r.gridZone };
-      });
-    const scope2TotalEmissionTon = Number(scope2ByRecord.reduce((acc, r) => acc + r.emissionTon, 0).toFixed(2));
-    const scope2TotalPurchasedKwh = scope2ByRecord.reduce((acc, r) => acc + r.purchasedKwh, 0);
-    const scope2RecordsWithFallback = scope2ByRecord.filter(r => r.factorStatus === 'fallback_jamali').length;
+    // Sum purchased electricity for Scope 2 (purchased MWh converted to kWh * Grid factor)
+    const totalPurchasedKwh = energyRecords.filter(r => !r.isAggregateRow).reduce((acc, r) => acc + r.purchasedKwh, 0);
+    const scope2TotalEmissionTon = Number(((totalPurchasedKwh * 0.87) / 1000).toFixed(2));
 
     // Fuel Scope 1 from fuelRecords strictly
     const fuelScope1Ton = fuelRecords.reduce((acc, r) => acc + r.emissionTon, 0);
@@ -173,29 +159,7 @@ export async function GET(request) {
         totalLitersYtd: Number(fuelRecords.reduce((acc, r) => acc + r.liters, 0).toFixed(2)),
         totalEmissionTonYtd: Number(fuelScope1Ton.toFixed(3)),
         totalCostJutaYtd: Number((fuelRecords.reduce((acc, r) => acc + (r.costRupiah || 0), 0) / 1_000_000).toFixed(2)),
-        detailActivities: fuelRecords,
-        // Untuk SustainabilityContext — scope1 summary dari DB riil
-        scope1Summary: {
-          totalFuelLitersYTD: Number(fuelRecords.reduce((acc, r) => acc + r.liters, 0).toFixed(2)),
-          totalEmissionCO2e: Number(fuelScope1Ton.toFixed(3)),
-          fuelCostTotalJuta: Number((fuelRecords.reduce((acc, r) => acc + (r.costRupiah || 0), 0) / 1_000_000).toFixed(2)),
-          activeGensetUnits: new Set(fuelRecords.map(r => r.dcId).filter(Boolean)).size,
-          source: 'DB_FUEL_ACTIVITY',
-          dataNote: hasFuelData
-            ? `${fuelRecords.length} transaksi fuelActivity dari DB`
-            : 'Tidak ada data fuelActivity — tampilkan Data tidak tersedia'
-        }
-      },
-      // Scope 2 summary dari DB untuk SustainabilityContext
-      scope2Summary: {
-        totalPlnKwhYTD: Number(scope2TotalPurchasedKwh.toFixed(1)),
-        totalEmissionCO2e: scope2TotalEmissionTon,
-        totalCostJuta: null, // belum ada data tagihan PLN per DC
-        observationCount: scope2ByRecord.length,
-        recordsWithFallbackFactor: scope2RecordsWithFallback,
-        source: 'DB_ENERGY_MEASUREMENT_PURCHASED',
-        methodology: 'location-based, per-grid emission factor (ESDM)',
-        dataNote: `${scope2ByRecord.length} observasi; ${scope2RecordsWithFallback} pakai fallback JAMALI 0.87`
+        detailActivities: fuelRecords
       },
       targets: targetRecords,
       plants: plantMasters

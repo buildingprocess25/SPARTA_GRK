@@ -8,6 +8,7 @@ import PengurangEmisiTab from '@/components/PengurangEmisiTab';
 import PenambahEmisiTab from '@/components/PenambahEmisiTab';
 import InputDataTab from '@/components/InputDataTab';
 import HistoryTab from '@/components/HistoryTab';
+import EmissionCalculatorPage from '@/components/calculator/EmissionCalculatorPage';
 import { SustainabilityProvider } from '@/context/SustainabilityContext';
 
 export default function Home() {
@@ -88,6 +89,9 @@ export default function Home() {
               )}
               {activeTab === 'history' && (
                 <HistoryTab setActiveTab={setActiveTab} />
+              )}
+              {activeTab === 'calculator' && (
+                <EmissionCalculatorPage />
               )}
             </main>
           </div>

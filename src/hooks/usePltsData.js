@@ -8,17 +8,29 @@ const clientCache = typeof window !== 'undefined'
   ? (window.__PLTS_CLIENT_CACHE__ = window.__PLTS_CLIENT_CACHE__ || new Map())
   : new Map();
 
+const CLIENT_CACHE_TTL_MS = 60 * 1000; // 1 minute client freshness window
+
+function getCachedEntry(key) {
+  const entry = clientCache.get(key);
+  if (!entry) return null;
+  // If legacy un-wrapped entry, wrap it
+  if (!entry.timestamp) return entry;
+  if (Date.now() - entry.timestamp < CLIENT_CACHE_TTL_MS) {
+    return entry.data;
+  }
+  return null;
+}
 
 export function prefetchPltsEndpoint(endpoint, filters = {}) {
   const baseKey = buildCacheKey(endpoint, filters);
-  if (clientCache.has(baseKey)) return;
+  if (getCachedEntry(baseKey)) return;
 
   const qs = buildQueryString(filters);
   fetch(`${endpoint}?${qs}`)
     .then((res) => res.json())
     .then((payload) => {
       if (payload && payload.success) {
-        clientCache.set(baseKey, payload.data);
+        clientCache.set(baseKey, { data: payload.data, timestamp: Date.now() });
       }
     })
     .catch(() => {});
@@ -28,16 +40,16 @@ export function usePltsEndpoint(endpoint, filters = {}, { enabled = true } = {})
   const baseKey = buildCacheKey(endpoint, filters);
   const qs = buildQueryString(filters);
 
-  const [data, setData] = useState(() => clientCache.get(baseKey) || null);
-  const [loading, setLoading] = useState(() => !clientCache.has(baseKey) && enabled);
+  const [data, setData] = useState(() => getCachedEntry(baseKey) || null);
+  const [loading, setLoading] = useState(() => !getCachedEntry(baseKey) && enabled);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!enabled) return;
 
-    // If cache hit on base key, render immediately with 0 network requests
-    if (clientCache.has(baseKey)) {
-      setData(clientCache.get(baseKey));
+    const cachedData = getCachedEntry(baseKey);
+    if (cachedData) {
+      setData(cachedData);
       setLoading(false);
       setError(null);
       return;
@@ -57,7 +69,7 @@ export function usePltsEndpoint(endpoint, filters = {}, { enabled = true } = {})
       })
       .then((result) => {
         if (!isCurrent) return;
-        clientCache.set(baseKey, result);
+        clientCache.set(baseKey, { data: result, timestamp: Date.now() });
         setData(result);
         setLoading(false);
       })

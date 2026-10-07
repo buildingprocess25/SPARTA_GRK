@@ -13,9 +13,12 @@
     "import:isolar-history": "node --env-file=.env scripts/import-isolar-monthly-history.mjs",
     "import:rkap-targets": "node --env-file=.env scripts/import-rkap-targets.mjs",
     "verify:plts-lock": "node scripts/verify-plts-overview-lock.mjs",
-    "test:plts-dashboard": "node scripts/test-plts-dashboard-contracts.mjs",
-    "test": "node scripts/test-lint-verification.mjs && node scripts/test-units-and-denylist.mjs && node scripts/test-metrics-and-cilacap.mjs && node scripts/test-proxy-pr-audit.mjs && node scripts/test-carbon-reconciliation.mjs && node scripts/test-database-and-workbook-reconciliation.mjs && node scripts/test-scheduler-and-snapshots.mjs && node scripts/test-calculator-and-sustainability.mjs && node scripts/test-master-facilities-and-audit.mjs && node scripts/test-excel-upload-and-templates.mjs && node scripts/test-final-suite.mjs",
-    "test:stabilization": "node scripts/test-stabilization.mjs"
+    "test": "node scripts/run-unit-tests.mjs",
+    "test:db:isolated": "node scripts/run-isolated-db-tests.mjs",
+    "test:data:readonly": "node scripts/run-readonly-tests.mjs",
+    "test:all": "node scripts/run-all-tests.mjs",
+    "test:stabilization": "node scripts/test-stabilization.mjs",
+    "test:inverter-temp": "node --test src/lib/solar/__tests__/inverterTemperature.test.mjs && node scripts/run-inverter-temperature-test-isolated.mjs"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

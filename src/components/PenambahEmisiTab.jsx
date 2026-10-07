@@ -13,6 +13,7 @@ import {
 import { useSustainability } from '@/context/SustainabilityContext';
 import StatCard from '@/components/ui/StatCard';
 import CardBox from '@/components/ui/CardBox';
+import Scope2AnnualLoadDashboard from '@/components/Scope2AnnualLoadDashboard';
 import {
   branchHierarchyList,
   getHierarchyElectricityStats,
@@ -48,6 +49,10 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
 
   // Selected branch object
   const currentBranchObj = branchHierarchyList.find(b => b.id === selectedBranch);
+
+  if (activeSubScope === 'scope2') {
+    return <Scope2AnnualLoadDashboard />;
+  }
 
   return (
     <div className="space-y-6 animate-in">

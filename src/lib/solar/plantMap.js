@@ -70,6 +70,8 @@ export const CANONICAL_DC_ENTITIES = [
     baselineInstalledKwp: 58.0,
     region: 'Banten',
     grid: 'JAMALI',
+    facilityType: 'STORE',
+    type: 'STORE',
     isMultiPlant: false
   },
   {
@@ -202,6 +204,8 @@ export const CANONICAL_DC_ENTITIES = [
     baselineInstalledKwp: 40.0,
     region: 'Banten',
     grid: 'JAMALI',
+    facilityType: 'STORE',
+    type: 'STORE',
     isMultiPlant: false
   },
   {
@@ -525,3 +529,24 @@ export function lookupPlantMetadata(raw) {
     isMapped: false
   };
 }
+
+/**
+ * Helper to determine if a plant/entity is a DC (Distribution Center).
+ * Prioritizes explicit type/category/facilityType fields, and falls back to
+ * excluding non-DC names (e.g. "Tk. Drive Thru ...") via case-insensitive regex.
+ */
+export function isDcLocation(plant) {
+  if (!plant) return false;
+  const type = String(plant.facilityType || plant.type || plant.category || plant.plantType || '').toUpperCase().trim();
+  if (type === 'STORE' || type === 'TOKO' || type === 'RETAIL') return false;
+  if (type === 'DC' || type === 'DISTRIBUTION_CENTER') return true;
+
+  const name = String(plant.canonicalName || plant.plantName || plant.name || plant.psName || plant.ps_name || '').trim();
+  const dcId = String(plant.dcId || plant.id || plant.psId || '').trim();
+
+  if (/^tk\.?\s*drive\s*thru/i.test(name) || /^toko\s*drive\s*thru/i.test(name)) return false;
+  if (/^dc-demansion$/i.test(dcId) || /^dc-drivethrugs$/i.test(dcId)) return false;
+
+  return true;
+}
+

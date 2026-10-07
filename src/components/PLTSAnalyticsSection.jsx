@@ -15,7 +15,7 @@ import {
 import CardBox from '@/components/ui/CardBox';
 import { processAllDCAnalytics, SOLAR_CONSTANTS } from '@/lib/solar/processor';
 import { formatNum } from '@/data/sustainabilityData';
-import { isFeatureEnabled, EMISSION_CONSTANTS } from '@/lib/solar/conversionConfig';
+import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
 
 const ALL_METRIC_OPTIONS = [
   {
@@ -84,7 +84,7 @@ const ALL_METRIC_OPTIONS = [
     trendLabel: 'Emisi Terhindar Bulanan',
     unit: 'tCO₂e',
     trendUnit: 'tCO₂e',
-    desc: `Reduksi emisi GRK dari produksi PLTS (Faktor rata-rata nasional: ${EMISSION_CONSTANTS.GRID_WEIGHTED_AVERAGE_FACTOR_TON_PER_MWH} tCO₂e/MWh, sumber: konfigurasi internal, menunggu verifikasi dokumen resmi)`,
+    desc: 'Reduksi emisi GRK dari produksi PLTS (Faktor metode aplikasi 0.77644 kgCO₂e/kWh / 0.77644 tCO₂e/MWh)',
     sourceType: 'EXCEL_HISTORY',
     chartSourceType: 'EXCEL_HISTORY'
   }
@@ -266,9 +266,8 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, 
                 return (
                   <div
                     key={idx}
-                    className={`flex justify-between items-center text-[11px] font-mono py-0.5 px-1.5 rounded transition-colors ${
-                      isThisHovered ? 'bg-blue-500/25 text-white font-bold' : 'text-slate-300 hover:bg-slate-800/50'
-                    }`}
+                    className={`flex justify-between items-center text-[11px] font-mono py-0.5 px-1.5 rounded transition-colors ${isThisHovered ? 'bg-blue-500/25 text-white font-bold' : 'text-slate-300 hover:bg-slate-800/50'
+                      }`}
                   >
                     <div className="flex items-center gap-1.5 truncate max-w-[170px]">
                       <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
@@ -469,13 +468,12 @@ const DCRowItem = React.memo(function DCRowItem({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onClick={onToggle}
-      className={`flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer transition-all border ${
-        isSelected
+      className={`flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer transition-all border ${isSelected
           ? 'bg-blue-50/70 border-blue-200 text-slate-900 shadow-xs'
           : isExcludedFromRanking
-          ? 'opacity-75 bg-slate-50/70 border-dashed border-slate-200 text-slate-600'
-          : 'bg-white border-transparent text-slate-600 hover:bg-slate-50'
-      } ${isHovered ? 'ring-1 ring-blue-400' : ''}`}
+            ? 'opacity-75 bg-slate-50/70 border-dashed border-slate-200 text-slate-600'
+            : 'bg-white border-transparent text-slate-600 hover:bg-slate-50'
+        } ${isHovered ? 'ring-1 ring-blue-400' : ''}`}
       title={`Kapasitas API: ${dc.installedKwp} kWp${isAuditBaselineEnabled ? ` (Baseline: ${dc.baselineCapKwp || '—'} kWp${dc.capacityDiffPct ? `, Selisih: ${dc.capacityDiffPct}%` : ''})` : ''}${selectedMetric === 'pr' ? ' • Proxy PR perkiraan berbasis audit April 2026' : isExcludedFromRanking ? ' • Dikecualikan dari ranking' : ''}`}
     >
       <div className="flex items-center gap-2 min-w-0">
@@ -576,7 +574,7 @@ export default function PLTSAnalyticsSection({
       return next;
     });
   };
-  
+
   // UI filter states
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('table'); // 'table' | 'telemetry'
@@ -1071,11 +1069,10 @@ export default function PLTSAnalyticsSection({
             <button
               type="button"
               onClick={handleSelectAll}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-                isAllSelected
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${isAllSelected
                   ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
-              }`}
+                }`}
             >
               Semua ({allDCItems.filter(d => !d.isUnderConstruction).length})
             </button>
@@ -1118,11 +1115,10 @@ export default function PLTSAnalyticsSection({
                 key={opt.id}
                 type="button"
                 onClick={() => handleMetricChange(opt.id)}
-                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-                  selectedMetric === opt.id
+                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${selectedMetric === opt.id
                     ? 'bg-white text-slate-900 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
-                }`}
+                  }`}
                 title={opt.desc}
               >
                 {opt.label}
@@ -1219,8 +1215,8 @@ export default function PLTSAnalyticsSection({
                 const isExcludedFromRanking = dc.isUnderConstruction || (selectedMetric === 'pr'
                   ? !dc.isValidPr
                   : isAuditDependentMetric
-                  ? (!includeUnreliableBaseline && dc.requiresManualVerification)
-                  : !hasValidMetric);
+                    ? (!includeUnreliableBaseline && dc.requiresManualVerification)
+                    : !hasValidMetric);
                 const isRankable = !dc.isUnderConstruction && (selectedMetric === 'pr' ? (dc.isValidPr && hasValidMetric) : (!isExcludedFromRanking && hasValidMetric));
 
                 let rankDisplay = '—';
@@ -1284,18 +1280,17 @@ export default function PLTSAnalyticsSection({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-bold text-base text-slate-900">{trendTitle}</h3>
-                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold border ${
-                  selectedMetric === 'pr'
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold border ${selectedMetric === 'pr'
                     ? 'bg-slate-100 text-slate-600 border-slate-200'
                     : selectedMetric === 'peakPower'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-blue-50 text-blue-700 border-blue-200'
-                }`}>
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-blue-50 text-blue-700 border-blue-200'
+                  }`}>
                   {selectedMetric === 'pr'
                     ? 'audit_baseline (April 2026)'
                     : selectedMetric === 'peakPower'
-                    ? 'telemetri_live_api'
-                    : 'ISOLAR_REPORT_IMPORT (Jan–Sep 2026)'}
+                      ? 'telemetri_live_api'
+                      : 'ISOLAR_REPORT_IMPORT (Jan–Sep 2026)'}
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -1310,18 +1305,16 @@ export default function PLTSAnalyticsSection({
                   <button
                     type="button"
                     onClick={() => setUnitMode('monthly')}
-                    className={`px-2.5 py-1 rounded-full transition-all ${
-                      unitMode === 'monthly' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`px-2.5 py-1 rounded-full transition-all ${unitMode === 'monthly' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                      }`}
                   >
                     kWh/kWp per bulan
                   </button>
                   <button
                     type="button"
                     onClick={() => setUnitMode('daily')}
-                    className={`px-2.5 py-1 rounded-full transition-all ${
-                      unitMode === 'daily' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`px-2.5 py-1 rounded-full transition-all ${unitMode === 'daily' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                      }`}
                   >
                     kWh/kWp per hari
                   </button>
@@ -1333,33 +1326,30 @@ export default function PLTSAnalyticsSection({
                   <button
                     type="button"
                     onClick={() => handleChartViewModeChange('individual')}
-                    className={`px-2.5 py-1 rounded-full transition-all ${
-                      chartViewMode === 'individual'
+                    className={`px-2.5 py-1 rounded-full transition-all ${chartViewMode === 'individual'
                         ? 'bg-white text-slate-900 shadow-xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                      }`}
                   >
                     Semua PLTS
                   </button>
                   <button
                     type="button"
                     onClick={() => handleChartViewModeChange('average')}
-                    className={`px-2.5 py-1 rounded-full transition-all ${
-                      chartViewMode === 'average'
+                    className={`px-2.5 py-1 rounded-full transition-all ${chartViewMode === 'average'
                         ? 'bg-blue-600 text-white shadow-xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                      }`}
                   >
                     Rata-rata
                   </button>
                   <button
                     type="button"
                     onClick={() => handleChartViewModeChange('minmax')}
-                    className={`px-2.5 py-1 rounded-full transition-all ${
-                      chartViewMode === 'minmax'
+                    className={`px-2.5 py-1 rounded-full transition-all ${chartViewMode === 'minmax'
                         ? 'bg-white text-slate-900 shadow-xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                      }`}
                   >
                     Rentang Min-Maks
                   </button>
@@ -1470,7 +1460,7 @@ export default function PLTSAnalyticsSection({
                 <ComposedChart data={trendDataset} margin={{ top: 10, right: 15, left: 10, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748B' }} stroke="#E2E8F0" />
-                  
+
                   <YAxis
                     yAxisId="primary"
                     tick={{ fontSize: 11, fill: '#64748B' }}
@@ -1652,11 +1642,10 @@ export default function PLTSAnalyticsSection({
                 role="tab"
                 aria-selected={activeTab === 'table'}
                 onClick={() => setActiveTab('table')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'table'
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'table'
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 <List size={14} className="text-blue-600" />
                 <span>Tabel Data Matang ({tableDisplayItems.length} Lokasi)</span>
@@ -1666,11 +1655,10 @@ export default function PLTSAnalyticsSection({
                 role="tab"
                 aria-selected={activeTab === 'telemetry'}
                 onClick={() => setActiveTab('telemetry')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'telemetry'
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'telemetry'
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 <Radio size={14} className="text-emerald-500" />
                 <span>Telemetri Live per DC ({telemetryDisplayItems.length} Lokasi)</span>
@@ -1725,54 +1713,48 @@ export default function PLTSAnalyticsSection({
                   <button
                     type="button"
                     onClick={() => setTelemetryFilter('all')}
-                    className={`px-2 py-1 rounded-md transition-all ${
-                      telemetryFilter === 'all' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'
-                    }`}
+                    className={`px-2 py-1 rounded-md transition-all ${telemetryFilter === 'all' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'
+                      }`}
                   >
                     Semua
                   </button>
                   <button
                     type="button"
                     onClick={() => setTelemetryFilter('Peak Generation')}
-                    className={`px-2 py-1 rounded-md transition-all ${
-                      telemetryFilter === 'Peak Generation' ? 'bg-white text-emerald-700 shadow-xs' : 'text-slate-600'
-                    }`}
+                    className={`px-2 py-1 rounded-md transition-all ${telemetryFilter === 'Peak Generation' ? 'bg-white text-emerald-700 shadow-xs' : 'text-slate-600'
+                      }`}
                   >
                     Peak
                   </button>
                   <button
                     type="button"
                     onClick={() => setTelemetryFilter('Normal Producing')}
-                    className={`px-2 py-1 rounded-md transition-all ${
-                      telemetryFilter === 'Normal Producing' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600'
-                    }`}
+                    className={`px-2 py-1 rounded-md transition-all ${telemetryFilter === 'Normal Producing' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600'
+                      }`}
                   >
                     Producing
                   </button>
                   <button
                     type="button"
                     onClick={() => setTelemetryFilter('Alarm')}
-                    className={`px-2 py-1 rounded-md transition-all ${
-                      telemetryFilter === 'Alarm' ? 'bg-white text-amber-800 font-bold shadow-xs' : 'text-slate-600'
-                    }`}
+                    className={`px-2 py-1 rounded-md transition-all ${telemetryFilter === 'Alarm' ? 'bg-white text-amber-800 font-bold shadow-xs' : 'text-slate-600'
+                      }`}
                   >
                     Alarm
                   </button>
                   <button
                     type="button"
                     onClick={() => setTelemetryFilter('Menunggu Data')}
-                    className={`px-2 py-1 rounded-md transition-all ${
-                      telemetryFilter === 'Menunggu Data' ? 'bg-white text-amber-700 shadow-xs' : 'text-slate-600'
-                    }`}
+                    className={`px-2 py-1 rounded-md transition-all ${telemetryFilter === 'Menunggu Data' ? 'bg-white text-amber-700 shadow-xs' : 'text-slate-600'
+                      }`}
                   >
                     Menunggu Data
                   </button>
                   <button
                     type="button"
                     onClick={() => setTelemetryFilter('Offline')}
-                    className={`px-2 py-1 rounded-md transition-all ${
-                      telemetryFilter === 'Offline' ? 'bg-white text-rose-700 shadow-xs' : 'text-slate-600'
-                    }`}
+                    className={`px-2 py-1 rounded-md transition-all ${telemetryFilter === 'Offline' ? 'bg-white text-rose-700 shadow-xs' : 'text-slate-600'
+                      }`}
                   >
                     Offline
                   </button>
@@ -1783,9 +1765,8 @@ export default function PLTSAnalyticsSection({
                   <button
                     type="button"
                     onClick={() => setTelemetryViewMode('card')}
-                    className={`p-1 rounded-md transition-all ${
-                      telemetryViewMode === 'card' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'
-                    }`}
+                    className={`p-1 rounded-md transition-all ${telemetryViewMode === 'card' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'
+                      }`}
                     title="Tampilan Kartu"
                   >
                     <Grid size={14} />
@@ -1793,9 +1774,8 @@ export default function PLTSAnalyticsSection({
                   <button
                     type="button"
                     onClick={() => setTelemetryViewMode('compact')}
-                    className={`p-1 rounded-md transition-all ${
-                      telemetryViewMode === 'compact' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'
-                    }`}
+                    className={`p-1 rounded-md transition-all ${telemetryViewMode === 'compact' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'
+                      }`}
                     title="Tampilan Ringkas (1 Baris)"
                   >
                     <List size={14} />
@@ -2012,9 +1992,8 @@ export default function PLTSAnalyticsSection({
                                   per {d.portalPrManual.formattedDate}
                                 </span>
                                 {d.historicalMonthlyPr !== null && (
-                                  <span className={`text-[9px] font-mono ${
-                                    (d.historicalMonthlyPr - d.portalPrManual.prPercent) > 0 ? 'text-blue-600' : 'text-amber-600'
-                                  }`}>
+                                  <span className={`text-[9px] font-mono ${(d.historicalMonthlyPr - d.portalPrManual.prPercent) > 0 ? 'text-blue-600' : 'text-amber-600'
+                                    }`}>
                                     Δ {((d.historicalMonthlyPr - d.portalPrManual.prPercent) >= 0 ? '+' : '') + (d.historicalMonthlyPr - d.portalPrManual.prPercent).toFixed(1)} pt
                                   </span>
                                 )}
@@ -2055,15 +2034,14 @@ export default function PLTSAnalyticsSection({
                           <td className="px-3 py-3 text-center">
                             <div className="flex flex-col items-center gap-1">
                               <span
-                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
-                                  d.isUnderConstruction
+                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${d.isUnderConstruction
                                     ? 'bg-slate-100 text-slate-600 border-slate-300'
                                     : (d.status || '').includes('Normal') || (d.status || '').includes('Peak')
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                    : (d.status || '').includes('Offline')
-                                    ? 'bg-slate-100 text-slate-600 border-slate-200'
-                                    : 'bg-amber-50 text-amber-700 border-amber-200'
-                                }`}
+                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                      : (d.status || '').includes('Offline')
+                                        ? 'bg-slate-100 text-slate-600 border-slate-200'
+                                        : 'bg-amber-50 text-amber-700 border-amber-200'
+                                  }`}
                               >
                                 {d.status || 'Normal Producing'}
                               </span>
@@ -2101,9 +2079,8 @@ export default function PLTSAnalyticsSection({
                                     <div key={sp.psId || sIdx} className="bg-slate-50 rounded-lg p-2.5 border border-slate-100 text-[11px] space-y-1">
                                       <div className="flex items-center justify-between">
                                         <span className="font-bold text-slate-900">{sp.name}</span>
-                                        <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold ${
-                                          sp.isOnline ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
-                                        }`}>
+                                        <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold ${sp.isOnline ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
+                                          }`}>
                                           {sp.status || (sp.isOnline ? 'Online' : 'Offline')}
                                         </span>
                                       </div>

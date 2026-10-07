@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated/prisma/index.js';
 import * as XLSX from 'xlsx';
 import {
   generateGensetTemplate,
@@ -13,12 +13,12 @@ import {
   commitBatchToDatabase
 } from '../src/lib/importers/batchUploadProcessor.js';
 import { MASTER_FACILITIES } from '../src/lib/master/facilityMaster.js';
-import { skipUnlessIsolatedTestDatabase } from './lib/require-isolated-test-database.mjs';
+import { requireIsolatedTestDatabase } from './lib/require-isolated-test-database.mjs';
 
 const prisma = new PrismaClient();
 
 async function runTests() {
-  if (skipUnlessIsolatedTestDatabase('test-excel-upload-and-templates')) return;
+  requireIsolatedTestDatabase('test-excel-upload-and-templates');
   console.log('🧪 Starting Excel/CSV Templates & Batch Upload Test Suite...\n');
   let passed = 0;
   let total = 0;

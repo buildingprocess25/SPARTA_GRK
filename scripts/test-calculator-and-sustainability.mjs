@@ -8,7 +8,7 @@
  * 6. Factor Registry Audit Verification
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated/prisma/index.js';
 import {
   CARBON_FACTORS,
   FACTOR_REGISTRY_PROVENANCE,
@@ -18,7 +18,7 @@ import {
   calculateWaterRecycleImpact,
   reconcileCarbonBalance
 } from '../src/lib/carbon/carbonEngine.js';
-import { skipUnlessIsolatedTestDatabase } from './lib/require-isolated-test-database.mjs';
+import { requireIsolatedTestDatabase } from './lib/require-isolated-test-database.mjs';
 
 const prisma = new PrismaClient();
 
@@ -36,7 +36,7 @@ function assert(condition, message) {
 }
 
 async function runTests() {
-  if (skipUnlessIsolatedTestDatabase('test-calculator-and-sustainability')) return;
+  requireIsolatedTestDatabase('test-calculator-and-sustainability');
   console.log('='.repeat(80));
   console.log('TEST SUITE: CALCULATOR INTEGRITY, IDEMPOTENCY & FACTOR AUDIT');
   console.log('='.repeat(80));
@@ -142,15 +142,38 @@ async function runTests() {
 
     // ─── 5. PLTS DOUBLE-COUNTING PREVENTION LOGIC ────────────────────────────
     console.log('\n--- 5. PLTS DOUBLE-COUNTING PREVENTION ---');
-    const existingKarawang = await prisma.energyMeasurement.findFirst({
+    let existingKarawang = await prisma.energyMeasurement.findFirst({
       where: { dcId: 'DC-KARAWANG', yearMonth: '2026-04' }
     });
+    let createdFixture = false;
+    if (!existingKarawang) {
+      await prisma.$executeRawUnsafe(`
+        INSERT INTO plant_master (dc_id, canonical_name, api_installed_kwp, baseline_installed_kwp, updated_at)
+        VALUES ('DC-KARAWANG', 'DC KARAWANG', 100.0, 100.0, NOW())
+        ON CONFLICT (dc_id) DO NOTHING;
+      `);
+      await prisma.$executeRawUnsafe(`
+        INSERT INTO energy_measurement (id, year_month, dc_id, plant_name_raw, yield_mwh, feed_in_mwh, total_prod_mwh, avoided_co2_ton, is_aggregate_row, source, proof_ref, category, updated_at)
+        VALUES ('TEST-EM-KRW-04', '2026-04', 'DC-KARAWANG', 'DC KARAWANG', 25.9385, 0.123, 26.0615, 25.86, false, 'TEST_FIXTURE', 'TEST-PROOF', 'PLTS', NOW())
+        ON CONFLICT DO NOTHING;
+      `);
+      existingKarawang = await prisma.energyMeasurement.findFirst({
+        where: { dcId: 'DC-KARAWANG', yearMonth: '2026-04' }
+      });
+      createdFixture = true;
+    }
+
     assert(existingKarawang !== null, 'Found existing verified April 2026 measurement for Karawang');
     assert(existingKarawang.yieldMwh === 25.9385, 'Existing Karawang yield is 25.9385 MWh');
 
     // Simulate prevention: checking if duplicate insert is prevented
     const isAlreadyPresent = Boolean(existingKarawang);
     assert(isAlreadyPresent, 'Prevented creating duplicate energy row for same DC and yearMonth (blocks double-counting)');
+
+    if (createdFixture) {
+      await prisma.$executeRawUnsafe(`DELETE FROM energy_measurement WHERE source = 'TEST_FIXTURE';`);
+      await prisma.$executeRawUnsafe(`DELETE FROM plant_master WHERE dc_id = 'DC-KARAWANG';`);
+    }
 
     console.log('\n' + '='.repeat(80));
     console.log(`CALCULATOR & INTEGRITY TEST SUMMARY: ${passedAssertions} / ${passedAssertions + failedAssertions} PASSED (${failedAssertions} FAILED)`);

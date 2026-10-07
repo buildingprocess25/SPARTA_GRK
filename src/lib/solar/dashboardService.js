@@ -1,6 +1,7 @@
 import prisma from '../prisma.js';
 import { getGridFactor } from '../emission-factors.js';
 import { buildPltsDashboardFromRows, parseDashboardQuery } from './dashboard.js';
+import { isDcLocation } from './plantMap.js';
 import { performance } from 'perf_hooks';
 
 let nextRevalidateTag = null;
@@ -87,7 +88,7 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
       const minYm = `${years[0]}01`;
       const maxYm = `${years.at(-1)}12`;
 
-      const [plants, observations, targets, climate, loads, lastSync, latestPlants] = await Promise.all([
+      const [plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows] = await Promise.all([
         db.plantMaster.findMany({
           select: {
             dcId: true,
@@ -166,9 +167,15 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
           },
           orderBy: { psId: 'asc' },
         }).catch(() => []) : Promise.resolve([]),
+        db.$queryRaw`
+          SELECT year_month as "yearMonth", ps_id as "psId", yield_kwh as "yieldKwh", feed_in_kwh as "feedInKwh", purchased_kwh as "purchasedKwh", load_kwh as "loadKwh", source
+          FROM energy_flow_monthly
+          WHERE year_month BETWEEN ${minYm} AND ${maxYm}
+          ORDER BY year_month ASC, ps_id ASC
+        `.catch(() => []),
       ]);
 
-      return { plants, observations, targets, climate, loads, lastSync, latestPlants };
+      return { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows };
     } finally {
       inFlightPromises.delete(flightKey);
     }
@@ -195,11 +202,12 @@ export async function getPltsDashboard(rawQuery = {}, { db = prisma, now = new D
     Number(String(query.period || '').slice(0, 4)) || query.compareYears.at(-1) || now.getFullYear(),
   ])].sort();
 
-  const { plants, observations, targets, climate, loads, lastSync, latestPlants } = await fetchPltsRawData({ years, db, simulateLatencyMs });
+  const { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows } = await fetchPltsRawData({ years, db, simulateLatencyMs });
 
   const latestByPsId = new Map(latestPlants.map((row) => [Number(row.psId), row]));
 
-  const normalizedPlants = plants.map((plant) => ({
+  const dcPlants = plants.filter(isDcLocation);
+  const normalizedPlants = dcPlants.map((plant) => ({
     ...plant,
     gridLabel: plant.grid,
     grid: getGridFactor(plant.grid)?.grid || plant.grid,
@@ -228,6 +236,7 @@ export async function getPltsDashboard(rawQuery = {}, { db = prisma, now = new D
     factors,
     lastSync,
     statuses: latestPlants,
+    energyFlows,
   });
 
   if (!skipCache) {
@@ -280,7 +289,7 @@ async function executeWithTiming(cachePrefix, rawQuery, builderFn, options = {})
   ])].sort();
 
   const tDbStart = performance.now();
-  const { plants, observations, targets, climate, loads, lastSync, latestPlants } = await fetchPltsRawData({
+  const { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows } = await fetchPltsRawData({
     years,
     db: options.db || prisma,
     simulateLatencyMs: options.simulateLatencyMs,
@@ -289,7 +298,8 @@ async function executeWithTiming(cachePrefix, rawQuery, builderFn, options = {})
 
   const tComputeStart = performance.now();
   const latestByPsId = new Map(latestPlants.map((row) => [Number(row.psId), row]));
-  const normalizedPlants = plants.map((plant) => ({
+  const dcPlants = plants.filter(isDcLocation);
+  const normalizedPlants = dcPlants.map((plant) => ({
     ...plant,
     gridLabel: plant.grid,
     grid: getGridFactor(plant.grid)?.grid || plant.grid,
@@ -318,6 +328,7 @@ async function executeWithTiming(cachePrefix, rawQuery, builderFn, options = {})
     factors,
     lastSync,
     statuses: latestPlants,
+    energyFlows,
   });
 
   const sliceData = builderFn(fullData);
@@ -338,6 +349,10 @@ async function executeWithTiming(cachePrefix, rawQuery, builderFn, options = {})
   };
 }
 
+export function invalidatePltsServerCache() {
+  serverMemoryCache.clear();
+}
+
 /**
  * 1. Summary Endpoint Service
  */
@@ -352,6 +367,7 @@ export async function getPltsSummaryDashboardWithTiming(rawQuery = {}, options =
     plants: fullData.plants,
     prDetails: fullData.prDetails,
     energyMix: fullData.summary?.energyMix,
+    yoy: fullData.yoy,
   }), options);
 }
 

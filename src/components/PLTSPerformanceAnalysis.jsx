@@ -35,7 +35,7 @@ const TABS = [
 ];
 
 export default function PLTSPerformanceAnalysis({ filters, onPlantSelect }) {
-  const [tab, setTab] = useState(null);
+  const [tab, setTab] = useState('production');
 
   const handlePrefetch = (endpoint) => {
     if (endpoint) {
@@ -54,7 +54,7 @@ export default function PLTSPerformanceAnalysis({ filters, onPlantSelect }) {
           <div>
             <h3 className="text-base font-bold text-slate-900">Analisis Kinerja PLTS</h3>
             <p className="text-xs text-slate-500">
-              Satu sumber agregasi untuk produksi, target RKAP, PR, parameter radiasi, dan bauran energi (dalam satuan kWh)
+              Satu sumber agregasi untuk produksi, target, PR, parameter radiasi, dan bauran energi (dalam satuan kWh)
             </p>
           </div>
         </div>

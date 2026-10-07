@@ -6,32 +6,11 @@
  * power vs energy semantics, and stale detection.
  */
 
-import { fileURLToPath } from 'url';
-import path from 'path';
-import fs from 'fs';
+import { PrismaClient } from '../src/generated/prisma/index.js';
+import { requireIsolatedTestDatabase } from './lib/require-isolated-test-database.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const envPath = path.join(__dirname, '..', '.env.local');
+requireIsolatedTestDatabase('test-scheduler-and-snapshots');
 
-if (fs.existsSync(envPath)) {
-  const envContent = fs.readFileSync(envPath, 'utf-8');
-  envContent.split('\n').forEach(line => {
-    const trimmed = line.trim();
-    if (trimmed && !trimmed.startsWith('#')) {
-      const eqIdx = trimmed.indexOf('=');
-      if (eqIdx > 0) {
-        const key = trimmed.slice(0, eqIdx).trim();
-        let value = trimmed.slice(eqIdx + 1).trim();
-        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-          value = value.slice(1, -1);
-        }
-        process.env[key] = value;
-      }
-    }
-  });
-}
-
-const { PrismaClient } = await import('@prisma/client');
 const prisma = new PrismaClient();
 globalThis.prisma = prisma;
 
@@ -97,6 +76,33 @@ try {
   // ─── 3. IDEMPOTENT SNAPSHOT STORAGE & DUPLICATE PROTECTION ────────────────
   console.log('\n--- 3. IDEMPOTENT SNAPSHOT STORAGE & DUPLICATE PREVENTION ---');
   {
+    // Seed test plant in PlantLatest if running against empty test DB
+    await prisma.plantLatest.upsert({
+      where: { psId: 99001 },
+      create: {
+        psId: 99001,
+        name: 'TEST PLANT SNAPSHOT',
+        capacityKwp: 100.0,
+        currPowerKw: 50.0,
+        todayEnergyKwh: 120.0,
+        totalEnergyKwh: 5000.0,
+        statusCategory: 'NORMAL',
+        statusCheckedAt: new Date(),
+        syncId: 'test-sync-1',
+        raw: {},
+      },
+      update: {
+        name: 'TEST PLANT SNAPSHOT',
+        capacityKwp: 100.0,
+        currPowerKw: 50.0,
+        todayEnergyKwh: 120.0,
+        totalEnergyKwh: 5000.0,
+        statusCategory: 'NORMAL',
+        statusCheckedAt: new Date(),
+        syncId: 'test-sync-1',
+      },
+    });
+
     // Run snapshot for slot 10:00 WIB
     const testDate = new Date('2026-09-30T03:00:00.000Z');
     const res1 = await captureSnapshot30m({ trigger: 'manual', forceSlot: testDate });
@@ -180,6 +186,10 @@ try {
   console.error('Test execution error:', err);
   process.exitCode = 1;
 } finally {
+  try {
+    await prisma.plantSnapshot30m.deleteMany({ where: { psId: 99001 } });
+    await prisma.plantLatest.deleteMany({ where: { psId: 99001 } });
+  } catch {}
   await prisma.$disconnect();
   process.exit(process.exitCode || 0);
 }

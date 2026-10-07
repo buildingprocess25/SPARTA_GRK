@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   LayoutDashboard, TrendingDown, TrendingUp, PlusCircle, History,
-  FileSpreadsheet, X, ShieldCheck, ChevronDown, Sun, Droplets, Fuel, Zap
+  FileSpreadsheet, X, ShieldCheck, ChevronDown, Sun, Droplets, Fuel, Zap, Calculator
 } from 'lucide-react';
 
 const navItems = [
@@ -41,6 +41,7 @@ const navItems = [
   {
     group: 'INPUT & AUDIT',
     items: [
+      { id: 'calculator', label: 'Kalkulator Emisi (GRK)', icon: Calculator, badge: 'Simulasi' },
       { id: 'input', label: 'Mulai Audit / Input', icon: PlusCircle, badge: 'Form / Excel' },
       { id: 'history', label: 'Riwayat Audit', icon: History },
     ],

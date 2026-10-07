@@ -692,25 +692,30 @@ export function processAllDCAnalytics({
       : null;
 
     const histPlant = Array.isArray(historicalPlants)
-      ? historicalPlants.find(p => p.dcId === dc.dcId || p.canonicalName?.toLowerCase() === dc.canonicalName?.toLowerCase())
+      ? historicalPlants.find(p => {
+          if (p.dcId && dc.dcId && p.dcId.toUpperCase() === dc.dcId.toUpperCase()) return true;
+          if (p.psIds && dc.sungrowPsIds && p.psIds.some(id => dc.sungrowPsIds.includes(Number(id)))) return true;
+          if (p.sungrowPsIds && dc.sungrowPsIds && p.sungrowPsIds.some(id => dc.sungrowPsIds.includes(Number(id)))) return true;
+          if (p.psId && dc.sungrowPsIds && dc.sungrowPsIds.includes(Number(p.psId))) return true;
+          return p.canonicalName?.toLowerCase() === dc.canonicalName?.toLowerCase();
+        })
       : null;
 
-    const isGorontalo = dc.canonicalName.toLowerCase().includes('gorontalo') || histPlant?.isUnderConstruction === true;
+    const isGorontalo = (dc.canonicalName || '').toLowerCase().includes('gorontalo') || dc.dcId === 'DC-GORONTALO' || histPlant?.operationalStatus === 'UNDER_CONSTRUCTION' || histPlant?.isUnderConstruction === true;
     const isUnderConstruction = isGorontalo;
 
     const installedKwp = (dc.installedKwp && dc.installedKwp > 0)
       ? dc.installedKwp
-      : ((dc.apiInstalledKwp && dc.apiInstalledKwp > 0) ? dc.apiInstalledKwp : (histPlant?.installedKwp || null));
+      : ((dc.apiInstalledKwp && dc.apiInstalledKwp > 0) ? dc.apiInstalledKwp : (histPlant?.capacityKwp || histPlant?.installedKwp || null));
 
-    const productionKwh = histPlant?.productionKwh ?? (dc.todayYieldKwh ? Number(dc.todayYieldKwh) : 0);
-    const productionMwh = histPlant?.productionMwh ?? (histPlant?.productionKwh ? Number((histPlant.productionKwh / 1000).toFixed(2)) : (dc.monthYieldMwh ?? 0));
-    const emissionTon = (histPlant && histPlant.emissionTon !== undefined)
-      ? histPlant.emissionTon
-      : (histPlant?.productionKwh ? Number(((histPlant.productionKwh * SOLAR_CONSTANTS.CO2_FACTOR_PLTS) / 1000).toFixed(2)) : 0);
+    const productionKwh = isUnderConstruction ? null : (histPlant?.productionKwh ?? (dc.todayYieldKwh ? Number(dc.todayYieldKwh) : null));
+    const productionMwh = isUnderConstruction ? null : (histPlant?.productionMwh ?? (productionKwh !== null ? Number((productionKwh / 1000).toFixed(2)) : null));
+    const emissionTon = isUnderConstruction ? null : (histPlant?.emissionTon ?? (productionKwh !== null ? Number(((productionKwh * (histPlant?.factor?.cmPlts ?? SOLAR_CONSTANTS.CO2_FACTOR_PLTS)) / 1000).toFixed(2)) : null));
     const monthlyHistory = histPlant?.monthly || dc.monthlyHistory || [];
+    const dataAvailable = !isUnderConstruction && (productionKwh !== null || (dc.todayYieldKwh !== null && dc.todayYieldKwh !== undefined));
 
-    const monthlyYieldMwh = productionMwh > 0 ? productionMwh : (baselineRef?.monthlyYieldMwh ?? dc.monthYieldMwh ?? 0);
-    const monthlyYieldKwh = monthlyYieldMwh * 1000;
+    const monthlyYieldMwh = isUnderConstruction ? null : (productionMwh ?? (baselineRef?.monthlyYieldMwh ?? (dc.monthYieldMwh ? Number(dc.monthYieldMwh) : null)));
+    const monthlyYieldKwh = monthlyYieldMwh !== null ? monthlyYieldMwh * 1000 : null;
 
     const todaySpecificYield = isUnderConstruction
       ? null
@@ -724,7 +729,7 @@ export function processAllDCAnalytics({
       ? null
       : (histPlant?.specificYield !== undefined && histPlant?.specificYield !== null
           ? histPlant.specificYield
-          : ((installedKwp !== null && installedKwp > 0 && monthlyYieldKwh > 0)
+          : ((installedKwp !== null && installedKwp > 0 && monthlyYieldKwh !== null && monthlyYieldKwh > 0)
               ? Number((monthlyYieldKwh / installedKwp).toFixed(1))
               : null));
 
@@ -733,35 +738,27 @@ export function processAllDCAnalytics({
     
     // Unified Proxy PR normalization (Single Source of Truth)
     const proxyPrNorm = normalizeProxyPr(dc, baselineRef);
-    const prPct = isUnderConstruction ? null : proxyPrNorm.proxyPrPercent;
-    const rawPrPct = isUnderConstruction ? null : proxyPrNorm.rawPrPct;
-    const isValidPr = !isUnderConstruction && proxyPrNorm.isValid;
+    const prPct = isUnderConstruction ? null : (histPlant?.pr?.valuePct ?? proxyPrNorm.proxyPrPercent);
+    const rawPrPct = isUnderConstruction ? null : (histPlant?.pr?.valuePct ?? proxyPrNorm.rawPrPct);
+    const isValidPr = !isUnderConstruction && (prPct !== null && prPct > 0 && prPct <= 100);
     const prStatus = isUnderConstruction ? 'Dalam Pembangunan' : proxyPrNorm.statusLabel;
 
     const capacityFactor = isUnderConstruction
       ? null
-      : ((installedKwp !== null && installedKwp > 0 && monthlyYieldKwh > 0)
+      : ((installedKwp !== null && installedKwp > 0 && monthlyYieldKwh !== null && monthlyYieldKwh > 0)
           ? Number(((monthlyYieldKwh / (installedKwp * 24 * 30)) * 100).toFixed(1))
           : (dc.todayYieldKwh !== null && dc.todayYieldKwh !== undefined && installedKwp !== null && installedKwp > 0
               ? Number(((dc.todayYieldKwh / (installedKwp * 24)) * 100).toFixed(1))
               : null));
 
     const peakPower = isUnderConstruction ? null : (dc.currentPowerKw !== null && dc.currentPowerKw !== undefined ? dc.currentPowerKw : null);
-    const co2Ton = isUnderConstruction
-      ? null
-      : (histPlant !== null && histPlant !== undefined && 'emissionTon' in histPlant
-          ? histPlant.emissionTon
-          : (emissionTon !== null && emissionTon !== undefined
-              ? emissionTon
-              : (monthlyYieldMwh > 0
-                  ? Number(((monthlyYieldMwh * 1000 * SOLAR_CONSTANTS.CO2_FACTOR_PLTS) / 1000).toFixed(2))
-                  : (dc.todayYieldKwh ? Number(((dc.todayYieldKwh * SOLAR_CONSTANTS.CO2_FACTOR_PLTS) / 1000).toFixed(2)) : 0))));
+    const co2Ton = isUnderConstruction ? null : emissionTon;
 
     let metricValue = null;
     if (isUnderConstruction) {
       metricValue = null;
     } else if (selectedMetric === 'specificYield') {
-      metricValue = todaySpecificYield;
+      metricValue = specificYield ?? todaySpecificYield;
     } else if (selectedMetric === 'equivalentHour') {
       metricValue = equivalentHour;
     } else if (selectedMetric === 'pr') {
@@ -795,6 +792,7 @@ export function processAllDCAnalytics({
       isValidPr,
       isOffline,
       isUnderConstruction,
+      dataAvailable,
       status: isUnderConstruction ? 'Dalam Pembangunan' : dc.status,
       statusColor: isUnderConstruction ? '#94A3B8' : dc.statusColor,
       prStatus,

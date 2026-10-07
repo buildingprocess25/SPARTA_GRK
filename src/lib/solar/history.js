@@ -1,5 +1,6 @@
 import { getGridFactor } from '../emission-factors.js';
-import { CANONICAL_DC_ENTITIES } from './plantMap.js';
+import { CANONICAL_DC_ENTITIES, isDcLocation } from './plantMap.js';
+import { resolveMonthly } from './dashboard.js';
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 export const EMISSION_FACTOR_VERSION = 'INTERNAL_CONFIG_VERIFICATION_PENDING';
@@ -58,10 +59,12 @@ function matchesGrid(entity, grid) {
 
 function matchesDc(entity, dc) {
   if (!dc || dc === 'ALL') return true;
-  const requested = String(dc).trim().toLowerCase();
-  return entity.dcId.toLowerCase() === requested
-    || entity.canonicalName.toLowerCase() === requested
-    || (entity.aliases || []).some(alias => String(alias).toLowerCase() === requested);
+  const requestedList = String(dc).split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+  if (requestedList.length === 0) return true;
+  const id = entity.dcId.toLowerCase();
+  const canonical = entity.canonicalName.toLowerCase();
+  const aliases = (entity.aliases || []).map(alias => String(alias).toLowerCase());
+  return requestedList.some(req => req === id || req === canonical || aliases.includes(req));
 }
 
 function qualityOf(records) {
@@ -159,7 +162,7 @@ export function aggregateMonthlyHistory({
   const availableYears = [...new Set(availableMonths.map(item => Number(item.slice(0, 4))))].sort();
   const bounds = parsePeriod(period, availableMonths);
   const expectedMonths = monthRange(bounds.start, bounds.end);
-  const filteredEntities = entities.filter(entity => matchesGrid(entity, grid) && matchesDc(entity, dc));
+  const filteredEntities = entities.filter(isDcLocation).filter(entity => matchesGrid(entity, grid) && matchesDc(entity, dc));
   const recordsByKey = new Map(allRows.map(item => [`${item.yearMonth}:${Number(item.psId)}`, item]));
 
   const locations = filteredEntities.map(entity => {
@@ -168,17 +171,24 @@ export function aggregateMonthlyHistory({
     const productionKwh = available.length
       ? round(available.reduce((sum, item) => sum + item.energyKwh, 0))
       : null;
-    const factor = getGridFactor(entity.grid);
+    const factorObj = getGridFactor(entity.grid);
+    const isOfficial = factorObj && factorObj.status === 'resmi';
+    const factor = isOfficial ? factorObj.cmPlts : null;
+    const installedKwp = entity.apiInstalledKwp || entity.installedKwp || entity.capacityKwp || 0;
+    const co2Ton = factor !== null && productionKwh != null ? round((productionKwh / 1000) * factor, 2) : null;
     return {
       dcId: entity.dcId,
       canonicalName: entity.canonicalName,
       region: entity.region,
       grid: entity.grid,
       sungrowPsIds: [...entity.sungrowPsIds],
+      installedKwp,
       productionKwh,
       productionMwh: productionKwh == null ? null : productionKwh / 1000,
-      avoidedEmissionTon: factor && productionKwh != null ? round((productionKwh / 1000) * factor.cmPlts, 6) : null,
-      emissionFactor: factor ? { method: 'cmPlts', value: factor.cmPlts, version: EMISSION_FACTOR_VERSION } : null,
+      co2Ton,
+      avoidedEmissionTon: factor !== null && productionKwh != null ? round((productionKwh / 1000) * factor, 6) : null,
+      specificYield: productionKwh != null && installedKwp > 0 ? round(productionKwh / installedKwp, 1) : null,
+      emissionFactor: factorObj ? { method: 'cmPlts', value: factorObj.cmPlts, status: factorObj.status, version: EMISSION_FACTOR_VERSION } : null,
       monthly,
       monthsAvailable: available.length,
       monthsExpected: expectedMonths.length,
@@ -280,11 +290,55 @@ export function aggregateMonthlyHistory({
 
 export function createPrismaHistoryRepository(prisma) {
   return {
-    listMonthlyYields() {
-      return prisma.monthlyYield.findMany({
-        select: { yearMonth: true, psId: true, energyKwh: true, source: true, qualityStatus: true },
+    async listMonthlyYields() {
+      const observations = await prisma.monthlyYieldObservation.findMany({
+        where: { measurementType: 'MONTHLY_YIELD' },
+        select: { yearMonth: true, psId: true, energyKwh: true, source: true },
         orderBy: [{ yearMonth: 'asc' }, { psId: 'asc' }],
       });
+      if (!observations || observations.length === 0) {
+        return prisma.monthlyYield.findMany({
+          select: { yearMonth: true, psId: true, energyKwh: true, source: true, qualityStatus: true },
+          orderBy: [{ yearMonth: 'asc' }, { psId: 'asc' }],
+        });
+      }
+      const obsIndex = new Map();
+      const uniqueKeys = new Set();
+      for (const obs of observations) {
+        const key = `${obs.yearMonth}:${Number(obs.psId)}`;
+        uniqueKeys.add(key);
+        if (!obsIndex.has(key)) obsIndex.set(key, new Map());
+        obsIndex.get(key).set(obs.source, obs);
+      }
+      const currentYearMonth = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit',
+      }).format(new Date()).replace('-', '');
+
+      const resolvedMonthlyYields = [];
+      for (const key of uniqueKeys) {
+        const [yearMonth, psIdStr] = key.split(':');
+        const psId = Number(psIdStr);
+        const sources = obsIndex.get(key) || new Map();
+        const report = sources.get('ISOLAR_REPORT_IMPORT');
+        const api = sources.get('api_history');
+        const partial = sources.get('api_live_partial');
+        const resolved = resolveMonthly({
+          reportKwh: report?.energyKwh,
+          apiHistoryKwh: api?.energyKwh,
+          livePartialKwh: partial?.energyKwh,
+          isCompletedMonth: yearMonth < currentYearMonth,
+        });
+        if (resolved.energyKwh !== null) {
+          resolvedMonthlyYields.push({
+            yearMonth,
+            psId,
+            energyKwh: resolved.energyKwh,
+            source: resolved.source,
+            qualityStatus: yearMonth < currentYearMonth ? 'FINAL' : 'PARTIAL',
+          });
+        }
+      }
+      return resolvedMonthlyYields;
     },
     listDailyYields(monthPrefix) {
       return prisma.dailyYield.findMany({

@@ -77,3 +77,14 @@ Sesuai spesifikasi resmi Sungrow OpenAPI:
 ## 6. Validasi Telemetri: Inverter vs Plant
 
 Pengujian dalam **satu siklus sampling serentak** membuktikan bahwa total daya dan energi dari seluruh inverter (`p24` current power dalam W dan `p1` daily yield dalam Wh; `p4` suhu internal inverter) **100% identik (selisih 0,0%)** dengan metrik stasiun (`curr_power` dan `today_energy`). Selisih 25–40% sebelumnya terjadi semata-mata karena perbedaan waktu pencatatan (asinkron) antar request.
+
+---
+
+## 7. Integrasi Data Cuaca & Lisensi Open-Meteo (CC BY 4.0)
+
+Untuk menghitung **Performance Ratio (PR) terbobot kapasitas**, **koreksi temperatur termal silikon modul surya (-0,45%/°C STC 25°C)**, dan **analisis korelasi parameter operasional**:
+- **Penyedia Data**: Open-Meteo Historical Weather API & Forecast API (`https://open-meteo.com/`).
+- **Parameter yang Dikonsumsi**: Global Horizontal Irradiation (GHI, $W/m^2$ dan $kWh/m^2$), Suhu Udara Rata-rata ($^\circ C$), Suhu Udara Siang Hari ($^\circ C$), Kelembapan Udara Rata-rata ($\%$).
+- **Atribusi Lisensi**: Data cuaca disediakan oleh [Open-Meteo.com](https://open-meteo.com/) di bawah lisensi **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
+- **Model Suhu Panel**: Diestimasi menggunakan model Sandia/King: $T_{\text{panel}} = T_{\text{siang}} + \left(\frac{G_{\text{siang}}}{800}\right) \times (\text{NOCT} - 20)$ dengan nominal $\text{NOCT} = 45^\circ\text{C}$.
+

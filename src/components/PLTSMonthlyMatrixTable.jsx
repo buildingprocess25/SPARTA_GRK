@@ -220,7 +220,7 @@ export default function PLTSMonthlyMatrixTable({
     const rows = [
       [
         `Energi Listrik (${unit})`,
-        'Target RKAP',
+        'Target',
         ...monthlyRows.map(m => m.targetKwh !== null ? (m.targetKwh * unitMultiplier).toFixed(unitDecimals) : ''),
         (totals.targetYtdKwh * unitMultiplier).toFixed(unitDecimals),
         (totals.targetEoyKwh * unitMultiplier).toFixed(unitDecimals),
@@ -238,7 +238,7 @@ export default function PLTSMonthlyMatrixTable({
       ],
       [
         'Energi Listrik (%)',
-        '% Pencapaian RKAP',
+        '% Pencapaian Target',
         ...monthlyRows.map(m => m.achievementPct !== null ? `${m.achievementPct.toFixed(1)}%` : ''),
         totals.achievementYtdPct ? `${totals.achievementYtdPct.toFixed(2)}%` : '-',
         '-',
@@ -323,7 +323,7 @@ export default function PLTSMonthlyMatrixTable({
               Rekapitulasi Bulanan Kinerja PLTS & Indikator Lingkungan 2026
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Monitoring target RKAP Sustainability, realisasi energi terbarukan, PR ratio, dan reduksi emisi resmi (ESDM)
+              Monitoring target Sustainability, realisasi energi terbarukan, PR ratio, dan reduksi emisi resmi (ESDM)
             </p>
           </div>
         </div>
@@ -452,7 +452,7 @@ export default function PLTSMonthlyMatrixTable({
             {/* ============================================================
                 BARIS 1: ENERGI LISTRIK (Target, Aktual, % Capai)
                 ============================================================ */}
-            {/* 1.1 Target RKAP */}
+            {/* 1.1 Target */}
             <tr className="hover:bg-slate-50/60 transition-colors">
               <td
                 rowSpan={3}
@@ -466,8 +466,8 @@ export default function PLTSMonthlyMatrixTable({
                   ({unit})
                 </span>
               </td>
-              <td className="sticky left-[140px] bg-white font-semibold text-slate-700 px-3 py-2.5 z-10 border-r border-slate-200">
-                Target RKAP
+              <td className="sticky left-[140px] bg-white font-semibold text-slate-700 px-3 py-2.5 z-10 border-r border-slate-200" title="Sumber: RKAP">
+                Target
               </td>
               {monthlyRows.map((m, idx) => {
                 const isDimmed = m.month > selectedThroughMonth;

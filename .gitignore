@@ -1,6 +1,7 @@
 # Dependencies and Next.js output
 node_modules/
 .next/
+.next-*/
 out/
 
 # Local environment and credentials
@@ -9,8 +10,14 @@ out/
 !.env.example
 .env.local
 
-# Local runtime stat
+# Local runtime data & evidence
 .data/
+.data
+.data*
+docs/evidence/
+docs/evidence
+docs/evidence*
+docs/evidence/**
 *.log
 npm-debug.log*
 pnpm-debug.log*
@@ -29,8 +36,18 @@ coverage/
 test-results/
 playwright-report/
 src/generated/prisma/
+
+# Local backups and one-off investigation scripts
+.backup/
+backups/
+scratch/
+
+# Raw operational evidence embedded for local backfill only
+scripts/populate-fault-history-from-evidence.mjs
+
 # Spreadsheets & Data Files
 *.csv
+!docs/templates/*.csv
 *.tsv
 *.xls
 *.xlsx

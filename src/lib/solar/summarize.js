@@ -1,5 +1,5 @@
 import prisma from '../prisma.js';
-import { CANONICAL_DC_ENTITIES } from './plantMap.js';
+import { CANONICAL_DC_ENTITIES, isDcLocation } from './plantMap.js';
 import { getGridFactor } from '../emission-factors.js';
 import { classifyLocationStatus } from './status.js';
 import { createPrismaHistoryRepository, getPltsHistory } from './history.js';
@@ -13,7 +13,56 @@ const VENDOR_OFFLINE_DEVICES = {
   1162742: 1, // Alfamart DC Bogor (1 device offline)
 };
 
-export async function summarizePlts({ period, grid, dc, compareYears, comparisonThroughMonth } = {}) {
+// Server-side in-memory cache for summarizePlts
+if (!globalThis.__PLTS_SUMMARIZE_CACHE__) {
+  globalThis.__PLTS_SUMMARIZE_CACHE__ = new Map();
+}
+const summarizeMemoryCache = globalThis.__PLTS_SUMMARIZE_CACHE__;
+
+if (!globalThis.__PLTS_SUMMARIZE_IN_FLIGHT__) {
+  globalThis.__PLTS_SUMMARIZE_IN_FLIGHT__ = new Map();
+}
+const summarizeInFlight = globalThis.__PLTS_SUMMARIZE_IN_FLIGHT__;
+
+export function invalidateSummarizeCache() {
+  summarizeMemoryCache.clear();
+}
+
+export async function summarizePlts({ period, grid, dc, compareYears, comparisonThroughMonth, skipCache = false } = {}) {
+  const cacheKey = JSON.stringify({
+    period: period || 'default',
+    grid: grid || 'ALL',
+    dc: dc || 'ALL',
+    compareYears: compareYears || [],
+    comparisonThroughMonth: comparisonThroughMonth || 0,
+  });
+
+  if (!skipCache && summarizeMemoryCache.has(cacheKey)) {
+    const entry = summarizeMemoryCache.get(cacheKey);
+    if (Date.now() - entry.timestamp < 30 * 60 * 1000) {
+      return entry.data;
+    }
+  }
+
+  if (summarizeInFlight.has(cacheKey)) {
+    return summarizeInFlight.get(cacheKey);
+  }
+
+  const computePromise = (async () => {
+    try {
+      return await computeSummarizePlts({ period, grid, dc, compareYears, comparisonThroughMonth });
+    } finally {
+      summarizeInFlight.delete(cacheKey);
+    }
+  })();
+
+  summarizeInFlight.set(cacheKey, computePromise);
+  const result = await computePromise;
+  summarizeMemoryCache.set(cacheKey, { timestamp: Date.now(), data: result });
+  return result;
+}
+
+async function computeSummarizePlts({ period, grid, dc, compareYears, comparisonThroughMonth } = {}) {
   // 1. Fetch SyncRun for freshness & status
   const lastSync = await prisma.syncRun.findFirst({
     where: { status: 'success' },
@@ -139,6 +188,17 @@ export async function summarizePlts({ period, grid, dc, compareYears, comparison
 
   const plantLatest = await prisma.plantLatest.findMany();
   const faultActive = await prisma.faultActive.findMany();
+  let faultHistory24h = [];
+  try {
+    faultHistory24h = await prisma.$queryRaw`
+      SELECT ps_id, COUNT(*)::int as count
+      FROM fault_history
+      WHERE create_time >= NOW() - INTERVAL '24 hours'
+      GROUP BY ps_id
+    `;
+  } catch (_err) {
+    faultHistory24h = [];
+  }
 
   const plantLatestMap = new Map(plantLatest.map(p => [Number(p.psId), p]));
   const faultMap = new Map();
@@ -147,6 +207,7 @@ export async function summarizePlts({ period, grid, dc, compareYears, comparison
     arr.push(f);
     faultMap.set(Number(f.psId), arr);
   });
+  const faultHistory24hMap = new Map((faultHistory24h || []).map(r => [Number(r.ps_id), Number(r.count)]));
 
   // Expected months in range
   const expectedMonths = [];
@@ -170,13 +231,15 @@ export async function summarizePlts({ period, grid, dc, compareYears, comparison
 
   // 5. Build entity map and aggregate
   const resultsMap = new Map();
+  const dcEntities = CANONICAL_DC_ENTITIES.filter(isDcLocation);
 
-  CANONICAL_DC_ENTITIES.forEach(entity => {
+  dcEntities.forEach(entity => {
     let cap = 0;
     let isOffline = false;
     let alarmCount = 0;
     let hasFault = false;
     let offlineDeviceCount = 0;
+    let faultCount24h = 0;
     const faultNames = [];
     const subPlants = [];
 
@@ -205,6 +268,10 @@ export async function summarizePlts({ period, grid, dc, compareYears, comparison
         hasFault = true;
         activeF.forEach(f => faultNames.push(f.faultName));
       }
+
+      if (faultHistory24hMap.has(numId)) {
+        faultCount24h += faultHistory24hMap.get(numId);
+      }
     });
 
     resultsMap.set(entity.dcId, {
@@ -217,6 +284,7 @@ export async function summarizePlts({ period, grid, dc, compareYears, comparison
       alarmCount,
       hasFault,
       faultNames,
+      faultCount24h,
       offlineDeviceCount,
       subPlants,
       monthsCount: 0,
@@ -230,7 +298,7 @@ export async function summarizePlts({ period, grid, dc, compareYears, comparison
   const yieldByEntityMonth = new Map();
   yields.forEach(y => {
     const numId = Number(y.psId);
-    const entity = CANONICAL_DC_ENTITIES.find(e => e.sungrowPsIds.includes(numId));
+    const entity = dcEntities.find(e => e.sungrowPsIds.includes(numId));
     if (entity && y.energyKwh !== null && y.energyKwh !== undefined) {
       if (!yieldByEntityMonth.has(entity.dcId)) {
         yieldByEntityMonth.set(entity.dcId, new Map());
@@ -243,7 +311,7 @@ export async function summarizePlts({ period, grid, dc, compareYears, comparison
 
   // If includes current month (partial), pull from DailyYield/PlantLatest today
   if (endYearMonth >= currentYM) {
-    CANONICAL_DC_ENTITIES.forEach(entity => {
+    dcEntities.forEach(entity => {
       let todayEnergy = 0;
       let hasToday = false;
       entity.sungrowPsIds.forEach(psId => {
@@ -332,7 +400,8 @@ export async function summarizePlts({ period, grid, dc, compareYears, comparison
 
   Array.from(resultsMap.values()).forEach(loc => {
     const factorObj = getGridFactor(loc.grid);
-    const factor = factorObj ? factorObj.cmPlts : null;
+    const isOfficial = factorObj && factorObj.status === 'resmi';
+    const factor = isOfficial ? factorObj.cmPlts : null;
     const productionMwh = Number((loc.totalProductionKwh / 1000).toFixed(2));
 
     let co2Ton = null;
@@ -425,12 +494,15 @@ export async function summarizePlts({ period, grid, dc, compareYears, comparison
     });
   }
   if (dc && dc !== 'ALL') {
-    const normDc = String(dc).trim();
-    filteredLocations = filteredLocations.filter(loc => 
-      loc.dcId === normDc || 
-      loc.canonicalName === normDc ||
-      (loc.aliases && loc.aliases.includes(normDc.toLowerCase()))
-    );
+    const dcList = String(dc).split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+    if (dcList.length > 0) {
+      filteredLocations = filteredLocations.filter(loc => {
+        const id = String(loc.dcId || '').toLowerCase();
+        const name = String(loc.canonicalName || '').toLowerCase();
+        const aliases = (loc.aliases || []).map(a => String(a).toLowerCase());
+        return dcList.includes(id) || dcList.includes(name) || aliases.some(a => dcList.includes(a));
+      });
+    }
   }
 
   // Calculate Subtotals / Totals for filtered locations

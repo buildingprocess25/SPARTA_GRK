@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "registryVersion": "2026-10-06",
+  "sourcePolicy": "Only vendor metadata or an authoritative manufacturer document may populate a rating. Plant capacity must never be divided or inferred.",
+  "ratings": []
+}

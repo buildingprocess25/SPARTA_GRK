@@ -1,6 +1,3 @@
-// Prisma Schema for iSolarCloud Dashboard
-// Database: Prisma Postgres (PostgreSQL)
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -13,60 +10,60 @@ datasource db {
 
 /// Latest telemetry for each physical plant (39 rows)
 model PlantLatest {
-  psId              Int       @id @map("ps_id")
-  name              String
-  location          String?
-  capacityKwp       Float     @map("capacity_kwp")
-  currPowerKw       Float?    @map("curr_power_kw")
-  todayEnergyKwh    Float?    @map("today_energy_kwh")
-  totalEnergyKwh    Float?    @map("total_energy_kwh")
-  psStatus          Int       @default(1) @map("ps_status")
-  psFaultStatus     Int       @default(3) @map("ps_fault_status")
-  alarmCount        Int       @default(0) @map("alarm_count")
-  faultCount        Int       @default(0) @map("fault_count")
-  statusCategory    String    @default("MONITORED") @map("status_category")
-  statusReason      String    @default("belum diklasifikasikan") @map("status_reason")
-  statusCheckedAt   DateTime  @default(now()) @map("status_checked_at") @db.Timestamptz
-  equivalentHour    Float?    @map("equivalent_hour")
-  connectType       Int?      @map("connect_type")
-  buildStatus       Int?      @map("build_status")
-  validFlag         Int?      @map("valid_flag")
-  co2ReduceKg       Float?    @map("co2_reduce_kg")
-  co2ReduceTotalKg  Float?    @map("co2_reduce_total_kg")
-  todayIncome       Float?    @map("today_income")
-  vendorUpdateTime  DateTime? @map("vendor_update_time") @db.Timestamptz
-  syncId            String    @map("sync_id")
-  raw               Json      @default("{}")
-  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  psId             Int       @id @map("ps_id")
+  name             String
+  location         String?
+  capacityKwp      Float     @map("capacity_kwp")
+  currPowerKw      Float?    @map("curr_power_kw")
+  todayEnergyKwh   Float?    @map("today_energy_kwh")
+  totalEnergyKwh   Float?    @map("total_energy_kwh")
+  psStatus         Int       @default(1) @map("ps_status")
+  psFaultStatus    Int       @default(3) @map("ps_fault_status")
+  alarmCount       Int       @default(0) @map("alarm_count")
+  faultCount       Int       @default(0) @map("fault_count")
+  equivalentHour   Float?    @map("equivalent_hour")
+  vendorUpdateTime DateTime? @map("vendor_update_time") @db.Timestamptz(6)
+  syncId           String    @map("sync_id")
+  raw              Json      @default("{}")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  buildStatus      Int?      @map("build_status")
+  co2ReduceKg      Float?    @map("co2_reduce_kg")
+  co2ReduceTotalKg Float?    @map("co2_reduce_total_kg")
+  connectType      Int?      @map("connect_type")
+  todayIncome      Float?    @map("today_income")
+  validFlag        Int?      @map("valid_flag")
+  statusCategory   String    @default("MONITORED") @map("status_category")
+  statusReason     String    @default("belum diklasifikasikan") @map("status_reason")
+  statusCheckedAt  DateTime  @default(now()) @map("status_checked_at") @db.Timestamptz(6)
 
   @@map("plant_latest")
 }
 
 /// Record of each synchronization run
 model SyncRun {
-  id           String   @id @default(cuid())
-  startedAt    DateTime @default(now()) @map("started_at") @db.Timestamptz
-  finishedAt   DateTime? @map("finished_at") @db.Timestamptz
-  trigger      String   // cron | manual | fallback
-  status       String   // success | failed | skipped
-  plantCount   Int      @default(0) @map("plant_count")
-  httpCalls    Int      @default(0) @map("http_calls")
-  errorCode    String?  @map("error_code")
-  errorMessage String?  @map("error_message")
+  id           String    @id @default(cuid())
+  startedAt    DateTime  @default(now()) @map("started_at") @db.Timestamptz(6)
+  finishedAt   DateTime? @map("finished_at") @db.Timestamptz(6)
+  trigger      String
+  status       String
+  plantCount   Int       @default(0) @map("plant_count")
+  httpCalls    Int       @default(0) @map("http_calls")
+  errorCode    String?   @map("error_code")
+  errorMessage String?   @map("error_message")
 
   @@map("sync_run")
 }
 
 /// Daily yield snapshots per plant (upsert with max or official history)
 model DailyYield {
-  dateWib      String   @map("date_wib") // YYYY-MM-DD in WIB
-  psId         Int      @map("ps_id")
-  yieldKwh     Float    @map("yield_kwh")
-  peakPowerKw  Float?   @map("peak_power_kw")
-  capacityKwp  Float    @map("capacity_kwp")
-  source       String   @default("api_live") // api_live | api_history
-  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  dateWib     String   @map("date_wib")
+  psId        Int      @map("ps_id")
+  yieldKwh    Float    @map("yield_kwh")
+  peakPowerKw Float?   @map("peak_power_kw")
+  capacityKwp Float    @map("capacity_kwp")
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  source      String   @default("api_live")
 
   @@id([dateWib, psId])
   @@map("daily_yield")
@@ -74,21 +71,20 @@ model DailyYield {
 
 /// Monthly yield snapshots per plant
 model MonthlyYield {
-  yearMonth       String       @map("year_month") // compact YYYYMM used by existing consumers
+  yearMonth       String       @map("year_month")
   psId            Int          @map("ps_id")
   energyKwh       Float        @map("energy_kwh")
-  source          String       @default("api_history") // api_history | api_live_partial | ISOLAR_REPORT_IMPORT
-  measurementType String       @default("MONTHLY_YIELD") @map("measurement_type")
-  sourceFile      String?      @map("source_file")
-  sourceRow       Int?         @map("source_row")
-  sourceFileHash  String?      @map("source_file_hash")
+  source          String       @default("api_history")
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
   importBatchId   String?      @map("import_batch_id")
-  importedAt      DateTime?    @map("imported_at") @db.Timestamptz
-  qualityStatus   String?      @map("quality_status") // FINAL | PARTIAL | CONFLICT
+  importedAt      DateTime?    @map("imported_at") @db.Timestamptz(6)
+  measurementType String       @default("MONTHLY_YIELD") @map("measurement_type")
   metadata        Json         @default("{}")
-  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz
-
-  importBatch     ImportBatch? @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
+  qualityStatus   String?      @map("quality_status")
+  sourceFile      String?      @map("source_file")
+  sourceFileHash  String?      @map("source_file_hash")
+  sourceRow       Int?         @map("source_row")
+  importBatch     ImportBatch? @relation(fields: [importBatchId], references: [id])
 
   @@id([yearMonth, psId])
   @@index([importBatchId])
@@ -110,8 +106,8 @@ model MonthlyYieldObservation {
   importBatchId   String?  @map("import_batch_id")
   qualityStatus   String?  @map("quality_status")
   metadata        Json     @default("{}")
-  observedAt      DateTime @default(now()) @map("observed_at") @db.Timestamptz
-  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  observedAt      DateTime @default(now()) @map("observed_at") @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@unique([yearMonth, psId, measurementType, source])
   @@index([yearMonth])
@@ -121,19 +117,20 @@ model MonthlyYieldObservation {
   @@map("monthly_yield_observation")
 }
 
+
 /// Owner-provided national RKAP targets imported from sustainabilityData.
 model TargetMonthly {
   id         String   @id @default(cuid())
   yearMonth  String   @map("year_month")
-  metric     String   // prod_mwh | co2_t
+  metric     String
   value      Float
   unit       String
   source     String
   sourceRef  String?  @map("source_ref")
   sourceHash String?  @map("source_hash")
   metadata   Json     @default("{}")
-  importedAt DateTime @default(now()) @map("imported_at") @db.Timestamptz
-  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  importedAt DateTime @default(now()) @map("imported_at") @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@unique([yearMonth, metric, source])
   @@index([yearMonth])
@@ -142,16 +139,16 @@ model TargetMonthly {
 
 /// Proven monthly supporting climate measurements from vendor/BMES sources.
 model ClimateMonthly {
-  id               String   @id @default(cuid())
-  yearMonth        String   @map("year_month")
-  psId             Int      @map("ps_id")
-  radiationKwhM2   Float?   @map("radiation_kwh_m2")
-  moduleTempC      Float?   @map("module_temp_c")
-  source           String
-  sourceRef        String?  @map("source_ref")
-  metadata         Json     @default("{}")
-  importedAt       DateTime @default(now()) @map("imported_at") @db.Timestamptz
-  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id             String   @id @default(cuid())
+  yearMonth      String   @map("year_month")
+  psId           Int      @map("ps_id")
+  radiationKwhM2 Float?   @map("radiation_kwh_m2")
+  moduleTempC    Float?   @map("module_temp_c")
+  source         String
+  sourceRef      String?  @map("source_ref")
+  metadata       Json     @default("{}")
+  importedAt     DateTime @default(now()) @map("imported_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@unique([yearMonth, psId, source])
   @@index([yearMonth])
@@ -168,8 +165,8 @@ model LoadMonthly {
   source     String
   sourceRef  String?  @map("source_ref")
   metadata   Json     @default("{}")
-  importedAt DateTime @default(now()) @map("imported_at") @db.Timestamptz
-  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  importedAt DateTime @default(now()) @map("imported_at") @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@unique([yearMonth, psId, source])
   @@index([yearMonth])
@@ -177,25 +174,44 @@ model LoadMonthly {
   @@map("load_monthly")
 }
 
+/// Proven monthly energy balance & flow (Production, Feed-In, Purchased, Load)
+model EnergyFlowMonthly {
+  id           String   @id @default(cuid())
+  yearMonth    String   @map("year_month")
+  psId         Int      @map("ps_id")
+  yieldKwh     Float?   @map("yield_kwh")
+  feedInKwh    Float?   @map("feed_in_kwh")
+  purchasedKwh Float?   @map("purchased_kwh")
+  loadKwh      Float?   @map("load_kwh")
+  source       String   @default("ISOLAR_REPORT_IMPORT")
+  fetchedAt    DateTime @default(now()) @map("fetched_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([yearMonth, psId, source])
+  @@index([yearMonth])
+  @@index([yearMonth, psId])
+  @@map("energy_flow_monthly")
+}
+
 /// Cached API token (1 row)
 model ApiToken {
   id              Int      @id @default(1)
   token           String
-  expiresAt       DateTime @map("expires_at") @db.Timestamptz
+  expiresAt       DateTime @map("expires_at") @db.Timestamptz(6)
   credentialsHash String   @map("credentials_hash")
   loginBlocked    Boolean  @default(false) @map("login_blocked")
   blockReason     String?  @map("block_reason")
-  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("api_token")
 }
 
 /// Quota counters (hourly + monthly + daily buckets)
 model QuotaCounter {
-  kind       String // "hourly" | "monthly" | "daily"
-  bucketKey  String @map("bucket_key") // e.g. "2026-09-30_09" or "2026-09-30" or "2026-09"
-  count      Int    @default(0)
-  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  kind      String
+  bucketKey String   @map("bucket_key")
+  count     Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@id([kind, bucketKey])
   @@map("quota_counter")
@@ -203,10 +219,10 @@ model QuotaCounter {
 
 /// Distributed sync lock (1 row)
 model SyncLock {
-  id         Int      @id @default(1)
-  lockedUntil DateTime? @map("locked_until") @db.Timestamptz
-  lockedBy   String?  @map("locked_by")
-  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id          Int       @id @default(1)
+  lockedUntil DateTime? @map("locked_until") @db.Timestamptz(6)
+  lockedBy    String?   @map("locked_by")
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("sync_lock")
 }
@@ -216,89 +232,108 @@ model PortalPrReference {
   id         Int      @id @default(autoincrement())
   psId       Int      @unique @map("ps_id")
   prPercent  Float    @map("pr_percent")
-  capturedAt DateTime @map("captured_at") @db.Timestamptz
-  source     String   @default("manual") // "manual"
+  capturedAt DateTime @map("captured_at") @db.Timestamptz(6)
+  source     String   @default("manual")
   notes      String?  @map("notes")
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("portal_pr_reference")
 }
 
 /// Physical Inverter Devices list per plant
 model Device {
-  id               String   @id @default(cuid())
-  psId             Int      @map("ps_id")
-  psKey            String   @map("ps_key")
-  deviceSn         String   @unique @map("device_sn")
-  deviceModelCode  String?  @map("device_model_code")
-  deviceName       String?  @map("device_name")
-  devFaultStatus   Int      @default(3) @map("dev_fault_status") // 1=Fault, 2=Alarm, 3=Normal
-  devStatus        Int      @default(1) @map("dev_status") // 1=Online, 0=Offline
-  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id              String   @id @default(cuid())
+  psId            Int      @map("ps_id")
+  deviceSn        String   @unique @map("device_sn")
+  psKey           String   @map("ps_key")
+  devFaultStatus  Int      @default(3) @map("dev_fault_status")
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  devStatus       Int      @default(1) @map("dev_status")
+  deviceModelCode String?  @map("device_model_code")
+  deviceName      String?  @map("device_name")
 
   @@map("device")
 }
 
 /// Official Plant PR from getDeviceRealTimeData (if verified point exists)
 model PlantPr {
-  psId       Int      @id @map("ps_id")
-  prPercent  Float    @map("pr_percent")
-  pointId    String   @map("point_id")
-  vendorTime DateTime? @map("vendor_time") @db.Timestamptz
-  fetchedAt  DateTime @default(now()) @map("fetched_at") @db.Timestamptz
+  psId       Int       @id @map("ps_id")
+  prPercent  Float     @map("pr_percent")
+  pointId    String    @map("point_id")
+  vendorTime DateTime? @map("vendor_time") @db.Timestamptz(6)
+  fetchedAt  DateTime  @default(now()) @map("fetched_at") @db.Timestamptz(6)
 
   @@map("plant_pr")
 }
 
 /// Inverter Realtime Telemetry from getPVInverterRealTimeData
 model InverterLatest {
-  deviceSn       String   @id @map("device_sn")
-  psKey          String   @map("ps_key")
-  psId           Int      @map("ps_id")
-  temp           Float?   @map("temp") // in Celsius
-  powerKw        Float?   @map("power_kw")
-  yieldKwh       Float?   @map("yield_kwh")
-  devFaultStatus Int      @default(3) @map("dev_fault_status")
-  deviceTime     DateTime? @map("device_time") @db.Timestamptz
-  fetchedAt      DateTime @default(now()) @map("fetched_at") @db.Timestamptz
+  deviceSn       String    @id @map("device_sn")
+  psKey          String    @map("ps_key")
+  psId           Int       @map("ps_id")
+  temp           Float?    @map("temp")
+  powerKw        Float?    @map("power_kw")
+  yieldKwh       Float?    @map("yield_kwh")
+  devFaultStatus Int       @default(3) @map("dev_fault_status")
+  deviceTime     DateTime? @map("device_time") @db.Timestamptz(6)
+  fetchedAt      DateTime  @default(now()) @map("fetched_at") @db.Timestamptz(6)
 
   @@map("inverter_latest")
 }
 
 /// Active Faults and Alarms from getFaultAlarmInfo
 model FaultActive {
-  faultCode      String   @id @map("fault_code")
-  psId           Int      @map("ps_id")
-  psKey          String?  @map("ps_key")
-  faultName      String   @map("fault_name")
-  faultType      Int      @map("fault_type")
-  faultLevel     Int      @map("fault_level")
-  createTime     DateTime? @map("create_time") @db.Timestamptz
-  processStatus  String?  @map("process_status")
-  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  faultCode     String    @id @map("fault_code")
+  psId          Int       @map("ps_id")
+  psKey         String?   @map("ps_key")
+  faultName     String    @map("fault_name")
+  faultType     Int       @map("fault_type")
+  faultLevel    Int       @map("fault_level")
+  createTime    DateTime? @map("create_time") @db.Timestamptz(6)
+  processStatus String?   @map("process_status")
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("fault_active")
 }
 
+/// Historical Faults and Alarms retained for 400 days (no PII)
+model FaultHistory {
+  faultCode     String    @id @map("fault_code")
+  psId          Int       @map("ps_id")
+  psKey         String?   @map("ps_key")
+  faultName     String    @map("fault_name")
+  faultType     Int       @map("fault_type")
+  faultLevel    Int       @map("fault_level")
+  createTime    DateTime? @map("create_time") @db.Timestamptz(6)
+  overTime      DateTime? @map("over_time") @db.Timestamptz(6)
+  processStatus String?   @map("process_status")
+  firstSeenAt   DateTime  @default(now()) @map("first_seen_at") @db.Timestamptz(6)
+  lastSeenAt    DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz(6)
+
+  @@index([psId])
+  @@index([faultType])
+  @@index([createTime])
+  @@map("fault_history")
+}
+
 /// Canonical plant and alias registry (39 detail plants)
 model PlantMaster {
-  dcId                 String   @id @map("dc_id")
-  canonicalName        String   @map("canonical_name")
-  aliases              Json     @default("[]")
-  sungrowPsIds         Int[]    @map("sungrow_ps_ids")
-  apiInstalledKwp      Float    @map("api_installed_kwp")
-  baselineInstalledKwp Float    @map("baseline_installed_kwp")
+  dcId                 String              @id @map("dc_id")
+  canonicalName        String              @map("canonical_name")
+  aliases              Json                @default("[]")
+  sungrowPsIds         Int[]               @map("sungrow_ps_ids")
+  apiInstalledKwp      Float               @map("api_installed_kwp")
+  baselineInstalledKwp Float               @map("baseline_installed_kwp")
   region               String?
   grid                 String?
-  isMultiPlant         Boolean  @default(false) @map("is_multi_plant")
-  parentDc             String?  @map("parent_dc")
-  facilityId           String?  @map("facility_id") // Optional link to physical facility
-  operationalStatus    String   @default("OPERATIONAL") @map("operational_status") // OPERATIONAL | UNDER_CONSTRUCTION | INACTIVE
-  codDate              DateTime? @map("cod_date") @db.Date
-  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz
-
+  isMultiPlant         Boolean             @default(false) @map("is_multi_plant")
+  parentDc             String?             @map("parent_dc")
+  createdAt            DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+  facilityId           String?             @map("facility_id")
+  operationalStatus    String              @default("OPERATIONAL") @map("operational_status")
+  codDate              DateTime?           @map("cod_date") @db.Date
   energyMeasurements   EnergyMeasurement[]
 
   @@map("plant_master")
@@ -306,29 +341,29 @@ model PlantMaster {
 
 /// Physical Facility and Building Master Registry (HO, Branch Office, DC, Warehouse, Depo, Store)
 model FacilityMaster {
-  id                   String   @id @map("id") // e.g. "FAC-HO-ALFATOWER", "FAC-DC-CIKOKOL", "FAC-STR-DEMANSION"
-  code                 String   @unique @map("code") // e.g. "HO-01", "DC-CKK", "STR-DEM"
-  name                 String   @map("name")
-  facilityType         String   @map("facility_type") // HO | BRANCH_OFFICE | DC | WAREHOUSE | DEPO | STORE | STORE_HUB | OTHER
-  branchId             String?  @map("branch_id")
-  branchName           String?  @map("branch_name")
-  region               String?  @map("region")
-  province             String?  @map("province")
-  city                 String?  @map("city")
-  address              String?  @map("address")
-  gridRegion           String?  @map("grid_region") // e.g. "JAMALI", "SULSELRABAR", "SUMATERA"
-  gridEmissionFactor   Float?   @map("grid_emission_factor") // e.g. 0.87, 0.73, 0.761
-  timezone             String   @default("Asia/Jakarta") @map("timezone")
-  isActive             Boolean  @default(true) @map("is_active")
-  verificationStatus   String   @default("VERIFIED") @map("verification_status") // VERIFIED | UNVERIFIED | PENDING_MASTER_SYNC
-  sourceMaster         String   @default("MONITOR_PLTS_WORKBOOK") @map("source_master") // MONITOR_PLTS_WORKBOOK | HO_MASTER_CORPORATE | CSV_IMPORT
-  sourceRef            String?  @map("source_ref")
-  plantId              String?  @map("plant_id")
-  meterType            String   @default("DEDICATED") @map("meter_type") // DEDICATED | SHARED
-  sharedMeterCoverage  String?  @map("shared_meter_coverage")
-  metadata             Json     @default("{}") @map("metadata")
-  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id                  String   @id @map("id")
+  code                String   @unique @map("code")
+  name                String   @map("name")
+  facilityType        String   @map("facility_type")
+  branchId            String?  @map("branch_id")
+  branchName          String?  @map("branch_name")
+  region              String?  @map("region")
+  province            String?  @map("province")
+  city                String?  @map("city")
+  address             String?  @map("address")
+  gridRegion          String?  @map("grid_region")
+  gridEmissionFactor  Float?   @map("grid_emission_factor")
+  timezone            String   @default("Asia/Jakarta") @map("timezone")
+  isActive            Boolean  @default(true) @map("is_active")
+  verificationStatus  String   @default("VERIFIED") @map("verification_status")
+  sourceMaster        String   @default("MONITOR_PLTS_WORKBOOK") @map("source_master")
+  sourceRef           String?  @map("source_ref")
+  plantId             String?  @map("plant_id")
+  meterType           String   @default("DEDICATED") @map("meter_type")
+  sharedMeterCoverage String?  @map("shared_meter_coverage")
+  metadata            Json     @default("{}") @map("metadata")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@index([facilityType])
   @@index([branchId])
@@ -338,34 +373,33 @@ model FacilityMaster {
 
 /// Actual energy measurements per plant and period from Excel / API
 model EnergyMeasurement {
-  id               String       @id @default(cuid())
-  yearMonth        String       @map("year_month") // e.g. "2026-01"
-  dcId             String       @map("dc_id")
-  plantNameRaw     String       @map("plant_name_raw")
-  yieldMwh         Float        @default(0) @map("yield_mwh")
-  purchasedMwh     Float        @default(0) @map("purchased_mwh")
-  feedInMwh        Float        @default(0) @map("feed_in_mwh")
-  loadMwh          Float        @default(0) @map("load_mwh")
-  totalProdMwh     Float        @default(0) @map("total_prod_mwh")
-  yieldKwh         Float        @default(0) @map("yield_kwh")
-  purchasedKwh     Float        @default(0) @map("purchased_kwh")
-  feedInKwh        Float        @default(0) @map("feed_in_kwh")
-  loadKwh          Float        @default(0) @map("load_kwh")
-  totalProdKwh     Float        @default(0) @map("total_prod_kwh")
-  avoidedCo2Ton    Float        @default(0) @map("avoided_co2_ton")
-  category         String       @default("PLN") // PLN | PLTS
-  proofRef         String       @default("") @map("proof_ref")
-  source           String       @default("EXCEL_IMPORT") // EXCEL_IMPORT | API | MANUAL
-  batchId          String?      @map("batch_id")
-  sheetName        String?      @map("sheet_name")
-  rowNumber        Int?         @map("row_number")
-  qualityStatus    String       @default("COMPLETE") // COMPLETE | PARTIAL | ESTIMATED | MISSING
-  isAggregateRow   Boolean      @default(false) @map("is_aggregate_row")
-  metadata         Json         @default("{}")
-  recordedAt       DateTime     @default(now()) @map("recorded_at") @db.Timestamptz
-  updatedAt        DateTime     @updatedAt @map("updated_at") @db.Timestamptz
-
-  plant            PlantMaster? @relation(fields: [dcId], references: [dcId])
+  id             String      @id @default(cuid())
+  yearMonth      String      @map("year_month")
+  dcId           String      @map("dc_id")
+  plantNameRaw   String      @map("plant_name_raw")
+  yieldMwh       Float       @default(0) @map("yield_mwh")
+  purchasedMwh   Float       @default(0) @map("purchased_mwh")
+  feedInMwh      Float       @default(0) @map("feed_in_mwh")
+  loadMwh        Float       @default(0) @map("load_mwh")
+  totalProdMwh   Float       @default(0) @map("total_prod_mwh")
+  yieldKwh       Float       @default(0) @map("yield_kwh")
+  purchasedKwh   Float       @default(0) @map("purchased_kwh")
+  feedInKwh      Float       @default(0) @map("feed_in_kwh")
+  loadKwh        Float       @default(0) @map("load_kwh")
+  totalProdKwh   Float       @default(0) @map("total_prod_kwh")
+  avoidedCo2Ton  Float       @default(0) @map("avoided_co2_ton")
+  source         String      @default("EXCEL_IMPORT")
+  batchId        String?     @map("batch_id")
+  sheetName      String?     @map("sheet_name")
+  rowNumber      Int?        @map("row_number")
+  qualityStatus  String      @default("COMPLETE")
+  isAggregateRow Boolean     @default(false) @map("is_aggregate_row")
+  recordedAt     DateTime    @default(now()) @map("recorded_at") @db.Timestamptz(6)
+  updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+  category       String      @default("PLN")
+  proofRef       String      @default("") @map("proof_ref")
+  metadata       Json        @default("{}")
+  plant          PlantMaster @relation(fields: [dcId], references: [dcId])
 
   @@unique([yearMonth, dcId, source, category, proofRef])
   @@index([yearMonth])
@@ -375,28 +409,28 @@ model EnergyMeasurement {
 
 /// Fuel / BBM Activity Transactions (Scope 1)
 model FuelActivity {
-  id               String   @id @default(cuid())
-  date             String   // YYYY-MM-DD
-  yearMonth        String   @map("year_month") // YYYY-MM
-  dcId             String   @map("dc_id")
-  facilityType     String   @default("warehouse") @map("facility_type") // office | warehouse | toko
-  warehouseSub     String?  @map("warehouse_sub") // wh | bulky | depo | storeHub
-  fuelType         String   @map("fuel_type") // SOLAR | PERTALITE | PERTAMAX
-  liters           Float    @default(0)
-  costRupiah       Float?   @map("cost_rupiah")
-  pricePerLiter    Float?   @map("price_per_liter")
-  emissionFactor   Float    @map("emission_factor") // kgCO2e/L
-  emissionKg       Float    @map("emission_kg")
-  emissionTon      Float    @map("emission_ton")
-  scope            String   @default("SCOPE_1")
-  status           String   @default("ACTIVE") // ACTIVE | PENDING_VALIDATION | UNVERIFIED
-  validationNote   String?  @map("validation_note")
-  source           String   @default("MANUAL") // MANUAL | EXCEL_IMPORT
-  batchId          String?  @map("batch_id")
-  proofRef         String?  @map("proof_ref")
-  metadata         Json     @default("{}")
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id             String   @id @default(cuid())
+  date           String
+  yearMonth      String   @map("year_month")
+  dcId           String   @map("dc_id")
+  facilityType   String   @default("warehouse") @map("facility_type")
+  warehouseSub   String?  @map("warehouse_sub")
+  fuelType       String   @map("fuel_type")
+  liters         Float    @default(0)
+  costRupiah     Float?   @map("cost_rupiah")
+  pricePerLiter  Float?   @map("price_per_liter")
+  emissionFactor Float    @map("emission_factor")
+  emissionKg     Float    @map("emission_kg")
+  emissionTon    Float    @map("emission_ton")
+  scope          String   @default("SCOPE_1")
+  status         String   @default("ACTIVE")
+  validationNote String?  @map("validation_note")
+  source         String   @default("MANUAL")
+  batchId        String?  @map("batch_id")
+  proofRef       String?  @map("proof_ref")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  metadata       Json     @default("{}")
 
   @@index([yearMonth])
   @@index([dcId])
@@ -405,27 +439,27 @@ model FuelActivity {
 
 /// Water Meter and Recycling Records
 model WaterActivity {
-  id               String   @id @default(cuid())
-  date             String   // YYYY-MM-DD
-  yearMonth        String   @map("year_month") // YYYY-MM
-  dcId             String   @map("dc_id")
-  branchName       String   @map("branch_name")
-  activityType     String   @default("RECYCLE") @map("activity_type") // RECYCLE | INTAKE
-  meterStart       Float?   @map("meter_start")
-  meterEnd         Float?   @map("meter_end")
-  volumeM3         Float    @default(0) @map("volume_m3")
-  emissionFactor   Float    @default(0.344) @map("emission_factor") // 0.344 kgCO2e/m3
-  emissionAvoidedKg Float   @default(0) @map("emission_avoided_kg")
-  emissionAvoidedTon Float  @default(0) @map("emission_avoided_ton")
-  costSavedRupiah  Float?   @map("cost_saved_rupiah")
-  ratePerM3        Float    @default(8000) @map("rate_per_m3")
-  qualityStatus    String   @default("VERIFIED") // VERIFIED | METER_DEFECT | ESTIMATED
-  notes            String?
-  source           String   @default("EXCEL_IMPORT") // EXCEL_IMPORT | MANUAL
-  batchId          String?  @map("batch_id")
-  metadata         Json     @default("{}")
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id                 String   @id @default(cuid())
+  date               String
+  yearMonth          String   @map("year_month")
+  dcId               String   @map("dc_id")
+  branchName         String   @map("branch_name")
+  activityType       String   @default("RECYCLE") @map("activity_type")
+  meterStart         Float?   @map("meter_start")
+  meterEnd           Float?   @map("meter_end")
+  volumeM3           Float    @default(0) @map("volume_m3")
+  emissionFactor     Float    @default(0.344) @map("emission_factor")
+  emissionAvoidedKg  Float    @default(0) @map("emission_avoided_kg")
+  emissionAvoidedTon Float    @default(0) @map("emission_avoided_ton")
+  costSavedRupiah    Float?   @map("cost_saved_rupiah")
+  ratePerM3          Float    @default(8000) @map("rate_per_m3")
+  qualityStatus      String   @default("VERIFIED")
+  notes              String?
+  source             String   @default("EXCEL_IMPORT")
+  batchId            String?  @map("batch_id")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  metadata           Json     @default("{}")
 
   @@unique([yearMonth, dcId, activityType])
   @@index([yearMonth])
@@ -435,40 +469,40 @@ model WaterActivity {
 
 /// Official Emission Factor Registry & Conflict Audit Log
 model EmissionFactorRegistry {
-  id               String   @id @default(cuid())
-  category         String   // FUEL | GRID | PLTS | WATER
-  code             String   @unique // e.g. "FUEL_SOLAR", "GRID_JAMALI", "PLTS_PORTFOLIO_RKAP", "WATER_RECYCLE_IPCC"
-  label            String
-  factorValue      Float    @map("factor_value")
-  unit             String   // kgCO2e/L | kgCO2e/kWh | tCO2e/MWh | kgCO2e/m3
-  locationOrGrid   String?  @map("location_or_grid")
-  sourceDoc        String   @map("source_doc")
-  validFrom        String?  @map("valid_from")
-  validTo          String?  @map("valid_to")
-  version          String   @default("2026.1")
-  status           String   @default("ACTIVE") // ACTIVE | PENDING_VALIDATION | DEPRECATED
-  conflictNotes    String?  @map("conflict_notes")
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id             String   @id @default(cuid())
+  category       String
+  code           String   @unique
+  label          String
+  factorValue    Float    @map("factor_value")
+  unit           String
+  locationOrGrid String?  @map("location_or_grid")
+  sourceDoc      String   @map("source_doc")
+  validFrom      String?  @map("valid_from")
+  validTo        String?  @map("valid_to")
+  version        String   @default("2026.1")
+  status         String   @default("ACTIVE")
+  conflictNotes  String?  @map("conflict_notes")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("emission_factor_registry")
 }
 
 /// Corporate Production & Sustainability Targets
 model ProductionTarget {
-  id               String   @id @default(cuid())
-  yearMonth        String   @map("year_month") // "2026-01" or "2026-ALL"
-  scope            String   @default("PORTFOLIO") // PORTFOLIO | DC
-  dcId             String?  @map("dc_id")
-  targetMwh        Float    @map("target_mwh")
-  targetKwh        Float    @map("target_kwh")
-  targetCo2Ton     Float    @map("target_co2_ton")
-  targetCoalTon    Float?   @map("target_coal_ton")
-  targetTreeCount  Int?     @map("target_tree_count")
-  version          String   @default("RKAP_2026_ORIGINAL") // RKAP_2026_ORIGINAL (5,858 MWh) | RKAP_2026_REVISED (6,453.9 MWh)
-  notes            String?
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  id              String   @id @default(cuid())
+  yearMonth       String   @map("year_month")
+  scope           String   @default("PORTFOLIO")
+  dcId            String?  @map("dc_id")
+  targetMwh       Float    @map("target_mwh")
+  targetKwh       Float    @map("target_kwh")
+  targetCo2Ton    Float    @map("target_co2_ton")
+  targetCoalTon   Float?   @map("target_coal_ton")
+  targetTreeCount Int?     @map("target_tree_count")
+  version         String   @default("RKAP_2026_ORIGINAL")
+  notes           String?
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@unique([yearMonth, scope, version])
   @@map("production_target")
@@ -476,19 +510,18 @@ model ProductionTarget {
 
 /// Data Importer Run & Audit History
 model ImportBatch {
-  id               String   @id @default(cuid())
-  filename         String
-  sheetName        String?  @map("sheet_name")
-  module           String   // PLTS_ENERGY | WATER_RECYCLE | FUEL_BBM | TARGET
-  fileHash         String?  @map("file_hash")
-  importMode       String?  @map("import_mode") // COMMIT; dry-runs are not persisted
-  recordCount      Int      @default(0) @map("record_count")
-  status           String   @default("SUCCESS") // SUCCESS | PARTIAL | FAILED
-  errors           Json     @default("[]")
-  metadata         Json     @default("{}")
-  importedAt       DateTime @default(now()) @map("imported_at") @db.Timestamptz
-
-  monthlyYields    MonthlyYield[]
+  id            String         @id @default(cuid())
+  filename      String
+  sheetName     String?        @map("sheet_name")
+  module        String
+  recordCount   Int            @default(0) @map("record_count")
+  status        String         @default("SUCCESS")
+  errors        Json           @default("[]")
+  metadata      Json           @default("{}")
+  importedAt    DateTime       @default(now()) @map("imported_at") @db.Timestamptz(6)
+  fileHash      String?        @map("file_hash")
+  importMode    String?        @map("import_mode")
+  monthlyYields MonthlyYield[]
 
   @@unique([module, fileHash])
   @@map("import_batch")
@@ -496,54 +529,212 @@ model ImportBatch {
 
 /// 30-Minute Periodic Telemetry Snapshot per plant (idempotent across runs)
 model PlantSnapshot30m {
-  id                String    @id @default(cuid())
-  slotAt            DateTime  @map("slot_at") @db.Timestamptz // Canonical 30m boundary e.g. 2026-09-30 10:00:00+07
-  slotWib           String    @map("slot_wib") // e.g. "2026-09-30 10:00"
-  psId              Int       @map("ps_id")
-  dcId              String?   @map("dc_id")
-  plantName         String    @map("plant_name")
-  capacityKwp       Float     @map("capacity_kwp")
-  currPowerKw       Float?    @map("curr_power_kw") // Instantaneous power at snapshot
-  todayEnergyKwh    Float?    @map("today_energy_kwh") // Cumulative daily counter
-  totalEnergyKwh    Float?    @map("total_energy_kwh") // Cumulative lifetime counter
-  equivalentHour    Float?    @map("equivalent_hour")
-  co2ReduceKg       Float?    @map("co2_reduce_kg")
-  psStatus          Int       @default(1) @map("ps_status")
-  psFaultStatus     Int       @default(3) @map("ps_fault_status")
-  sourceObservedAt  DateTime? @map("source_observed_at") @db.Timestamptz // Vendor timestamp from payload
-  fetchedAt         DateTime  @map("fetched_at") @db.Timestamptz // When server polled vendor API
-  savedAt           DateTime  @default(now()) @map("saved_at") @db.Timestamptz // When snapshot row was committed
-  dataAgeMinutes    Int?      @map("data_age_minutes") // (savedAt - sourceObservedAt) in minutes
-  qualityStatus     String    @default("COMPLETE") @map("quality_status") // COMPLETE | PARTIAL | STALE | OFFLINE | ERROR
-  syncId            String    @map("sync_id")
-  source            String    @default("api_live") // api_live | cache_replay | fallback
-  metadata          Json      @default("{}")
+  id               String    @id @default(cuid())
+  slotAt           DateTime  @map("slot_at") @db.Timestamptz(6)
+  slotWib          String    @map("slot_wib")
+  psId             Int       @map("ps_id")
+  dcId             String?   @map("dc_id")
+  plantName        String    @map("plant_name")
+  capacityKwp      Float     @map("capacity_kwp")
+  currPowerKw      Float?    @map("curr_power_kw")
+  todayEnergyKwh   Float?    @map("today_energy_kwh")
+  totalEnergyKwh   Float?    @map("total_energy_kwh")
+  equivalentHour   Float?    @map("equivalent_hour")
+  co2ReduceKg      Float?    @map("co2_reduce_kg")
+  psStatus         Int       @default(1) @map("ps_status")
+  psFaultStatus    Int       @default(3) @map("ps_fault_status")
+  sourceObservedAt DateTime? @map("source_observed_at") @db.Timestamptz(6)
+  fetchedAt        DateTime  @map("fetched_at") @db.Timestamptz(6)
+  savedAt          DateTime  @default(now()) @map("saved_at") @db.Timestamptz(6)
+  dataAgeMinutes   Int?      @map("data_age_minutes")
+  qualityStatus    String    @default("COMPLETE") @map("quality_status")
+  syncId           String    @map("sync_id")
+  source           String    @default("api_live")
+  metadata         Json      @default("{}")
 
   @@unique([psId, slotAt])
   @@index([slotAt])
   @@index([slotWib])
   @@index([psId])
+  @@index([psId], map: "idx_plant_snapshot_ps_id")
+  @@index([slotAt], map: "idx_plant_snapshot_slot_at")
+  @@index([slotWib], map: "idx_plant_snapshot_slot_wib")
   @@map("plant_snapshot_30m")
 }
 
 /// Run execution log for 30-Minute Snapshot cycles
 model SnapshotRun30m {
   id                  String    @id @default(cuid())
-  slotAt              DateTime  @unique @map("slot_at") @db.Timestamptz
-  slotWib             String    @map("slot_wib") // e.g. "2026-09-30 10:00"
-  status              String    // SUCCESS | PARTIAL | FAILED | SKIPPED
+  slotAt              DateTime  @unique @map("slot_at") @db.Timestamptz(6)
+  slotWib             String    @map("slot_wib")
+  status              String
   totalPlants         Int       @default(0) @map("total_plants")
   capturedCount       Int       @default(0) @map("captured_count")
   staleCount          Int       @default(0) @map("stale_count")
   missingCount        Int       @default(0) @map("missing_count")
   totalPowerKw        Float?    @map("total_power_kw")
   totalTodayEnergyKwh Float?    @map("total_today_energy_kwh")
-  trigger             String    @default("cron") // cron | daemon | manual | fallback
+  trigger             String    @default("cron")
   durationMs          Int?      @map("duration_ms")
   errorMessage        String?   @map("error_message")
-  startedAt           DateTime  @default(now()) @map("started_at") @db.Timestamptz
-  finishedAt          DateTime? @map("finished_at") @db.Timestamptz
+  startedAt           DateTime  @default(now()) @map("started_at") @db.Timestamptz(6)
+  finishedAt          DateTime? @map("finished_at") @db.Timestamptz(6)
 
   @@index([slotWib])
+  @@index([slotWib], map: "idx_snapshot_run_slot_wib")
   @@map("snapshot_run_30m")
+}
+
+/// Daily Weather & Solar Irradiance Data from Open-Meteo
+model WeatherDaily {
+  id            String    @id @default(cuid())
+  date          String    @map("date")
+  locationKey   String    @map("location_key")
+  lat           Float     @map("lat")
+  lon           Float     @map("lon")
+  tempMeanC     Float?    @map("temp_mean_c")
+  tempMaxC      Float?    @map("temp_max_c")
+  tempDayMeanC  Float?    @map("temp_day_mean_c")
+  ghiKwhM2      Float?    @map("ghi_kwh_m2")
+  humidityMean  Float?    @map("humidity_mean")
+  source        String    @default("open-meteo-archive") @map("source")
+  isFinal       Boolean   @default(false) @map("is_final")
+  prevTempMeanC Float?    @map("prev_temp_mean_c")
+  prevGhiKwhM2  Float?    @map("prev_ghi_kwh_m2")
+  fetchedAt     DateTime  @default(now()) @map("fetched_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([locationKey, date])
+  @@index([date])
+  @@index([locationKey])
+  @@map("weather_daily")
+}
+
+/// Operational record for each forward-only iSolar inverter-temperature sampling cycle.
+model InverterTempSamplingRun {
+  id                String               @id @default(cuid())
+  scheduledSlotAt   DateTime?            @map("scheduled_slot_at") @db.Timestamptz(6)
+  startedAt         DateTime             @default(now()) @map("started_at") @db.Timestamptz(6)
+  finishedAt        DateTime?            @map("finished_at") @db.Timestamptz(6)
+  status            String               @default("running")
+  devicesExpected   Int                  @default(0) @map("devices_expected")
+  expectedDevices   Json                 @default("[]") @map("expected_devices")
+  devicesOk         Int                  @default(0) @map("devices_ok")
+  devicesFailed     Int                  @default(0) @map("devices_failed")
+  devicesFiltered   Int                  @default(0) @map("devices_filtered")
+  devicesDuplicate  Int                  @default(0) @map("devices_duplicate")
+  chunksTotal       Int                  @default(0) @map("chunks_total")
+  chunksFailed      Int                  @default(0) @map("chunks_failed")
+  errorSummary      String?              @map("error_summary")
+  chunkDetails      Json                 @default("[]") @map("chunk_details")
+  apiQuotaUsed      Int?                 @map("api_quota_used")
+  trigger           String
+  methodVersion     String               @map("method_version")
+  samples           InverterTempSample[]
+
+  @@unique([scheduledSlotAt, methodVersion])
+  @@index([startedAt])
+  @@index([status])
+  @@map("inverter_temp_sampling_run")
+}
+
+/// Append-only raw inverter observations. Validity is evaluated by the versioned aggregator.
+model InverterTempSample {
+  id               String                  @id @default(cuid())
+  runId            String                  @map("run_id")
+  deviceSn         String                  @map("device_sn")
+  psId             Int                     @map("ps_id")
+  deviceTime       DateTime?               @map("device_time") @db.Timestamptz(6)
+  deviceTimeRaw    String?                 @map("device_time_raw")
+  p4               Float?
+  p24              Float?
+  p4Raw            String?                 @map("p4_raw")
+  p24Raw           String?                 @map("p24_raw")
+  observationKey   String                  @unique @map("observation_key")
+  qualityFlags     Json                    @default("[]") @map("quality_flags")
+  fetchedAt        DateTime                @default(now()) @map("fetched_at") @db.Timestamptz(6)
+  methodVersion    String                  @map("method_version")
+  run              InverterTempSamplingRun @relation(fields: [runId], references: [id], onDelete: Restrict)
+
+  @@unique([deviceSn, deviceTime])
+  @@index([runId])
+  @@index([psId, deviceTime])
+  @@index([deviceSn, deviceTime])
+  @@map("inverter_temp_sample")
+}
+
+/// Idempotent daily inverter-temperature aggregate for one physical plant and method version.
+model InverterTempDaily {
+  id                         String   @id @default(cuid())
+  psId                       Int      @map("ps_id")
+  dateWib                    DateTime @map("date_wib") @db.Date
+  methodVersion              String   @map("method_version")
+  avgTempC                   Float?   @map("avg_temp_c")
+  maxTempC                   Float?   @map("max_temp_c")
+  sampleCount                Int      @default(0) @map("sample_count")
+  invertersCovered           Int      @default(0) @map("inverters_covered")
+  invertersRegistered        Int      @default(0) @map("inverters_registered")
+  coveragePct                Float    @default(0) @map("coverage_pct")
+  samplingCoveragePct        Float    @default(0) @map("sampling_coverage_pct")
+  productionCoveragePct      Float    @default(0) @map("production_coverage_pct")
+  maxInverterSpreadC         Float?   @map("max_inverter_spread_c")
+  hasSpreadAnomaly           Boolean  @default(false) @map("has_spread_anomaly")
+  qualityStatus              String   @map("quality_status")
+  qualityReasons             Json     @default("[]") @map("quality_reasons")
+  includedRunCount           Int      @default(0) @map("included_run_count")
+  expectedRunCount           Int      @default(0) @map("expected_run_count")
+  validSlotCount             Int      @default(0) @map("valid_slot_count")
+  minimumValidSlotCount      Int      @map("minimum_valid_slot_count")
+  staleDeviceTimeCount       Int      @default(0) @map("stale_device_time_count")
+  staleDeviceTimePct         Float    @default(0) @map("stale_device_time_pct")
+  fetchedAt                  DateTime @default(now()) @map("fetched_at") @db.Timestamptz(6)
+
+  @@unique([psId, dateWib, methodVersion])
+  @@index([dateWib])
+  @@index([qualityStatus])
+  @@map("inverter_temp_daily")
+}
+
+/// Audit log for manual or scheduled daily aggregation attempts.
+model InverterTempAggregationRun {
+  id                String    @id @default(cuid())
+  targetDateWib     DateTime  @map("target_date_wib") @db.Date
+  methodVersion     String    @map("method_version")
+  trigger           String
+  startedAt         DateTime  @default(now()) @map("started_at") @db.Timestamptz(6)
+  finishedAt        DateTime? @map("finished_at") @db.Timestamptz(6)
+  status            String    @default("running")
+  plantsExpected    Int       @default(0) @map("plants_expected")
+  plantsOk          Int       @default(0) @map("plants_ok")
+  plantsFailed      Int       @default(0) @map("plants_failed")
+  errorSummary      String?   @map("error_summary")
+  resultSummary     Json      @default("{}") @map("result_summary")
+
+  @@index([startedAt])
+  @@index([targetDateWib])
+  @@index([status])
+  @@map("inverter_temp_aggregation_run")
+}
+
+/// Authenticated download audit for PR and inverter-temperature exports.
+model InverterTempExportAudit {
+  id                String    @id @default(cuid())
+  userIdentifier    String    @map("user_identifier")
+  format            String
+  scope             String
+  targetId          String?   @map("target_id")
+  year              Int
+  filters           Json      @default("{}")
+  methodVersion     String    @map("method_version")
+  requestedAt       DateTime  @default(now()) @map("requested_at") @db.Timestamptz(6)
+  finishedAt        DateTime? @map("finished_at") @db.Timestamptz(6)
+  status            String    @default("running")
+  rowCount          Int?      @map("row_count")
+  fileName          String?   @map("file_name")
+  errorSummary      String?   @map("error_summary")
+
+  @@index([requestedAt])
+  @@index([userIdentifier])
+  @@index([status])
+  @@map("inverter_temp_export_audit")
 }

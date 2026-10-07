@@ -23,6 +23,7 @@ import { getWibHour } from './apiClient.js';
 import { parseEnergyKwh, parsePowerKw, parseTotalEnergyMwh } from './processor.js';
 import { parseFreshnessThreshold, resolveTelemetryFreshness } from './freshness.js';
 import { classifyVendorPlantStatus } from './status.js';
+import { isDcLocation } from './plantMap.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const SYNC_WINDOW = { start: 5, end: 18, startMinute: 30, endMinute: 30 };
@@ -417,17 +418,19 @@ export async function runSync({ trigger = 'cron' } = {}) {
         throw new Error(`Validasi gagal: ps_id tidak unik (${uniqueIds.size} unik dari ${rawPlants.length})`);
       }
       
-      // 8. Atomic write
+      // 8. Atomic write (only DC locations persisted)
+      const dcPlants = rawPlants.filter(p => isDcLocation(p));
+      const dcPsIds = dcPlants.map(p => Number(p.ps_id));
       const { dateWib, hour: localHour } = getWibTimeInfo(now);
       
       await prisma.$transaction(async (tx) => {
-        // Delete old plants not in response
+        // Delete old plants not in response or non-DC
         await tx.plantLatest.deleteMany({
-          where: { psId: { notIn: psIds } },
+          where: { psId: { notIn: dcPsIds } },
         });
         
-        // Parallel Upsert all plants
-        await Promise.all(rawPlants.map(async (plant) => {
+        // Parallel Upsert all DC plants
+        await Promise.all(dcPlants.map(async (plant) => {
           const psId = Number(plant.ps_id);
           const capacityKwp = Number(plant.total_capcity?.value || 0);
           const currPowerKw = parsePowerKw(plant.curr_power);
@@ -550,50 +553,94 @@ export async function runSync({ trigger = 'cron' } = {}) {
         timeout: 60000,
       });
 
-      // ─── Sub-component 2: Active Faults & Alarms (getFaultAlarmInfo) ──────────
+      // ─── Sub-component 2: Faults & Alarms (getFaultAlarmInfo 24h) ───────────
       try {
-        await incrementQuota(now, 1);
-        httpCalls++;
-        const faultRes = await fetch(`${baseUrl}/openapi/getFaultAlarmInfo`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            'sys_code': QUOTA_CONFIG.SYS_CODE,
-            'x-access-key': secretKey,
-          },
-          body: JSON.stringify({
-            appkey: appKey,
-            token,
-            lang: '_en_US',
-            curPage: 1,
-            size: 100,
-            process_status: '8', // Unprocessed / Active
-            fault_type: '1,2,3,4',
-          }),
-        });
-        if (faultRes.ok) {
-          const faultJson = await faultRes.json();
-          if (faultJson.result_code === '1') {
-            const faults = faultJson.result_data?.pageList || faultJson.result_data?.data || [];
-            await prisma.faultActive.deleteMany();
-            for (const f of faults) {
-              const faultCode = String(f.id || f.fault_code || `${f.ps_id}_${f.device_sn}_${f.fault_name}_${f.create_time}`);
-              const psId = Number(f.ps_id || 0);
-              const psKey = String(f.ps_key || '');
-              const faultName = String(f.fault_name || '');
-              const faultType = Number(f.fault_type ?? 1);
-              const faultLevel = Number(f.fault_level ?? 1);
-              const createTime = f.create_time ? new Date(f.create_time) : null;
-              const processStatus = String(f.process_status || '8');
+        let curPage = 1;
+        let totalPages = 1;
+        let totalFaultsSynced = 0;
+        let activeFaultsCount = 0;
+        let historyFaultsCount = 0;
 
+        // Clear active faults table for fresh snapshot
+        await prisma.faultActive.deleteMany();
+
+        while (curPage <= totalPages && curPage <= 5) { // Safety ceiling of 5 pages max
+          await incrementQuota(now, 1);
+          httpCalls++;
+          const faultRes = await fetch(`${baseUrl}/openapi/getFaultAlarmInfo`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json;charset=UTF-8',
+              'sys_code': QUOTA_CONFIG.SYS_CODE,
+              'x-access-key': secretKey,
+            },
+            body: JSON.stringify({
+              appkey: appKey,
+              token,
+              lang: '_en_US',
+              curPage,
+              size: 100,
+              process_status: '999', // All statuses: 8 (active) and 9 (closed/history)
+              fault_type: '1,2,3,4',
+            }),
+          });
+
+          if (!faultRes.ok) break;
+          const faultJson = await faultRes.json();
+          if (faultJson.result_code !== '1') break;
+
+          const pageData = faultJson.result_data || {};
+          const faults = pageData.pageList || pageData.data || [];
+          const totalRecords = Number(pageData.totalRows || pageData.total || faults.length);
+          totalPages = Math.ceil(totalRecords / 100) || 1;
+          totalFaultsSynced += faults.length;
+
+          for (const f of faults) {
+            const faultCode = String(f.id || f.fault_code || `${f.ps_id}_${f.device_sn || 'dev'}_${f.fault_name}_${f.create_time}`);
+            const psId = Number(f.ps_id || 0);
+            const psKey = String(f.ps_key || '');
+            const faultName = String(f.fault_name || '');
+            const faultType = Number(f.fault_type ?? 1);
+            const faultLevel = Number(f.fault_level ?? 1);
+            const createTime = f.create_time ? new Date(f.create_time) : null;
+            const overTime = f.over_time ? new Date(f.over_time) : null;
+            const processStatus = String(f.process_status || '8');
+
+            if (processStatus === '8') {
+              // 1. Write to FaultActive table
+              activeFaultsCount++;
               await prisma.faultActive.upsert({
                 where: { faultCode },
                 update: { psId, psKey, faultName, faultType, faultLevel, createTime, processStatus },
                 create: { faultCode, psId, psKey, faultName, faultType, faultLevel, createTime, processStatus },
               });
+            } else if (processStatus === '9') {
+              // 2. Write to FaultHistory table (idempotent per fault_code)
+              historyFaultsCount++;
+              try {
+                await prisma.$executeRaw`
+                  INSERT INTO fault_history (
+                    fault_code, ps_id, ps_key, fault_name, fault_type, fault_level,
+                    create_time, over_time, process_status, first_seen_at, last_seen_at
+                  ) VALUES (
+                    ${faultCode}, ${psId}, ${psKey}, ${faultName}, ${faultType}, ${faultLevel},
+                    ${createTime}, ${overTime}, ${processStatus}, NOW(), NOW()
+                  )
+                  ON CONFLICT (fault_code) DO UPDATE SET
+                    over_time = EXCLUDED.over_time,
+                    process_status = EXCLUDED.process_status,
+                    last_seen_at = NOW()
+                `;
+              } catch (histDbErr) {
+                console.warn('[SYNC] Gagal menyimpan rekaman FaultHistory:', histDbErr.message);
+              }
             }
           }
+
+          curPage++;
         }
+
+        console.log(`[SYNC] getFaultAlarmInfo synced rowCount=${totalFaultsSynced} (Active=${activeFaultsCount}, History=${historyFaultsCount})`);
       } catch (faultErr) {
         console.warn('[SYNC] Sub-component getFaultAlarmInfo gagal:', faultErr.message);
       }
@@ -701,6 +748,11 @@ export async function runSync({ trigger = 'cron' } = {}) {
       } catch (invErr) {
         console.warn('[SYNC] Sub-component Inverter Telemetry gagal:', invErr.message);
       }
+      
+      // Invalidate all server-side in-memory caches upon successful sync
+      globalThis.__PLTS_SERVER_CACHE__?.clear();
+      globalThis.__PLTS_SUMMARIZE_CACHE__?.clear();
+      globalThis.__PLTS_SUMMARY_CACHE__?.clear();
       
       return {
         syncRun: { ...syncRun, status: 'success', plantCount: rawPlants.length, httpCalls },

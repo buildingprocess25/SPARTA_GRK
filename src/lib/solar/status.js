@@ -1,38 +1,36 @@
 /**
- * iSolarCloud status classifier.
- * 
- * 3 Distinct Dimensions (Requirement 8):
+ * iSolarCloud Status Classifier & Single Source of Truth
+ *
+ * 3 Distinct Dimensions:
  * 1. Status Operasional (Vendor device/plant telemetry):
+ *    - OFFLINE: Total plant offline (ps_status = 0)
+ *    - FAULT: Critical hardware faults (ps_fault_status = 1 OR fault_count > 0 OR FaultActive fault_type = 1)
+ *    - ALARM: Active warnings (ps_fault_status = 2 OR alarm_count > 0)
+ *    - WAITING_DATA: Telemetry pending initialization
  *    - NORMAL: All devices operational and producing
- *    - DEVICE_OFFLINE: 1 or more inverters/devices offline while plant remains online (e.g. Kotabumi, Bogor)
- *    - ALARM: Active non-critical warnings
- *    - FAULT: Critical hardware faults
- *    - OFFLINE: Total plant offline (ps_status 0)
- * 
+ *
+ * Priority order: OFFLINE > FAULT > ALARM > WAITING_DATA > NORMAL
+ *
  * 2. Kualitas Data (Telemetry completeness & freshness):
  *    - COMPLETE: Full data available for expected period
  *    - PARTIAL: Partial history (e.g. onboarding mid-year)
  *    - STALE: No fresh telemetry received >90m
  *    - MISSING: No records available
- *    - INVALID: Data format or negative values
- * 
+ *
  * 3. Analisis Performa (Yield benchmarking):
  *    - NORMAL: Specific yield within normal operating envelope
- *    - LOW_YIELD: Low specific yield based on documented rules (never falsely classified as hardware fault)
+ *    - LOW_YIELD: Low specific yield based on documented rules
  */
 
-// The public vendor guide documents the status categories, but not these
-// numeric OpenAPI codes. Keep observed codes labelled as such and preserve the
-// raw values for audit; fault/alarm classification uses explicit counters.
 export const VENDOR_STATUS_MAP = {
   PS_STATUS: {
-    0: { label: 'Observed offline', color: '#EF4444', isOnline: false, evidence: 'portal/API comparison' },
-    1: { label: 'Observed connected', color: '#10B981', isOnline: true, evidence: 'portal/API comparison' },
+    0: { label: 'Offline', color: '#334155', isOnline: false, evidence: 'ps_status=0' },
+    1: { label: 'Online / Connected', color: '#10B981', isOnline: true, evidence: 'ps_status=1' },
   },
   PS_FAULT_STATUS: {
-    1: { label: 'Undocumented raw code 1' },
-    2: { label: 'Undocumented raw code 2' },
-    3: { label: 'Undocumented raw code 3' },
+    1: { label: 'Fault', color: '#DC2626', evidence: 'ps_fault_status=1' },
+    2: { label: 'Alarm', color: '#F59E0B', evidence: 'ps_fault_status=2' },
+    3: { label: 'Normal', color: '#10B981', evidence: 'ps_fault_status=3' },
   },
 };
 
@@ -44,11 +42,9 @@ function metricNumber(metric) {
 }
 
 /**
- * Classifies the raw station response without inferring communication state
- * from power/yield alone. Numeric vendor codes are retained in the reason so
- * every persisted decision remains auditable.
+ * Classifies raw station response without inferring communication state from power/yield alone.
  */
-export function classifyVendorPlantStatus(raw = {}, { checkedAt = new Date(), localHour = null } = {}) {
+export function classifyVendorPlantStatus(raw = {}, { checkedAt = new Date(), localHour = null, activeFaults = [] } = {}) {
   const psStatus = Number.isFinite(Number(raw.ps_status)) ? Number(raw.ps_status) : null;
   const psFaultStatus = Number.isFinite(Number(raw.ps_fault_status)) ? Number(raw.ps_fault_status) : null;
   const alarmCount = Number(raw.alarm_count || 0);
@@ -58,18 +54,25 @@ export function classifyVendorPlantStatus(raw = {}, { checkedAt = new Date(), lo
   const statusCheckedAt = new Date(checkedAt);
   const isDaytime = Number.isInteger(localHour) && localHour >= 8 && localHour <= 17;
 
-  let category = 'MONITORED';
-  let reason = `telemetry vendor terpantau (ps_status=${psStatus ?? 'null'}, ps_fault_status=${psFaultStatus ?? 'null'})`;
+  const hasFaultActiveType1 = Array.isArray(activeFaults) && activeFaults.some(f => Number(f.faultType || f.fault_type) === 1);
+  const isFault = psFaultStatus === 1 || faultCount > 0 || hasFaultActiveType1;
+  const isAlarm = (psFaultStatus === 2 || alarmCount > 0) && !isFault;
+
+  let category = 'NORMAL';
+  let reason = `telemetry vendor terpantau (ps_status=${psStatus ?? '—'}, ps_fault_status=${psFaultStatus ?? '—'})`;
 
   if (psStatus === 0) {
     category = 'OFFLINE';
     reason = 'komunikasi plant terputus menurut vendor (ps_status=0)';
-  } else if (faultCount > 0) {
+  } else if (psStatus === null) {
+    category = 'WAITING_DATA';
+    reason = 'menunggu penerimaan telemetri awal dari vendor';
+  } else if (isFault) {
     category = 'FAULT';
-    reason = `vendor melaporkan fault_count=${faultCount} (ps_fault_status=${psFaultStatus ?? 'null'})`;
-  } else if (alarmCount > 0) {
+    reason = `vendor melaporkan fault_count=${faultCount}, ps_fault_status=${psFaultStatus ?? '—'}${hasFaultActiveType1 ? ' (FaultActive tipe 1)' : ''}`;
+  } else if (isAlarm) {
     category = 'ALARM';
-    reason = `vendor melaporkan alarm_count=${alarmCount} (ps_fault_status=${psFaultStatus ?? 'null'})`;
+    reason = `vendor melaporkan alarm_count=${alarmCount}, ps_fault_status=${psFaultStatus ?? '—'}`;
   } else if (psStatus === 1 && isDaytime && currPower === 0 && todayEnergy === 0) {
     category = 'ZERO_PRODUCTION_ANOMALY';
     reason = `plant terhubung tetapi daya dan energi nol pada jam produksi (${String(localHour).padStart(2, '0')}:00 lokal)`;
@@ -85,7 +88,9 @@ export function classifyVendorPlantStatus(raw = {}, { checkedAt = new Date(), lo
     faultCount,
     currPower,
     todayEnergy,
-    validZeroProduction: category === 'MONITORED' && todayEnergy === 0,
+    isFault,
+    isAlarm,
+    validZeroProduction: category === 'NORMAL' && todayEnergy === 0,
   };
 }
 
@@ -98,10 +103,19 @@ export function summarizePlantStatuses(rows = []) {
     checkedAt: row.statusCheckedAt || row.checkedAt || null,
   }));
   const offlinePlants = normalized.filter((row) => row.category === 'OFFLINE');
+  const faultPlants = normalized.filter((row) => row.category === 'FAULT');
+  const alarmPlants = normalized.filter((row) => row.category === 'ALARM');
+  const normalPlants = normalized.filter((row) => row.category === 'NORMAL' || row.category === 'MONITORED');
+
   return {
     totalCount: normalized.length,
     offlineCount: offlinePlants.length,
+    faultCount: faultPlants.length,
+    alarmCount: alarmPlants.length,
+    normalCount: normalPlants.length,
     offlinePlants,
+    faultPlants,
+    alarmPlants,
     plants: normalized,
   };
 }
@@ -109,44 +123,49 @@ export function summarizePlantStatuses(rows = []) {
 /**
  * Resolves operational status for a single physical plant
  */
-export function resolvePlantStatus({
-  psStatus = 1,
-  psFaultStatus = 3,
-  alarmCount = 0,
-  faultCount = 0,
-  currPowerKw = null,
-  offlineDeviceCount = 0,
-} = {}) {
-  const isPsOffline = Number(psStatus) === 0;
-  const isFault = Number(faultCount) > 0;
-  const isAlarm = Number(alarmCount) > 0;
+export function resolvePlantStatus(input = {}) {
+  const psStatus = input.psStatus !== undefined ? input.psStatus : (input.ps_status !== undefined ? input.ps_status : 1);
+  const psFaultStatus = input.psFaultStatus !== undefined ? input.psFaultStatus : (input.ps_fault_status !== undefined ? input.ps_fault_status : 3);
+  const alarmCount = Number(input.alarmCount !== undefined ? input.alarmCount : (input.alarm_count || 0));
+  const faultCount = Number(input.faultCount !== undefined ? input.faultCount : (input.fault_count || 0));
+  const activeFaults = input.activeFaults || input.active_faults || [];
+  const offlineDeviceCount = Number(input.offlineDeviceCount !== undefined ? input.offlineDeviceCount : (input.offline_device_count || 0));
+
+  const isWaiting = psStatus === null || psStatus === undefined || psStatus === '';
+  const isPsOffline = !isWaiting && Number(psStatus) === 0;
+  const hasFaultActiveType1 = Array.isArray(activeFaults) && activeFaults.some(f => Number(f.faultType || f.fault_type) === 1);
+  const isFault = Number(psFaultStatus) === 1 || Number(faultCount) > 0 || hasFaultActiveType1;
+  const isAlarm = (Number(psFaultStatus) === 2 || Number(alarmCount) > 0) && !isFault;
   const hasOfflineDevice = Number(offlineDeviceCount) > 0;
 
   if (isPsOffline) {
     return {
       key: 'OFFLINE',
       label: 'Offline',
-      badgeColor: 'bg-rose-50 text-rose-700 border-rose-200',
-      dotColor: 'bg-rose-500',
+      badgeColor: 'bg-slate-700 text-white border-slate-800',
+      dotColor: 'bg-slate-500',
       isOnline: false,
       hasAlarm: false,
       hasFault: false,
       hasOfflineDevice: false,
+      priority: 1,
       note: 'Stasiun offline secara keseluruhan',
     };
   }
 
   if (isFault) {
+    const count = faultCount || (activeFaults.length > 0 ? activeFaults.length : 1);
     return {
       key: 'FAULT',
-      label: `Fault (${faultCount || 1})`,
-      badgeColor: 'bg-red-50 text-red-700 border-red-200',
-      dotColor: 'bg-red-500',
+      label: `Fault (${count})`,
+      badgeColor: 'bg-red-600 text-white border-red-700 shadow-xs',
+      dotColor: 'bg-red-600',
       isOnline: true,
       hasAlarm: false,
       hasFault: true,
       hasOfflineDevice,
-      note: 'Terdeteksi gangguan/kerusakan perangkat pada stasiun',
+      priority: 2,
+      note: 'Terdeteksi gangguan/kerusakan hardware pada stasiun',
     };
   }
 
@@ -154,26 +173,43 @@ export function resolvePlantStatus({
     return {
       key: 'ALARM',
       label: `Alarm (${alarmCount || 1})`,
-      badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
+      badgeColor: 'bg-amber-500 text-white border-amber-600',
       dotColor: 'bg-amber-500',
       isOnline: true,
       hasAlarm: true,
       hasFault: false,
       hasOfflineDevice,
+      priority: 3,
       note: 'Peringatan aktif dari inverter/perangkat',
+    };
+  }
+
+  if (isWaiting) {
+    return {
+      key: 'WAITING_DATA',
+      label: 'Menunggu Data',
+      badgeColor: 'bg-slate-100 text-slate-700 border-slate-300',
+      dotColor: 'bg-slate-400',
+      isOnline: false,
+      hasAlarm: false,
+      hasFault: false,
+      hasOfflineDevice: false,
+      priority: 4,
+      note: 'Menunggu data telemetri pertama',
     };
   }
 
   if (hasOfflineDevice) {
     return {
       key: 'DEVICE_OFFLINE',
-      label: `1 Device Offline`,
+      label: `${offlineDeviceCount} Device Offline`,
       badgeColor: 'bg-amber-50 text-amber-800 border-amber-300',
       dotColor: 'bg-amber-500',
       isOnline: true,
       hasAlarm: false,
       hasFault: false,
       hasOfflineDevice: true,
+      priority: 5,
       note: `${offlineDeviceCount} inverter/perangkat offline (daya parsial tetap aktif)`,
     };
   }
@@ -187,6 +223,7 @@ export function resolvePlantStatus({
     hasAlarm: false,
     hasFault: false,
     hasOfflineDevice: false,
+    priority: 6,
     note: null,
   };
 }
@@ -199,7 +236,9 @@ export function classifyLocationStatus({
   isOffline = false,
   alarmCount = 0,
   hasFault = false,
+  faultCount = 0,
   faultNames = [],
+  activeFaults = [],
   offlineDeviceCount = 0,
   monthsAvailable = 0,
   monthsExpected = 9,
@@ -210,26 +249,58 @@ export function classifyLocationStatus({
   abnormalMonthTooltip = null,
 } = {}) {
   // 1. Status Operasional (Vendor Telemetry)
+  // Check sub-plants to determine worst status if compound
+  let subPlantFaultCount = 0;
+  let subPlantAlarmCount = 0;
+  let subPlantOfflineCount = 0;
+
+  if (Array.isArray(subPlants) && subPlants.length > 0) {
+    subPlants.forEach(sp => {
+      const spOffline = Number(sp.psStatus) === 0;
+      const spFault = Number(sp.psFaultStatus) === 1 || Number(sp.faultCount) > 0;
+      const spAlarm = (Number(sp.psFaultStatus) === 2 || Number(sp.alarmCount) > 0) && !spFault;
+      if (spOffline) subPlantOfflineCount++;
+      if (spFault) subPlantFaultCount++;
+      if (spAlarm) subPlantAlarmCount++;
+    });
+  }
+
+  const effectiveFault = hasFault || Number(faultCount) > 0 || subPlantFaultCount > 0 || (Array.isArray(activeFaults) && activeFaults.some(f => Number(f.faultType || f.fault_type) === 1));
+  const effectiveAlarm = (alarmCount > 0 || subPlantAlarmCount > 0) && !effectiveFault;
+
   let operationalKey = 'NORMAL';
   let operationalLabel = 'Normal';
   let operationalBadgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
   let operationalNote = null;
+  let compoundNote = null;
 
-  if (isOffline) {
+  if (isOffline || (subPlants.length > 0 && subPlantOfflineCount === subPlants.length)) {
     operationalKey = 'OFFLINE';
     operationalLabel = 'Offline';
-    operationalBadgeColor = 'bg-rose-100 text-rose-800 border-rose-200';
+    operationalBadgeColor = 'bg-slate-700 text-white border-slate-800';
     operationalNote = 'Seluruh stasiun dalam kondisi offline';
-  } else if (hasFault) {
+  } else if (effectiveFault) {
     operationalKey = 'FAULT';
-    operationalLabel = `Fault (${faultNames.length || 1})`;
-    operationalBadgeColor = 'bg-red-100 text-red-800 border-red-200';
+    const totalFaults = faultNames.length || faultCount || subPlantFaultCount || 1;
+    operationalLabel = `Fault (${totalFaults})`;
+    operationalBadgeColor = 'bg-red-600 text-white border-red-700 shadow-xs';
     operationalNote = faultNames.join(', ') || 'Terdeteksi kerusakan hardware';
-  } else if (alarmCount > 0) {
+    if (subPlants.length > 1 && subPlantFaultCount > 0) {
+      compoundNote = `${subPlantFaultCount} dari ${subPlants.length} sub-plant Fault`;
+    }
+  } else if (effectiveAlarm) {
     operationalKey = 'ALARM';
-    operationalLabel = `Alarm (${alarmCount})`;
-    operationalBadgeColor = 'bg-amber-100 text-amber-800 border-amber-200';
-    operationalNote = `${alarmCount} alarm aktif pada stasiun`;
+    operationalLabel = `Alarm (${alarmCount || subPlantAlarmCount || 1})`;
+    operationalBadgeColor = 'bg-amber-500 text-white border-amber-600';
+    operationalNote = `${alarmCount || subPlantAlarmCount} alarm aktif pada stasiun`;
+    if (subPlants.length > 1 && subPlantAlarmCount > 0) {
+      compoundNote = `${subPlantAlarmCount} dari ${subPlants.length} sub-plant Alarm`;
+    }
+  } else if (subPlantOfflineCount > 0) {
+    operationalKey = 'PARTIAL_OFFLINE';
+    operationalLabel = `${subPlantOfflineCount} Sub-Plant Offline`;
+    operationalBadgeColor = 'bg-amber-50 text-amber-800 border-amber-300';
+    operationalNote = `${subPlantOfflineCount} dari ${subPlants.length} sub-plant offline`;
   } else if (offlineDeviceCount > 0) {
     operationalKey = 'DEVICE_OFFLINE';
     operationalLabel = `${offlineDeviceCount} Perangkat Offline`;
@@ -265,14 +336,12 @@ export function classifyLocationStatus({
   let performanceLabel = 'Normal';
   let isLowYield = false;
 
-  // Specific yield rule: <300 kWh/kWp in YTD 9-months is low
   if (specificYield !== null && specificYield > 0 && monthsAvailable >= monthsExpected && specificYield < 300) {
     performanceKey = 'LOW_YIELD';
     performanceLabel = 'Yield Rendah';
     isLowYield = true;
   }
 
-  // Operational attention is STRICTLY separated from data completeness
   const isOperationalIssue = operationalKey !== 'NORMAL';
   const hasDataAnomaly = hasAbnormalMonth || dataQualityKey === 'PARTIAL' || dataQualityKey === 'MISSING';
 
@@ -282,7 +351,11 @@ export function classifyLocationStatus({
       label: operationalLabel,
       badgeColor: operationalBadgeColor,
       note: operationalNote,
+      compoundNote,
       isNormal: operationalKey === 'NORMAL',
+      isFault: operationalKey === 'FAULT',
+      isAlarm: operationalKey === 'ALARM',
+      isOffline: operationalKey === 'OFFLINE',
     },
     dataQuality: {
       key: dataQualityKey,

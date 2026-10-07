@@ -21,3 +21,17 @@ export function buildCacheKey(endpoint, filters = {}) {
   const qs = buildQueryString(filters);
   return qs ? `${ep}?${qs}` : ep;
 }
+
+export function isValidPltsHistoryPeriod(value) {
+  const match = String(value || '').trim().match(/^(\d{4})-(\d{2})_(\d{4})-(\d{2})$/);
+  if (!match) return false;
+  const [, startYear, startMonth, endYear, endMonth] = match;
+  const startMonthNumber = Number(startMonth);
+  const endMonthNumber = Number(endMonth);
+  return startYear === endYear
+    && startMonthNumber >= 1
+    && startMonthNumber <= 12
+    && endMonthNumber >= 1
+    && endMonthNumber <= 12
+    && startMonthNumber <= endMonthNumber;
+}

@@ -189,7 +189,7 @@ export default function PLTSTab() {
                       window.__PLTS_CLIENT_CACHE__.set(cacheKey, res.data);
                     }
                   })
-                  .catch(() => {});
+                  .catch(() => { });
               });
             };
 
@@ -348,19 +348,19 @@ export default function PLTSTab() {
   // Derived data for the table: prefer actualEmissions (39 independent plants) with fallback to validDcs
   const rawPlantList = (actualEmissions && actualEmissions.length > 0)
     ? actualEmissions.map(a => ({
-        id: a.id || a.dcId,
-        dcId: a.dcId || a.id,
-        name: a.name || a.canonicalName,
-        grid: (a.grid || a.gridRegion || 'JAMALI').toUpperCase(),
-        gridRegion: (a.grid || a.gridRegion || 'JAMALI').toUpperCase(),
-        plnConsumptionMWh: a.plnConsumptionMWh || null,
-        pltsProdMWh: Number((a.pltsProdMWh || 0).toFixed(2)),
-        region: a.region || 'Nasional'
-      }))
+      id: a.id || a.dcId,
+      dcId: a.dcId || a.id,
+      name: a.name || a.canonicalName,
+      grid: (a.grid || a.gridRegion || 'JAMALI').toUpperCase(),
+      gridRegion: (a.grid || a.gridRegion || 'JAMALI').toUpperCase(),
+      plnConsumptionMWh: a.plnConsumptionMWh || null,
+      pltsProdMWh: Number((a.pltsProdMWh || 0).toFixed(2)),
+      region: a.region || 'Nasional'
+    }))
     : dcLocations.filter(dc => dc.facilityType === 'DC' || dc.facilityType === 'BRANCH_OFFICE' || dc.hasPlts);
 
   const validDcs = rawPlantList;
-  
+
   // Apply Grid Filter with canonical normalization
   let filteredDcs = validDcs;
   if (selectedGridFilter !== 'ALL') {
@@ -374,12 +374,12 @@ export default function PLTSTab() {
       return false;
     });
   }
-  
+
   // Apply DC Search
   if (dcSearch) {
     filteredDcs = filteredDcs.filter(dc => dc.name.toLowerCase().includes(dcSearch.toLowerCase()));
   }
-  
+
   // Apply DC Dropdown Filter
   if (selectedDcFilter !== 'ALL') {
     filteredDcs = filteredDcs.filter(dc => dc.id === selectedDcFilter || dc.dcId === selectedDcFilter);
@@ -387,12 +387,10 @@ export default function PLTSTab() {
 
   // Calculate table data and subtotals with verified grid factors
   const dcTableData = filteredDcs.map(dc => {
-    // Grid Factor — nilai diambil dari emission-factors.js via getGridFactor().
-    // Fallback 0.87 = cmExPost JAMALI (resmi) bila grid DC tidak diketahui.
-    // Fallback 0.83 = cmPlts JAMALI bila grid DC tidak diketahui.
+    // Grid Factor
     const factorObj = getGridFactor(dc.grid || dc.gridRegion);
-    const factor = factorObj?.cmExPost ?? 0.87;  // JAMALI fallback
-    const factorPlts = factorObj?.cmPlts ?? 0.83; // JAMALI fallback
+    const factor = factorObj?.cmExPost ?? 0.87;
+    const factorPlts = factorObj?.cmPlts ?? 0.83;
 
     const plnConsumptionMWh = dc.plnConsumptionMWh || null;
     const pltsProdMWh = Number((dc.pltsProdMWh || 0).toFixed(2));
@@ -501,11 +499,10 @@ export default function PLTSTab() {
         <div className="inline-flex flex-wrap gap-1 rounded-full bg-slate-100 p-1 shrink-0 self-start sm:self-center">
           <button
             type="button"
-            className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${
-              activePltsSubView === 'overview'
+            className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'overview'
                 ? 'bg-white text-slate-900 shadow-sm font-semibold'
                 : 'text-slate-500 hover:text-slate-900'
-            }`}
+              }`}
             onClick={() => setActivePltsSubView('overview')}
           >
             Target
@@ -513,11 +510,10 @@ export default function PLTSTab() {
           {isAuditBaselineEnabled && (
             <button
               type="button"
-              className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${
-                activePltsSubView === 'april-audit'
+              className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'april-audit'
                   ? 'bg-white text-slate-900 shadow-sm font-semibold'
                   : 'text-slate-500 hover:text-slate-900'
-              }`}
+                }`}
               onClick={() => setActivePltsSubView('april-audit')}
             >
               <FileSpreadsheet size={14} className="text-emerald-600" />
@@ -526,11 +522,10 @@ export default function PLTSTab() {
           )}
           <button
             type="button"
-            className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${
-              activePltsSubView === 'isolar-api'
+            className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'isolar-api'
                 ? 'bg-white text-slate-900 shadow-sm font-semibold'
                 : 'text-slate-500 hover:text-slate-900'
-            }`}
+              }`}
             onClick={() => setActivePltsSubView('isolar-api')}
           >
             <Radio size={14} className="text-emerald-500 animate-pulse" />
@@ -693,10 +688,10 @@ export default function PLTSTab() {
             const isLoading = !isolarLiveState;
             const isError = isolarLiveState?.success === false;
             const hasData = isolarLiveState?.stationList?.length > 0;
-            
+
             const isNightOrOff = isolarLiveState?.quota?.isProductionHours === false || (isolarLiveState?.summaryNationwide?.currentRealtimePowerKw === 0 && !isolarLiveState?.quota?.isProductionHours);
             const stationList = isolarLiveState?.stationList || [];
-            
+
             const offlineList = stationList.filter(s => s.isOffline || s.status === 'Offline' || s.psStatus === 0 || s.ps_status === 0 || (s.subPlants && s.subPlants.length > 0 && s.subPlants.every(sp => sp.isOffline)));
             const faultList = stationList.filter(s => !offlineList.includes(s) && (s.operationalStatus?.key === 'FAULT' || s.hasFault || s.isFault));
             const alarmList = stationList.filter(s => !offlineList.includes(s) && !faultList.includes(s) && (s.operationalStatus?.key === 'ALARM' || s.hasAlarm || s.isAlarm));
@@ -802,11 +797,10 @@ export default function PLTSTab() {
                     setSelectedPeriod('2026-01_2026-09');
                     setDashboardFilters(prev => ({ ...prev, period: '2026-01_2026-09', mode: 'YTD', month: 9, throughMonth: 9 }));
                   }}
-                  className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                    dashboardFilters.mode === 'YTD'
+                  className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.mode === 'YTD'
                       ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/60'
                       : 'text-slate-500 hover:text-slate-900'
-                  }`}
+                    }`}
                 >
                   Akumulasi Jan-Sep (YTD)
                 </button>
@@ -816,11 +810,10 @@ export default function PLTSTab() {
                     setSelectedPeriod('2026-09_2026-09');
                     setDashboardFilters(prev => ({ ...prev, period: '2026-09_2026-09', mode: 'MONTH', month: 9, throughMonth: 9 }));
                   }}
-                  className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                    dashboardFilters.mode === 'MONTH'
+                  className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.mode === 'MONTH'
                       ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/60'
                       : 'text-slate-500 hover:text-slate-900'
-                  }`}
+                    }`}
                 >
                   Bulan Ini Saja (Sep 2026)
                 </button>
@@ -1200,7 +1193,7 @@ export default function PLTSTab() {
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Wilayah Grid</label>
                 <div className="relative">
                   <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                  <select 
+                  <select
                     className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-amber-500 appearance-none"
                     value={selectedGridFilter}
                     onChange={(e) => {
@@ -1225,7 +1218,7 @@ export default function PLTSTab() {
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Cabang / DC</label>
                 <div className="relative">
                   <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                  <select 
+                  <select
                     className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-amber-500 appearance-none"
                     value={selectedDcFilter}
                     onChange={(e) => setSelectedDcFilter(e.target.value)}
@@ -1242,7 +1235,7 @@ export default function PLTSTab() {
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Pencarian</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                  <input 
+                  <input
                     type="text"
                     placeholder="Cari nama cabang/DC..."
                     className="w-full pl-9 pr-8 py-2 text-xs font-medium text-slate-800 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-amber-500"
@@ -1280,11 +1273,11 @@ export default function PLTSTab() {
                   <tr>
                     <th className="sticky top-0 left-0 z-30 bg-slate-900 px-4 py-3 font-semibold border-b border-slate-700">Cabang / DC</th>
                     <th className="sticky top-0 z-20 bg-slate-900 px-4 py-3 font-semibold border-b border-slate-700">Wilayah Grid</th>
-                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold border-b border-slate-700">Konsumsi PLN<br/><span className="text-slate-400 font-normal normal-case">(MWh)</span></th>
-                    <th className="sticky top-0 z-20 bg-slate-900 text-center px-4 py-3 font-semibold border-b border-slate-700">Faktor<br/><span className="text-slate-400 font-normal normal-case">(kg/kWh)</span></th>
-                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold text-amber-300 border-b border-slate-700">Emisi Scope 2<br/><span className="font-normal normal-case text-white/70">(tCO₂e)</span></th>
-                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold border-b border-slate-700">Produksi PLTS<br/><span className="text-slate-400 font-normal normal-case">(MWh)</span></th>
-                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold text-emerald-400 border-b border-slate-700">Emisi Terhindar<br/><span className="font-normal normal-case text-white/70">(tCO₂e)</span></th>
+                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold border-b border-slate-700">Konsumsi PLN<br /><span className="text-slate-400 font-normal normal-case">(MWh)</span></th>
+                    <th className="sticky top-0 z-20 bg-slate-900 text-center px-4 py-3 font-semibold border-b border-slate-700">Faktor<br /><span className="text-slate-400 font-normal normal-case">(kg/kWh)</span></th>
+                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold text-amber-300 border-b border-slate-700">Emisi Scope 2<br /><span className="font-normal normal-case text-white/70">(tCO₂e)</span></th>
+                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold border-b border-slate-700">Produksi PLTS<br /><span className="text-slate-400 font-normal normal-case">(MWh)</span></th>
+                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold text-emerald-400 border-b border-slate-700">Emisi Terhindar<br /><span className="font-normal normal-case text-white/70">(tCO₂e)</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">

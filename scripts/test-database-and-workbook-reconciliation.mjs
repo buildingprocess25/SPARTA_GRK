@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated/prisma/index.js';
 import {
   CARBON_FACTORS,
   LOCATION_GRID_MAP,

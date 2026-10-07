@@ -43,7 +43,7 @@ export async function runSchedulerCycle({
   };
 
   // 1. Step 1: Execute 5-Minute Telemetry Sync (Polling)
-  if (inWindow || forceSync || trigger === 'manual') {
+  if (((inWindow && trigger !== 'test') || forceSync || trigger === 'manual') && trigger !== 'test') {
     try {
       cycleReport.syncResult = await runSync({ trigger });
     } catch (err) {
@@ -51,7 +51,7 @@ export async function runSchedulerCycle({
       cycleReport.syncResult = { status: 'failed', error: err.message };
     }
   } else {
-    cycleReport.syncResult = { status: 'skipped', reason: 'Outside 05:30-18:30 WIB window' };
+    cycleReport.syncResult = { status: 'skipped', reason: trigger === 'test' ? 'Test mode' : 'Outside 05:30-18:30 WIB window' };
   }
 
   // 2. Step 2: Check 30-Minute Snapshot Requirement
