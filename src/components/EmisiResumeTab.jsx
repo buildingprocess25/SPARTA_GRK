@@ -16,9 +16,10 @@ import { formatNum } from '@/data/sustainabilityData';
 import { CARBON_FACTORS } from '@/lib/carbon/carbonEngine';
 import StatCard from '@/components/ui/StatCard';
 import CardBox from '@/components/ui/CardBox';
+import MainScope2Bridge from '@/components/MainScope2Bridge';
 
 export default function EmisiResumeTab({ setActiveTab, navigateTo }) {
-  const { resumeKPI, scope1, scope2, pltsData, waterData, inputHistory } = useSustainability();
+  const { resumeKPI, scope1, scope2, pltsData, waterData, inputHistory, backendError, isLoaded, backendMeta } = useSustainability();
   const [showDetailedMapping, setShowDetailedMapping] = useState(false);
   const [chartMetricView, setChartMetricView] = useState('net'); // 'net' | 'all' | 'penambahan' | 'pengurangan'
 
@@ -120,6 +121,37 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo }) {
         </div>
       </div>
 
+      {/* Banner: Backend Error — tampilkan jika data tidak tersedia dari DB */}
+      {backendError && (
+        <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
+          <AlertCircle size={16} className="mt-0.5 shrink-0 text-amber-600" />
+          <div>
+            <strong>Sumber data tidak terhubung:</strong> {backendError}<br />
+            <span className="text-amber-700">Angka di bawah mungkin tidak mencerminkan data DB terkini. Pastikan server berjalan dan coba refresh.</span>
+          </div>
+        </div>
+      )}
+
+      {/* Banner: Metodologi & Sumber Data */}
+      {isLoaded && !backendError && (
+        <div className="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-xs text-slate-600">
+          <ShieldCheck size={14} className="mt-0.5 shrink-0 text-emerald-500" />
+          <div className="leading-relaxed">
+            <strong>Metodologi:</strong> Scope 1 = pembakaran BBM genset (DB fuelActivity,{' '}
+            {scope1.summary.dataNote || 'dari DB'}).
+            Scope 2 = listrik PLN location-based per sistem grid ESDM
+            ({scope2.summary.dataNote || 'dari DB energyMeasurement'}).
+            Emisi terhindar PLTS = self-consumption × faktor grid (cmPlts, per wilayah).
+            {backendMeta?.timestamp && (
+              <> Data diambil {new Date(backendMeta.timestamp).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' })}.</>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* scope2Bridge: canonical connection to Scope 2 and PLTS without double counting */}
+      <MainScope2Bridge scope1Ton={scope1.summary.totalEmissionCO2e} onNavigate={handleNav} />
+
       {/* 2. Ringkasan Metrik (High Priority First Sight) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
         {/* Metric 1: Net Emission */}
@@ -137,7 +169,11 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo }) {
           title="EMISI KOTOR (SCOPE 1 & 2)"
           value={formatNum(resumeKPI.grossEmissionTon, 1)}
           unit="tCO₂e"
-          trendText="Listrik PLN (97.9%) & Solar Genset (2.1%)"
+          trendText={
+            scope1.summary.totalEmissionCO2e > 0 || scope2.summary.totalEmissionCO2e > 0
+              ? `Listrik PLN + Solar Genset (${scope1.summary.dataNote || 'dari DB'})`
+              : 'Data tidak tersedia — belum ada transaksi di DB'
+          }
           icon={TrendingUp}
           theme="danger"
         />
