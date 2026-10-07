@@ -10,6 +10,8 @@
 // 1. OFFICIAL EMISSION FACTORS & REFERENCE CONSTANTS
 // ============================================================
 
+import { EMISSION_CONSTANTS, CONVERSION_CONFIG } from '../solar/conversionConfig';
+
 export const CARBON_FACTORS = {
   // Fuel / BBM (Scope 1) in kgCO2e / Liter (Source: ESDM Pedoman Penyelenggaraan Inventarisasi GRK)
   FUEL: {
@@ -62,9 +64,9 @@ export const CARBON_FACTORS = {
 
   // PLTS Corporate Portfolio RKAP Multipliers (Source: "Monitor PLTS 2026 (1).xlsx" -> Resume sheet)
   PLTS_PORTFOLIO: {
-    CO2_AVOIDED_TON_PER_MWH: 0.997, // 0.997 Ton CO2 / MWh = 0.997 kgCO2 / kWh
-    STANDARD_COAL_TON_PER_MWH: 0.404, // 0.404 Ton Standard Coal / MWh
-    TREE_EQUIVALENT_PER_MWH: 54, // 0.054 * 1000 = 54 Trees / MWh
+    CO2_AVOIDED_TON_PER_MWH: EMISSION_CONSTANTS.CORPORATE_TARGET_FACTOR_TON_PER_MWH,
+    STANDARD_COAL_TON_PER_MWH: CONVERSION_CONFIG.coal.factorTonPerMwh,
+    TREE_EQUIVALENT_PER_MWH: EMISSION_CONSTANTS.TREE_FACTOR_PER_MWH,
     CM_BASELINE_PLTS: 0.83, // CDM Baseline Grid Margin factor (kgCO2e / kWh)
     sourceDoc: 'Monitor PLTS 2026 (1).xlsx (Sheet Resume / Corporate Target)'
   },
@@ -343,7 +345,7 @@ export function calculateScope1FuelEmission({
 }) {
   const typeKey = String(fuelType).toUpperCase();
   const fuelConfig = CARBON_FACTORS.FUEL[typeKey] || CARBON_FACTORS.FUEL.SOLAR;
-  
+
   let effectiveLiters = 0;
   if (liters !== null && liters !== undefined && !isNaN(liters) && Number(liters) > 0) {
     effectiveLiters = Number(liters);
@@ -493,7 +495,7 @@ export function reconcileCarbonBalance({
 }) {
   const grossEmissionsTon = Number((Math.max(0, scope1Ton) + Math.max(0, scope2Ton)).toFixed(2));
   const totalOffsetTon = Number((Math.max(0, pltsAvoidedTon) + Math.max(0, waterAvoidedTon)).toFixed(2));
-  
+
   // Mathematical Net Balance: Gross - Offset
   const rawNetEmissionsTon = Number((grossEmissionsTon - totalOffsetTon).toFixed(2));
   // Display Net Clamped for reporting (zero-floor)
