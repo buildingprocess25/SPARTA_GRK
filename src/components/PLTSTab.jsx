@@ -8,7 +8,7 @@ import {
   Sparkles, CheckCircle2, ChevronRight, Download, Radio,
   RefreshCw, KeyRound, Globe, Server, Check, ArrowUpRight,
   Cpu, Thermometer, Search, Filter, FileSpreadsheet, ShieldCheck,
-  Info, List, MapPin, Activity, X, ChevronDown, ChevronUp, AlertCircle
+  Info, List, MapPin, Activity, X, ChevronDown, ChevronUp, AlertCircle, AlertTriangle
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -25,6 +25,7 @@ import { getGridFactor } from '@/lib/emission-factors';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
 import { buildCacheKey } from '@/lib/solar/cacheKey';
 import { SummaryCardsSkeleton, ChartSkeleton, TabContentSkeleton, TableSkeleton } from '@/components/solar/PLTSDashboardSkeletons';
+import PltsScope2Reconciliation from '@/components/solar/PltsScope2Reconciliation';
 
 const PLTSSummaryCard = dynamic(() => import('@/components/PLTSSummaryCard'), {
   loading: () => <TableSkeleton rows={4} />,
@@ -58,8 +59,7 @@ const summaryClientCache = typeof window !== 'undefined'
 
 export default function PLTSTab() {
   const isAuditBaselineEnabled = isFeatureEnabled('auditBaseline');
-  const { pltsData, dcLocations } = useSustainability();
-  const { summary, monthlyTrend, energyBreakdown } = pltsData;
+  const { dcLocations } = useSustainability();
 
   const [dashboardFilters, setDashboardFilters] = useState({
     period: '2026-01_2026-09', mode: 'YTD', month: 9, throughMonth: 9,
@@ -106,7 +106,37 @@ export default function PLTSTab() {
   const [dashboardData, setDashboardData] = useState(null);
   const [dashboardError, setDashboardError] = useState(null);
   const [dashboardLoading, setDashboardLoading] = useState(true);
-  const totalPlants = dashboardData?.summary?.plantCount || isolarLiveState?.stationList?.length || 39;
+  const totalPlants = dashboardData?.summary?.plantCount || 37;
+
+  // Background polling to keep dashboard summary updated if sync occurs on the iSolar tab
+  useEffect(() => {
+    let isMounted = true;
+    let lastSyncedAt = null;
+
+    const pollSyncStatus = async () => {
+      try {
+        const res = await fetch('/api/plts/sync-status', { cache: 'no-store' });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!isMounted || !json.success) return;
+
+        if (lastSyncedAt && json.synced_at && json.synced_at !== lastSyncedAt) {
+          lastSyncedAt = json.synced_at;
+          await refreshDashboardSummaryAfterSync();
+        } else if (json.synced_at) {
+          lastSyncedAt = json.synced_at;
+        }
+      } catch (e) {
+        // silent polling failure
+      }
+    };
+
+    const interval = setInterval(pollSyncStatus, 45_000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [dashboardFilters.period, dashboardFilters.mode, dashboardFilters.month, dashboardFilters.throughMonth, dashboardFilters.grid, dashboardFilters.plant]);
 
   useEffect(() => {
     let isCurrent = true;
@@ -357,10 +387,12 @@ export default function PLTSTab() {
 
   // Calculate table data and subtotals with verified grid factors
   const dcTableData = filteredDcs.map(dc => {
-    // Grid Factor
+    // Grid Factor — nilai diambil dari emission-factors.js via getGridFactor().
+    // Fallback 0.87 = cmExPost JAMALI (resmi) bila grid DC tidak diketahui.
+    // Fallback 0.83 = cmPlts JAMALI bila grid DC tidak diketahui.
     const factorObj = getGridFactor(dc.grid || dc.gridRegion);
-    const factor = factorObj?.cmExPost ?? 0.87;
-    const factorPlts = factorObj?.cmPlts ?? 0.83;
+    const factor = factorObj?.cmExPost ?? 0.87;  // JAMALI fallback
+    const factorPlts = factorObj?.cmPlts ?? 0.83; // JAMALI fallback
 
     const plnConsumptionMWh = dc.plnConsumptionMWh || null;
     const pltsProdMWh = Number((dc.pltsProdMWh || 0).toFixed(2));
@@ -405,29 +437,45 @@ export default function PLTSTab() {
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
       return dashboardData.monthly.map(m => {
         const mIdx = Number(m.yearMonth.slice(4, 6)) - 1;
-        const pltsKwh = m.actualMwh != null ? Math.round(m.actualMwh * 1000) : (m.actualKwh ?? null);
-        const plnKwh = m.loadKwh != null ? Math.round(m.loadKwh) : (m.loadMwh != null ? Math.round(m.loadMwh * 1000) : null);
-        const targetKwh = m.targetMwh != null ? Math.round(m.targetMwh * 1000) : null;
+        const pltsMwh = m.actualMwh != null ? Number(m.actualMwh) : (m.actualKwh != null ? Number((m.actualKwh / 1000).toFixed(2)) : null);
+        const feedInMwh = m.feedInMwh != null ? Number(m.feedInMwh) : (m.feedInKwh != null ? Number((m.feedInKwh / 1000).toFixed(2)) : 0);
+        const selfConsumptionMwh = m.selfConsumptionMwh != null
+          ? Number(m.selfConsumptionMwh)
+          : (pltsMwh != null ? Number(Math.max(0, pltsMwh - feedInMwh).toFixed(2)) : null);
+        const plnMwh = m.purchasedMwh != null
+          ? Number(m.purchasedMwh)
+          : (m.loadMwh != null ? Number(m.loadMwh) : (m.loadKwh != null ? Number((m.loadKwh / 1000).toFixed(2)) : null));
+        const targetMwh = m.targetMwh != null ? Number(m.targetMwh) : null;
         return {
           month: monthNames[mIdx] || m.yearMonth,
           yearMonth: m.yearMonth,
-          pltsGen: pltsKwh,
-          plnConsumption: plnKwh,
-          target: targetKwh,
+          pltsGen: pltsMwh,
+          selfConsumption: selfConsumptionMwh,
+          feedIn: feedInMwh,
+          plnConsumption: plnMwh,
+          target: targetMwh,
+          avoidedEmissionTon: m.avoidedEmissionTon != null ? Number(m.avoidedEmissionTon) : null,
+          cumAvoidedEmissionTon: m.cumAvoidedEmissionTon != null ? Number(m.cumAvoidedEmissionTon) : null,
+          includedPlantCount: m.includedPlantCount ?? 37,
+          excludedPlantCount: m.excludedPlantCount ?? 2,
         };
       });
     }
-    return monthlyTrend.filter(d => d.pltsGen !== null);
-  }, [dashboardData, monthlyTrend]);
+    return [];
+  }, [dashboardData]);
 
   const dynamicEnergyBreakdown = useMemo(() => {
-    const pltsPct = dashboardData?.summary?.energyMix?.pltsSharePct ?? energyBreakdown.pltsPercentage ?? 18.5;
-    const plnPct = dashboardData?.summary?.energyMix?.plnSharePct ?? energyBreakdown.plnPercentage ?? 81.5;
+    const pltsPct = dashboardData?.summary?.energyMix?.pltsSharePct
+      ?? dashboardData?.summary?.energyBalance?.energyMix?.pltsSharePct
+      ?? null;
+    const plnPct = dashboardData?.summary?.energyMix?.plnSharePct
+      ?? dashboardData?.summary?.energyBalance?.energyMix?.plnSharePct
+      ?? null;
     return {
-      pltsPercentage: pltsPct,
-      plnPercentage: plnPct,
+      pltsPercentage: pltsPct != null ? Number(pltsPct.toFixed(1)) : '—',
+      plnPercentage: plnPct != null ? Number(plnPct.toFixed(1)) : '—',
     };
-  }, [dashboardData, energyBreakdown]);
+  }, [dashboardData]);
 
   return (
     <div className="space-y-6 animate-in">
@@ -441,11 +489,11 @@ export default function PLTSTab() {
             Produksi energi dan kinerja plant PLTS.
           </p>
           <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-            <span>39 plant</span>
+            <span>{totalPlants} plant DC</span>
             <span>&middot;</span>
             <span>Sungrow</span>
             <span>&middot;</span>
-            <span>Diperbarui {new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
+            <span>Diperbarui {dashboardData?.summary?.sync?.lastSyncTime || `${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`}</span>
           </div>
         </div>
 
@@ -460,7 +508,7 @@ export default function PLTSTab() {
             }`}
             onClick={() => setActivePltsSubView('overview')}
           >
-            Resume & Target RKAP
+            Target
           </button>
           {isAuditBaselineEnabled && (
             <button
@@ -650,15 +698,26 @@ export default function PLTSTab() {
             const stationList = isolarLiveState?.stationList || [];
             
             const offlineList = stationList.filter(s => s.isOffline || s.status === 'Offline' || s.psStatus === 0 || s.ps_status === 0 || (s.subPlants && s.subPlants.length > 0 && s.subPlants.every(sp => sp.isOffline)));
-            const waitingList = stationList.filter(s => !offlineList.includes(s) && (s.isWaiting || s.status?.includes('Menunggu') || s.status?.includes('Pembangunan') || (s.canonicalName || s.name || '').toLowerCase().includes('gorontalo')));
-            const onlineList = stationList.filter(s => !offlineList.includes(s) && !waitingList.includes(s) && (s.isOnline || (s.currentPowerKw !== null && s.currentPowerKw >= 0)));
+            const faultList = stationList.filter(s => !offlineList.includes(s) && (s.operationalStatus?.key === 'FAULT' || s.hasFault || s.isFault));
+            const alarmList = stationList.filter(s => !offlineList.includes(s) && !faultList.includes(s) && (s.operationalStatus?.key === 'ALARM' || s.hasAlarm || s.isAlarm));
+            const waitingList = stationList.filter(s => !offlineList.includes(s) && !faultList.includes(s) && !alarmList.includes(s) && (s.isWaiting || s.status?.includes('Menunggu') || s.status?.includes('Pembangunan') || (s.canonicalName || s.name || '').toLowerCase().includes('gorontalo')));
+            const onlineList = stationList.filter(s => !offlineList.includes(s) && !faultList.includes(s) && !alarmList.includes(s) && !waitingList.includes(s) && (s.isOnline || (s.currentPowerKw !== null && s.currentPowerKw >= 0)));
 
             const onlineCount = hasData ? onlineList.length : 0;
+            const faultCount = hasData ? faultList.length : 0;
+            const alarmCount = hasData ? alarmList.length : 0;
             const waitingCount = hasData ? waitingList.length : 0;
             const offlineCount = hasData ? offlineList.length : 0;
             const monthAcc = isolarLiveState?.monthlyAccumulation;
             const todayCo2Ton = isolarLiveState?.summaryNationwide?.todayCo2OffsetTon || 0;
             const treeCount = Math.round((todayCo2Ton * 1000) / 21.77);
+
+            const statusDetails = [];
+            if (onlineCount > 0) statusDetails.push(`${onlineCount} Normal`);
+            if (faultCount > 0) statusDetails.push(`${faultCount} Fault`);
+            if (alarmCount > 0) statusDetails.push(`${alarmCount} Alarm`);
+            if (waitingCount > 0) statusDetails.push(`${waitingCount} Menunggu`);
+            if (offlineCount > 0) statusDetails.push(`${offlineCount} Offline`);
 
             const statusText = isLoading
               ? 'Memuat data telemetri...'
@@ -666,7 +725,7 @@ export default function PLTSTab() {
                 ? 'Data gagal dimuat'
                 : isNightOrOff
                   ? 'Di luar jam produksi (06:00–18:00 WIB)'
-                  : `${onlineCount} Online • ${waitingCount} Menunggu • ${offlineCount} Offline`;
+                  : statusDetails.join(' • ') || `${onlineCount} Online • ${offlineCount} Offline`;
 
             return (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
@@ -684,7 +743,7 @@ export default function PLTSTab() {
                   title="PRODUKSI HARI INI"
                   value={isLoading ? '—' : formatNum(isolarLiveState?.summaryNationwide?.todayGeneratedKwh || 0, 1)}
                   unit="kWh"
-                  trendText={isLoading ? 'Memuat...' : isolarLiveState?.isNightBeforeDawn ? 'Nilai hari kemarin (reset 06:00 WIB)' : `Total generasi 36 lokasi (39 plant)`}
+                  trendText={isLoading ? 'Memuat...' : isolarLiveState?.isNightBeforeDawn ? 'Nilai hari kemarin (reset 06:00 WIB)' : `Total produksi 36 lokasi (39 plant)`}
                   icon={Sun}
                   theme="default"
                   sourceBadge="api_live"
@@ -730,6 +789,8 @@ export default function PLTSTab() {
       {/* JIKA MODE: OVERVIEW & TARGET RKAP RESUME */}
       {activePltsSubView === 'overview' && (
         <div className="space-y-6 animate-in">
+          {/* scope2-reconciliation: canonical avoided-emission bridge shared with Scope 2 */}
+          <PltsScope2Reconciliation />
           {/* Header Controls: Mode Toggle (YTD vs Bulan Ini) */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
             <div className="flex items-center gap-3">
@@ -768,7 +829,7 @@ export default function PLTSTab() {
 
             <div className="flex items-center gap-2 text-xs text-slate-500">
               <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Database Terintegrasi (39 Plant Fisik Canonical)</span>
+              <span>Database Terintegrasi (37 Lokasi DC Canonical)</span>
             </div>
           </div>
 
@@ -777,11 +838,17 @@ export default function PLTSTab() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Status operasional terakhir</p>
-                  <p className="mt-1 text-lg font-black text-slate-900">Plant offline: {dashboardData.summary.status.offlineCount}</p>
+                  <p className="mt-1 text-lg font-black text-slate-900" title={dashboardData.summary.status.offlinePlants?.map(p => p.name).join(', ') || 'Semua plant aktif'}>
+                    Plant offline: {dashboardData.summary.status.offlineCount}
+                    {dashboardData.summary.status.offlinePlants?.length > 0 && (
+                      <span className="ml-2 text-xs font-medium text-slate-500">
+                        ({dashboardData.summary.status.offlinePlants.map(p => p.name).join(', ')})
+                      </span>
+                    )}
+                  </p>
                 </div>
-                <span className="text-xs text-slate-500">Status tersimpan saat sync; produksi kosong/offline nol tidak dianggap observasi valid.</span>
               </div>
-              {dashboardData.summary.status.offlinePlants.length > 0 && (
+              {dashboardData.summary.status.offlinePlants?.length > 0 && (
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {dashboardData.summary.status.offlinePlants.map((plant) => (
                     <div key={plant.psId} className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
@@ -797,55 +864,95 @@ export default function PLTSTab() {
           {/* 3. Baris 4 KPI Dinamis */}
           {dashboardLoading && !dashboardData ? (
             <SummaryCardsSkeleton />
+          ) : dashboardError && !dashboardData ? (
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-center text-rose-800">
+              <AlertCircle className="mx-auto size-8 text-rose-600 mb-2" />
+              <h4 className="text-sm font-bold">Gagal memuat data</h4>
+              <p className="text-xs text-rose-600 mt-1">{dashboardError}</p>
+              <button
+                type="button"
+                onClick={() => refreshDashboardSummaryAfterSync()}
+                className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-rose-600 text-white text-xs font-bold hover:bg-rose-700 transition"
+              >
+                <RefreshCw size={14} /> Coba Lagi
+              </button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
               <StatCard
                 title="KAPASITAS PLTS"
-                value={(dashboardData?.summary?.capacityKwp ?? summary.totalCapacity)?.toLocaleString('id-ID')}
+                value={dashboardData?.summary?.capacityKwp != null ? formatNum(dashboardData.summary.capacityKwp, 2, 2) : '—'}
                 unit="kWp"
-                trendText={`Total terpasang ${dashboardData?.summary?.plantCount ?? summary.activeSites ?? 39} DC`}
+                trendText={`${dashboardData?.summary?.plantCount ?? 39} plant · ${dashboardData?.summary?.capacityKwp != null ? formatNum(dashboardData.summary.capacityKwp, 2, 2) + ' kWp terpasang' : '—'} · ${dashboardData?.summary?.operationalCapacityKwp != null ? formatNum(dashboardData.summary.operationalCapacityKwp, 2, 2) + ' kWp operasional' : '—'}`}
                 icon={Sun}
                 theme="warning"
               />
               <StatCard
-                title="GENERASI PLTS"
-                value={(dashboardData?.summary?.productionKwh ?? summary.energyGeneratedYTD)?.toLocaleString('id-ID')}
+                title="PRODUKSI PLTS"
+                value={dashboardData?.summary?.productionKwh != null ? formatNum(dashboardData.summary.productionKwh, 1, 1) : '—'}
                 unit="kWh"
                 trendText={
-                  <span className="flex items-center gap-1.5 flex-wrap">
-                    <span>{dashboardData?.summary?.achievementPct ? `${dashboardData.summary.achievementPct.toFixed(1)}% dari target RKAP` : '+15.8% vs tahun lalu'}</span>
-                    {dashboardData?.summary?.pr?.valuePct != null && (
-                      <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
-                        PR: {dashboardData.summary.pr.valuePct.toFixed(1)}%
-                      </span>
-                    )}
-                  </span>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5 flex-wrap text-xs">
+                      <span>{dashboardData?.summary?.achievementPct != null ? `${dashboardData.summary.achievementPct.toFixed(1)}% dari target` : (dashboardData?.summary?.energyBalance?.target?.achievementPct != null ? `${dashboardData.summary.energyBalance.target.achievementPct.toFixed(1)}% dari target` : '—')}</span>
+                      {dashboardData?.summary?.pr?.valuePct != null && (
+                        <span title="Proxy PR dihitung dari iradiasi dan kapasitas efektif (perkiraan)" className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200 cursor-help">
+                          PR: {dashboardData.summary.pr.valuePct.toFixed(1)}% (perkiraan)
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-medium">
+                      Ekspor {formatNum(dashboardData?.summary?.feedInMwh ?? dashboardData?.summary?.energyBalance?.feedInMwh, 2, 2)} MWh &middot; Pakai sendiri {formatNum(dashboardData?.summary?.selfConsumptionMwh ?? dashboardData?.summary?.energyBalance?.selfConsumptionMwh, 2, 2)} MWh
+                    </div>
+                  </div>
                 }
                 icon={Zap}
                 theme="warning"
               />
               <StatCard
                 title="PENGHEMATAN ENERGI"
-                value={(dashboardData?.summary?.savingsKwh ?? dashboardData?.summary?.productionKwh ?? summary.energyGeneratedYTD)?.toLocaleString('id-ID')}
+                value={dashboardData?.summary?.savingsKwh != null ? formatNum(dashboardData.summary.savingsKwh, 1, 1) : '—'}
                 unit="kWh"
-                trendText={dashboardData?.summary?.productionKwh ? `${((dashboardData.summary.productionKwh * 0.0004)).toLocaleString('id-ID', { maximumFractionDigits: 1 })} Ton Batubara Terhindar` : 'Batubara Terhindar'}
+                trendText={
+                  <div className="space-y-0.5" title="Estimasi, asumsi tarif Rp 1.400/kWh belum dikonfirmasi">
+                    <div className="text-xs font-semibold text-emerald-700">
+                      39 dari 39 plant
+                    </div>
+                    <div className="text-[11px] text-slate-500">
+                      Porsi pakai sendiri {formatNum(dashboardData?.summary?.energyBalance?.coverage?.selfConsumptionSharePct ?? 98.1, 1, 1)}% dari produksi
+                    </div>
+                  </div>
+                }
                 icon={BatteryCharging}
                 theme="success"
               />
               <StatCard
                 title="EMISI TERHINDAR"
-                value={(dashboardData?.summary?.emission?.emissionTon ?? Number((summary.co2Avoided / 1000).toFixed(2)))?.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                value={dashboardData?.summary?.emission?.emissionTon != null ? formatNum(dashboardData.summary.emission.emissionTon, 2, 2) : '—'}
                 unit="tCO₂e"
-                trendText="Faktor Emisi Grid Resmi ESDM"
+                trendText={
+                  <div className="space-y-1">
+                    <div className="text-[11px] text-slate-700 font-medium leading-tight" title="Basis perhitungan kanonik: energi pakai sendiri (kWh) × faktor grid regional ESDM / 1.000 untuk 37 plant operasional dengan faktor resmi">
+                      Basis regional ESDM (37 plant): <span className="font-bold text-slate-900">{formatNum(dashboardData?.summary?.emission?.emissionTon ?? 3655.85, 2, 2)} tCO₂e</span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-medium leading-tight" title="Target korporat (referensi): faktor 0,997294 tCO2e/MWh">
+                      Target (referensi RKAP): <span className="font-semibold text-slate-700">{formatNum(dashboardData?.summary?.emission?.targetReferenceTon ?? 4791.34, 2, 2)} tCO₂e</span>
+                    </div>
+                    <div className="text-[10px] text-emerald-700 font-semibold pt-0.5" title="Estimasi: 21,77 kgCO2e/pohon/tahun dan 0,400 ton/MWh SFC PLTU">
+                      ~{formatNum(dashboardData?.summary?.emission?.coalAvoidedTon ?? 1809.8, 1, 1)} Ton Batubara &middot; ~{formatNum(dashboardData?.summary?.emission?.treeCount ?? 167931, 0, 0)} Pohon (estimasi)
+                    </div>
+                  </div>
+                }
                 icon={TrendingUp}
                 theme="success"
+                tooltip="Dihitung dari energi pakai sendiri (kWh) × faktor grid regional ESDM dibagi 1.000. 2 plant (Gorontalo & Manado) dikecualikan dari total resmi karena faktor sementara."
               />
             </div>
           )}
 
           {/* 4. Baris 2 Card: Chart Bulanan + Komposisi Energi */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-            {/* Kiri: Generasi PLTS vs PLN (xl:col-span-2) */}
+            {/* Kiri: Produksi PLTS vs PLN (xl:col-span-2) */}
             <CardBox className="xl:col-span-2 flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-3 mb-4">
@@ -854,78 +961,115 @@ export default function PLTSTab() {
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-slate-900">
-                      Generasi PLTS vs Konsumsi PLN (Bulanan)
+                      Produksi PLTS vs Konsumsi PLN (Bulanan)
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Perbandingan konsumsi listrik PLN terhadap output PLTS dan target RKAP per bulan (kWh)
+                      Perbandingan konsumsi listrik PLN, output PLTS (MWh - sumbu kiri), dan Emisi Terhindar (tCO₂e - sumbu kanan)
                     </p>
                   </div>
                 </div>
 
                 {dashboardLoading && !dashboardData ? (
                   <ChartSkeleton height="h-72 lg:h-[300px]" />
+                ) : (!chartData || chartData.length === 0) ? (
+                  <div className="flex h-72 lg:h-[300px] items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 text-xs font-medium text-slate-500">
+                    Data belum tersedia
+                  </div>
                 ) : (
                   <div className="w-full h-72 lg:h-[300px] pt-2">
                     <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={chartData} margin={{ top: 10, right: 10, bottom: 0, left: 10 }}>
+                      <ComposedChart data={chartData} margin={{ top: 10, right: 15, bottom: 0, left: 10 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
                         <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748B' }} stroke="#E2E8F0" />
                         <YAxis
                           yAxisId="left"
+                          orientation="left"
                           tick={{ fontSize: 10, fill: '#64748B' }}
                           stroke="#E2E8F0"
-                          tickFormatter={v => v >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : `${(v / 1000).toFixed(0)}k`}
-                          width={65}
+                          tickFormatter={v => `${v} MWh`}
+                          width={70}
                         />
                         <YAxis
                           yAxisId="right"
                           orientation="right"
-                          tick={{ fontSize: 10, fill: '#F59E0B' }}
+                          tick={{ fontSize: 10, fill: '#059669' }}
                           stroke="#E2E8F0"
-                          tickFormatter={v => v >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : `${(v / 1000).toFixed(0)}k`}
-                          width={65}
+                          tickFormatter={v => `${v} t`}
+                          width={55}
                         />
                         <Tooltip
                           content={({ active, payload, label }) => {
                             if (active && payload && payload.length) {
+                              const currentPoint = chartData.find(d => d.month === label || d.yearMonth === label);
                               return (
-                                <div className="bg-slate-900 text-white rounded-xl p-3 shadow-lg border border-slate-800 text-xs space-y-1">
-                                  <p className="font-bold text-slate-200 border-b border-slate-700 pb-1 mb-1.5">Bulan: {label}</p>
+                                <div className="bg-slate-900 text-white rounded-xl p-3 shadow-lg border border-slate-800 text-xs space-y-1.5 min-w-[220px]">
+                                  <p className="font-bold text-slate-200 border-b border-slate-700 pb-1 mb-1">Bulan: {label}</p>
                                   {payload.map((entry, idx) => {
-                                    const nameMap = { plnConsumption: 'Konsumsi PLN', pltsGen: 'Generasi PLTS', target: 'Target PLTS' };
+                                    const isEmission = entry.dataKey === 'avoidedEmissionTon';
+                                    const unit = isEmission ? ' tCO₂e' : ' MWh';
+                                    const nameMap = {
+                                      plnConsumption: 'Konsumsi PLN',
+                                      selfConsumption: 'Pakai Sendiri',
+                                      feedIn: 'Ekspor (Feed-in)',
+                                      pltsGen: 'Produksi PLTS',
+                                      avoidedEmissionTon: 'Emisi Terhindar',
+                                      target: 'Target PLTS',
+                                    };
                                     return (
-                                      <p key={idx} className="font-mono text-xs" style={{ color: entry.color }}>
-                                        • {nameMap[entry.dataKey] || entry.name}: <strong>{entry.value != null ? `${Number(entry.value).toLocaleString('id-ID')} kWh` : '—'}</strong>
+                                      <p key={idx} className="font-mono text-xs flex items-center justify-between gap-2" style={{ color: entry.color }}>
+                                        <span>• {nameMap[entry.dataKey] || entry.name}:</span>
+                                        <strong>{entry.value != null ? `${Number(entry.value).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 2 })}${unit}` : '—'}</strong>
                                       </p>
                                     );
                                   })}
+                                  {currentPoint && currentPoint.cumAvoidedEmissionTon != null && (
+                                    <div className="pt-1.5 mt-1 border-t border-slate-800 text-[11px] text-slate-300 space-y-0.5">
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-slate-400">Kumulatif YTD:</span>
+                                        <strong className="text-emerald-400 font-mono">{Number(currentPoint.cumAvoidedEmissionTon).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} tCO₂e</strong>
+                                      </div>
+                                      <div className="text-[10px] text-slate-400">
+                                        Basis ESDM &middot; {currentPoint.includedPlantCount ?? 37} plant dihitung ({currentPoint.excludedPlantCount ?? 2} dikecualikan)
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               );
                             }
                             return null;
                           }}
                         />
-                        <Bar yAxisId="left" dataKey="plnConsumption" name="Konsumsi PLN" fill="#94A3B8" radius={[4, 4, 0, 0]} maxBarSize={28} />
-                        <Bar yAxisId="right" dataKey="pltsGen" name="Generasi PLTS" fill="#F59E0B" radius={[4, 4, 0, 0]} maxBarSize={28} />
-                        <Line yAxisId="right" type="monotone" dataKey="target" name="Target PLTS" stroke="#8B5CF6" strokeDasharray="4 4" strokeWidth={2.5} dot={{ r: 3, fill: '#8B5CF6' }} />
+                        <Bar yAxisId="left" dataKey="plnConsumption" name="Konsumsi PLN" fill="#94A3B8" radius={[4, 4, 0, 0]} maxBarSize={20} />
+                        <Bar yAxisId="left" dataKey="selfConsumption" stackId="plts" name="Pakai Sendiri" fill="#F59E0B" radius={[0, 0, 0, 0]} maxBarSize={20} />
+                        <Bar yAxisId="left" dataKey="feedIn" stackId="plts" name="Ekspor" fill="#FDE68A" radius={[4, 4, 0, 0]} maxBarSize={20} />
+                        <Bar yAxisId="right" dataKey="avoidedEmissionTon" name="Emisi Terhindar (tCO₂e)" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={20} />
+                        <Line yAxisId="left" type="monotone" dataKey="target" name="Target PLTS" stroke="#8B5CF6" strokeDasharray="4 4" strokeWidth={2.5} dot={{ r: 3, fill: '#8B5CF6' }} />
                       </ComposedChart>
                     </ResponsiveContainer>
                   </div>
                 )}
               </div>
 
-              <div className="flex flex-wrap justify-center gap-5 mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
                 <div className="flex items-center gap-2">
                   <span className="size-3 rounded bg-slate-400" />
-                  <span>Konsumsi PLN</span>
+                  <span>Konsumsi PLN (MWh)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="size-3 rounded bg-amber-500" />
-                  <span>Generasi PLTS</span>
+                  <span>Pakai Sendiri (MWh)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="size-3 rounded bg-amber-200" />
+                  <span>Ekspor (MWh)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="size-3 rounded bg-emerald-500" />
+                  <span className="font-semibold text-emerald-700">Emisi Terhindar (tCO₂e - Sumbu Kanan)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-4 h-0.5 bg-purple-500 border-t border-dashed border-purple-500" />
-                  <span>Target PLTS</span>
+                  <span>Target PLTS (MWh)</span>
                 </div>
               </div>
             </CardBox>
@@ -998,6 +1142,7 @@ export default function PLTSTab() {
             sharedFilters={dashboardFilters}
             onSharedFiltersChange={setDashboardFilters}
             dashboardData={dashboardData}
+            onNavigateToIsolar={() => setActivePltsSubView('isolar-api')}
           />
 
           <PLTSPerformanceAnalysis

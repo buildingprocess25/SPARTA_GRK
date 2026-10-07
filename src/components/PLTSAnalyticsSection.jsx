@@ -15,7 +15,7 @@ import {
 import CardBox from '@/components/ui/CardBox';
 import { processAllDCAnalytics, SOLAR_CONSTANTS } from '@/lib/solar/processor';
 import { formatNum } from '@/data/sustainabilityData';
-import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
+import { isFeatureEnabled, EMISSION_CONSTANTS } from '@/lib/solar/conversionConfig';
 
 const ALL_METRIC_OPTIONS = [
   {
@@ -84,7 +84,7 @@ const ALL_METRIC_OPTIONS = [
     trendLabel: 'Emisi Terhindar Bulanan',
     unit: 'tCO₂e',
     trendUnit: 'tCO₂e',
-    desc: 'Reduksi emisi GRK dari produksi PLTS (Faktor metode aplikasi 0.77644 kgCO₂e/kWh / 0.77644 tCO₂e/MWh)',
+    desc: `Reduksi emisi GRK dari produksi PLTS (Faktor rata-rata nasional: ${EMISSION_CONSTANTS.GRID_WEIGHTED_AVERAGE_FACTOR_TON_PER_MWH} tCO₂e/MWh, sumber: konfigurasi internal, menunggu verifikasi dokumen resmi)`,
     sourceType: 'EXCEL_HISTORY',
     chartSourceType: 'EXCEL_HISTORY'
   }
@@ -849,18 +849,6 @@ export default function PLTSAnalyticsSection({
         if (!isGorontalo && hist && hist.energyKwh !== null && hist.energyKwh !== undefined && hist.energyKwh > 0) {
           monthlyKwh = hist.energyKwh;
           monthlyYieldMwh = hist.energyMwh !== null && hist.energyMwh !== undefined ? hist.energyMwh : Number((monthlyKwh / 1000).toFixed(2));
-          const baseSpecYield = (installedKwp !== null && installedKwp > 0)
-            ? Number((monthlyKwh / installedKwp).toFixed(2))
-            : null;
-          specificYield = isDaily && baseSpecYield !== null
-            ? Number((baseSpecYield / m.days).toFixed(2))
-            : baseSpecYield;
-          equivalentHour = baseSpecYield !== null && m.days > 0
-            ? Number((baseSpecYield / m.days).toFixed(2))
-            : null;
-        } else if (!isGorontalo && m.ym === '202604' && (dc.monthlyYieldKwh || dc.monthYieldMwh)) {
-          monthlyKwh = dc.monthlyYieldKwh || ((dc.monthYieldMwh || 0) * 1000);
-          monthlyYieldMwh = Number((monthlyKwh / 1000).toFixed(2));
           const baseSpecYield = (installedKwp !== null && installedKwp > 0)
             ? Number((monthlyKwh / installedKwp).toFixed(2))
             : null;
@@ -2217,8 +2205,18 @@ export default function PLTSAnalyticsSection({
                     const installedKwp = st.installedKwp !== null ? st.installedKwp : 100;
                     const currentKw = st.currentPowerKw;
                     const todayKwh = st.todayYieldKwh !== undefined ? st.todayYieldKwh : 0;
-                    const status = st.status || (currentKw !== null && currentKw > 0 ? 'Normal Producing' : (st.isOffline ? 'Offline' : 'Menunggu Data'));
-                    const statusColor = st.statusColor || (currentKw !== null && currentKw > 0 ? '#059669' : (st.isOffline ? '#E11D48' : '#F59E0B'));
+                    const isFault = st.operationalStatus?.key === 'FAULT' || st.hasFault || st.isFault || st.status === 'Fault' || (typeof st.status === 'string' && st.status.startsWith('Fault'));
+                    const isAlarm = ((st.operationalStatus?.key === 'ALARM' || st.hasAlarm || st.isAlarm || st.status === 'Alarm' || (typeof st.status === 'string' && st.status.startsWith('Alarm'))) && !isFault);
+                    const status = isFault
+                      ? (st.operationalStatus?.label || `Fault (${st.faultCount || 1})`)
+                      : isAlarm
+                        ? (st.operationalStatus?.label || `Alarm (${st.alarmCount || 1})`)
+                        : st.status || (currentKw !== null && currentKw > 0 ? 'Normal Producing' : (st.isOffline ? 'Offline' : 'Menunggu Data'));
+                    const statusColor = isFault
+                      ? '#DC2626'
+                      : isAlarm
+                        ? '#F59E0B'
+                        : st.statusColor || (currentKw !== null && currentKw > 0 ? '#059669' : (st.isOffline ? '#334155' : '#64748B'));
 
                     return (
                       <div
@@ -2340,8 +2338,18 @@ export default function PLTSAnalyticsSection({
                         const installedKwp = st.installedKwp !== null ? st.installedKwp : 100;
                         const currentKw = st.currentPowerKw;
                         const todayKwh = st.todayYieldKwh !== undefined ? st.todayYieldKwh : 0;
-                        const status = st.status || (currentKw !== null && currentKw > 0 ? 'Normal Producing' : (st.isOffline ? 'Offline' : 'Menunggu Data'));
-                        const statusColor = st.statusColor || (currentKw !== null && currentKw > 0 ? '#059669' : (st.isOffline ? '#E11D48' : '#F59E0B'));
+                        const isFault = st.operationalStatus?.key === 'FAULT' || st.hasFault || st.isFault || st.status === 'Fault' || (typeof st.status === 'string' && st.status.startsWith('Fault'));
+                        const isAlarm = ((st.operationalStatus?.key === 'ALARM' || st.hasAlarm || st.isAlarm || st.status === 'Alarm' || (typeof st.status === 'string' && st.status.startsWith('Alarm'))) && !isFault);
+                        const status = isFault
+                          ? (st.operationalStatus?.label || `Fault (${st.faultCount || 1})`)
+                          : isAlarm
+                            ? (st.operationalStatus?.label || `Alarm (${st.alarmCount || 1})`)
+                            : st.status || (currentKw !== null && currentKw > 0 ? 'Normal Producing' : (st.isOffline ? 'Offline' : 'Menunggu Data'));
+                        const statusColor = isFault
+                          ? '#DC2626'
+                          : isAlarm
+                            ? '#F59E0B'
+                            : st.statusColor || (currentKw !== null && currentKw > 0 ? '#059669' : (st.isOffline ? '#334155' : '#64748B'));
 
                         return (
                           <tr key={psId} className="hover:bg-slate-50 transition-colors">
