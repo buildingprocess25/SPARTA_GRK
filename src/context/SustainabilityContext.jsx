@@ -21,7 +21,8 @@ import {
 
 const SustainabilityContext = createContext(null);
 
-const STORAGE_KEY = 'alfamart_sustainability_sparta_v3';
+// localStorage dihapus — state Resume GRK hanya dari DB, bukan browser cache.
+// Angka statis demo (Cikarang/Balaraja/Cikokol) dihapus dari initial state.
 
 export function SustainabilityProvider({ children }) {
   const [dcLocations, setDcLocations] = useState(initialDCLocations);
@@ -29,34 +30,12 @@ export function SustainabilityProvider({ children }) {
   const [pltsData, setPltsData] = useState(initialPltsData);
   const [scope1, setScope1] = useState(initialScope1Data);
   const [scope2, setScope2] = useState(initialScope2Data);
-  const [inputHistory, setInputHistory] = useState([
-    {
-      id: 'init-1',
-      date: '2026-08-31',
-      dcName: 'DC Cikarang',
-      module: 'plts',
-      details: 'Produksi PLTS: 54,000 kWh • Emisi avoided: ~44.8 tCO2e',
-      recordedAt: '31/08/2026 17:00'
-    },
-    {
-      id: 'init-2',
-      date: '2026-08-31',
-      dcName: 'DC Balaraja',
-      module: 'genset',
-      details: 'Konsumsi Solar Genset: 1,850 Liter • Emisi: 4.94 tCO2e',
-      recordedAt: '31/08/2026 16:30'
-    },
-    {
-      id: 'init-3',
-      date: '2026-08-31',
-      dcName: 'DC Cikokol',
-      module: 'water',
-      details: 'Air Terolah: 2,850 m³ • Hemat biaya: Rp 22.8 Juta',
-      recordedAt: '31/08/2026 15:45'
-    }
-  ]);
+  // Riwayat input dimulai kosong — tidak ada entri demo hardcoded.
+  // Entri riil hanya berasal dari addDataEntry() atau DB audit log.
+  const [inputHistory, setInputHistory] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [backendMeta, setBackendMeta] = useState(null);
+  const [backendError, setBackendError] = useState(null);
 
   const fetchBackendData = React.useCallback(async () => {
     try {
@@ -97,48 +76,25 @@ export function SustainabilityProvider({ children }) {
         }
       }
     } catch (err) {
-      console.warn('Note: Using local verified state while backend syncs', err);
+      console.error('[SustainabilityContext] Backend gagal — tampilkan "Data tidak tersedia"', err);
+      setBackendError('Gagal memuat data dari server. Periksa koneksi dan coba refresh.');
     }
   }, []);
 
-  // Load from LocalStorage & Live API
+  // Load data dari backend saja — tidak ada localStorage.
+  // Ini memastikan Resume GRK selalu menampilkan data DB terkini,
+  // bukan angka lama yang tersimpan di browser pengguna.
   useEffect(() => {
+    // Bersihkan localStorage lama jika masih ada (migrasi sekali)
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.dcLocations) setDcLocations(parsed.dcLocations);
-        if (parsed.waterData) setWaterData(parsed.waterData);
-        if (parsed.pltsData) setPltsData(parsed.pltsData);
-        if (parsed.scope1) setScope1(parsed.scope1);
-        if (parsed.scope2) setScope2(parsed.scope2);
-        if (parsed.inputHistory) setInputHistory(parsed.inputHistory);
-      }
-    } catch (e) {
-      console.warn('Failed to load sustainability state from localStorage', e);
-    }
+      localStorage.removeItem('alfamart_sustainability_sparta_v3');
+      localStorage.removeItem('alfamart_sustainability_sparta_v2');
+      localStorage.removeItem('alfamart_sustainability_sparta_v1');
+    } catch (_e) { /* tidak kritis */ }
 
     fetchBackendData();
     setIsLoaded(true);
   }, [fetchBackendData]);
-
-  // Sync to LocalStorage
-  useEffect(() => {
-    if (!isLoaded) return;
-    try {
-      const stateToSave = {
-        dcLocations,
-        waterData,
-        pltsData,
-        scope1,
-        scope2,
-        inputHistory,
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
-    } catch (e) {
-      console.warn('Failed to save sustainability state to localStorage', e);
-    }
-  }, [dcLocations, waterData, pltsData, scope1, scope2, inputHistory, isLoaded]);
 
   // Centralized Reconciled KPI calculations using Carbon Engine
   const carbonBalance = useMemo(() => {
@@ -331,11 +287,8 @@ export function SustainabilityProvider({ children }) {
     setScope1(initialScope1Data);
     setScope2(initialScope2Data);
     setInputHistory([]);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch (e) {
-      console.warn(e);
-    }
+    setBackendError(null);
+    fetchBackendData();
   };
 
   const deleteHistoryItem = (id) => {
@@ -364,6 +317,7 @@ export function SustainabilityProvider({ children }) {
       deleteHistoryItem,
       refreshData: fetchBackendData,
       backendMeta,
+      backendError,
       isLoaded
     }}>
       {children}
