@@ -74,6 +74,44 @@ export function SustainabilityProvider({ children }) {
             monthlyTrend: data.water.monthlyTrend
           }));
         }
+
+        // Update Scope 1 dari DB fuelActivity (bukan angka statis 315.95)
+        if (data.fuel && data.fuel.scope1Summary) {
+          const s1 = data.fuel.scope1Summary;
+          setScope1(prev => ({
+            ...prev,
+            summary: {
+              ...prev.summary,
+              totalFuelLitersYTD: s1.totalFuelLitersYTD,
+              totalEmissionCO2e: s1.totalEmissionCO2e,
+              fuelCostTotalJuta: s1.fuelCostTotalJuta,
+              activeGensetUnits: s1.activeGensetUnits,
+              dataSource: s1.source,
+              dataNote: s1.dataNote,
+            },
+            monthlyTrend: data.fuel.detailActivities
+              ? data.fuel.detailActivities.slice(0, 12)
+              : prev.monthlyTrend,
+          }));
+        }
+
+        // Update Scope 2 dari DB energyMeasurement purchasedKwh (bukan statis 14.774)
+        if (data.scope2Summary) {
+          const s2 = data.scope2Summary;
+          setScope2(prev => ({
+            ...prev,
+            summary: {
+              ...prev.summary,
+              totalPlnKwhYTD: s2.totalPlnKwhYTD,
+              totalEmissionCO2e: s2.totalEmissionCO2e,
+              observationCount: s2.observationCount,
+              recordsWithFallbackFactor: s2.recordsWithFallbackFactor,
+              dataSource: s2.source,
+              methodology: s2.methodology,
+              dataNote: s2.dataNote,
+            },
+          }));
+        }
       }
     } catch (err) {
       console.error('[SustainabilityContext] Backend gagal — tampilkan "Data tidak tersedia"', err);
