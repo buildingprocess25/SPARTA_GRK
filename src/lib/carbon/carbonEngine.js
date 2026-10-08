@@ -6,6 +6,8 @@
  * 3. "WR Thn 2026 Laporan H.O (akun SAT) - WR_Thn_2026.csv" (Actual Metered Water Recycling)
  */
 
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../solar/conversionConfig.js';
+
 // ============================================================
 // 1. OFFICIAL EMISSION FACTORS & REFERENCE CONSTANTS
 // ============================================================
@@ -62,7 +64,7 @@ export const CARBON_FACTORS = {
 
   // PLTS Corporate Portfolio RKAP Multipliers (Source: "Monitor PLTS 2026 (1).xlsx" -> Resume sheet)
   PLTS_PORTFOLIO: {
-    CO2_AVOIDED_TON_PER_MWH: 0.997, // 0.997 Ton CO2 / MWh = 0.997 kgCO2 / kWh
+    CO2_AVOIDED_TON_PER_MWH: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH, // 0.997 Ton CO2 / MWh = 0.997 kgCO2 / kWh
     STANDARD_COAL_TON_PER_MWH: 0.404, // 0.404 Ton Standard Coal / MWh
     TREE_EQUIVALENT_PER_MWH: 54, // 0.054 * 1000 = 54 Trees / MWh
     CM_BASELINE_PLTS: 0.83, // CDM Baseline Grid Margin factor (kgCO2e / kWh)
@@ -225,7 +227,7 @@ export const FACTOR_REGISTRY_PROVENANCE = [
   {
     factorKey: 'PLTS_PORTFOLIO_AVOIDED',
     category: 'Pengurang Emisi (PLTS)',
-    factorValue: 0.997,
+    factorValue: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
     unit: 'tCO2e / MWh',
     sourceDocument: 'Monitor PLTS 2026 (1).xlsx (Sheet Resume / Target RKAP Perusahaan)',
     year: '2026',

@@ -95,17 +95,17 @@ export default function PLTSMonthlyMatrixTable({
         ? (actualKwh / targetKwh) * 100
         : null;
 
-      // Derived Environmental Metrics: Use canonical avoided emission from regional factors
-      const canonicalAvoidedTon = selectedPlantData
-        ? (selectedPlantData.isEmissionEligible && selectedPlantData.factor?.cmPlts != null && actualKwh !== null
-            ? ((Math.max(0, actualKwh - (selectedPlantData.feedInKwh || 0))) * selectedPlantData.factor.cmPlts) / 1000
-            : (actualKwh !== null ? (actualKwh / 1000) * CONVERSION_CONFIG.emission.factorTonPerMwh : null))
-        : (fullMonthly[index]?.avoidedEmissionTon ?? (actualKwh !== null ? (actualKwh / 1000) * CONVERSION_CONFIG.emission.factorTonPerMwh : null));
+      // Derived Environmental Metrics: self-consumption × the shared PLTS factor.
+      const selfConsumptionKwh = fullMonthly[index]?.selfConsumptionKwh ?? actualKwh;
+      const canonicalAvoidedTon = fullMonthly[index]?.avoidedEmissionTon
+        ?? (selfConsumptionKwh !== null
+          ? (selfConsumptionKwh * CONVERSION_CONFIG.emission.factorKgPerKwh) / 1000
+          : null);
 
       const emissionTon = canonicalAvoidedTon !== null ? Number(canonicalAvoidedTon.toFixed(2)) : null;
 
       const coalTon = emissionTon !== null
-        ? Number(((emissionTon / (CONVERSION_CONFIG.emission.factorTonPerMwh || 0.77644)) * CONVERSION_CONFIG.coal.factorTonPerMwh).toFixed(2))
+        ? Number(((emissionTon / CONVERSION_CONFIG.emission.factorTonPerMwh) * CONVERSION_CONFIG.coal.factorTonPerMwh).toFixed(2))
         : null;
 
       const treeCount = emissionTon !== null
@@ -161,10 +161,10 @@ export default function PLTSMonthlyMatrixTable({
           ? dashboardData.summary.emission.emissionTon
           : Number(completedYtd.reduce((sum, m) => sum + (m.emissionTon || 0), 0).toFixed(2)));
 
-    const emissionEoyTargetTon = (targetEoyKwh / 1000) * (CONVERSION_CONFIG.emission.factorTonPerMwh || 0.77644);
-    const emissionEoyProjectedTon = projectedEoyKwh ? (projectedEoyKwh / 1000) * (CONVERSION_CONFIG.emission.factorTonPerMwh || 0.77644) : null;
+    const emissionEoyTargetTon = (targetEoyKwh / 1000) * CONVERSION_CONFIG.emission.factorTonPerMwh;
+    const emissionEoyProjectedTon = projectedEoyKwh ? (projectedEoyKwh / 1000) * CONVERSION_CONFIG.emission.factorTonPerMwh : null;
 
-    const coalYtdTon = emissionYtdTon !== null ? Number(((emissionYtdTon / (CONVERSION_CONFIG.emission.factorTonPerMwh || 0.77644)) * CONVERSION_CONFIG.coal.factorTonPerMwh).toFixed(2)) : null;
+    const coalYtdTon = emissionYtdTon !== null ? Number(((emissionYtdTon / CONVERSION_CONFIG.emission.factorTonPerMwh) * CONVERSION_CONFIG.coal.factorTonPerMwh).toFixed(2)) : null;
     const coalEoyTargetTon = (targetEoyKwh / 1000) * CONVERSION_CONFIG.coal.factorTonPerMwh;
     const coalEoyProjectedTon = projectedEoyKwh ? (projectedEoyKwh / 1000) * CONVERSION_CONFIG.coal.factorTonPerMwh : null;
 

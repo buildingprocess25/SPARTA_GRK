@@ -1,0 +1,3154 @@
+{
+  "generatedAt": "2026-10-08T06:38:10.990Z",
+  "comparisonScope": "2026-01 through 2026-09 complete months; 37 DC, excluding two Drive Thru stores",
+  "fileProfiles": [
+    {
+      "filename": "Monitor PLTS 2026 (3)-2025 vs 2026.csv",
+      "bytes": 3614,
+      "sha256": "e5c960e7cba2811c76c60f7640554a3cc23b396bb74b2dd4439da0f7033f5fb8",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 145,
+      "nonEmptyRowCount": 145,
+      "maxColumnCount": 6,
+      "firstNonEmptyRow": [
+        "Branch",
+        "Januari 2026",
+        "TOTAL PRODUKSI 2026",
+        "Januari 2025",
+        "TOTAL PRODUKSI 2025",
+        "KETERANGAN"
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-AGUS 2026.csv",
+      "bytes": 2174,
+      "sha256": "839fcc3c64889cce5cf8f8dba0f2943401ad2ec5262f8cf85fb996f9095bc332",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 42,
+      "nonEmptyRowCount": 42,
+      "maxColumnCount": 6,
+      "firstNonEmptyRow": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi"
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-APRIL 2026.csv",
+      "bytes": 2128,
+      "sha256": "cc4777ef60f410364efa616ffa3d79ea04a3e89ad967fe97ea87d31709e3cdce",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 42,
+      "nonEmptyRowCount": 42,
+      "maxColumnCount": 6,
+      "firstNonEmptyRow": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi"
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-COMPARASI FEB.csv",
+      "bytes": 3901,
+      "sha256": "f2d601580a8feb7d23c577280500af75d05b579650be7c0622c35897a1eae6bd",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 47,
+      "nonEmptyRowCount": 46,
+      "maxColumnCount": 9,
+      "firstNonEmptyRow": [
+        "Monthly iradiasi2_Year_2025",
+        null,
+        null,
+        null,
+        null,
+        "Monthly iradiasi2_Year_2026",
+        null,
+        null,
+        null
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-FEB 2026.csv",
+      "bytes": 2151,
+      "sha256": "9f28424b62d9bda4a849b303d4100fd6a32621c36ede5f763a042067e60793b8",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 42,
+      "nonEmptyRowCount": 42,
+      "maxColumnCount": 6,
+      "firstNonEmptyRow": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi"
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-JAN 2026.csv",
+      "bytes": 1794,
+      "sha256": "fd802dbd3e3f365f1ef86caca75fc854bc0e86b0a1d0d6002a48735e168f461c",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 42,
+      "nonEmptyRowCount": 42,
+      "maxColumnCount": 5,
+      "firstNonEmptyRow": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)"
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-JULI 2026.csv",
+      "bytes": 2454,
+      "sha256": "3ca69af372ede6cbb916d45ccf8fe6ba85a5a802607398621db10be4ea3b5b0c",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 42,
+      "nonEmptyRowCount": 42,
+      "maxColumnCount": 9,
+      "firstNonEmptyRow": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi",
+        null,
+        null,
+        "Kapasitas"
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-JUNI 2026.csv",
+      "bytes": 2454,
+      "sha256": "dc703f98f746725bdcd39ca2b5a46298687680586e1b983f6d69065406aeeef5",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 42,
+      "nonEmptyRowCount": 42,
+      "maxColumnCount": 9,
+      "firstNonEmptyRow": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi",
+        null,
+        null,
+        "Kapasitas"
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-MAR 2026.csv",
+      "bytes": 2139,
+      "sha256": "fa43e6ca4d297c0d638cd1a5227bd295cba543e023921c9a868f19648888657d",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 42,
+      "nonEmptyRowCount": 42,
+      "maxColumnCount": 6,
+      "firstNonEmptyRow": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi"
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-MEI 2026.csv",
+      "bytes": 2450,
+      "sha256": "7c13e720a9d670cc59a2ebe7cb59dee24f1a4700905ce2252f278234feb79331",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 42,
+      "nonEmptyRowCount": 42,
+      "maxColumnCount": 9,
+      "firstNonEmptyRow": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi",
+        null,
+        null,
+        "Kapasitas"
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-Radiasi.csv",
+      "bytes": 367,
+      "sha256": "f1f772891a749019824c7b30e7c84f496e4998a90373015d75613925ceda43d6",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 15,
+      "nonEmptyRowCount": 15,
+      "maxColumnCount": 3,
+      "firstNonEmptyRow": [
+        null,
+        "2025",
+        "2026"
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-Rekap Corporate Reputation.csv",
+      "bytes": 18945,
+      "sha256": "2edf1acfe7174fe5cb8c3a32c77d6a57303f2f9c01b0c621e862847ecf2ca084",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 218,
+      "nonEmptyRowCount": 197,
+      "maxColumnCount": 28,
+      "firstNonEmptyRow": [
+        "Parameter in iSolar",
+        "Keterangan",
+        "Branch",
+        "Januari 2026",
+        "Februari 2026",
+        "Maret 2026",
+        "April 2026",
+        "Mei 2026",
+        "Juni 2026",
+        "Juli 2026",
+        "Agustus 2026",
+        "September 2026",
+        "Oktober 2026",
+        "November 2026",
+        "Desember 2026",
+        "TOTAL Produksi PLTS",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 8
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-Resume.csv",
+      "bytes": 3739,
+      "sha256": "a85bede9506f841515ef4f84a37aac55e89979d5a6450e71ffc0c095d26fca1b",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 31,
+      "nonEmptyRowCount": 23,
+      "maxColumnCount": 40,
+      "firstNonEmptyRow": [
+        null,
+        null,
+        null,
+        null,
+        "95.74%",
+        "101.97%",
+        "103.73%",
+        "105.07%",
+        "106.51%",
+        "108.46%",
+        "110.40%",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Target Produksi Gorontalo",
+        "10.80",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-SEP 2026.csv",
+      "bytes": 2169,
+      "sha256": "f97333a9b4aa67c6ef766b0853c84e2a8098148c7fbdc07f92221d30f268a303",
+      "encoding": "UTF-8 (valid/assumed)",
+      "delimiter": ",",
+      "rowCount": 42,
+      "nonEmptyRowCount": 42,
+      "maxColumnCount": 6,
+      "firstNonEmptyRow": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi"
+      ],
+      "formulaLikeCellCount": 0,
+      "spreadsheetErrorCellCount": 0
+    }
+  ],
+  "monthlyIntegrity": [
+    {
+      "filename": "Monitor PLTS 2026 (3)-JAN 2026.csv",
+      "headers": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)"
+      ],
+      "physicalRowCount": 39,
+      "derivedRowCount": 2,
+      "derivedNames": [
+        "Lombok",
+        "Cilacap"
+      ],
+      "productionIdentityViolations": 0,
+      "loadIdentityViolations": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-FEB 2026.csv",
+      "headers": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi"
+      ],
+      "physicalRowCount": 39,
+      "derivedRowCount": 2,
+      "derivedNames": [
+        "Lombok",
+        "Cilacap"
+      ],
+      "productionIdentityViolations": 36,
+      "loadIdentityViolations": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-MAR 2026.csv",
+      "headers": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi"
+      ],
+      "physicalRowCount": 39,
+      "derivedRowCount": 2,
+      "derivedNames": [
+        "Lombok",
+        "Cilacap"
+      ],
+      "productionIdentityViolations": 35,
+      "loadIdentityViolations": 0
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-APRIL 2026.csv",
+      "headers": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi"
+      ],
+      "physicalRowCount": 39,
+      "derivedRowCount": 2,
+      "derivedNames": [
+        "Lombok",
+        "Cilacap"
+      ],
+      "productionIdentityViolations": 35,
+      "loadIdentityViolations": 34
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-MEI 2026.csv",
+      "headers": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi",
+        "",
+        "",
+        "Kapasitas"
+      ],
+      "physicalRowCount": 39,
+      "derivedRowCount": 2,
+      "derivedNames": [
+        "Lombok",
+        "Cilacap"
+      ],
+      "productionIdentityViolations": 33,
+      "loadIdentityViolations": 1
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-JUNI 2026.csv",
+      "headers": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi",
+        "",
+        "",
+        "Kapasitas"
+      ],
+      "physicalRowCount": 39,
+      "derivedRowCount": 2,
+      "derivedNames": [
+        "Lombok",
+        "Cilacap"
+      ],
+      "productionIdentityViolations": 35,
+      "loadIdentityViolations": 1
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-JULI 2026.csv",
+      "headers": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi",
+        "",
+        "",
+        "Kapasitas"
+      ],
+      "physicalRowCount": 39,
+      "derivedRowCount": 2,
+      "derivedNames": [
+        "Lombok",
+        "Cilacap"
+      ],
+      "productionIdentityViolations": 35,
+      "loadIdentityViolations": 1
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-AGUS 2026.csv",
+      "headers": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi"
+      ],
+      "physicalRowCount": 39,
+      "derivedRowCount": 2,
+      "derivedNames": [
+        "Lombok",
+        "Cilacap"
+      ],
+      "productionIdentityViolations": 37,
+      "loadIdentityViolations": 1
+    },
+    {
+      "filename": "Monitor PLTS 2026 (3)-SEP 2026.csv",
+      "headers": [
+        "Plant name",
+        "Monthly yield(MWh)",
+        "Energy purchased this month(MWh)",
+        "Monthly feed-in(MWh)",
+        "Monthly load consumption(MWh)",
+        "Total Produksi"
+      ],
+      "physicalRowCount": 39,
+      "derivedRowCount": 2,
+      "derivedNames": [
+        "Lombok",
+        "Cilacap"
+      ],
+      "productionIdentityViolations": 36,
+      "loadIdentityViolations": 2
+    }
+  ],
+  "compareRowCount": 1665,
+  "statusCounts": {
+    "COCOK_PERSIS": 1573,
+    "SELISIH_KECIL_<=0.5%": 78,
+    "SELISIH_MATERIAL_>0.5%": 14
+  },
+  "materialTop20": [
+    {
+      "year_month": "2026-09",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 0.10225,
+      "dashboard_value": 1.05406,
+      "difference_dashboard_minus_csv": 0.95181,
+      "difference_pct_of_csv": 930.865526,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-SEP 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-09",
+      "dc_name": "Parung",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 14.05012,
+      "dashboard_value": 14.79482,
+      "difference_dashboard_minus_csv": 0.7447,
+      "difference_pct_of_csv": 5.300311,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-SEP 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-07",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 0.23225,
+      "dashboard_value": 0.79435,
+      "difference_dashboard_minus_csv": 0.5621,
+      "difference_pct_of_csv": 242.023681,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-JULI 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-06",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 0.38244,
+      "dashboard_value": 0.83799,
+      "difference_dashboard_minus_csv": 0.45555,
+      "difference_pct_of_csv": 119.116724,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-JUNI 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-05",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 0.32313,
+      "dashboard_value": 0.77352,
+      "difference_dashboard_minus_csv": 0.45039,
+      "difference_pct_of_csv": 139.38353,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-MEI 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-08",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 0.3715,
+      "dashboard_value": 0.78697,
+      "difference_dashboard_minus_csv": 0.41547,
+      "difference_pct_of_csv": 111.835801,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-AGUS 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 3.02713,
+      "dashboard_value": 3.30167,
+      "difference_dashboard_minus_csv": 0.27454,
+      "difference_pct_of_csv": 9.069316,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-07",
+      "dc_name": "Parung",
+      "metric": "production",
+      "unit": "MWh",
+      "csv_value": 0,
+      "dashboard_value": 0.2017,
+      "difference_dashboard_minus_csv": 0.2017,
+      "difference_pct_of_csv": null,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-JULI 2026.csv: productionMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-07",
+      "dc_name": "Parung",
+      "metric": "self_consumption",
+      "unit": "MWh",
+      "csv_value": 0,
+      "dashboard_value": 0.2017,
+      "difference_dashboard_minus_csv": 0.2017,
+      "difference_pct_of_csv": null,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-JULI 2026.csv: selfMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-07",
+      "dc_name": "Parung",
+      "metric": "load",
+      "unit": "MWh",
+      "csv_value": 0,
+      "dashboard_value": 0.2017,
+      "difference_dashboard_minus_csv": 0.2017,
+      "difference_pct_of_csv": null,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-JULI 2026.csv: loadMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Lampung",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 11.345,
+      "dashboard_value": 11.1995,
+      "difference_dashboard_minus_csv": -0.1455,
+      "difference_pct_of_csv": -1.282503,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-02",
+      "dc_name": "Parung",
+      "metric": "production",
+      "unit": "MWh",
+      "csv_value": 2.8636,
+      "dashboard_value": 2.9914,
+      "difference_dashboard_minus_csv": 0.1278,
+      "difference_pct_of_csv": 4.462914,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-FEB 2026.csv: productionMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-02",
+      "dc_name": "Parung",
+      "metric": "self_consumption",
+      "unit": "MWh",
+      "csv_value": 2.86336,
+      "dashboard_value": 2.99116,
+      "difference_dashboard_minus_csv": 0.1278,
+      "difference_pct_of_csv": 4.463288,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-FEB 2026.csv: selfMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Bandung 2",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 18.55513,
+      "dashboard_value": 18.43752,
+      "difference_dashboard_minus_csv": -0.11761,
+      "difference_pct_of_csv": -0.633841,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    }
+  ],
+  "top20Differences": [
+    {
+      "year_month": "2026-09",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 0.10225,
+      "dashboard_value": 1.05406,
+      "difference_dashboard_minus_csv": 0.95181,
+      "difference_pct_of_csv": 930.865526,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-SEP 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-09",
+      "dc_name": "Parung",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 14.05012,
+      "dashboard_value": 14.79482,
+      "difference_dashboard_minus_csv": 0.7447,
+      "difference_pct_of_csv": 5.300311,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-SEP 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-07",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 0.23225,
+      "dashboard_value": 0.79435,
+      "difference_dashboard_minus_csv": 0.5621,
+      "difference_pct_of_csv": 242.023681,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-JULI 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-06",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 0.38244,
+      "dashboard_value": 0.83799,
+      "difference_dashboard_minus_csv": 0.45555,
+      "difference_pct_of_csv": 119.116724,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-JUNI 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-05",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 0.32313,
+      "dashboard_value": 0.77352,
+      "difference_dashboard_minus_csv": 0.45039,
+      "difference_pct_of_csv": 139.38353,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-MEI 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-08",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 0.3715,
+      "dashboard_value": 0.78697,
+      "difference_dashboard_minus_csv": 0.41547,
+      "difference_pct_of_csv": 111.835801,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-AGUS 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Balaraja",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 107.67,
+      "dashboard_value": 107.3127,
+      "difference_dashboard_minus_csv": -0.3573,
+      "difference_pct_of_csv": -0.331847,
+      "status": "SELISIH_KECIL_<=0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Cileungsi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 141.34775,
+      "dashboard_value": 141.01285,
+      "difference_dashboard_minus_csv": -0.3349,
+      "difference_pct_of_csv": -0.236933,
+      "status": "SELISIH_KECIL_<=0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Jambi",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 3.02713,
+      "dashboard_value": 3.30167,
+      "difference_dashboard_minus_csv": 0.27454,
+      "difference_pct_of_csv": 9.069316,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Pekanbaru",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 56.32688,
+      "dashboard_value": 56.08858,
+      "difference_dashboard_minus_csv": -0.2383,
+      "difference_pct_of_csv": -0.423066,
+      "status": "SELISIH_KECIL_<=0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Palembang",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 86.268,
+      "dashboard_value": 86.0496,
+      "difference_dashboard_minus_csv": -0.2184,
+      "difference_pct_of_csv": -0.253165,
+      "status": "SELISIH_KECIL_<=0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Medan",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 57.357,
+      "dashboard_value": 57.1406,
+      "difference_dashboard_minus_csv": -0.2164,
+      "difference_pct_of_csv": -0.377286,
+      "status": "SELISIH_KECIL_<=0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-07",
+      "dc_name": "Parung",
+      "metric": "production",
+      "unit": "MWh",
+      "csv_value": 0,
+      "dashboard_value": 0.2017,
+      "difference_dashboard_minus_csv": 0.2017,
+      "difference_pct_of_csv": null,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-JULI 2026.csv: productionMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-07",
+      "dc_name": "Parung",
+      "metric": "self_consumption",
+      "unit": "MWh",
+      "csv_value": 0,
+      "dashboard_value": 0.2017,
+      "difference_dashboard_minus_csv": 0.2017,
+      "difference_pct_of_csv": null,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-JULI 2026.csv: selfMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-07",
+      "dc_name": "Parung",
+      "metric": "load",
+      "unit": "MWh",
+      "csv_value": 0,
+      "dashboard_value": 0.2017,
+      "difference_dashboard_minus_csv": 0.2017,
+      "difference_pct_of_csv": null,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-JULI 2026.csv: loadMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Serang",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 34.48775,
+      "dashboard_value": 34.32945,
+      "difference_dashboard_minus_csv": -0.1583,
+      "difference_pct_of_csv": -0.459004,
+      "status": "SELISIH_KECIL_<=0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Karawang",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 48.8705,
+      "dashboard_value": 48.7217,
+      "difference_dashboard_minus_csv": -0.1488,
+      "difference_pct_of_csv": -0.304478,
+      "status": "SELISIH_KECIL_<=0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-04",
+      "dc_name": "Lampung",
+      "metric": "purchased_pln",
+      "unit": "MWh",
+      "csv_value": 11.345,
+      "dashboard_value": 11.1995,
+      "difference_dashboard_minus_csv": -0.1455,
+      "difference_pct_of_csv": -1.282503,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-APRIL 2026.csv: purchasedMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-02",
+      "dc_name": "Parung",
+      "metric": "production",
+      "unit": "MWh",
+      "csv_value": 2.8636,
+      "dashboard_value": 2.9914,
+      "difference_dashboard_minus_csv": 0.1278,
+      "difference_pct_of_csv": 4.462914,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-FEB 2026.csv: productionMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    },
+    {
+      "year_month": "2026-02",
+      "dc_name": "Parung",
+      "metric": "self_consumption",
+      "unit": "MWh",
+      "csv_value": 2.86336,
+      "dashboard_value": 2.99116,
+      "difference_dashboard_minus_csv": 0.1278,
+      "difference_pct_of_csv": 4.463288,
+      "status": "SELISIH_MATERIAL_>0.5%",
+      "csv_source": "Monitor PLTS 2026 (3)-FEB 2026.csv: selfMwh",
+      "dashboard_source": "monthly load consump_Annual report_20261002100201.csv:Monthly load consumption(kWh) + Monthly Report:Monthly yield(kWh)",
+      "notes": ""
+    }
+  ],
+  "monthlyComparison": [
+    {
+      "yearMonth": "2026-01",
+      "csvSource": "Monitor PLTS 2026 (3)-JAN 2026.csv",
+      "production": {
+        "csvMwh": 464.6586,
+        "dashboardMwh": 464.6586,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "self_consumption": {
+        "csvMwh": 458.15767,
+        "dashboardMwh": 458.15767,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "export": {
+        "csvMwh": 6.50093,
+        "dashboardMwh": 6.50093,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "purchased_pln": {
+        "csvMwh": 1510.90052,
+        "dashboardMwh": 1510.90053,
+        "differenceMwh": 0.00001,
+        "differencePct": 0.000001,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "load": {
+        "csvMwh": 1969.0582,
+        "dashboardMwh": 1969.0582,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      }
+    },
+    {
+      "yearMonth": "2026-02",
+      "csvSource": "Monitor PLTS 2026 (3)-FEB 2026.csv",
+      "production": {
+        "csvMwh": 441.3837,
+        "dashboardMwh": 441.5115,
+        "differenceMwh": 0.1278,
+        "differencePct": 0.028954,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "self_consumption": {
+        "csvMwh": 435.40519,
+        "dashboardMwh": 435.53299,
+        "differenceMwh": 0.1278,
+        "differencePct": 0.029352,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "export": {
+        "csvMwh": 5.97851,
+        "dashboardMwh": 5.97851,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "purchased_pln": {
+        "csvMwh": 1412.64443,
+        "dashboardMwh": 1412.64439,
+        "differenceMwh": -0.00004,
+        "differencePct": -0.000003,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "load": {
+        "csvMwh": 1848.04958,
+        "dashboardMwh": 1848.17738,
+        "differenceMwh": 0.1278,
+        "differencePct": 0.006915,
+        "status": "SELISIH_KECIL_<=0.5%"
+      }
+    },
+    {
+      "yearMonth": "2026-03",
+      "csvSource": "Monitor PLTS 2026 (3)-MAR 2026.csv",
+      "production": {
+        "csvMwh": 561.1109,
+        "dashboardMwh": 561.1109,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "self_consumption": {
+        "csvMwh": 548.24627,
+        "dashboardMwh": 548.24627,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "export": {
+        "csvMwh": 12.86463,
+        "dashboardMwh": 12.86463,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "purchased_pln": {
+        "csvMwh": 1405.45262,
+        "dashboardMwh": 1405.45258,
+        "differenceMwh": -0.00004,
+        "differencePct": -0.000003,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "load": {
+        "csvMwh": 1953.69885,
+        "dashboardMwh": 1953.69885,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      }
+    },
+    {
+      "yearMonth": "2026-04",
+      "csvSource": "Monitor PLTS 2026 (3)-APRIL 2026.csv",
+      "production": {
+        "csvMwh": 564.4833,
+        "dashboardMwh": 564.4833,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "self_consumption": {
+        "csvMwh": 555.64824,
+        "dashboardMwh": 555.64824,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "export": {
+        "csvMwh": 8.83506,
+        "dashboardMwh": 8.83506,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "purchased_pln": {
+        "csvMwh": 1388.29157,
+        "dashboardMwh": 1385.43979,
+        "differenceMwh": -2.85178,
+        "differencePct": -0.205417,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "load": {
+        "csvMwh": 1941.08803,
+        "dashboardMwh": 1941.08803,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      }
+    },
+    {
+      "yearMonth": "2026-05",
+      "csvSource": "Monitor PLTS 2026 (3)-MEI 2026.csv",
+      "production": {
+        "csvMwh": 512.603,
+        "dashboardMwh": 512.603,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "self_consumption": {
+        "csvMwh": 503.02358,
+        "dashboardMwh": 503.02358,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "export": {
+        "csvMwh": 9.57942,
+        "dashboardMwh": 9.57942,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "purchased_pln": {
+        "csvMwh": 1353.02944,
+        "dashboardMwh": 1353.47977,
+        "differenceMwh": 0.45033,
+        "differencePct": 0.033283,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "load": {
+        "csvMwh": 1856.50335,
+        "dashboardMwh": 1856.50335,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      }
+    },
+    {
+      "yearMonth": "2026-06",
+      "csvSource": "Monitor PLTS 2026 (3)-JUNI 2026.csv",
+      "production": {
+        "csvMwh": 517.659,
+        "dashboardMwh": 517.659,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "self_consumption": {
+        "csvMwh": 510.50714,
+        "dashboardMwh": 510.50714,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "export": {
+        "csvMwh": 7.15186,
+        "dashboardMwh": 7.15186,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "purchased_pln": {
+        "csvMwh": 1354.15288,
+        "dashboardMwh": 1354.6084,
+        "differenceMwh": 0.45552,
+        "differencePct": 0.033639,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "load": {
+        "csvMwh": 1865.11554,
+        "dashboardMwh": 1865.11554,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      }
+    },
+    {
+      "yearMonth": "2026-07",
+      "csvSource": "Monitor PLTS 2026 (3)-JULI 2026.csv",
+      "production": {
+        "csvMwh": 530.6745,
+        "dashboardMwh": 530.8762,
+        "differenceMwh": 0.2017,
+        "differencePct": 0.038008,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "self_consumption": {
+        "csvMwh": 521.86502,
+        "dashboardMwh": 522.06672,
+        "differenceMwh": 0.2017,
+        "differencePct": 0.03865,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "export": {
+        "csvMwh": 8.80948,
+        "dashboardMwh": 8.80948,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "purchased_pln": {
+        "csvMwh": 1424.91305,
+        "dashboardMwh": 1425.47513,
+        "differenceMwh": 0.56208,
+        "differencePct": 0.039447,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "load": {
+        "csvMwh": 1947.34015,
+        "dashboardMwh": 1947.54185,
+        "differenceMwh": 0.2017,
+        "differencePct": 0.010358,
+        "status": "SELISIH_KECIL_<=0.5%"
+      }
+    },
+    {
+      "yearMonth": "2026-08",
+      "csvSource": "Monitor PLTS 2026 (3)-AGUS 2026.csv",
+      "production": {
+        "csvMwh": 559.9019,
+        "dashboardMwh": 559.9019,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "self_consumption": {
+        "csvMwh": 545.82582,
+        "dashboardMwh": 545.82582,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "export": {
+        "csvMwh": 14.07608,
+        "dashboardMwh": 14.07608,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "purchased_pln": {
+        "csvMwh": 1364.69956,
+        "dashboardMwh": 1365.11501,
+        "differenceMwh": 0.41545,
+        "differencePct": 0.030443,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "load": {
+        "csvMwh": 1910.94083,
+        "dashboardMwh": 1910.94083,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      }
+    },
+    {
+      "yearMonth": "2026-09",
+      "csvSource": "Monitor PLTS 2026 (3)-SEP 2026.csv",
+      "production": {
+        "csvMwh": 574.5409,
+        "dashboardMwh": 574.5409,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "self_consumption": {
+        "csvMwh": 556.15586,
+        "dashboardMwh": 556.15586,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "export": {
+        "csvMwh": 18.38504,
+        "dashboardMwh": 18.38504,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      },
+      "purchased_pln": {
+        "csvMwh": 1317.4459,
+        "dashboardMwh": 1319.14238,
+        "differenceMwh": 1.69648,
+        "differencePct": 0.12877,
+        "status": "SELISIH_KECIL_<=0.5%"
+      },
+      "load": {
+        "csvMwh": 1875.29824,
+        "dashboardMwh": 1875.29824,
+        "differenceMwh": 0,
+        "differencePct": 0,
+        "status": "COCOK_PERSIS"
+      }
+    }
+  ],
+  "ytdComparison": {
+    "production": {
+      "csvMwh": 4727.0158,
+      "dashboardMwh": 4727.3453,
+      "differenceMwh": 0.3295,
+      "differencePct": 0.006971,
+      "status": "SELISIH_KECIL_<=0.5%"
+    },
+    "self_consumption": {
+      "csvMwh": 4634.83479,
+      "dashboardMwh": 4635.16429,
+      "differenceMwh": 0.3295,
+      "differencePct": 0.007109,
+      "status": "SELISIH_KECIL_<=0.5%"
+    },
+    "export": {
+      "csvMwh": 92.18101,
+      "dashboardMwh": 92.18101,
+      "differenceMwh": 0,
+      "differencePct": 0,
+      "status": "COCOK_PERSIS"
+    },
+    "purchased_pln": {
+      "csvMwh": 12531.52997,
+      "dashboardMwh": 12532.25798,
+      "differenceMwh": 0.72801,
+      "differencePct": 0.005809,
+      "status": "SELISIH_KECIL_<=0.5%"
+    },
+    "load": {
+      "csvMwh": 17167.09277,
+      "dashboardMwh": 17167.42227,
+      "differenceMwh": 0.3295,
+      "differencePct": 0.001919,
+      "status": "SELISIH_KECIL_<=0.5%"
+    }
+  },
+  "capacity": {
+    "dashboardKwp": 5778.8,
+    "plantCount": 37,
+    "mentorMonthsWithCapacity": {
+      "2026-05": {
+        "filename": "Monitor PLTS 2026 (3)-MEI 2026.csv",
+        "capacityIndex": 8,
+        "sumKwp": 5828.03,
+        "nonNumericCount": 0
+      },
+      "2026-06": {
+        "filename": "Monitor PLTS 2026 (3)-JUNI 2026.csv",
+        "capacityIndex": 8,
+        "sumKwp": 5828.03,
+        "nonNumericCount": 0
+      },
+      "2026-07": {
+        "filename": "Monitor PLTS 2026 (3)-JULI 2026.csv",
+        "capacityIndex": 8,
+        "sumKwp": 5828.03,
+        "nonNumericCount": 0
+      }
+    }
+  },
+  "dashboardScope2": {
+    "summaryIncludingOctoberPartial": {
+      "plantMonthCount": 370,
+      "plantCount": 37,
+      "purchasedBasisCount": 333,
+      "loadUpperBoundCount": 37,
+      "officialFactorCount": 350,
+      "temporaryFactorCount": 20,
+      "totalLoadKwh": 17233201.99,
+      "totalPurchasedKwh": 12532257.98,
+      "totalSelfConsumedKwh": 4635164.29,
+      "purchasedBasisEnergyKwh": 12532257.98,
+      "loadUpperBoundEnergyKwh": 65779.72,
+      "excludedTemporaryFactorKwh": 594440.81,
+      "scope2EmissionTon": 9673.15261,
+      "loadBasisEmissionTon": 13339.408692,
+      "pltsAvoidedTon": 3666.256082,
+      "weightedFactorKgPerKwh": 0.842696
+    },
+    "completeSummaryJanSep": {
+      "plantMonthCount": 333,
+      "plantCount": 37,
+      "purchasedBasisCount": 333,
+      "loadUpperBoundCount": 0,
+      "officialFactorCount": 315,
+      "temporaryFactorCount": 18,
+      "totalLoadKwh": 17167422.27,
+      "totalPurchasedKwh": 12532257.98,
+      "totalSelfConsumedKwh": 4635164.29,
+      "purchasedBasisEnergyKwh": 12532257.98,
+      "loadUpperBoundEnergyKwh": 0,
+      "excludedTemporaryFactorKwh": 591406.99,
+      "scope2EmissionTon": 9622.236999,
+      "loadBasisEmissionTon": 13288.493081,
+      "pltsAvoidedTon": 3666.256082,
+      "weightedFactorKgPerKwh": 0.842694
+    },
+    "partialSummaryOctober": {
+      "plantMonthCount": 37,
+      "plantCount": 37,
+      "purchasedBasisCount": 0,
+      "loadUpperBoundCount": 37,
+      "officialFactorCount": 35,
+      "temporaryFactorCount": 2,
+      "totalLoadKwh": 65779.72,
+      "totalPurchasedKwh": 0,
+      "totalSelfConsumedKwh": 0,
+      "purchasedBasisEnergyKwh": 0,
+      "loadUpperBoundEnergyKwh": 65779.72,
+      "excludedTemporaryFactorKwh": 3033.82,
+      "scope2EmissionTon": 50.915611,
+      "loadBasisEmissionTon": 50.915611,
+      "pltsAvoidedTon": 0,
+      "weightedFactorKgPerKwh": 0.843047
+    },
+    "coverage": {
+      "monitoredPlantCount": 37,
+      "companyFacilityCount": null,
+      "companyCoveragePct": null,
+      "note": "Total Scope 2 perusahaan belum tersedia; cakupan ini hanya fasilitas ber-PLTS terpantau."
+    },
+    "reports": [
+      {
+        "filename": "monthly load consump_Annual report_20261002100201.csv",
+        "year": 2026,
+        "hash": "66e1806fd70fe7487bb6dbd0e15ee232b74b4a364e36657529ee11c2b29247e3",
+        "rowCount": 468,
+        "plantCount": 39,
+        "validCount": 390,
+        "missingCount": 78
+      },
+      {
+        "filename": "monthly load consump_Annual report_20261002100210.csv",
+        "year": 2025,
+        "hash": "3b99b25ff5195da442e6b4d256d72906dbcc363419735aaac65eee70ac1c38cb",
+        "rowCount": 468,
+        "plantCount": 39,
+        "validCount": 460,
+        "missingCount": 8
+      }
+    ]
+  },
+  "prMonthly": [
+    {
+      "yearMonth": "2026-01",
+      "dashboardAlgorithm": {
+        "valuePct": 76.876473,
+        "activePlantCount": 20,
+        "totalPlantCount": 37,
+        "excludedBeforeCod": 0,
+        "excludedNoRadiation": 4,
+        "excludedMissingEnergy": 0,
+        "anomalies": [
+          {
+            "plantId": "DC-GORONTALO",
+            "yearMonth": "2026-01",
+            "valuePct": 0,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-SIDOARJO",
+            "yearMonth": "2026-01",
+            "valuePct": 30.599517,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MADIUN",
+            "yearMonth": "2026-01",
+            "valuePct": 48.579926,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-BANDUNG2",
+            "yearMonth": "2026-01",
+            "valuePct": 48.820468,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MAKASSAR",
+            "yearMonth": "2026-01",
+            "valuePct": 119.134695,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-MANADO",
+            "yearMonth": "2026-01",
+            "valuePct": 381.953175,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-LOMBOK-B",
+            "yearMonth": "2026-01",
+            "valuePct": 106.625468,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-PARUNG",
+            "yearMonth": "2026-01",
+            "valuePct": 26.580127,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MALANG",
+            "yearMonth": "2026-01",
+            "valuePct": 150.4828,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALI",
+            "yearMonth": "2026-01",
+            "valuePct": 117.823467,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALARAJA",
+            "yearMonth": "2026-01",
+            "valuePct": 123.95335,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-MEDAN",
+            "yearMonth": "2026-01",
+            "valuePct": 104.61413,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-KARAWANG",
+            "yearMonth": "2026-01",
+            "valuePct": 125.127915,
+            "reason": "PR_ABOVE_100"
+          }
+        ],
+        "invalid": false
+      },
+      "vendorOfficialAveragePct": 73.725152
+    },
+    {
+      "yearMonth": "2026-02",
+      "dashboardAlgorithm": {
+        "valuePct": 75.413236,
+        "activePlantCount": 20,
+        "totalPlantCount": 37,
+        "excludedBeforeCod": 0,
+        "excludedNoRadiation": 4,
+        "excludedMissingEnergy": 0,
+        "anomalies": [
+          {
+            "plantId": "DC-GORONTALO",
+            "yearMonth": "2026-02",
+            "valuePct": 0,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-SIDOARJO",
+            "yearMonth": "2026-02",
+            "valuePct": 44.265295,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MADIUN",
+            "yearMonth": "2026-02",
+            "valuePct": 49.526995,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MAKASSAR",
+            "yearMonth": "2026-02",
+            "valuePct": 129.366015,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-MANADO",
+            "yearMonth": "2026-02",
+            "valuePct": 467.857904,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-JAMBI",
+            "yearMonth": "2026-02",
+            "valuePct": 105.763492,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-LOMBOK-B",
+            "yearMonth": "2026-02",
+            "valuePct": 105.016731,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-PARUNG",
+            "yearMonth": "2026-02",
+            "valuePct": 41.51777,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MALANG",
+            "yearMonth": "2026-02",
+            "valuePct": 144.160085,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALI",
+            "yearMonth": "2026-02",
+            "valuePct": 122.471661,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALARAJA",
+            "yearMonth": "2026-02",
+            "valuePct": 136.701259,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-MEDAN",
+            "yearMonth": "2026-02",
+            "valuePct": 110.884128,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-KARAWANG",
+            "yearMonth": "2026-02",
+            "valuePct": 129.201462,
+            "reason": "PR_ABOVE_100"
+          }
+        ],
+        "invalid": false
+      },
+      "vendorOfficialAveragePct": 76.777576
+    },
+    {
+      "yearMonth": "2026-03",
+      "dashboardAlgorithm": {
+        "valuePct": 73.897679,
+        "activePlantCount": 19,
+        "totalPlantCount": 37,
+        "excludedBeforeCod": 0,
+        "excludedNoRadiation": 4,
+        "excludedMissingEnergy": 0,
+        "anomalies": [
+          {
+            "plantId": "DC-GORONTALO",
+            "yearMonth": "2026-03",
+            "valuePct": 0,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-PLUMBON",
+            "yearMonth": "2026-03",
+            "valuePct": 45.984165,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MADIUN",
+            "yearMonth": "2026-03",
+            "valuePct": 40.849192,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-BANDUNG2",
+            "yearMonth": "2026-03",
+            "valuePct": 37.3413,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-CIANJUR",
+            "yearMonth": "2026-03",
+            "valuePct": 43.160765,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MAKASSAR",
+            "yearMonth": "2026-03",
+            "valuePct": 121.120608,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-MANADO",
+            "yearMonth": "2026-03",
+            "valuePct": 203.954449,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-JAMBI",
+            "yearMonth": "2026-03",
+            "valuePct": 101.584481,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-LOMBOK-B",
+            "yearMonth": "2026-03",
+            "valuePct": 101.425295,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-PARUNG",
+            "yearMonth": "2026-03",
+            "valuePct": 179.039436,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-MALANG",
+            "yearMonth": "2026-03",
+            "valuePct": 130.13665,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALI",
+            "yearMonth": "2026-03",
+            "valuePct": 147.549134,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALARAJA",
+            "yearMonth": "2026-03",
+            "valuePct": 148.859299,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-KARAWANG",
+            "yearMonth": "2026-03",
+            "valuePct": 217.22147,
+            "reason": "PR_ABOVE_100"
+          }
+        ],
+        "invalid": false
+      },
+      "vendorOfficialAveragePct": 74.232121
+    },
+    {
+      "yearMonth": "2026-04",
+      "dashboardAlgorithm": {
+        "valuePct": 72.702222,
+        "activePlantCount": 23,
+        "totalPlantCount": 37,
+        "excludedBeforeCod": 0,
+        "excludedNoRadiation": 4,
+        "excludedMissingEnergy": 0,
+        "anomalies": [
+          {
+            "plantId": "DC-GORONTALO",
+            "yearMonth": "2026-04",
+            "valuePct": 0,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MADIUN",
+            "yearMonth": "2026-04",
+            "valuePct": 46.250808,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-BANDUNG2",
+            "yearMonth": "2026-04",
+            "valuePct": 42.766157,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-CIANJUR",
+            "yearMonth": "2026-04",
+            "valuePct": 46.641692,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MAKASSAR",
+            "yearMonth": "2026-04",
+            "valuePct": 132.577359,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-PARUNG",
+            "yearMonth": "2026-04",
+            "valuePct": 164.553193,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-MALANG",
+            "yearMonth": "2026-04",
+            "valuePct": 129.307144,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALI",
+            "yearMonth": "2026-04",
+            "valuePct": 128.159444,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALARAJA",
+            "yearMonth": "2026-04",
+            "valuePct": 164.614516,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-KARAWANG",
+            "yearMonth": "2026-04",
+            "valuePct": 230.017081,
+            "reason": "PR_ABOVE_100"
+          }
+        ],
+        "invalid": false
+      },
+      "vendorOfficialAveragePct": 73.522727
+    },
+    {
+      "yearMonth": "2026-05",
+      "dashboardAlgorithm": {
+        "valuePct": 75.644462,
+        "activePlantCount": 20,
+        "totalPlantCount": 37,
+        "excludedBeforeCod": 0,
+        "excludedNoRadiation": 4,
+        "excludedMissingEnergy": 0,
+        "anomalies": [
+          {
+            "plantId": "DC-GORONTALO",
+            "yearMonth": "2026-05",
+            "valuePct": 0,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-LUWU",
+            "yearMonth": "2026-05",
+            "valuePct": 42.492749,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-PLUMBON",
+            "yearMonth": "2026-05",
+            "valuePct": 49.997193,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MADIUN",
+            "yearMonth": "2026-05",
+            "valuePct": 47.069132,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-BANDUNG2",
+            "yearMonth": "2026-05",
+            "valuePct": 42.651631,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-CIANJUR",
+            "yearMonth": "2026-05",
+            "valuePct": 47.254431,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MANADO",
+            "yearMonth": "2026-05",
+            "valuePct": 104.948591,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-LOMBOK-B",
+            "yearMonth": "2026-05",
+            "valuePct": 103.427189,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-PARUNG",
+            "yearMonth": "2026-05",
+            "valuePct": 553.765688,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-MALANG",
+            "yearMonth": "2026-05",
+            "valuePct": 130.371486,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALI",
+            "yearMonth": "2026-05",
+            "valuePct": 119.144341,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALARAJA",
+            "yearMonth": "2026-05",
+            "valuePct": 156.230838,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-KARAWANG",
+            "yearMonth": "2026-05",
+            "valuePct": 245.040059,
+            "reason": "PR_ABOVE_100"
+          }
+        ],
+        "invalid": false
+      },
+      "vendorOfficialAveragePct": 74.181818
+    },
+    {
+      "yearMonth": "2026-06",
+      "dashboardAlgorithm": {
+        "valuePct": 73.282574,
+        "activePlantCount": 22,
+        "totalPlantCount": 37,
+        "excludedBeforeCod": 0,
+        "excludedNoRadiation": 4,
+        "excludedMissingEnergy": 0,
+        "anomalies": [
+          {
+            "plantId": "DC-GORONTALO",
+            "yearMonth": "2026-06",
+            "valuePct": 0,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-LUWU",
+            "yearMonth": "2026-06",
+            "valuePct": 42.954011,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MADIUN",
+            "yearMonth": "2026-06",
+            "valuePct": 48.97245,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-BANDUNG2",
+            "yearMonth": "2026-06",
+            "valuePct": 44.222911,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MANADO",
+            "yearMonth": "2026-06",
+            "valuePct": 542.984957,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-LOMBOK-B",
+            "yearMonth": "2026-06",
+            "valuePct": 100.533454,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-PARUNG",
+            "yearMonth": "2026-06",
+            "valuePct": 207.148868,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-MALANG",
+            "yearMonth": "2026-06",
+            "valuePct": 127.656268,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALI",
+            "yearMonth": "2026-06",
+            "valuePct": 108.303535,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALARAJA",
+            "yearMonth": "2026-06",
+            "valuePct": 141.813572,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-KARAWANG",
+            "yearMonth": "2026-06",
+            "valuePct": 205.667103,
+            "reason": "PR_ABOVE_100"
+          }
+        ],
+        "invalid": false
+      },
+      "vendorOfficialAveragePct": 75.978182
+    },
+    {
+      "yearMonth": "2026-07",
+      "dashboardAlgorithm": {
+        "valuePct": 70.798457,
+        "activePlantCount": 19,
+        "totalPlantCount": 37,
+        "excludedBeforeCod": 0,
+        "excludedNoRadiation": 4,
+        "excludedMissingEnergy": 0,
+        "anomalies": [
+          {
+            "plantId": "DC-GORONTALO",
+            "yearMonth": "2026-07",
+            "valuePct": 0,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-LUWU",
+            "yearMonth": "2026-07",
+            "valuePct": 35.041383,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MADIUN",
+            "yearMonth": "2026-07",
+            "valuePct": 47.063518,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-BANDUNG2",
+            "yearMonth": "2026-07",
+            "valuePct": 40.609075,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-KOTABUMI",
+            "yearMonth": "2026-07",
+            "valuePct": 34.837737,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MANADO",
+            "yearMonth": "2026-07",
+            "valuePct": 479.364143,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-PEKANBARU",
+            "yearMonth": "2026-07",
+            "valuePct": 102.511521,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-JAMBI",
+            "yearMonth": "2026-07",
+            "valuePct": 131.594072,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-LOMBOK-B",
+            "yearMonth": "2026-07",
+            "valuePct": 104.429748,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-PARUNG",
+            "yearMonth": "2026-07",
+            "valuePct": 12.879082,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MALANG",
+            "yearMonth": "2026-07",
+            "valuePct": 135.217015,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALI",
+            "yearMonth": "2026-07",
+            "valuePct": 108.77914,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALARAJA",
+            "yearMonth": "2026-07",
+            "valuePct": 128.187612,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-KARAWANG",
+            "yearMonth": "2026-07",
+            "valuePct": 253.906337,
+            "reason": "PR_ABOVE_100"
+          }
+        ],
+        "invalid": false
+      },
+      "vendorOfficialAveragePct": 69.653939
+    },
+    {
+      "yearMonth": "2026-08",
+      "dashboardAlgorithm": {
+        "valuePct": 73.764743,
+        "activePlantCount": 20,
+        "totalPlantCount": 37,
+        "excludedBeforeCod": 0,
+        "excludedNoRadiation": 4,
+        "excludedMissingEnergy": 0,
+        "anomalies": [
+          {
+            "plantId": "DC-GORONTALO",
+            "yearMonth": "2026-08",
+            "valuePct": 28.607984,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-SIDOARJO",
+            "yearMonth": "2026-08",
+            "valuePct": 49.059024,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-PLUMBON",
+            "yearMonth": "2026-08",
+            "valuePct": 48.448495,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MADIUN",
+            "yearMonth": "2026-08",
+            "valuePct": 46.048078,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-BANDUNG2",
+            "yearMonth": "2026-08",
+            "valuePct": 39.13695,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MANADO",
+            "yearMonth": "2026-08",
+            "valuePct": 290.543902,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-JAMBI",
+            "yearMonth": "2026-08",
+            "valuePct": 126.591903,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-LOMBOK-B",
+            "yearMonth": "2026-08",
+            "valuePct": 106.992951,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-PARUNG",
+            "yearMonth": "2026-08",
+            "valuePct": 23.114945,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MALANG",
+            "yearMonth": "2026-08",
+            "valuePct": 126.399387,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALI",
+            "yearMonth": "2026-08",
+            "valuePct": 118.219574,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BANJARMASIN",
+            "yearMonth": "2026-08",
+            "valuePct": 48.360173,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-KARAWANG",
+            "yearMonth": "2026-08",
+            "valuePct": 171.98137,
+            "reason": "PR_ABOVE_100"
+          }
+        ],
+        "invalid": false
+      },
+      "vendorOfficialAveragePct": 70.099394
+    },
+    {
+      "yearMonth": "2026-09",
+      "dashboardAlgorithm": {
+        "valuePct": 71.084436,
+        "activePlantCount": 20,
+        "totalPlantCount": 37,
+        "excludedBeforeCod": 0,
+        "excludedNoRadiation": 4,
+        "excludedMissingEnergy": 0,
+        "anomalies": [
+          {
+            "plantId": "DC-GORONTALO",
+            "yearMonth": "2026-09",
+            "valuePct": 0,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MADIUN",
+            "yearMonth": "2026-09",
+            "valuePct": 42.411298,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-BANDUNG2",
+            "yearMonth": "2026-09",
+            "valuePct": 41.01822,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-MANADO",
+            "yearMonth": "2026-09",
+            "valuePct": 1158.914045,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-PEKANBARU",
+            "yearMonth": "2026-09",
+            "valuePct": 104.732667,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-JAMBI",
+            "yearMonth": "2026-09",
+            "valuePct": 101.392792,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-LOMBOK-B",
+            "yearMonth": "2026-09",
+            "valuePct": 102.398146,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-PARUNG",
+            "yearMonth": "2026-09",
+            "valuePct": 219.443862,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-MALANG",
+            "yearMonth": "2026-09",
+            "valuePct": 120.646717,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALI",
+            "yearMonth": "2026-09",
+            "valuePct": 137.462147,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BALARAJA",
+            "yearMonth": "2026-09",
+            "valuePct": 109.910575,
+            "reason": "PR_ABOVE_100"
+          },
+          {
+            "plantId": "DC-BANJARMASIN",
+            "yearMonth": "2026-09",
+            "valuePct": 48.621959,
+            "reason": "PR_BELOW_50"
+          },
+          {
+            "plantId": "DC-KARAWANG",
+            "yearMonth": "2026-09",
+            "valuePct": 138.590487,
+            "reason": "PR_ABOVE_100"
+          }
+        ],
+        "invalid": false
+      },
+      "vendorOfficialAveragePct": 73.639091
+    }
+  ],
+  "prYtd": {
+    "valuePct": 73.503544,
+    "activePlantCount": 183,
+    "totalPlantCount": 333,
+    "excludedBeforeCod": 0,
+    "excludedNoRadiation": 36,
+    "excludedMissingEnergy": 0,
+    "anomalies": [
+      {
+        "plantId": "DC-GORONTALO",
+        "yearMonth": "2026-01",
+        "valuePct": 0,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-GORONTALO",
+        "yearMonth": "2026-02",
+        "valuePct": 0,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-GORONTALO",
+        "yearMonth": "2026-03",
+        "valuePct": 0,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-GORONTALO",
+        "yearMonth": "2026-04",
+        "valuePct": 0,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-GORONTALO",
+        "yearMonth": "2026-05",
+        "valuePct": 0,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-GORONTALO",
+        "yearMonth": "2026-06",
+        "valuePct": 0,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-GORONTALO",
+        "yearMonth": "2026-07",
+        "valuePct": 0,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-GORONTALO",
+        "yearMonth": "2026-08",
+        "valuePct": 28.607984,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-GORONTALO",
+        "yearMonth": "2026-09",
+        "valuePct": 0,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-LUWU",
+        "yearMonth": "2026-05",
+        "valuePct": 42.492749,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-LUWU",
+        "yearMonth": "2026-06",
+        "valuePct": 42.954011,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-LUWU",
+        "yearMonth": "2026-07",
+        "valuePct": 35.041383,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-SIDOARJO",
+        "yearMonth": "2026-01",
+        "valuePct": 30.599517,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-SIDOARJO",
+        "yearMonth": "2026-02",
+        "valuePct": 44.265295,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-SIDOARJO",
+        "yearMonth": "2026-08",
+        "valuePct": 49.059024,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-PLUMBON",
+        "yearMonth": "2026-03",
+        "valuePct": 45.984165,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-PLUMBON",
+        "yearMonth": "2026-05",
+        "valuePct": 49.997193,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-PLUMBON",
+        "yearMonth": "2026-08",
+        "valuePct": 48.448495,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-MADIUN",
+        "yearMonth": "2026-01",
+        "valuePct": 48.579926,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-MADIUN",
+        "yearMonth": "2026-02",
+        "valuePct": 49.526995,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-MADIUN",
+        "yearMonth": "2026-03",
+        "valuePct": 40.849192,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-MADIUN",
+        "yearMonth": "2026-04",
+        "valuePct": 46.250808,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-MADIUN",
+        "yearMonth": "2026-05",
+        "valuePct": 47.069132,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-MADIUN",
+        "yearMonth": "2026-06",
+        "valuePct": 48.97245,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-MADIUN",
+        "yearMonth": "2026-07",
+        "valuePct": 47.063518,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-MADIUN",
+        "yearMonth": "2026-08",
+        "valuePct": 46.048078,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-MADIUN",
+        "yearMonth": "2026-09",
+        "valuePct": 42.411298,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-BANDUNG2",
+        "yearMonth": "2026-01",
+        "valuePct": 48.820468,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-BANDUNG2",
+        "yearMonth": "2026-03",
+        "valuePct": 37.3413,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-BANDUNG2",
+        "yearMonth": "2026-04",
+        "valuePct": 42.766157,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-BANDUNG2",
+        "yearMonth": "2026-05",
+        "valuePct": 42.651631,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-BANDUNG2",
+        "yearMonth": "2026-06",
+        "valuePct": 44.222911,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-BANDUNG2",
+        "yearMonth": "2026-07",
+        "valuePct": 40.609075,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-BANDUNG2",
+        "yearMonth": "2026-08",
+        "valuePct": 39.13695,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-BANDUNG2",
+        "yearMonth": "2026-09",
+        "valuePct": 41.01822,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-CIANJUR",
+        "yearMonth": "2026-03",
+        "valuePct": 43.160765,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-CIANJUR",
+        "yearMonth": "2026-04",
+        "valuePct": 46.641692,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-CIANJUR",
+        "yearMonth": "2026-05",
+        "valuePct": 47.254431,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-KOTABUMI",
+        "yearMonth": "2026-07",
+        "valuePct": 34.837737,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-MAKASSAR",
+        "yearMonth": "2026-01",
+        "valuePct": 119.134695,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MAKASSAR",
+        "yearMonth": "2026-02",
+        "valuePct": 129.366015,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MAKASSAR",
+        "yearMonth": "2026-03",
+        "valuePct": 121.120608,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MAKASSAR",
+        "yearMonth": "2026-04",
+        "valuePct": 132.577359,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MANADO",
+        "yearMonth": "2026-01",
+        "valuePct": 381.953175,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MANADO",
+        "yearMonth": "2026-02",
+        "valuePct": 467.857904,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MANADO",
+        "yearMonth": "2026-03",
+        "valuePct": 203.954449,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MANADO",
+        "yearMonth": "2026-05",
+        "valuePct": 104.948591,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MANADO",
+        "yearMonth": "2026-06",
+        "valuePct": 542.984957,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MANADO",
+        "yearMonth": "2026-07",
+        "valuePct": 479.364143,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MANADO",
+        "yearMonth": "2026-08",
+        "valuePct": 290.543902,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MANADO",
+        "yearMonth": "2026-09",
+        "valuePct": 1158.914045,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-PEKANBARU",
+        "yearMonth": "2026-07",
+        "valuePct": 102.511521,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-PEKANBARU",
+        "yearMonth": "2026-09",
+        "valuePct": 104.732667,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-JAMBI",
+        "yearMonth": "2026-02",
+        "valuePct": 105.763492,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-JAMBI",
+        "yearMonth": "2026-03",
+        "valuePct": 101.584481,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-JAMBI",
+        "yearMonth": "2026-07",
+        "valuePct": 131.594072,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-JAMBI",
+        "yearMonth": "2026-08",
+        "valuePct": 126.591903,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-JAMBI",
+        "yearMonth": "2026-09",
+        "valuePct": 101.392792,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-LOMBOK-B",
+        "yearMonth": "2026-01",
+        "valuePct": 106.625468,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-LOMBOK-B",
+        "yearMonth": "2026-02",
+        "valuePct": 105.016731,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-LOMBOK-B",
+        "yearMonth": "2026-03",
+        "valuePct": 101.425295,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-LOMBOK-B",
+        "yearMonth": "2026-05",
+        "valuePct": 103.427189,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-LOMBOK-B",
+        "yearMonth": "2026-06",
+        "valuePct": 100.533454,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-LOMBOK-B",
+        "yearMonth": "2026-07",
+        "valuePct": 104.429748,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-LOMBOK-B",
+        "yearMonth": "2026-08",
+        "valuePct": 106.992951,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-LOMBOK-B",
+        "yearMonth": "2026-09",
+        "valuePct": 102.398146,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-PARUNG",
+        "yearMonth": "2026-01",
+        "valuePct": 26.580127,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-PARUNG",
+        "yearMonth": "2026-02",
+        "valuePct": 41.51777,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-PARUNG",
+        "yearMonth": "2026-03",
+        "valuePct": 179.039436,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-PARUNG",
+        "yearMonth": "2026-04",
+        "valuePct": 164.553193,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-PARUNG",
+        "yearMonth": "2026-05",
+        "valuePct": 553.765688,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-PARUNG",
+        "yearMonth": "2026-06",
+        "valuePct": 207.148868,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-PARUNG",
+        "yearMonth": "2026-07",
+        "valuePct": 12.879082,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-PARUNG",
+        "yearMonth": "2026-08",
+        "valuePct": 23.114945,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-PARUNG",
+        "yearMonth": "2026-09",
+        "valuePct": 219.443862,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MALANG",
+        "yearMonth": "2026-01",
+        "valuePct": 150.4828,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MALANG",
+        "yearMonth": "2026-02",
+        "valuePct": 144.160085,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MALANG",
+        "yearMonth": "2026-03",
+        "valuePct": 130.13665,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MALANG",
+        "yearMonth": "2026-04",
+        "valuePct": 129.307144,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MALANG",
+        "yearMonth": "2026-05",
+        "valuePct": 130.371486,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MALANG",
+        "yearMonth": "2026-06",
+        "valuePct": 127.656268,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MALANG",
+        "yearMonth": "2026-07",
+        "valuePct": 135.217015,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MALANG",
+        "yearMonth": "2026-08",
+        "valuePct": 126.399387,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MALANG",
+        "yearMonth": "2026-09",
+        "valuePct": 120.646717,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALI",
+        "yearMonth": "2026-01",
+        "valuePct": 117.823467,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALI",
+        "yearMonth": "2026-02",
+        "valuePct": 122.471661,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALI",
+        "yearMonth": "2026-03",
+        "valuePct": 147.549134,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALI",
+        "yearMonth": "2026-04",
+        "valuePct": 128.159444,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALI",
+        "yearMonth": "2026-05",
+        "valuePct": 119.144341,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALI",
+        "yearMonth": "2026-06",
+        "valuePct": 108.303535,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALI",
+        "yearMonth": "2026-07",
+        "valuePct": 108.77914,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALI",
+        "yearMonth": "2026-08",
+        "valuePct": 118.219574,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALI",
+        "yearMonth": "2026-09",
+        "valuePct": 137.462147,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALARAJA",
+        "yearMonth": "2026-01",
+        "valuePct": 123.95335,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALARAJA",
+        "yearMonth": "2026-02",
+        "valuePct": 136.701259,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALARAJA",
+        "yearMonth": "2026-03",
+        "valuePct": 148.859299,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALARAJA",
+        "yearMonth": "2026-04",
+        "valuePct": 164.614516,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALARAJA",
+        "yearMonth": "2026-05",
+        "valuePct": 156.230838,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALARAJA",
+        "yearMonth": "2026-06",
+        "valuePct": 141.813572,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALARAJA",
+        "yearMonth": "2026-07",
+        "valuePct": 128.187612,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BALARAJA",
+        "yearMonth": "2026-09",
+        "valuePct": 109.910575,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MEDAN",
+        "yearMonth": "2026-01",
+        "valuePct": 104.61413,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-MEDAN",
+        "yearMonth": "2026-02",
+        "valuePct": 110.884128,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-BANJARMASIN",
+        "yearMonth": "2026-08",
+        "valuePct": 48.360173,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-BANJARMASIN",
+        "yearMonth": "2026-09",
+        "valuePct": 48.621959,
+        "reason": "PR_BELOW_50"
+      },
+      {
+        "plantId": "DC-KARAWANG",
+        "yearMonth": "2026-01",
+        "valuePct": 125.127915,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-KARAWANG",
+        "yearMonth": "2026-02",
+        "valuePct": 129.201462,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-KARAWANG",
+        "yearMonth": "2026-03",
+        "valuePct": 217.22147,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-KARAWANG",
+        "yearMonth": "2026-04",
+        "valuePct": 230.017081,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-KARAWANG",
+        "yearMonth": "2026-05",
+        "valuePct": 245.040059,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-KARAWANG",
+        "yearMonth": "2026-06",
+        "valuePct": 205.667103,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-KARAWANG",
+        "yearMonth": "2026-07",
+        "valuePct": 253.906337,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-KARAWANG",
+        "yearMonth": "2026-08",
+        "valuePct": 171.98137,
+        "reason": "PR_ABOVE_100"
+      },
+      {
+        "plantId": "DC-KARAWANG",
+        "yearMonth": "2026-09",
+        "valuePct": 138.590487,
+        "reason": "PR_ABOVE_100"
+      }
+    ],
+    "invalid": false
+  },
+  "resumeEvidence": {
+    "originalTargetProductionMonthlyMwh": [
+      515,
+      535,
+      535,
+      475,
+      475,
+      475,
+      475,
+      475,
+      475,
+      475,
+      474,
+      474
+    ],
+    "originalTargetProductionEoyMwh": 5858,
+    "productionAchievementMonthlyAll39Mwh": [
+      478.83,
+      454.63,
+      584.03,
+      583.15,
+      528.87,
+      533.2,
+      549,
+      583.27,
+      601.21,
+      0,
+      0,
+      0
+    ],
+    "productionAchievementYtdAll39Mwh": 4896.2,
+    "co2AchievementMonthlyAll39Ton": [
+      477.4,
+      453.27,
+      582.28,
+      581.4,
+      527.29,
+      531.6,
+      547.35,
+      581.52,
+      599.41,
+      0,
+      0,
+      0
+    ],
+    "co2AchievementYtdAll39Ton": 4882,
+    "coalAchievementMonthlyAll39Ton": [
+      193.45,
+      183.67,
+      235.95,
+      235.59,
+      213.66,
+      215.41,
+      221.79,
+      235.64,
+      242.89,
+      0,
+      0,
+      0
+    ],
+    "coalAchievementYtdAll39Ton": 1978,
+    "treeAchievementMonthlyAll39": [
+      25857.03,
+      24550.21,
+      31537.5,
+      31490.13,
+      28559.12,
+      28792.63,
+      29645.75,
+      31496.77,
+      32465.53,
+      0,
+      0,
+      0
+    ],
+    "treeAchievementYtdAll39": 264395
+  },
+  "dashboardDerived": {
+    "productionMwh": 4727.3453,
+    "selfConsumptionMwh": 4635.16429,
+    "avoidedEmissionTonRegionalOfficialOnly": 3591.95201,
+    "excludedTemporaryPltsSelfConsumptionKwh": 187554.71,
+    "coalAvoidedTonCurrentPageFormula": 1854.1,
+    "treeCountCurrentPageFormula": 164995,
+    "scope2EmissionCurrentTon": 9622.236999,
+    "scope2MissingBanjarmasinPurchasedMwh": 522.4319,
+    "scope2EmissionIfKalseltengFactor12AppliedTon": 10249.155279,
+    "targetEoyMwhFallback": 5858,
+    "targetYtdMwhJanSep": 4435
+  },
+  "extraEvidence": {
+    "Monitor PLTS 2026 (3)-2025 vs 2026.csv": {
+      "nonEmptyRows": 145,
+      "maxColumns": 6,
+      "notes": [
+        "Blok per cabang: load, self-consumption, feed-in, purchase; kolom TOTAL PRODUKSI adalah self-consumption + feed-in."
+      ]
+    },
+    "Monitor PLTS 2026 (3)-COMPARASI FEB.csv": {
+      "nonEmptyRows": 46,
+      "maxColumns": 9,
+      "notes": [
+        "Kolom Produksi Feb-2026 cocok dengan Monthly yield + feed-in (total produksi) per plant; iradiasi bersumber dari laporan vendor."
+      ]
+    },
+    "Monitor PLTS 2026 (3)-Radiasi.csv": {
+      "nonEmptyRows": 15,
+      "maxColumns": 3,
+      "notes": [
+        "Ringkasan rata-rata radiasi 2026 hanya terisi Januari-Maret; tidak memadai untuk validasi PR April-September."
+      ]
+    },
+    "Monitor PLTS 2026 (3)-Rekap Corporate Reputation.csv": {
+      "nonEmptyRows": 197,
+      "maxColumns": 28,
+      "notes": [
+        "Matriks bulanan mengulang load, self-consumption, feed-in, purchase dari CSV bulanan."
+      ]
+    },
+    "Monitor PLTS 2026 (3)-Resume.csv": {
+      "nonEmptyRows": 23,
+      "maxColumns": 40,
+      "notes": []
+    }
+  }
+}

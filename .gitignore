@@ -55,6 +55,11 @@ scripts/populate-fault-history-from-evidence.mjs
 *.xlsb
 *.ods
 
+*.png
+*.jpg
+*.jpeg
+
+
 # Word Documents & Text
 *.doc
 *.docx

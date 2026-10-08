@@ -3,7 +3,10 @@
  * Single source of truth untuk seluruh metrik turunan energi & lingkungan PLTS
  */
 
+export const PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH = 0.997;
+
 export const EMISSION_CONSTANTS = {
+  PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
   CORPORATE_TARGET_FACTOR_TON_PER_MWH: 0.99729425,
   GRID_WEIGHTED_AVERAGE_FACTOR_TON_PER_MWH: 0.77644,
   COAL_FACTOR_TON_PER_MWH: 0.404,
@@ -13,16 +16,16 @@ export const EMISSION_CONSTANTS = {
 export const CONVERSION_CONFIG = {
   // 1. Emisi Karbon Terhindar (tCO2e)
   emission: {
-    // Faktor rata-rata tertimbang nasional grid PLTS
-    factorKgPerKwh: EMISSION_CONSTANTS.GRID_WEIGHTED_AVERAGE_FACTOR_TON_PER_MWH,
-    factorTonPerMwh: EMISSION_CONSTANTS.GRID_WEIGHTED_AVERAGE_FACTOR_TON_PER_MWH,
+    // Faktor tunggal untuk emisi terhindar pada tab Kelistrikan PLTS Atap.
+    factorKgPerKwh: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
+    factorTonPerMwh: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
     corporateTargetFactor: EMISSION_CONSTANTS.CORPORATE_TARGET_FACTOR_TON_PER_MWH,
     unit: 'tCO₂e',
     name: 'Emisi Terhindar',
-    source: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)',
+    source: 'Faktor emisi PLTS dashboard 2026',
     year: '2026',
     status: 'resmi',
-    description: 'Faktor emisi marjinal grid pembangkit PLTS per wilayah sistem kelistrikan (sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)).'
+    description: `Emisi terhindar dihitung dari energi PLTS yang dipakai sendiri dikali ${PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH} kgCOâ‚‚/kWh.`
   },
 
 
@@ -92,4 +95,3 @@ export function isFeatureEnabled(featureName) {
   }
   return false;
 }
-

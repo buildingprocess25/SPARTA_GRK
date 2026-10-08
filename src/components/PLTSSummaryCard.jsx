@@ -9,9 +9,12 @@ import {
 import CardBox from '@/components/ui/CardBox';
 import { isDcLocation } from '@/lib/solar/plantMap';
 import { isValidPltsHistoryPeriod } from '@/lib/solar/cacheKey';
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
 import {
   BarChart, Bar, ComposedChart, Line, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis
 } from 'recharts';
+
+const PLTS_EMISSION_FACTOR_LABEL = String(PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH).replace('.', ',');
 
 // Fuzzy search normalizer: lowercase, trims, collapses repeated characters
 function normalizeFuzzy(str) {
@@ -342,8 +345,8 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         ...performance,
         installedKwp,
         productionMwh: item.productionMwh ?? performance.productionMwh ?? 0,
-        avoidedEmissionTon: item.avoidedEmissionTon ?? item.co2Ton ?? performance.emissionTon ?? 0,
-        co2Ton: item.co2Ton ?? item.avoidedEmissionTon ?? performance.emissionTon ?? 0,
+        avoidedEmissionTon: performance.emissionTon ?? item.avoidedEmissionTon ?? item.co2Ton ?? 0,
+        co2Ton: performance.emissionTon ?? item.co2Ton ?? item.avoidedEmissionTon ?? 0,
         specificYield: item.specificYield ?? performance.specificYield ?? (item.productionKwh != null && installedKwp > 0
           ? Number((item.productionKwh / installedKwp).toFixed(1))
           : null),
@@ -875,10 +878,8 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             <span className="text-[11px] text-slate-500 block mt-1">
               Setara {formatNum(kpi.treeEquivalent, 0, 0)} pohon
             </span>
-            <div className="mt-2 border-t border-emerald-100 pt-2 text-[10px] text-slate-600" title="Basis regional faktor grid ESDM (37 plant). Sumber target: RKAP">
-              {dashboardData?.summary?.emission?.targetCo2Ton == null
-                ? 'Faktor Emisi Grid Resmi ESDM'
-                : `Target (referensi): ${formatNum(dashboardData.summary.emission.targetCo2Ton, 2, 2)} tCO₂e (${formatNum(dashboardData.summary.emission.achievementPct, 1, 1)}% capai)`}
+            <div className="mt-2 border-t border-emerald-100 pt-2 text-[10px] text-slate-600" title="Energi PLTS yang dipakai sendiri dikali faktor emisi tunggal dashboard">
+              Faktor emisi: {PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh
             </div>
           </div>
 

@@ -2,7 +2,7 @@ import { calculateCostSavings } from '../pln-tariff.js';
 import { summarizePlantStatuses } from './status.js';
 import { computeEnergyBalance, validateEnergyBalanceRow } from './energyBalance.js';
 import { OFFICIAL_RKAP_FACTORS, getRkapFactorsForPeriod } from './rkap-factors.js';
-import { EMISSION_CONSTANTS } from './conversionConfig.js';
+import { EMISSION_CONSTANTS, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './conversionConfig.js';
 
 export const MONTHLY_SOURCE_POLICY = Object.freeze({
   preferredCompletedSource: 'ISOLAR_REPORT_IMPORT',
@@ -364,9 +364,56 @@ export function buildPltsDashboardFromRows({
   });
   const selectedPsIds = new Set(filteredPlants.flatMap((plant) => plant.sungrowPsIds || []));
   const statusSummary = summarizePlantStatuses(statuses.filter((row) => selectedPsIds.has(Number(row.psId))));
+  const energyFlowIndex = new Map(energyFlows.map((flow) => (
+    [`${flow.yearMonth}:${Number(flow.psId)}`, flow]
+  )));
+
+  const resolveMonthlyEnergyFlow = (resolvedMonth) => {
+    const availableParts = (resolvedMonth?.parts || []).filter((part) => part.energyKwh !== null);
+    if (!availableParts.length) {
+      return {
+        feedInKwh: null,
+        selfConsumptionKwh: null,
+        avoidedEmissionTon: null,
+        hasCompleteEnergyFlow: false,
+      };
+    }
+
+    const balances = availableParts.map((part) => {
+      const flow = energyFlowIndex.get(`${resolvedMonth.yearMonth}:${Number(part.psId)}`);
+      return validateEnergyBalanceRow({
+        productionKwh: Number(part.energyKwh),
+        feedInKwh: finiteOrNull(flow?.feedInKwh),
+      });
+    });
+
+    if (balances.some((balance) => !balance.isValid)) {
+      return {
+        feedInKwh: null,
+        selfConsumptionKwh: null,
+        avoidedEmissionTon: null,
+        hasCompleteEnergyFlow: false,
+      };
+    }
+
+    const feedInKwh = round(balances.reduce((sum, balance) => sum + balance.E, 0));
+    const selfConsumptionKwh = round(balances.reduce((sum, balance) => sum + balance.S, 0));
+    return {
+      feedInKwh,
+      selfConsumptionKwh,
+      avoidedEmissionTon: round(
+        (selfConsumptionKwh * PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH) / 1000,
+        6,
+      ),
+      hasCompleteEnergyFlow: true,
+    };
+  };
 
   const plantRows = filteredPlants.map((plant) => {
-    const monthly = selectedKeys.map((ym) => resolvePlantMonth(plant, ym, index, currentYearMonth));
+    const monthly = selectedKeys.map((ym) => {
+      const resolved = resolvePlantMonth(plant, ym, index, currentYearMonth);
+      return { ...resolved, ...resolveMonthlyEnergyFlow(resolved) };
+    });
     const available = monthly.filter((item) => item.energyKwh !== null);
     const productionKwh = available.length ? round(available.reduce((sum, item) => sum + item.energyKwh, 0)) : null;
     const fullCoverage = available.length === selectedKeys.length;
@@ -396,21 +443,24 @@ export function buildPltsDashboardFromRows({
     const loadValues = loadRows.map((item) => finiteOrNull(item.loadKwh)).filter((value) => value !== null);
     const costSavings = calculateCostSavings(productionKwh, plant.dcId);
 
-    // Plant-level energy flows (feed-in / export and self-consumption)
-    const plantFlows = energyFlows.filter((flow) => (
-      selectedKeys.includes(flow.yearMonth) && (plant.sungrowPsIds || []).includes(Number(flow.psId))
-    ));
-    const plantFeedInKwh = plantFlows.length ? round(plantFlows.reduce((sum, f) => sum + (Number(f.feedInKwh) || 0), 0)) : 0;
-    const plantFeedInMwh = plantFeedInKwh !== null ? round(plantFeedInKwh / 1000, 2) : 0;
-    const plantSelfConsumptionKwh = productionKwh !== null ? round(Math.max(0, productionKwh - (plantFeedInKwh || 0))) : null;
+    // Missing or invalid feed-in data must never imply 100% self-consumption.
+    const validFlowMonths = monthly.filter((item) => item.hasCompleteEnergyFlow);
+    const plantFeedInKwh = validFlowMonths.length
+      ? round(validFlowMonths.reduce((sum, item) => sum + item.feedInKwh, 0))
+      : null;
+    const plantFeedInMwh = plantFeedInKwh !== null ? round(plantFeedInKwh / 1000, 2) : null;
+    const plantSelfConsumptionKwh = validFlowMonths.length
+      ? round(validFlowMonths.reduce((sum, item) => sum + item.selfConsumptionKwh, 0))
+      : null;
     const plantSelfConsumptionMwh = plantSelfConsumptionKwh !== null ? round(plantSelfConsumptionKwh / 1000, 2) : null;
 
-    const isEligibleForEmission = !underConst && factorStatus === 'resmi' && finiteOrNull(factor?.cmPlts) !== null;
-    const emissionProductionBasisTon = isEligibleForEmission && productionKwh !== null
-      ? round((productionKwh / 1000) * factor.cmPlts, 2)
+    const isEligibleForEmission = !underConst && validFlowMonths.length > 0;
+    const eligibleProductionKwh = validFlowMonths.reduce((sum, item) => sum + Number(item.energyKwh), 0);
+    const emissionProductionBasisTon = isEligibleForEmission
+      ? round((eligibleProductionKwh * PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH) / 1000, 6)
       : null;
     const emissionSelfConsumptionBasisTon = isEligibleForEmission && plantSelfConsumptionKwh !== null
-      ? round((plantSelfConsumptionKwh / 1000) * factor.cmPlts, 2)
+      ? round((plantSelfConsumptionKwh * PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH) / 1000, 6)
       : null;
     // Canonical avoided emission is self-consumption basis (export energy not counted)
     const emissionTon = emissionSelfConsumptionBasisTon;
@@ -463,25 +513,31 @@ export function buildPltsDashboardFromRows({
   const rkapFactor = targetMwh > 0 && targetCo2Ton != null ? targetCo2Ton / targetMwh : null;
   const rkapActualTon = productionKwh != null && rkapFactor != null ? round(productionKwh / 1000 * rkapFactor) : null;
 
-  const eligiblePlantRows = plantRows.filter((row) => (row.factor?.status || 'sementara') === 'resmi');
-  const eligibleSelfConsumptionKwh = eligiblePlantRows.reduce((sum, row) => sum + (row.selfConsumptionKwh || 0), 0);
+  const eligiblePlantRows = plantRows.filter((row) => row.isEmissionEligible);
+  const eligibleSelfConsumptionKwh = eligiblePlantRows.reduce((sum, row) => sum + row.selfConsumptionKwh, 0);
   const eligibleSelfConsumptionMwh = round(eligibleSelfConsumptionKwh / 1000, 2);
 
-  // Canonical emissions: sum per eligible plant (Gorontalo & Manado excluded)
-  const canonicalEmission = sumEligibleEmissions(plantRows.map((row) => ({
-    energyMwh: row.selfConsumptionMwh,
-    factor: row.factor?.cmPlts,
-    factorStatus: row.factor?.status || 'sementara',
-  })));
-  canonicalEmission.emissionTon = round(canonicalEmission.emissionTon, 2);
-  canonicalEmission.excludedEnergyMwh = round(canonicalEmission.excludedEnergyMwh, 2);
+  // Canonical PLTS avoided emissions: self-consumption multiplied by one shared factor.
+  const canonicalEmission = {
+    emissionTon: round(eligiblePlantRows.reduce((sum, row) => sum + row.emissionTon, 0), 6),
+    includedPlantCount: eligiblePlantRows.length,
+    excludedPlantCount: plantRows.length - eligiblePlantRows.length,
+    excludedEnergyMwh: round(plantRows.reduce((sum, row) => {
+      const excludedKwh = row.monthly.reduce((monthSum, item) => (
+        monthSum + (item.energyKwh !== null && (!item.hasCompleteEnergyFlow || !row.isEmissionEligible)
+          ? Number(item.energyKwh)
+          : 0)
+      ), 0);
+      return sum + excludedKwh;
+    }, 0) / 1000, 2),
+  };
 
   const productionEmission = sumEligibleEmissions(plantRows.map((row) => ({
-    energyMwh: row.productionMwh,
-    factor: row.factor?.cmPlts,
-    factorStatus: row.factor?.status || 'sementara',
+    energyMwh: row.productionKwh === null ? null : row.productionKwh / 1000,
+    factor: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
+    factorStatus: row.isEmissionEligible ? 'resmi' : 'sementara',
   })));
-  productionEmission.emissionTon = round(productionEmission.emissionTon, 2);
+  productionEmission.emissionTon = round(productionEmission.emissionTon, 6);
 
   const emission = {
     ...canonicalEmission,
@@ -701,10 +757,10 @@ export function buildPltsDashboardFromRows({
         const pFeedInKwh = pFlows.length ? pFlows.reduce((s, item) => s + (Number(item.feedInKwh) || 0), 0) : 0;
         const pSelfKwh = Math.max(0, pProdKwh - pFeedInKwh);
 
-        if (p.isEmissionEligible && p.factor?.cmPlts != null) {
+        if (p.isEmissionEligible) {
           monthIncludedCount++;
-          monthAvoidedEmissionTon += (pSelfKwh * p.factor.cmPlts) / 1000;
-          monthProdBasisEmissionTon += (pProdKwh * p.factor.cmPlts) / 1000;
+          monthAvoidedEmissionTon += (pSelfKwh * PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH) / 1000;
+          monthProdBasisEmissionTon += (pProdKwh * PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH) / 1000;
         } else {
           monthExcludedCount++;
         }
@@ -732,8 +788,8 @@ export function buildPltsDashboardFromRows({
       purchasedMwh,
       targetMwh: target ? Number(target.value) : null,
       achievementPct: calculateAchievement(actualMwh, target?.value),
-      avoidedEmissionTon: round(monthAvoidedEmissionTon, 2),
-      productionBasisEmissionTon: round(monthProdBasisEmissionTon, 2),
+      avoidedEmissionTon: round(monthAvoidedEmissionTon, 6),
+      productionBasisEmissionTon: round(monthProdBasisEmissionTon, 6),
       includedPlantCount: monthIncludedCount,
       excludedPlantCount: monthExcludedCount,
       loadKwh,
@@ -838,8 +894,8 @@ export function buildPltsDashboardFromRows({
         const pFeedInKwh = pFlows.length ? pFlows.reduce((s, item) => s + (Number(item.feedInKwh) || 0), 0) : 0;
         const pSelfKwh = Math.max(0, Number(pProdKwh) - pFeedInKwh);
 
-        if (p.isEmissionEligible && p.factor?.cmPlts != null) {
-          monthAvoidedEmissionTon += (pSelfKwh * p.factor.cmPlts) / 1000;
+        if (p.isEmissionEligible) {
+          monthAvoidedEmissionTon += (pSelfKwh * PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH) / 1000;
         }
       }
     }
@@ -853,7 +909,7 @@ export function buildPltsDashboardFromRows({
       actualMwh,
       selfConsumptionKwh,
       feedInKwh,
-      avoidedEmissionTon: actualKwh !== null ? round(monthAvoidedEmissionTon, 2) : null,
+      avoidedEmissionTon: actualKwh !== null ? round(monthAvoidedEmissionTon, 6) : null,
       targetKwh: targetKwhVal,
       targetMwh: targetMwhVal,
       achievementPct: calculateAchievement(actualKwh, targetKwhVal),
@@ -906,13 +962,14 @@ export function buildPltsDashboardFromRows({
         coalAvoidedTon: round((emission.eligibleSelfConsumptionKwh ?? energyBalance?.selfConsumptionKwh ?? productionKwh ?? 0) * 0.000400, 1),
         treeCount: Math.round(((emission.selfConsumptionBasisTon ?? emission.emissionTon ?? 0) * 1000) / 21.77),
         basis: 'self_consumption',
+        factorKgPerKwh: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
         targetCo2Ton: targetCo2Ton,
         achievementPct: calculateAchievement(emission.selfConsumptionBasisTon ?? emission.emissionTon, targetCo2Ton),
         targetFactor: EMISSION_CONSTANTS.CORPORATE_TARGET_FACTOR_TON_PER_MWH,
         includedPlantCount: emission.includedPlantCount,
         excludedPlantCount: emission.excludedPlantCount,
         excludedEnergyMwh: emission.excludedEnergyMwh,
-        disclaimer: `${emission.includedPlantCount} dari ${plantRows.length} plant dihitung (faktor grid resmi ESDM)`,
+        disclaimer: `${emission.includedPlantCount} dari ${plantRows.length} plant dihitung dengan faktor ${PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH} kgCOâ‚‚/kWh`,
       },
       rkap: {
         factorKgPerKwh: round(rkapFactor, 9),

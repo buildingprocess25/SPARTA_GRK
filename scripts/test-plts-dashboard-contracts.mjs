@@ -14,6 +14,7 @@ import { buildTargetMonthlyRows, deriveRkapFactors } from '../src/lib/solar/rkap
 import { importRkapTargets } from '../src/lib/importers/rkapTargetImport.js';
 import { GRID_EMISSION_FACTORS, getGridFactor } from '../src/lib/emission-factors.js';
 import { getPlnTariff, calculateCostSavings, PLN_TARIFF_DEFAULT } from '../src/lib/pln-tariff.js';
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../src/lib/solar/conversionConfig.js';
 
 let passed = 0;
 const tests = [];
@@ -143,6 +144,10 @@ test('single dashboard aggregation resolves sources, filters, targets, factors, 
     targets: [{ yearMonth: '202601', metric: 'prod_mwh', value: 0.2, source: 'SUSTAINABILITY_DATA_OWNER' }],
     climate: [],
     loads: [],
+    energyFlows: [
+      { yearMonth: '202601', psId: 1, yieldKwh: 120, feedInKwh: 0 },
+      { yearMonth: '202601', psId: 2, yieldKwh: 50, feedInKwh: 0 },
+    ],
     factors: {
       JAMALI: { cmPlts: 0.83, status: 'resmi' },
       SULUTGO: { cmPlts: 0.6, status: 'sementara' },
@@ -151,13 +156,45 @@ test('single dashboard aggregation resolves sources, filters, targets, factors, 
   assert.equal(data.summary.productionKwh, 170);
   assert.equal(data.summary.targetMwh, 0.2);
   assert.equal(data.summary.achievementPct, 85);
-  assert.equal(data.summary.emission.emissionTon, 0.0996);
-  assert.equal(data.summary.emission.excludedEnergyMwh, 0.05);
+  assert.equal(data.summary.emission.emissionTon, 0.16949);
+  assert.equal(data.summary.emission.excludedEnergyMwh, 0);
   assert.equal(data.conflicts.length, 1);
   assert.equal(data.conflicts[0].differencePct, 20);
   assert.equal(data.yoy.likeForLike.plantCount, 1);
   assert.equal(data.summary.pr.valuePct, null);
   assert.equal(data.support.load.available, false);
+});
+
+test('PLTS avoided emissions use self-consumption times the single 0.997 factor in card, chart, and plant table', () => {
+  const data = buildPltsDashboardFromRows({
+    query: { period: '2026-01_2026-01', mode: 'YTD', throughMonth: 1, grid: 'ALL', plant: 'ALL', compareYears: [2025, 2026] },
+    currentYearMonth: '202610',
+    plants: [
+      { dcId: 'A', canonicalName: 'Plant A', grid: 'JAMALI', sungrowPsIds: [1], apiInstalledKwp: 100 },
+      { dcId: 'B', canonicalName: 'Plant B', grid: 'SULUTGO', sungrowPsIds: [2], apiInstalledKwp: 50 },
+    ],
+    observations: [
+      { yearMonth: '202601', psId: 1, energyKwh: 100000, source: 'ISOLAR_REPORT_IMPORT' },
+      { yearMonth: '202601', psId: 2, energyKwh: 50000, source: 'ISOLAR_REPORT_IMPORT' },
+    ],
+    targets: [], climate: [], loads: [],
+    energyFlows: [
+      { yearMonth: '202601', psId: 1, yieldKwh: 100000, feedInKwh: 10000 },
+      { yearMonth: '202601', psId: 2, yieldKwh: 50000, feedInKwh: 5000 },
+    ],
+    factors: {
+      JAMALI: { cmPlts: 0.83, status: 'resmi' },
+      SULUTGO: { cmPlts: 0.6, status: 'sementara' },
+    },
+  });
+
+  assert.equal(PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH, 0.997);
+  assert.equal(data.plants[0].avoidedEmissionTon, 89.73);
+  assert.equal(data.plants[1].avoidedEmissionTon, 44.865);
+  assert.equal(data.monthly[0].avoidedEmissionTon, 134.595);
+  assert.equal(data.summary.emission.emissionTon, 134.595);
+  assert.equal(data.summary.emission.factorKgPerKwh, 0.997);
+  assert.equal(data.summary.emission.includedPlantCount, 2);
 });
 
 test('owner grid table marks factor eligibility explicitly', () => {
@@ -224,6 +261,14 @@ test('monthly table sum reconciles exactly with card KPI in kWh and targets matc
       { yearMonth: '202601', psId: 1, loadKwh: 50000 },
       { yearMonth: '202602', psId: 1, loadKwh: 55000 },
       { yearMonth: '202603', psId: 1, loadKwh: 52000 },
+    ],
+    energyFlows: [
+      { yearMonth: '202601', psId: 1, yieldKwh: 10000, feedInKwh: 0 },
+      { yearMonth: '202601', psId: 2, yieldKwh: 15000, feedInKwh: 0 },
+      { yearMonth: '202602', psId: 1, yieldKwh: 12000, feedInKwh: 0 },
+      { yearMonth: '202602', psId: 2, yieldKwh: 18000, feedInKwh: 0 },
+      { yearMonth: '202603', psId: 1, yieldKwh: 11000, feedInKwh: 0 },
+      { yearMonth: '202603', psId: 2, yieldKwh: 17000, feedInKwh: 0 },
     ],
     factors: { JAMALI: { cmPlts: 0.83, status: 'resmi' } },
   });
@@ -330,7 +375,7 @@ test('conversion config exposes single official parameters and factors', async (
   assert.equal(CONVERSION_CONFIG.emission.unit, 'tCO₂e');
   assert.equal(CONVERSION_CONFIG.coal.factorKgPerKwh, 0.400);
   assert.equal(CONVERSION_CONFIG.tree.factorKgPerTreePerYear, 21.77);
-  assert.ok(CONVERSION_CONFIG.emission.factorTonPerMwh > 0.7 && CONVERSION_CONFIG.emission.factorTonPerMwh < 0.9);
+  assert.equal(CONVERSION_CONFIG.emission.factorTonPerMwh, 0.997);
 });
 
 test('feature flag audit baseline is off by default and response is clean of baseline fields', async () => {

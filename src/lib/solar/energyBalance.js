@@ -4,6 +4,7 @@
  */
 
 import { OFFICIAL_RKAP_FACTORS, getRkapFactorsForPeriod } from './rkap-factors.js';
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './conversionConfig.js';
 
 export const EMISSION_CONFIG = {
   DEFAULT_BASIS: 'production', // 'production' | 'self_consumption'
@@ -119,7 +120,7 @@ export function computeEnergyBalance(rows = [], options = {}) {
 
   // Target Factors for Period
   const factors = getRkapFactorsForPeriod(startMonth, endMonth);
-  const targetCo2Factor = factors.weightedCo2Factor; // ~0.997294
+  const targetCo2Factor = PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH;
   const targetCoalFactor = factors.weightedCoalFactor; // 0.4040 t/MWh
   const targetTreeFactor = factors.weightedTreeFactor; // 54.0 pohon/MWh
 

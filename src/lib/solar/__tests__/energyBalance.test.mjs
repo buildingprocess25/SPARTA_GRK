@@ -6,6 +6,7 @@ import {
   EMISSION_CONFIG
 } from '../energyBalance.js';
 import { OFFICIAL_RKAP_FACTORS, getRkapFactorsForPeriod } from '../rkap-factors.js';
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../conversionConfig.js';
 
 test('1. Validates energy balance row: 0 <= E <= P, computes exact S = P - E', () => {
   // Valid row
@@ -65,14 +66,17 @@ test('3. Plant without feed-in is NOT counted as 0 or 100% self-consumption', ()
   assert.equal(result.coverage.coveragePct, 49.0);
 });
 
-test('4. Emission calculation respects EMISSION_BASIS configuration', () => {
+test('4. Emission calculation uses the single 0.997 factor and respects EMISSION_BASIS configuration', () => {
   const sampleRows = [
     { psId: 1, yieldKwh: 100000, feedInKwh: 5000 }, // S = 95,000 kWh
   ];
 
   // Default: production basis
   const prodResult = computeEnergyBalance(sampleRows, { basis: 'production', startMonth: 1, endMonth: 9 });
-  // Factors ~ 0.997294 t/MWh
+  assert.equal(PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH, 0.997);
+  assert.equal(prodResult.emission.factorCo2TonPerMwh, 0.997);
+  assert.equal(prodResult.emission.productionBasisTon, 99.7);
+  assert.equal(prodResult.emission.selfConsumptionBasisTon, 94.72);
   assert.equal(prodResult.emission.activeTon, prodResult.emission.productionBasisTon);
   assert.ok(prodResult.emission.productionBasisTon > prodResult.emission.selfConsumptionBasisTon);
 

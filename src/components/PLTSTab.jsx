@@ -22,7 +22,7 @@ import CardBox from '@/components/ui/CardBox';
 import { useSustainability } from '@/context/SustainabilityContext';
 import { fetchLiveIsolarData } from '@/services/isolarCloudService';
 import { getGridFactor } from '@/lib/emission-factors';
-import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
+import { isFeatureEnabled, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
 import { buildCacheKey } from '@/lib/solar/cacheKey';
 import { SummaryCardsSkeleton, ChartSkeleton, TabContentSkeleton, TableSkeleton } from '@/components/solar/PLTSDashboardSkeletons';
 
@@ -55,6 +55,7 @@ const PLTSMonthlyMatrixTable = dynamic(() => import('@/components/PLTSMonthlyMat
 const summaryClientCache = typeof window !== 'undefined'
   ? (window.__PLTS_SUMMARY_CACHE__ = window.__PLTS_SUMMARY_CACHE__ || new Map())
   : new Map();
+const PLTS_EMISSION_FACTOR_LABEL = String(PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH).replace('.', ',');
 
 export default function PLTSTab() {
   const isAuditBaselineEnabled = isFeatureEnabled('auditBaseline');
@@ -344,18 +345,25 @@ export default function PLTSTab() {
   };
 
 
-  // Derived data for the table: prefer actualEmissions (39 independent plants) with fallback to validDcs
+  const dashboardPlantByDc = new Map((dashboardData?.plants || []).map(plant => [plant.dcId, plant]));
+
+  // Preserve monitoring rows while sharing the reconciled self-consumption
+  // values used by the KPI and monthly chart.
   const rawPlantList = (actualEmissions && actualEmissions.length > 0)
-    ? actualEmissions.map(a => ({
-      id: a.id || a.dcId,
-      dcId: a.dcId || a.id,
-      name: a.name || a.canonicalName,
-      grid: (a.grid || a.gridRegion || 'JAMALI').toUpperCase(),
-      gridRegion: (a.grid || a.gridRegion || 'JAMALI').toUpperCase(),
-      plnConsumptionMWh: a.plnConsumptionMWh || null,
-      pltsProdMWh: Number((a.pltsProdMWh || 0).toFixed(2)),
-      region: a.region || 'Nasional'
-    }))
+    ? actualEmissions.map(a => {
+      const performance = dashboardPlantByDc.get(a.dcId || a.id) || {};
+      return {
+        id: a.id || a.dcId,
+        dcId: a.dcId || a.id,
+        name: a.name || a.canonicalName,
+        grid: (a.grid || a.gridRegion || 'JAMALI').toUpperCase(),
+        gridRegion: (a.grid || a.gridRegion || 'JAMALI').toUpperCase(),
+        plnConsumptionMWh: a.plnConsumptionMWh || null,
+        pltsProdMWh: Number((performance.productionMwh ?? a.pltsProdMWh ?? 0).toFixed(6)),
+        selfConsumptionMWh: performance.selfConsumptionMwh ?? a.selfConsumptionMWh ?? null,
+        region: a.region || 'Nasional'
+      };
+    })
     : dcLocations.filter(dc => dc.facilityType === 'DC' || dc.facilityType === 'BRANCH_OFFICE' || dc.hasPlts);
 
   const validDcs = rawPlantList;
@@ -389,17 +397,21 @@ export default function PLTSTab() {
     // Grid Factor
     const factorObj = getGridFactor(dc.grid || dc.gridRegion);
     const factor = factorObj?.cmExPost ?? 0.87;
-    const factorPlts = factorObj?.cmPlts ?? 0.83;
+    const factorPlts = PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH;
 
     const plnConsumptionMWh = dc.plnConsumptionMWh || null;
     const pltsProdMWh = Number((dc.pltsProdMWh || 0).toFixed(2));
+    const selfConsumptionMWh = dc.selfConsumptionMWh == null ? null : Number(Number(dc.selfConsumptionMWh).toFixed(6));
     const scope2EmissionTon = plnConsumptionMWh !== null ? Number((plnConsumptionMWh * factor).toFixed(2)) : null;
-    const avoidedEmissionTon = pltsProdMWh > 0 ? Number((pltsProdMWh * factorPlts).toFixed(2)) : null;
+    const avoidedEmissionTon = selfConsumptionMWh !== null && selfConsumptionMWh > 0
+      ? Number((selfConsumptionMWh * factorPlts).toFixed(6))
+      : null;
 
     return {
       ...dc,
       plnConsumptionMWh,
       pltsProdMWh,
+      selfConsumptionMWh,
       factor,
       factorPlts,
       scope2EmissionTon,
@@ -922,9 +934,10 @@ export default function PLTSTab() {
                 value={dashboardData?.summary?.emission?.emissionTon != null ? formatNum(dashboardData.summary.emission.emissionTon, 2, 2) : '—'}
                 unit="tCO₂e"
                 trendText={
-                  <div className="space-y-1">
-                    <div className="text-[11px] text-slate-700 font-medium leading-tight" title="Basis perhitungan kanonik: energi pakai sendiri (kWh) × faktor grid regional ESDM / 1.000 untuk 35 DC operasional dengan faktor resmi">
-                      Basis regional ESDM ({dashboardData?.summary?.emission?.includedPlantCount ?? 35} DC resmi): <span className="font-bold text-slate-900">{formatNum(dashboardData?.summary?.emission?.emissionTon ?? 3591.95, 2, 2)} tCO₂e</span>
+                  <div className="space-y-1.5 whitespace-normal">
+                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold" title={`Emisi Terhindar = Produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
+                      <span className="text-emerald-700 font-medium">Faktor Emisi:</span>
+                      <span className="font-mono text-emerald-900">1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂</span>
                     </div>
                     <div className="text-[11px] text-slate-500 font-medium leading-tight" title="Target korporat (referensi): faktor 0,997294 tCO2e/MWh">
                       Target (referensi RKAP): <span className="font-semibold text-slate-700">{formatNum(dashboardData?.summary?.emission?.targetReferenceTon ?? 4791.34, 2, 2)} tCO₂e</span>
@@ -936,7 +949,7 @@ export default function PLTSTab() {
                 }
                 icon={TrendingUp}
                 theme="success"
-                tooltip="Dihitung dari energi pakai sendiri (kWh) × faktor grid regional ESDM dibagi 1.000. 2 plant (Gorontalo & Manado) dikecualikan dari total resmi karena faktor sementara."
+                tooltip={`Konstanta faktor emisi: 1 kWh = ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂. Dihitung dari produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000.`}
               />
             </div>
           )}
@@ -946,17 +959,23 @@ export default function PLTSTab() {
             {/* Kiri: Produksi PLTS vs PLN (xl:col-span-2) */}
             <CardBox className="xl:col-span-2 flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="size-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                    <BarChart3 size={20} />
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                      <BarChart3 size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">
+                        Produksi PLTS vs Konsumsi PLN (Bulanan)
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Perbandingan konsumsi listrik PLN, output PLTS (MWh - sumbu kiri), dan Emisi Terhindar (tCO₂e - sumbu kanan)
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-base font-bold text-slate-900">
-                      Produksi PLTS vs Konsumsi PLN (Bulanan)
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Perbandingan konsumsi listrik PLN, output PLTS (MWh - sumbu kiri), dan Emisi Terhindar (tCO₂e - sumbu kanan)
-                    </p>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold shrink-0" title={`Perhitungan Emisi Terhindar: Produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
+                    <span className="text-emerald-700 font-medium">Faktor Emisi:</span>
+                    <span className="font-bold font-mono">1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂</span>
                   </div>
                 </div>
 
@@ -1020,7 +1039,7 @@ export default function PLTSTab() {
                                         <strong className="text-emerald-400 font-mono">{Number(currentPoint.cumAvoidedEmissionTon).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} tCO₂e</strong>
                                       </div>
                                       <div className="text-[10px] text-slate-400">
-                                        Basis ESDM &middot; {currentPoint.includedPlantCount ?? 37} plant dihitung ({currentPoint.excludedPlantCount ?? 2} dikecualikan)
+                                        Faktor 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂ (Pakai Sendiri) &middot; {currentPoint.includedPlantCount ?? 37} plant dihitung ({currentPoint.excludedPlantCount ?? 2} dikecualikan)
                                       </div>
                                     </div>
                                   )}
@@ -1056,7 +1075,7 @@ export default function PLTSTab() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="size-3 rounded bg-emerald-500" />
-                  <span className="font-semibold text-emerald-700">Emisi Terhindar (tCO₂e - Sumbu Kanan)</span>
+                  <span className="font-semibold text-emerald-700">Emisi Terhindar (tCO₂e · 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-4 h-0.5 bg-purple-500 border-t border-dashed border-purple-500" />
@@ -1275,7 +1294,7 @@ export default function PLTSTab() {
                     <th className="sticky top-0 z-20 bg-slate-900 text-center px-4 py-3 font-semibold border-b border-slate-700">Faktor<br /><span className="text-slate-400 font-normal normal-case">(kg/kWh)</span></th>
                     <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold text-amber-300 border-b border-slate-700">Emisi Scope 2<br /><span className="font-normal normal-case text-white/70">(tCO₂e)</span></th>
                     <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold border-b border-slate-700">Produksi PLTS<br /><span className="text-slate-400 font-normal normal-case">(MWh)</span></th>
-                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold text-emerald-400 border-b border-slate-700">Emisi Terhindar<br /><span className="font-normal normal-case text-white/70">(tCO₂e)</span></th>
+                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold text-emerald-400 border-b border-slate-700">Emisi Terhindar<br /><span className="font-normal normal-case text-white/70">(tCO₂e · 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂)</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -1356,9 +1375,9 @@ export default function PLTSTab() {
 
             {/* Methodology Note */}
             <div className="mt-4 text-[10px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg border border-slate-100">
-              <p><strong className="text-slate-700">Metode & Faktor Emisi Grid:</strong> sumber: konfigurasi internal (menunggu verifikasi dokumen resmi).</p>
+              <p><strong className="text-slate-700">Faktor Emisi PLTS:</strong> 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂ (konstanta konfigurasi tunggal: <code>PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH</code>).</p>
               <p><strong className="text-slate-700">Rumus Scope 2:</strong> <code>Emisi (tCO₂e) = Konsumsi PLN (MWh) × CM Ex-Post</code></p>
-              <p><strong className="text-slate-700">Rumus PLTS Terhindar:</strong> <code>Penghematan (tCO₂e) = Produksi PLTS (MWh) × CM PLTS</code></p>
+              <p><strong className="text-slate-700">Rumus Emisi Terhindar:</strong> <code>Emisi Terhindar (tCO₂e) = Produksi PLTS yang dipakai sendiri (kWh) × {PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000</code></p>
               <p>Catatan: Penghematan emisi (Avoided Emissions) dari PLTS tidak dikurangi lagi dari Scope 2 karena Scope 2 sudah dihitung murni dari listrik yang dibeli (Purchased Electricity).</p>
             </div>
 
