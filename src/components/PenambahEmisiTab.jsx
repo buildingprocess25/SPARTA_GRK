@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import {
   TrendingUp, Fuel, Zap, AlertCircle,
   Calculator, Gauge, Factory, Building2, Flame,
-  Layers, MapPin, Store, Calendar, ArrowRight
+  Layers, MapPin, Store, Calendar, ArrowRight, PlusCircle
 } from 'lucide-react';
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis,
@@ -14,6 +14,7 @@ import { useSustainability } from '@/context/SustainabilityContext';
 import StatCard from '@/components/ui/StatCard';
 import CardBox from '@/components/ui/CardBox';
 import Scope2AnnualLoadDashboard from '@/components/Scope2AnnualLoadDashboard';
+import Scope1InputModal from '@/components/scope1/Scope1InputModal';
 import {
   branchHierarchyList,
   getHierarchyElectricityStats,
@@ -24,6 +25,7 @@ import {
 
 export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveSubScope }) {
   const { scope1, scope2, dcLocations } = useSustainability();
+  const [isInputModalOpen, setIsInputModalOpen] = useState(false);
 
   // Hierarchy filter state
   const [selectedBranch, setSelectedBranch] = useState('all');
@@ -57,16 +59,31 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
   return (
     <div className="space-y-6 animate-in">
       {/* 1. Header Halaman */}
-      <div className="pb-4 border-b border-slate-100">
-        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 mb-1">
-          {activeSubScope === 'scope1' ? 'Scope 1 — BBM' : 'Scope 2 — Listrik'}
-        </h1>
-        <p className="text-sm text-slate-500 leading-relaxed">
-          {activeSubScope === 'scope1'
-            ? 'Konsumsi BBM genset dan kendaraan operasional.'
-            : 'Konsumsi listrik yang dibeli dan emisi per fasilitas.'}
-        </p>
-      </div>
+      <header className="pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
+            {activeSubScope === 'scope1' ? 'Scope 1 — BBM' : 'Scope 2 — Listrik'}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 leading-relaxed">
+            {activeSubScope === 'scope1'
+              ? 'Konsumsi BBM genset dan kendaraan operasional.'
+              : 'Konsumsi listrik yang dibeli dan emisi per fasilitas.'}
+          </p>
+        </div>
+
+        {activeSubScope === 'scope1' && (
+          <div className="flex items-center gap-2 shrink-0 sm:self-start">
+            <button
+              type="button"
+              onClick={() => setIsInputModalOpen(true)}
+              className="inline-flex items-center justify-center gap-2 h-10 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 text-white shadow-sm hover:bg-slate-800 hover:shadow-md hover:ring-2 hover:ring-slate-700/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 active:scale-[0.98] transition-all duration-150 shrink-0 cursor-pointer"
+            >
+              <Fuel size={16} className="text-rose-400 shrink-0" />
+              <span className="tracking-wide">Input Data Scope 1</span>
+            </button>
+          </div>
+        )}
+      </header>
 
       {/* 2. Metode & Sumber Info */}
       <details className="group border border-slate-200 rounded-xl bg-white shadow-sm [&_summary::-webkit-details-marker]:hidden">
@@ -609,6 +626,14 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           )}
         </div>
       </CardBox>
+
+      {/* Modal Input Data Scope 1 */}
+      {isInputModalOpen && (
+        <Scope1InputModal
+          isOpen={isInputModalOpen}
+          onClose={() => setIsInputModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

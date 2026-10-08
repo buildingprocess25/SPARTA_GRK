@@ -181,24 +181,58 @@ export function SustainabilityProvider({ children }) {
 
       historyDetails = `${calc.label}: ${calc.liters.toLocaleString()} L • Emisi Scope 1: +${calc.emissionTon.toFixed(2)} tCO2e`;
 
-      setScope1(prev => ({
-        ...prev,
-        summary: {
-          ...prev.summary,
-          totalFuelLitersYTD: Number((prev.summary.totalFuelLitersYTD + calc.liters).toFixed(2)),
-          totalEmissionCO2e: Number((prev.summary.totalEmissionCO2e + calc.emissionTon).toFixed(2)),
-          fuelCostTotalJuta: Number((prev.summary.fuelCostTotalJuta + calc.costEstimateJuta).toFixed(1)),
+      setScope1(prev => {
+        const monthMap = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+        const ym = entry.yearMonth || (entry.date ? entry.date.slice(0, 7) : '2026-08');
+        const monthNum = parseInt(ym.slice(5, 7), 10);
+        const targetMonth = monthMap[monthNum - 1] || 'Ags';
+
+        let trendUpdated = false;
+        const newTrend = (prev.monthlyTrend || []).map(m => {
+          if (m.month === targetMonth) {
+            trendUpdated = true;
+            return {
+              ...m,
+              fuelLiters: m.fuelLiters + calc.liters,
+              emissionTon: Number((m.emissionTon + calc.emissionTon).toFixed(2)),
+              runHours: m.runHours + (parseFloat(entry.runHours) || 0)
+            };
+          }
+          return m;
+        });
+
+        if (!trendUpdated) {
+          newTrend.push({
+            month: targetMonth,
+            fuelLiters: calc.liters,
+            emissionTon: Number(calc.emissionTon.toFixed(2)),
+            runHours: parseFloat(entry.runHours) || 0
+          });
         }
-      }));
+
+        return {
+          ...prev,
+          summary: {
+            ...prev.summary,
+            totalFuelLitersYTD: Number((prev.summary.totalFuelLitersYTD + calc.liters).toFixed(2)),
+            totalEmissionCO2e: Number((prev.summary.totalEmissionCO2e + calc.emissionTon).toFixed(2)),
+            fuelCostTotalJuta: Number((prev.summary.fuelCostTotalJuta + calc.costEstimateJuta).toFixed(1)),
+          },
+          monthlyTrend: newTrend
+        };
+      });
 
       setDcLocations(prev => prev.map(dc => {
-        if (dc.name.toLowerCase() === entry.dcName.toLowerCase()) {
+        const matchesDc = (entry.dcId && dc.id === entry.dcId) ||
+          (entry.dcCode && dc.code === entry.dcCode) ||
+          (entry.dcName && dc.name.toLowerCase() === entry.dcName.toLowerCase());
+        if (matchesDc) {
           return {
             ...dc,
             genset: {
               ...dc.genset,
-              monthlyFuelLiters: calc.liters,
-              runHours: parseFloat(entry.runHours) || dc.genset?.runHours || 40,
+              monthlyFuelLiters: (dc.genset?.monthlyFuelLiters || 0) + calc.liters,
+              runHours: (parseFloat(entry.runHours) || 0) + (dc.genset?.runHours || 0),
             }
           };
         }

@@ -12,14 +12,19 @@ import StatCard from '@/components/ui/StatCard';
 import Scope2DcDrawer from '@/components/scope2/Scope2DcDrawer';
 import Scope2Filters from '@/components/scope2/Scope2Filters';
 import Scope2Waterfall from '@/components/scope2/Scope2Waterfall';
+import Scope2InputModal from '@/components/scope2/Scope2InputModal';
 import { buildProjection, filterCanonicalRows, parseScope2Query } from '@/lib/scope2/analytics.js';
 import { aggregateCanonicalRows } from '@/lib/scope2/energyReconciliation.js';
+import { getGridFactor } from '@/lib/emission-factors.js';
 
 const SHOW_TARIFF = false;
 const PAGE_SIZE = 10;
 const number = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 });
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
 const show = value => value === null || value === undefined || !Number.isFinite(value) ? '—' : number.format(value);
+const formatFactor = value => value === null || value === undefined || !Number.isFinite(value)
+  ? '—'
+  : Number(value).toLocaleString('id-ID', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
 function initialFilters() {
   if (typeof window === 'undefined') return { period: 'ytd', month: '2026-09', from: '2026-01', to: '2026-09', grid: 'all', dc: 'all', q: '', tariff: 1400, scope2Basis: 'purchased' };
@@ -65,7 +70,15 @@ function aggregateByPlant(rows) {
   });
   return [...grouped.values()].map(item => {
     const summary = aggregateCanonicalRows(item.rows);
-    return { ...item, ...summary, electricityEnergyKwh: summary.purchasedBasisEnergyKwh + summary.loadUpperBoundEnergyKwh };
+    const gridConfig = getGridFactor(item.grid);
+    const rowFactor = item.rows.find(r => r.gridFactorKgPerKwh != null)?.gridFactorKgPerKwh;
+    const emissionFactor = rowFactor ?? summary.weightedFactorKgPerKwh ?? gridConfig?.cmExPost ?? null;
+    return {
+      ...item,
+      ...summary,
+      emissionFactor,
+      electricityEnergyKwh: summary.purchasedBasisEnergyKwh + summary.loadUpperBoundEnergyKwh,
+    };
   });
 }
 
@@ -85,6 +98,64 @@ export default function Scope2AnnualLoadDashboard() {
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'scope2EmissionTon', direction: 'desc' });
   const [currentPage, setCurrentPage] = useState(1);
+  const [isInputModalOpen, setIsInputModalOpen] = useState(false);
+
+  const handleScope2SubmitSuccess = (entry) => {
+    setData(prev => {
+      if (!prev) return prev;
+      const canonical = prev.canonicalRows || [];
+      const targetPsId = Number(entry.psId);
+      const existingIdx = canonical.findIndex(r =>
+        (targetPsId && Number(r.psId) === targetPsId) ||
+        (entry.dcId && r.dcId === entry.dcId) ||
+        (entry.dcName && r.dcName === entry.dcName)
+      );
+
+      const addedKwh = entry.purchasedKwh || 0;
+      let updatedRows;
+      if (existingIdx >= 0) {
+        updatedRows = [...canonical];
+        const old = updatedRows[existingIdx];
+        const newPurchasedKwh = (old.purchasedBasisEnergyKwh || old.purchasedEnergyKwh || 0) + addedKwh;
+        const ef = entry.gridFactor || old.gridFactorKgPerKwh || 0.87;
+        const newEmissionTon = Number(((newPurchasedKwh * ef) / 1000).toFixed(3));
+
+        updatedRows[existingIdx] = {
+          ...old,
+          purchasedBasisEnergyKwh: newPurchasedKwh,
+          purchasedEnergyKwh: newPurchasedKwh,
+          totalLoadKwh: (old.totalLoadKwh || 0) + addedKwh,
+          scope2EmissionTon: newEmissionTon,
+        };
+      } else {
+        const ef = entry.gridFactor || 0.87;
+        const newEmissionTon = Number(((addedKwh * ef) / 1000).toFixed(3));
+        const newRow = {
+          yearMonth: entry.yearMonth,
+          psId: targetPsId || 9999,
+          dcId: entry.dcId || `DC-${entry.dcName}`,
+          dcName: entry.dcName,
+          grid: entry.grid || 'JAMALI',
+          installedKwp: 0,
+          connectType: 3,
+          purchasedBasisEnergyKwh: addedKwh,
+          loadUpperBoundEnergyKwh: 0,
+          purchasedEnergyKwh: addedKwh,
+          totalSelfConsumedKwh: 0,
+          totalLoadKwh: addedKwh,
+          scope2EmissionTon: newEmissionTon,
+          gridFactorKgPerKwh: ef,
+          periodStatus: 'complete'
+        };
+        updatedRows = [...canonical, newRow];
+      }
+
+      return {
+        ...prev,
+        canonicalRows: updatedRows,
+      };
+    });
+  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -185,7 +256,26 @@ export default function Scope2AnnualLoadDashboard() {
   const updateSort = key => setSortConfig(current => ({ key, direction: current.key === key && current.direction === 'desc' ? 'asc' : 'desc' }));
 
   return <div className="min-w-0 space-y-6 animate-in">
-    <header className="border-b border-slate-100 pb-4"><h1 className="text-2xl font-bold text-slate-900 lg:text-3xl">Scope 2: Listrik PLN</h1><p className="mt-1 text-sm text-slate-500">Emisi karbon dari listrik yang dibeli pada setiap distribution center.</p></header>
+    <header className="pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+      <div>
+        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
+          Scope 2: Listrik PLN
+        </h1>
+        <p className="mt-1 text-sm text-slate-500 leading-relaxed">
+          Emisi karbon dari listrik yang dibeli pada setiap distribution center.
+        </p>
+      </div>
+      <div className="flex items-center gap-2 shrink-0 sm:self-start">
+        <button
+          type="button"
+          onClick={() => setIsInputModalOpen(true)}
+          className="inline-flex items-center justify-center gap-2 h-10 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 text-white shadow-sm hover:bg-slate-800 hover:shadow-md hover:ring-2 hover:ring-slate-700/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 active:scale-[0.98] transition-all duration-150 shrink-0 cursor-pointer"
+        >
+          <Zap size={16} className="text-amber-400 shrink-0" />
+          <span className="tracking-wide">Input Data Scope 2</span>
+        </button>
+      </div>
+    </header>
 
     <CardBox className="space-y-3"><h2 className="text-sm font-bold text-slate-900">Filter data</h2><Scope2Filters filters={filters} grids={grids} plants={plants} onChange={setFilters} />{SHOW_TARIFF && <div className="flex flex-wrap items-end gap-3 border-t pt-3"><label className="text-xs font-semibold text-slate-600">Tarif asumsi (Rp/kWh)<input type="number" min="1" value={filters.tariff} onChange={event => setFilters({ ...filters, tariff: Math.max(1, Number(event.target.value) || 1) })} className="ml-2 w-32 rounded-lg border px-3 py-2" /></label><span className="rounded-full bg-amber-50 px-3 py-1 text-xs text-amber-800">Asumsi, perlu konfirmasi</span><span className="text-xs text-slate-500">Implisit portal: Rp {number.format(data.assumptions.portalImplicitTariffRupiahPerKwh)}/kWh</span></div>}</CardBox>
 
@@ -197,7 +287,7 @@ export default function Scope2AnnualLoadDashboard() {
 
     <CardBox className="space-y-4"><div><h2 className="font-bold text-slate-900">Tren emisi bulanan</h2><p className="text-xs text-slate-500">Energi memakai sumbu kiri (MWh), emisi memakai sumbu kanan (tCO₂e). Bulan berjalan ditandai Parsial dan tidak digunakan sebagai bulan lengkap dalam proyeksi.</p></div>{monthly.length ? <><div className="h-[360px] max-w-full"><ResponsiveContainer width="100%" height="100%"><ComposedChart data={monthly} margin={{ top: 18, left: 10, right: 28 }}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="label" tickFormatter={(label, index) => `${label}${monthly[index]?.periodStatus === 'partial' ? '*' : ''}`} /><YAxis yAxisId="energy" label={{ value: 'Energi (MWh)', angle: -90, position: 'insideLeft' }} /><YAxis yAxisId="emission" orientation="right" label={{ value: 'Emisi (tCO₂e)', angle: 90, position: 'insideRight' }} /><Tooltip content={<Scope2ChartTooltip />} /><Legend /><Bar yAxisId="energy" stackId="energy" dataKey="electricityMwh" name="Listrik dibeli PLN" fill="#2563EB" /><Bar yAxisId="energy" stackId="energy" dataKey="selfMwh" name="PLTS dipakai sendiri" fill="#059669" /><Line yAxisId="emission" dataKey="emissionTon" name="Emisi Scope 2" stroke="#E11D48" strokeWidth={3} dot={{ r: 4 }} connectNulls={false} /></ComposedChart></ResponsiveContainer></div><div className="overflow-x-auto rounded-xl border"><table className="min-w-[900px] w-full text-xs"><thead className="sticky top-0 z-10 bg-slate-900 text-white"><tr><th className="p-3 text-left">Bulan</th><th className="p-3 text-right">Beban total</th><th className="p-3 text-right">PLTS dipakai sendiri</th><th className="p-3 text-right">Dibeli PLN</th><th className="p-3 text-right">Emisi (tCO₂e)</th><th className="p-3 text-right">Cakupan DC</th><th className="p-3 text-right">Perubahan vs bulan lalu (%)</th></tr></thead><tbody>{monthly.map(row => <tr key={row.yearMonth} className={row.periodStatus === 'partial' ? 'border-b bg-amber-50/70' : 'border-b'}><td className="p-3 font-semibold">{row.label} {row.yearMonth.slice(0, 4)}{row.periodStatus === 'partial' && <span className="ml-2 rounded-full border border-amber-300 bg-amber-100 px-2 py-0.5 text-[10px] text-amber-900">Parsial</span>}</td><td className="p-3 text-right">{show(row.loadMwh)} MWh</td><td className="p-3 text-right">{show(row.selfMwh)} MWh</td><td className="p-3 text-right">{show(row.electricityMwh)} MWh</td><td className="p-3 text-right font-semibold text-rose-700">{show(row.emissionTon)} tCO₂e</td><td className="p-3 text-right">{row.plantCount}/{row.monitoredCount}</td><td className="p-3 text-right">{row.changePct === null ? '—' : `${row.changePct > 0 ? '+' : ''}${show(row.changePct)}%`}</td></tr>)}</tbody></table></div></> : <div className="rounded-xl border border-dashed p-10 text-center text-sm text-slate-500">Tidak ada data pada filter yang dipilih.</div>}</CardBox>
 
-    <CardBox className="space-y-4"><div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="font-bold text-slate-900">Emisi per DC</h2><p className="text-xs text-slate-500">Klik baris untuk melihat tren bulanan DC.</p></div><div className="flex items-center gap-2 text-xs text-slate-500"><Search size={15} />{ranking.length} DC</div></div>{ranking.length ? <><div className="max-h-[560px] overflow-auto rounded-xl border"><table className="min-w-[720px] w-full text-xs"><thead className="sticky top-0 z-10 bg-slate-900 text-white"><tr><th className="p-3 text-left"><button onClick={() => updateSort('dcName')} className="font-semibold">Cabang / DC ↕</button></th><th className="p-3 text-left"><button onClick={() => updateSort('grid')} className="font-semibold">Grid ↕</button></th><th className="p-3 text-right"><button onClick={() => updateSort('electricityEnergyKwh')} className="font-semibold">Dibeli PLN (MWh) ↕</button></th><th className="p-3 text-right"><button onClick={() => updateSort('scope2EmissionTon')} className="font-semibold">Emisi YTD (tCO₂e) ↕</button></th></tr></thead><tbody>{rankingPage.map(row => <tr key={row.psId} onClick={() => setSelectedPlant(row)} tabIndex="0" onKeyDown={event => { if (event.key === 'Enter') setSelectedPlant(row); }} className="cursor-pointer border-b hover:bg-blue-50 focus:bg-blue-50 focus:outline-none"><td className="p-3 font-semibold">{row.dcName}</td><td className="p-3">{row.grid}</td><td className="p-3 text-right">{show(row.electricityEnergyKwh / 1_000)}</td><td className="p-3 text-right font-bold text-rose-700">{show(row.scope2EmissionTon)}</td></tr>)}</tbody></table></div><div className="flex items-center justify-between text-xs text-slate-600"><span>Halaman {currentPage} dari {pageCount}</span><div className="flex gap-2"><button aria-label="Halaman sebelumnya" disabled={currentPage === 1} onClick={() => setCurrentPage(page => Math.max(1, page - 1))} className="rounded-lg border p-2 disabled:opacity-40"><ChevronLeft size={16} /></button><button aria-label="Halaman berikutnya" disabled={currentPage === pageCount} onClick={() => setCurrentPage(page => Math.min(pageCount, page + 1))} className="rounded-lg border p-2 disabled:opacity-40"><ChevronRight size={16} /></button></div></div></> : <div className="rounded-xl border border-dashed p-10 text-center text-sm text-slate-500">Tidak ada DC yang cocok dengan filter.</div>}</CardBox>
+    <CardBox className="space-y-4"><div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="font-bold text-slate-900">Emisi per DC</h2><p className="text-xs text-slate-500">Klik baris untuk melihat tren bulanan DC.</p></div><div className="flex items-center gap-2 text-xs text-slate-500"><Search size={15} />{ranking.length} DC</div></div>{ranking.length ? <><div className="max-h-[560px] overflow-auto rounded-xl border"><table className="min-w-[840px] w-full text-xs"><thead className="sticky top-0 z-10 bg-slate-900 text-white"><tr><th className="p-3 text-left"><button onClick={() => updateSort('dcName')} className="font-semibold">Cabang / DC ↕</button></th><th className="p-3 text-left"><button onClick={() => updateSort('grid')} className="font-semibold">Grid ↕</button></th><th className="p-3 text-right"><button onClick={() => updateSort('emissionFactor')} className="font-semibold" title="Faktor Emisi Grid (tCO₂e/MWh) / Faktor Perkalian">Faktor Emisi ↕</button></th><th className="p-3 text-right"><button onClick={() => updateSort('electricityEnergyKwh')} className="font-semibold">Dibeli PLN (MWh) ↕</button></th><th className="p-3 text-right"><button onClick={() => updateSort('scope2EmissionTon')} className="font-semibold">Emisi YTD (tCO₂e) ↕</button></th></tr></thead><tbody>{rankingPage.map(row => <tr key={row.psId} onClick={() => setSelectedPlant(row)} tabIndex="0" onKeyDown={event => { if (event.key === 'Enter') setSelectedPlant(row); }} className="cursor-pointer border-b hover:bg-blue-50 focus:bg-blue-50 focus:outline-none"><td className="p-3 font-semibold text-slate-900">{row.dcName}</td><td className="p-3 font-mono text-slate-600">{row.grid}</td><td className="p-3 text-right font-mono font-medium text-slate-700">{formatFactor(row.emissionFactor)}</td><td className="p-3 text-right font-mono text-slate-700">{show(row.electricityEnergyKwh / 1_000)}</td><td className="p-3 text-right font-mono font-bold text-rose-700">{show(row.scope2EmissionTon)}</td></tr>)}</tbody></table></div><div className="flex items-center justify-between text-xs text-slate-600"><span>Halaman {currentPage} dari {pageCount}</span><div className="flex gap-2"><button aria-label="Halaman sebelumnya" disabled={currentPage === 1} onClick={() => setCurrentPage(page => Math.max(1, page - 1))} className="rounded-lg border p-2 disabled:opacity-40"><ChevronLeft size={16} /></button><button aria-label="Halaman berikutnya" disabled={currentPage === pageCount} onClick={() => setCurrentPage(page => Math.min(pageCount, page + 1))} className="rounded-lg border p-2 disabled:opacity-40"><ChevronRight size={16} /></button></div></div></> : <div className="rounded-xl border border-dashed p-10 text-center text-sm text-slate-500">Tidak ada DC yang cocok dengan filter.</div>}</CardBox>
 
     <CardBox className="space-y-4"><div><h2 className="font-bold text-slate-900">Resume akumulasi karbon YTD</h2><p className="text-xs text-slate-500">Ringkasan hanya memakai bulan lengkap untuk rata-rata, tertinggi, dan terendah.</p></div><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><div className="rounded-xl bg-rose-50 p-4"><p className="text-xs text-rose-700">Total emisi YTD</p><p className="mt-1 text-xl font-bold text-rose-900">{show(summary.scope2EmissionTon)} tCO₂e</p></div><div className="rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-600">Rata-rata per bulan</p><p className="mt-1 text-xl font-bold">{show(averageEmission)} tCO₂e</p></div><div className="rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-600">Bulan tertinggi / terendah</p><p className="mt-1 font-bold">{highest?.label || '—'} / {lowest?.label || '—'}</p></div><div className="rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-600">Proyeksi akhir tahun</p><p className="mt-1 text-xl font-bold">{show(projection.baseAnnual)} tCO₂e</p></div></div><div className="h-64"><ResponsiveContainer width="100%" height="100%"><LineChart data={monthly}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="label" /><YAxis label={{ value: 'Akumulasi (tCO₂e)', angle: -90, position: 'insideLeft' }} /><Tooltip formatter={value => [`${show(value)} tCO₂e`, 'Akumulasi emisi']} /><Line dataKey="cumulativeEmissionTon" name="Akumulasi emisi" stroke="#E11D48" strokeWidth={3} dot={{ r: 4 }} /></LineChart></ResponsiveContainer></div></CardBox>
 
@@ -205,5 +295,15 @@ export default function Scope2AnnualLoadDashboard() {
 
     <div className="flex flex-wrap gap-3"><a href={`/api/scope2/export?format=xlsx&${new URLSearchParams(Object.entries(filters).map(([key, value]) => [key, String(value)]))}`} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">Unduh Excel</a><a href={`/api/scope2/export?format=csv&${new URLSearchParams(Object.entries(filters).map(([key, value]) => [key, String(value)]))}`} className="rounded-lg border border-emerald-600 px-4 py-2 text-sm font-semibold text-emerald-700">Unduh CSV</a></div>
     <Scope2DcDrawer plant={selectedPlant} rows={data.comparisonRows} onClose={() => setSelectedPlant(null)} />
+
+    {/* Modal Input Data Scope 2 */}
+    {isInputModalOpen && (
+      <Scope2InputModal
+        isOpen={isInputModalOpen}
+        onClose={() => setIsInputModalOpen(false)}
+        onSuccess={handleScope2SubmitSuccess}
+        plants={plants}
+      />
+    )}
   </div>;
 }
