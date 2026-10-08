@@ -25,7 +25,6 @@ import { getGridFactor } from '@/lib/emission-factors';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
 import { buildCacheKey } from '@/lib/solar/cacheKey';
 import { SummaryCardsSkeleton, ChartSkeleton, TabContentSkeleton, TableSkeleton } from '@/components/solar/PLTSDashboardSkeletons';
-import PltsScope2Reconciliation from '@/components/solar/PltsScope2Reconciliation';
 
 const PLTSSummaryCard = dynamic(() => import('@/components/PLTSSummaryCard'), {
   loading: () => <TableSkeleton rows={4} />,
@@ -784,8 +783,7 @@ export default function PLTSTab() {
       {/* JIKA MODE: OVERVIEW & TARGET RKAP RESUME */}
       {activePltsSubView === 'overview' && (
         <div className="space-y-6 animate-in">
-          {/* scope2-reconciliation: canonical avoided-emission bridge shared with Scope 2 */}
-          <PltsScope2Reconciliation />
+          {/* scope2-reconciliation: canonical data alignment without banner */}
           {/* Header Controls: Mode Toggle (YTD vs Bulan Ini) */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
             <div className="flex items-center gap-3">
@@ -909,7 +907,7 @@ export default function PLTSTab() {
                 trendText={
                   <div className="space-y-0.5" title="Estimasi, asumsi tarif Rp 1.400/kWh belum dikonfirmasi">
                     <div className="text-xs font-semibold text-emerald-700">
-                      39 dari 39 plant
+                      {dashboardData?.summary?.plantCount ?? 37} dari {dashboardData?.summary?.plantCount ?? 37} DC
                     </div>
                     <div className="text-[11px] text-slate-500">
                       Porsi pakai sendiri {formatNum(dashboardData?.summary?.energyBalance?.coverage?.selfConsumptionSharePct ?? 98.1, 1, 1)}% dari produksi
@@ -925,8 +923,8 @@ export default function PLTSTab() {
                 unit="tCO₂e"
                 trendText={
                   <div className="space-y-1">
-                    <div className="text-[11px] text-slate-700 font-medium leading-tight" title="Basis perhitungan kanonik: energi pakai sendiri (kWh) × faktor grid regional ESDM / 1.000 untuk 37 plant operasional dengan faktor resmi">
-                      Basis regional ESDM (37 plant): <span className="font-bold text-slate-900">{formatNum(dashboardData?.summary?.emission?.emissionTon ?? 3655.85, 2, 2)} tCO₂e</span>
+                    <div className="text-[11px] text-slate-700 font-medium leading-tight" title="Basis perhitungan kanonik: energi pakai sendiri (kWh) × faktor grid regional ESDM / 1.000 untuk 35 DC operasional dengan faktor resmi">
+                      Basis regional ESDM ({dashboardData?.summary?.emission?.includedPlantCount ?? 35} DC resmi): <span className="font-bold text-slate-900">{formatNum(dashboardData?.summary?.emission?.emissionTon ?? 3591.95, 2, 2)} tCO₂e</span>
                     </div>
                     <div className="text-[11px] text-slate-500 font-medium leading-tight" title="Target korporat (referensi): faktor 0,997294 tCO2e/MWh">
                       Target (referensi RKAP): <span className="font-semibold text-slate-700">{formatNum(dashboardData?.summary?.emission?.targetReferenceTon ?? 4791.34, 2, 2)} tCO₂e</span>

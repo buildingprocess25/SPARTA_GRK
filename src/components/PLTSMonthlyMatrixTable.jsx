@@ -95,13 +95,17 @@ export default function PLTSMonthlyMatrixTable({
         ? (actualKwh / targetKwh) * 100
         : null;
 
-      // Derived Environmental Metrics from Conversion Config
-      const emissionTon = actualKwh !== null
-        ? (actualKwh / 1000) * CONVERSION_CONFIG.emission.factorTonPerMwh
-        : null;
+      // Derived Environmental Metrics: Use canonical avoided emission from regional factors
+      const canonicalAvoidedTon = selectedPlantData
+        ? (selectedPlantData.isEmissionEligible && selectedPlantData.factor?.cmPlts != null && actualKwh !== null
+            ? ((Math.max(0, actualKwh - (selectedPlantData.feedInKwh || 0))) * selectedPlantData.factor.cmPlts) / 1000
+            : (actualKwh !== null ? (actualKwh / 1000) * CONVERSION_CONFIG.emission.factorTonPerMwh : null))
+        : (fullMonthly[index]?.avoidedEmissionTon ?? (actualKwh !== null ? (actualKwh / 1000) * CONVERSION_CONFIG.emission.factorTonPerMwh : null));
 
-      const coalTon = actualKwh !== null
-        ? (actualKwh / 1000) * CONVERSION_CONFIG.coal.factorTonPerMwh
+      const emissionTon = canonicalAvoidedTon !== null ? Number(canonicalAvoidedTon.toFixed(2)) : null;
+
+      const coalTon = emissionTon !== null
+        ? Number(((emissionTon / (CONVERSION_CONFIG.emission.factorTonPerMwh || 0.77644)) * CONVERSION_CONFIG.coal.factorTonPerMwh).toFixed(2))
         : null;
 
       const treeCount = emissionTon !== null
@@ -150,16 +154,21 @@ export default function PLTSMonthlyMatrixTable({
       ? (actualYtdKwh / targetYtdKwh) * targetEoyKwh
       : null;
 
-    // Environmental Totals
-    const emissionYtdTon = (actualYtdKwh / 1000) * CONVERSION_CONFIG.emission.factorTonPerMwh;
-    const emissionEoyTargetTon = (targetEoyKwh / 1000) * CONVERSION_CONFIG.emission.factorTonPerMwh;
-    const emissionEoyProjectedTon = projectedEoyKwh ? (projectedEoyKwh / 1000) * CONVERSION_CONFIG.emission.factorTonPerMwh : null;
+    // Environmental Totals (Canonical Regional ESDM Factors on Self-Consumption)
+    const emissionYtdTon = selectedPlantData
+      ? Number(completedYtd.reduce((sum, m) => sum + (m.emissionTon || 0), 0).toFixed(2))
+      : (dashboardData?.summary?.emission?.emissionTon != null
+          ? dashboardData.summary.emission.emissionTon
+          : Number(completedYtd.reduce((sum, m) => sum + (m.emissionTon || 0), 0).toFixed(2)));
 
-    const coalYtdTon = (actualYtdKwh / 1000) * CONVERSION_CONFIG.coal.factorTonPerMwh;
+    const emissionEoyTargetTon = (targetEoyKwh / 1000) * (CONVERSION_CONFIG.emission.factorTonPerMwh || 0.77644);
+    const emissionEoyProjectedTon = projectedEoyKwh ? (projectedEoyKwh / 1000) * (CONVERSION_CONFIG.emission.factorTonPerMwh || 0.77644) : null;
+
+    const coalYtdTon = emissionYtdTon !== null ? Number(((emissionYtdTon / (CONVERSION_CONFIG.emission.factorTonPerMwh || 0.77644)) * CONVERSION_CONFIG.coal.factorTonPerMwh).toFixed(2)) : null;
     const coalEoyTargetTon = (targetEoyKwh / 1000) * CONVERSION_CONFIG.coal.factorTonPerMwh;
     const coalEoyProjectedTon = projectedEoyKwh ? (projectedEoyKwh / 1000) * CONVERSION_CONFIG.coal.factorTonPerMwh : null;
 
-    const treeYtdCount = Math.round(emissionYtdTon * CONVERSION_CONFIG.tree.treesPerTonCo2);
+    const treeYtdCount = emissionYtdTon !== null ? Math.round(emissionYtdTon * CONVERSION_CONFIG.tree.treesPerTonCo2) : null;
     const treeEoyTargetCount = Math.round(emissionEoyTargetTon * CONVERSION_CONFIG.tree.treesPerTonCo2);
     const treeEoyProjectedCount = emissionEoyProjectedTon ? Math.round(emissionEoyProjectedTon * CONVERSION_CONFIG.tree.treesPerTonCo2) : null;
 
@@ -422,14 +431,20 @@ export default function PLTSMonthlyMatrixTable({
               {MONTH_NAMES.map((m, idx) => {
                 const isSelectedCol = idx + 1 === selectedThroughMonth;
                 const isDimmed = idx + 1 > selectedThroughMonth;
+                const isPartial = monthlyRows[idx]?.partial;
                 return (
                   <th
                     key={m}
-                    className={`text-center px-2 py-3 font-semibold min-w-[68px] ${
+                    className={`text-center px-2 py-2.5 font-semibold min-w-[68px] ${
                       isSelectedCol ? 'bg-amber-600/90 text-white ring-1 ring-amber-400' : isDimmed ? 'opacity-50 text-slate-400' : ''
                     }`}
                   >
-                    {m}
+                    <div>{m}</div>
+                    {isPartial && (
+                      <span className="inline-block mt-0.5 text-[8px] font-bold px-1 py-0.2 bg-amber-400/20 text-amber-300 rounded border border-amber-400/30 uppercase tracking-tight">
+                        Parsial
+                      </span>
+                    )}
                   </th>
                 );
               })}

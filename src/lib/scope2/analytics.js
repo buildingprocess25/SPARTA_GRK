@@ -117,15 +117,42 @@ export function detectAnomalies(rows, { field }) {
 }
 
 export function parseScope2Query(searchParams) {
-  const period = ['ytd', 'month', 'range'].includes(searchParams.get('period')) ? searchParams.get('period') : 'ytd';
+  const rawPeriod = (searchParams.get('period') || 'ytd').toLowerCase();
+  const period = ['ytd', 'month', 'range'].includes(rawPeriod) ? rawPeriod : 'ytd';
   const tariffValue = Number(searchParams.get('tariff'));
+  const rawGrid = (searchParams.get('grid') || 'all').trim();
+  const grid = (rawGrid.toLowerCase() === 'all' || rawGrid === '') ? 'all' : rawGrid.toUpperCase();
+  const rawDc = (searchParams.get('dc') || 'all').trim();
+  const dc = (rawDc.toLowerCase() === 'all' || rawDc === '') ? 'all' : rawDc;
+
+  let month = searchParams.get('month') || null;
+  if (month) {
+    month = month.trim();
+    if (/^\d{1,2}$/.test(month)) {
+      month = `2026-${month.padStart(2, '0')}`;
+    } else if (/^\d{4}\d{2}$/.test(month)) {
+      month = `${month.slice(0, 4)}-${month.slice(4, 6)}`;
+    }
+  }
+
+  let from = searchParams.get('from') || null;
+  if (from) {
+    from = from.trim();
+    if (/^\d{4}\d{2}$/.test(from)) from = `${from.slice(0, 4)}-${from.slice(4, 6)}`;
+  }
+  let to = searchParams.get('to') || null;
+  if (to) {
+    to = to.trim();
+    if (/^\d{4}\d{2}$/.test(to)) to = `${to.slice(0, 4)}-${to.slice(4, 6)}`;
+  }
+
   return {
     period,
-    month: searchParams.get('month') || null,
-    from: searchParams.get('from') || null,
-    to: searchParams.get('to') || null,
-    grid: searchParams.get('grid') || 'all',
-    dc: searchParams.get('dc') || 'all',
+    month,
+    from,
+    to,
+    grid,
+    dc,
     q: normalizeText(searchParams.get('q')),
     tariff: Number.isFinite(tariffValue) && tariffValue > 0 ? tariffValue : 1_400,
     scope2Basis: searchParams.get('scope2Basis') === 'load' ? 'load' : 'purchased',
@@ -133,11 +160,42 @@ export function parseScope2Query(searchParams) {
 }
 
 export function filterCanonicalRows(rows, query) {
+  const queryGrid = (query.grid || 'all').trim().toLowerCase();
+  const queryDc = (query.dc || 'all').trim().toLowerCase();
+  const queryQ = query.q ? normalizeText(query.q) : '';
+
   return rows.filter(row => {
-    if (query.grid !== 'all' && row.grid !== query.grid) return false;
-    if (query.dc !== 'all' && ![String(row.psId), row.dcName].includes(query.dc)) return false;
-    if (query.q && !normalizeText(`${row.dcName} ${row.psId}`).includes(query.q)) return false;
-    if (query.period === 'month' && query.month && row.yearMonth !== query.month) return false;
+    if (queryGrid !== 'all' && (row.grid || '').toLowerCase() !== queryGrid) {
+      return false;
+    }
+    if (queryDc !== 'all') {
+      const matchCandidates = [
+        String(row.psId || '').toLowerCase(),
+        (row.dcName || '').toLowerCase(),
+        (row.dcId || '').toLowerCase(),
+        (row.dcId || '').toLowerCase().replace(/^dc-/, ''),
+        normalizeText(row.dcName),
+      ];
+      const targetDc = queryDc.replace(/^dc-/, '');
+      const normalizedTarget = normalizeText(queryDc);
+      if (
+        !matchCandidates.includes(queryDc) &&
+        !matchCandidates.includes(targetDc) &&
+        !matchCandidates.includes(normalizedTarget)
+      ) {
+        return false;
+      }
+    }
+    if (queryQ) {
+      const searchHaystack = normalizeText(`${row.dcName || ''} ${row.psId || ''} ${row.dcId || ''}`);
+      if (!searchHaystack.includes(queryQ)) return false;
+    }
+    if (query.period === 'month' && query.month) {
+      const targetMonth = query.month.includes('-')
+        ? query.month
+        : `2026-${query.month.padStart(2, '0')}`;
+      if (row.yearMonth !== targetMonth) return false;
+    }
     if (query.period === 'range') {
       if (query.from && row.yearMonth < query.from) return false;
       if (query.to && row.yearMonth > query.to) return false;

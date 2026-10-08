@@ -66,6 +66,7 @@ export function reconcilePlantMonth(input) {
   return {
     yearMonth: input.yearMonth,
     psId: input.psId ?? null,
+    dcId: input.dcId ?? null,
     dcName: input.dcName,
     grid: input.grid ?? null,
     installedKwp: finiteOrNull(input.installedKwp),

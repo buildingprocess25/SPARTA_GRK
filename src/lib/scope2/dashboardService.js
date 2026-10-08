@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { CARBON_FACTORS, FACTOR_REGISTRY_PROVENANCE } from '../carbon/carbonEngine.js';
 import { parseIsolarMonthlyReportFile } from '../importers/isolarMonthlyReport.js';
-import { CANONICAL_DC_ENTITIES, normalizeName } from '../solar/plantMap.js';
+import { CANONICAL_DC_ENTITIES, isDcLocation, normalizeName } from '../solar/plantMap.js';
 import { parseAnnualLoadReport } from './annualLoadReport.js';
 import {
   buildAutomaticSummary,
@@ -65,9 +65,13 @@ function loadInputs(rootDir) {
 
 function buildRows({ loadReports, productionReports, discovery }) {
   const productionByKey = new Map();
+  const feedInByKey = new Map();
   for (const report of productionReports) {
     for (const record of report.records) {
-      if (record.status === 'VALID') productionByKey.set(`${record.psId}|${record.yearMonth}`, record.energyKwh);
+      if (record.status === 'VALID') {
+        productionByKey.set(`${record.psId}|${record.yearMonth}`, record.energyKwh);
+        feedInByKey.set(`${record.psId}|${record.yearMonth}`, record.feedInKwh ?? 0);
+      }
     }
   }
   const connectTypeByPsId = new Map(discovery.plants.map(plant => [Number(plant.ps_id), Number(plant.connect_type)]));
@@ -78,19 +82,25 @@ function buildRows({ loadReports, productionReports, discovery }) {
     for (const record of report.records) {
       if (record.status !== 'VALID') continue;
       const entity = resolveEntity(record.plantName);
+      if (!isDcLocation(entity)) continue; // Filter: 37 Distribution Centers only (sembunyikan 2 pilot Drive Thru)
+
       const psId = Number(entity.sungrowPsIds[0]);
       const factor = factorForGrid(entity.grid);
       const isPartial = record.yearMonth === '2026-10';
+      const prodKwh = productionByKey.get(`${psId}|${record.yearMonth}`) ?? null;
+      const feedInKwh = feedInByKey.get(`${psId}|${record.yearMonth}`) ?? 0;
+
       output.push(reconcilePlantMonth({
         yearMonth: record.yearMonth,
         psId,
+        dcId: entity.dcId,
         dcName: entity.canonicalName,
         grid: entity.grid,
         installedKwp: entity.apiInstalledKwp,
-        connectType: connectTypeByPsId.get(psId) ?? null,
+        connectType: connectTypeByPsId.get(psId) ?? 3,
         loadKwh: record.loadKwh,
-        productionKwh: productionByKey.get(`${psId}|${record.yearMonth}`) ?? null,
-        exportKwh: null,
+        productionKwh: prodKwh,
+        exportKwh: feedInKwh,
         gridFactorKgPerKwh: factor.value,
         factorStatus: factor.status,
         periodStatus: isPartial ? 'partial' : 'complete',

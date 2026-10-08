@@ -77,6 +77,23 @@ test('query parsing and filtering share period, grid, DC and tolerant search', (
   assert.equal(filtered[0].dcName, 'Alfamart DC A');
 });
 
+test('query parsing and filtering tolerate uppercase grid=ALL, dc=ALL, and DC prefix', () => {
+  const qAll = parseScope2Query(new URLSearchParams('grid=ALL&dc=ALL'));
+  assert.equal(qAll.grid, 'all');
+  assert.equal(qAll.dc, 'all');
+  const rows = [row({ psId: 10, dcId: 'DC-BALARAJA', dcName: 'Balaraja', grid: 'JAMALI' })];
+  assert.equal(filterCanonicalRows(rows, qAll).length, 1);
+
+  const qPrefix = parseScope2Query(new URLSearchParams('dc=DC-BALARAJA'));
+  assert.equal(filterCanonicalRows(rows, qPrefix).length, 1);
+
+  const qCaseGrid = parseScope2Query(new URLSearchParams('grid=jamali'));
+  assert.equal(filterCanonicalRows(rows, qCaseGrid).length, 1);
+
+  const qMonthNum = parseScope2Query(new URLSearchParams('period=month&month=1'));
+  assert.equal(filterCanonicalRows(rows, qMonthNum).length, 1);
+});
+
 test('automatic summary never emits undefined or NaN', () => {
   const sentences = buildAutomaticSummary({ rows: [row()], targetPltsSharePct: null });
   const text = sentences.join(' ');

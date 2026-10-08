@@ -135,6 +135,94 @@ export const FACTOR_REGISTRY_PROVENANCE = [
     notes: 'Faktor emisi jaringan interkoneksi Jawa-Madura-Bali'
   },
   {
+    factorKey: 'GRID_SUMATERA',
+    category: 'Scope 2 (Listrik PLN)',
+    factorValue: 0.761,
+    unit: 'kgCO2e / kWh',
+    sourceDocument: 'SK Dirjen Ketenagalistrikan ESDM (Grid Sumatera)',
+    year: '2024',
+    scope: 'Scope 2 - Purchased Electricity',
+    validationStatus: 'ACTIVE',
+    notes: 'Faktor emisi jaringan interkoneksi Sumatera'
+  },
+  {
+    factorKey: 'GRID_KALBAR',
+    category: 'Scope 2 (Listrik PLN)',
+    factorValue: 0.95,
+    unit: 'kgCO2e / kWh',
+    sourceDocument: 'SK Dirjen Ketenagalistrikan ESDM (Grid Kalbar)',
+    year: '2024',
+    scope: 'Scope 2 - Purchased Electricity',
+    validationStatus: 'ACTIVE',
+    notes: 'Faktor emisi jaringan Kalimantan Barat'
+  },
+  {
+    factorKey: 'GRID_KALSELTENG',
+    category: 'Scope 2 (Listrik PLN)',
+    factorValue: 1.20,
+    unit: 'kgCO2e / kWh',
+    sourceDocument: 'SK Dirjen Ketenagalistrikan ESDM (Grid Kalselteng)',
+    year: '2024',
+    scope: 'Scope 2 - Purchased Electricity',
+    validationStatus: 'ACTIVE',
+    notes: 'Faktor emisi jaringan Kalimantan Selatan & Tengah'
+  },
+  {
+    factorKey: 'GRID_SULSELRABAR',
+    category: 'Scope 2 (Listrik PLN)',
+    factorValue: 0.75,
+    unit: 'kgCO2e / kWh',
+    sourceDocument: 'SK Dirjen Ketenagalistrikan ESDM (Grid Sulselrabar)',
+    year: '2024',
+    scope: 'Scope 2 - Purchased Electricity',
+    validationStatus: 'ACTIVE',
+    notes: 'Faktor emisi jaringan Sulawesi Selatan, Barat & Tenggara'
+  },
+  {
+    factorKey: 'GRID_BATAM',
+    category: 'Scope 2 (Listrik PLN)',
+    factorValue: 0.76,
+    unit: 'kgCO2e / kWh',
+    sourceDocument: 'SK Dirjen Ketenagalistrikan ESDM (Grid Batam)',
+    year: '2024',
+    scope: 'Scope 2 - Purchased Electricity',
+    validationStatus: 'ACTIVE',
+    notes: 'Faktor emisi sistem Batam-Bintan'
+  },
+  {
+    factorKey: 'GRID_NTB_LOMBOK',
+    category: 'Scope 2 (Listrik PLN)',
+    factorValue: 0.87,
+    unit: 'kgCO2e / kWh',
+    sourceDocument: 'SK Dirjen Ketenagalistrikan ESDM (Grid Lombok)',
+    year: '2024',
+    scope: 'Scope 2 - Purchased Electricity',
+    validationStatus: 'ACTIVE',
+    notes: 'Faktor emisi sistem Lombok'
+  },
+  {
+    factorKey: 'GRID_LOMBOK',
+    category: 'Scope 2 (Listrik PLN)',
+    factorValue: 0.87,
+    unit: 'kgCO2e / kWh',
+    sourceDocument: 'SK Dirjen Ketenagalistrikan ESDM (Grid Lombok)',
+    year: '2024',
+    scope: 'Scope 2 - Purchased Electricity',
+    validationStatus: 'ACTIVE',
+    notes: 'Faktor emisi sistem Lombok'
+  },
+  {
+    factorKey: 'GRID_SULUTGO',
+    category: 'Scope 2 (Listrik PLN)',
+    factorValue: 0.60,
+    unit: 'kgCO2e / kWh',
+    sourceDocument: 'Estimasi sementara ESDM Sulutgo',
+    year: '2024',
+    scope: 'Scope 2 - Purchased Electricity',
+    validationStatus: 'TEMPORARY',
+    notes: 'Faktor emisi sementara Sulutgo (menunggu SK resmi spesifik)'
+  },
+  {
     factorKey: 'PLTS_PORTFOLIO_AVOIDED',
     category: 'Pengurang Emisi (PLTS)',
     factorValue: 0.997,

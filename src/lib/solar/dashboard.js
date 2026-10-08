@@ -338,6 +338,17 @@ export function buildPltsDashboardFromRows({
   const year = periodYear(query);
   const monthNumbers = selectedMonthNumbers(query);
   const selectedKeys = monthNumbers.map((month) => monthKey(year, month));
+
+  // Deduplicate loads (prevent double counting between MONITOR_PLTS_WORKBOOK and ISOLAR_ANNUAL_REPORT)
+  const uniqueLoads = [];
+  const seenLoadKey = new Set();
+  for (const l of loads) {
+    const key = `${l.yearMonth}:${l.psId}`;
+    if (!seenLoadKey.has(key)) {
+      seenLoadKey.add(key);
+      uniqueLoads.push(l);
+    }
+  }
   const index = observationIndex(observations);
   const requestedPlantIds = (query.plant && query.plant !== 'ALL')
     ? query.plant.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean)
@@ -379,7 +390,7 @@ export function buildPltsDashboardFromRows({
         ? false
         : (plant.codDate ? isPlantOperationalInMonth(plant.codDate, item.yearMonth) : (plant.commissionedAt ? isPlantOperationalInMonth(plant.commissionedAt, item.yearMonth) : true)),
     })));
-    const loadRows = loads.filter((item) => (
+    const loadRows = uniqueLoads.filter((item) => (
       (plant.sungrowPsIds || []).includes(Number(item.psId)) && selectedKeys.includes(item.yearMonth)
     ));
     const loadValues = loadRows.map((item) => finiteOrNull(item.loadKwh)).filter((value) => value !== null);
@@ -647,7 +658,7 @@ export function buildPltsDashboardFromRows({
     const selfConsumptionMwh = selfConsumptionKwh !== null ? round(selfConsumptionKwh / 1000, 2) : actualMwh;
 
     // Monthly Load
-    const monthLoads = loads.filter((item) => item.yearMonth === ym && filteredPlants.some(p => (p.sungrowPsIds || []).includes(Number(item.psId))));
+    const monthLoads = uniqueLoads.filter((item) => item.yearMonth === ym && filteredPlants.some(p => (p.sungrowPsIds || []).includes(Number(item.psId))));
     const loadKwh = monthLoads.length ? round(monthLoads.reduce((sum, item) => sum + (Number(item.loadKwh) || 0), 0)) : null;
     const loadMwh = loadKwh !== null ? round(loadKwh / 1000, 2) : null;
 
@@ -814,19 +825,44 @@ export function buildPltsDashboardFromRows({
     }
     const monthPr = calculateWeightedPr(monthPrInputs);
 
+    // Monthly Avoided Emissions & Energy Flow (Canonical: Self-consumption * ESDM factor / 1000)
+    let monthAvoidedEmissionTon = 0;
+    const monthFlows = energyFlows.filter((item) => item.yearMonth === ym && selectedPsIds.has(Number(item.psId)));
+    const feedInKwh = monthFlows.length ? round(monthFlows.reduce((sum, item) => sum + (Number(item.feedInKwh) || 0), 0)) : 0;
+    const selfConsumptionKwh = actualKwh !== null ? round(Math.max(0, actualKwh - feedInKwh)) : null;
+
+    for (const p of plantRows) {
+      const pProdKwh = plantMonthly.find((m, i) => plantRows[i]?.dcId === p.dcId)?.energyKwh;
+      if (pProdKwh !== null && pProdKwh !== undefined) {
+        const pFlows = energyFlows.filter((item) => item.yearMonth === ym && (p.psIds || []).includes(Number(item.psId)));
+        const pFeedInKwh = pFlows.length ? pFlows.reduce((s, item) => s + (Number(item.feedInKwh) || 0), 0) : 0;
+        const pSelfKwh = Math.max(0, Number(pProdKwh) - pFeedInKwh);
+
+        if (p.isEmissionEligible && p.factor?.cmPlts != null) {
+          monthAvoidedEmissionTon += (pSelfKwh * p.factor.cmPlts) / 1000;
+        }
+      }
+    }
+
+    const partial = ym >= currentYearMonth || plantMonthly.some((m) => m?.partial);
+
     return {
       month,
       yearMonth: ym,
       actualKwh,
       actualMwh,
+      selfConsumptionKwh,
+      feedInKwh,
+      avoidedEmissionTon: actualKwh !== null ? round(monthAvoidedEmissionTon, 2) : null,
       targetKwh: targetKwhVal,
       targetMwh: targetMwhVal,
       achievementPct: calculateAchievement(actualKwh, targetKwhVal),
       prValuePct: monthPr?.valuePct ?? null,
-      isCompleted: ym < currentYearMonth && actualKwh !== null,
+      isCompleted: ym < currentYearMonth && actualKwh !== null && !partial,
       isCurrent: ym === currentYearMonth,
       isFuture: ym > currentYearMonth,
       isWithinYtd: month <= (query.mode === 'YTD' ? query.throughMonth : query.month),
+      partial,
     };
   });
 

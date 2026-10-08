@@ -9,15 +9,15 @@ test('builds one canonical view model for Scope 2, PLTS and main dashboard', () 
     now: new Date('2026-10-07T00:00:00Z'),
   });
 
-  assert.equal(dashboard.coverage.monitoredPlantCount, 39);
+  assert.equal(dashboard.coverage.monitoredPlantCount, 37);
   assert.equal(dashboard.current.completeThroughMonth, 9);
   assert.equal(dashboard.current.partialMonth, 10);
   assert.equal(dashboard.current.partialDataThroughDate, '2026-10-02');
-  assert.equal(dashboard.current.completeRows.length, 351);
-  assert.equal(dashboard.current.partialRows.length, 39);
-  assert.equal(dashboard.summary.plantMonthCount, 390);
-  assert.equal(dashboard.summary.purchasedBasisCount, 144);
-  assert.equal(dashboard.summary.loadUpperBoundCount, 246);
+  assert.equal(dashboard.current.completeRows.length, 333);
+  assert.equal(dashboard.current.partialRows.length, 37);
+  assert.equal(dashboard.summary.plantMonthCount, 370);
+  assert.equal(dashboard.summary.purchasedBasisCount, 333);
+  assert.equal(dashboard.summary.loadUpperBoundCount, 37);
   assert.equal(dashboard.monthly.length, 10);
   assert.equal(dashboard.monthly[9].periodStatus, 'partial');
 });

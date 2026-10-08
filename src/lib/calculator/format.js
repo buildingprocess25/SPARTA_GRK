@@ -10,3 +10,7 @@ export function formatEmission(valueKg) {
     ? `${idNumber.format(valueKg / 1_000)} tCO₂e (${idNumber.format(valueKg)} kgCO₂e)`
     : `${idNumber.format(valueKg)} kgCO₂e`;
 }
+
+export function formatTotalEmission(valueKg) {
+  return Number.isFinite(valueKg) && valueKg !== 0 ? formatEmission(valueKg) : '—';
+}

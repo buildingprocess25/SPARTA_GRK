@@ -1,10 +1,12 @@
-import { factorByCode } from './factors.v1.js';
+import { FACTOR_STATUS, factorByCode } from './factors.v1.js';
 
 const DAY_MS = 86_400_000;
 
 function parseDate(value, label = 'Tanggal') {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
+  if (!match) throw new Error(`${label} tidak valid`);
   const date = new Date(`${value}T00:00:00Z`);
-  if (!value || Number.isNaN(date.getTime())) throw new Error(`${label} tidak valid`);
+  if (Number.isNaN(date.getTime()) || date.getUTCFullYear() !== Number(match[1]) || date.getUTCMonth() + 1 !== Number(match[2]) || date.getUTCDate() !== Number(match[3])) throw new Error(`${label} tidak valid`);
   return date;
 }
 
@@ -15,20 +17,19 @@ function nonNegative(value, label) {
   return parsed;
 }
 
-function requirePositive(value, label) {
+function positive(value, label) {
   const parsed = nonNegative(value, label);
   if (parsed === 0) throw new Error(`${label} harus lebih dari 0`);
   return parsed;
 }
 
-function getFactor(code, registry, allowMissing = false) {
-  const factor = factorByCode(code, registry);
-  if (!factor) throw new Error('Faktor emisi tidak ditemukan');
-  if (!Number.isFinite(factor.value)) {
-    if (allowMissing) return factor;
+function getFactor(code, registry, allowUnavailable = false) {
+  const found = factorByCode(code, registry);
+  if (!found) throw new Error('Faktor emisi tidak ditemukan');
+  if ((!Number.isFinite(found.value) || found.status === FACTOR_STATUS.NEEDS_FACTOR) && !allowUnavailable) {
     throw new Error('Faktor emisi belum tersedia');
   }
-  return factor;
+  return found;
 }
 
 export function inclusiveDays(start, end) {
@@ -38,11 +39,14 @@ export function inclusiveDays(start, end) {
   return Math.floor((to - from) / DAY_MS) + 1;
 }
 
-function daysInYear(year) {
+export function daysInYear(year) {
   return new Date(Date.UTC(year, 1, 29)).getUTCDate() === 29 ? 366 : 365;
 }
 
-function overlapAnnualAmount(annualKg, periodStart, periodEnd, ownershipStart, ownershipEnd) {
+export function prorateAnnualAmount(annualKg, periodStart, periodEnd, ownershipStart, ownershipEnd) {
+  const annual = nonNegative(annualKg, 'Nominal tahunan');
+  inclusiveDays(periodStart, periodEnd);
+  inclusiveDays(ownershipStart, ownershipEnd);
   const start = new Date(Math.max(parseDate(periodStart), parseDate(ownershipStart)));
   const end = new Date(Math.min(parseDate(periodEnd), parseDate(ownershipEnd)));
   if (end < start) return 0;
@@ -50,73 +54,148 @@ function overlapAnnualAmount(annualKg, periodStart, periodEnd, ownershipStart, o
   for (let year = start.getUTCFullYear(); year <= end.getUTCFullYear(); year += 1) {
     const segmentStart = new Date(Math.max(start, new Date(Date.UTC(year, 0, 1))));
     const segmentEnd = new Date(Math.min(end, new Date(Date.UTC(year, 11, 31))));
-    const days = Math.floor((segmentEnd - segmentStart) / DAY_MS) + 1;
-    total += annualKg * days / daysInYear(year);
+    total += annual * (Math.floor((segmentEnd - segmentStart) / DAY_MS) + 1) / daysInYear(year);
   }
   return total;
 }
 
-function result(kgCo2e, factor = null, details = {}) {
-  return { kgCo2e, status: 'calculated', factorSnapshot: factor ? structuredClone(factor) : null, details };
+function toKilograms(amount, unit, factor) {
+  if (unit === 'kg') return amount;
+  if (unit === 'L') {
+    if (!factor.densityKgPerL) throw new Error('Densitas kg/L belum tersedia untuk konversi');
+    return amount * factor.densityKgPerL;
+  }
+  if (unit === 'm3') {
+    if (!factor.densityKgPerM3) throw new Error('Densitas kg/m³ belum tersedia untuk konversi');
+    return amount * factor.densityKgPerM3;
+  }
+  if (unit === 'GJ') {
+    if (!factor.ncvMjPerKg) throw new Error('Nilai kalor belum tersedia untuk konversi');
+    return amount * 1_000 / factor.ncvMjPerKg;
+  }
+  throw new Error('Satuan aktivitas tidak didukung');
+}
+
+export function convertFuelActivity(amountValue, fromUnit, factor) {
+  const amount = nonNegative(amountValue, 'Data aktivitas');
+  const target = factor.activityUnit || factor.unit?.split('/').at(-1);
+  if (fromUnit === target) return amount;
+  const kilograms = toKilograms(amount, fromUnit, factor);
+  if (target === 'kg') return kilograms;
+  if (target === 'L') {
+    if (!factor.densityKgPerL) throw new Error('Densitas kg/L belum tersedia untuk konversi');
+    return kilograms / factor.densityKgPerL;
+  }
+  if (target === 'm3') {
+    if (!factor.densityKgPerM3) throw new Error('Densitas kg/m³ belum tersedia untuk konversi');
+    return kilograms / factor.densityKgPerM3;
+  }
+  if (target === 'GJ') {
+    if (!factor.ncvMjPerKg) throw new Error('Nilai kalor belum tersedia untuk konversi');
+    return kilograms * factor.ncvMjPerKg / 1_000;
+  }
+  throw new Error('Satuan faktor tidak didukung');
+}
+
+function calculated(kgCo2e, factors = [], details = {}) {
+  const snapshots = factors.filter(Boolean).map(item => structuredClone(item));
+  return { kgCo2e, status: 'calculated', factorSnapshot: snapshots[0] || null, factorSnapshots: snapshots, details };
+}
+
+function unavailable(factor, details = {}) {
+  return { kgCo2e: null, status: 'needs_factor', factorSnapshot: structuredClone(factor), factorSnapshots: [structuredClone(factor)], details };
 }
 
 export function calculateEntry(input, registry) {
   switch (input.category) {
-    case 'scope1a':
-    case 'scope2':
-    case 'renewable': {
-      const activity = nonNegative(input.activity, 'Data aktivitas');
-      const factor = getFactor(input.factorCode, registry);
-      return result(activity * factor.value, factor, { activity, factorValue: factor.value });
+    case 'scope1a': {
+      const emissionFactor = getFactor(input.factorCode, registry);
+      const convertedActivity = convertFuelActivity(input.activity, input.activityUnit || emissionFactor.activityUnit || 'L', emissionFactor);
+      return calculated(convertedActivity * emissionFactor.value, [emissionFactor], { activity: Number(input.activity), activityUnit: input.activityUnit || emissionFactor.activityUnit, convertedActivity, factorValue: emissionFactor.value });
     }
     case 'scope1b': {
-      const factor = getFactor(input.factorCode, registry);
+      const emissionFactor = getFactor(input.factorCode, registry);
+      if (input.mode === 'distance' && emissionFactor.category === 'vehicle') {
+        const distanceKm = nonNegative(input.distanceKm, 'Jarak');
+        const defaultConsumption = emissionFactor.defaultKmPerLiter;
+        const kmPerLiter = positive(input.kmPerLiter || defaultConsumption, 'Konsumsi kendaraan');
+        const fuel = getFactor(emissionFactor.fuelFactorCode, registry);
+        const kgCo2e = distanceKm / kmPerLiter * fuel.value;
+        return calculated(kgCo2e, [emissionFactor, fuel], { distanceKm, kmPerLiter, liters: distanceKm / kmPerLiter });
+      }
       const liters = input.mode === 'distance'
-        ? nonNegative(input.distanceKm, 'Jarak') / requirePositive(input.kmPerLiter, 'Konsumsi kendaraan')
-        : nonNegative(input.activity, 'Pemakaian BBM');
-      return result(liters * factor.value, factor, { liters, factorValue: factor.value });
+        ? nonNegative(input.distanceKm, 'Jarak') / positive(input.kmPerLiter, 'Konsumsi kendaraan')
+        : convertFuelActivity(input.activity, input.activityUnit || emissionFactor.activityUnit || 'L', emissionFactor);
+      return calculated(liters * emissionFactor.value, [emissionFactor], { convertedActivity: liters, factorValue: emissionFactor.value });
+    }
+    case 'scope2': {
+      const emissionFactor = getFactor(input.factorCode, registry);
+      const activity = nonNegative(input.activity, 'Pemakaian listrik');
+      return calculated(activity * emissionFactor.value, [emissionFactor], { activity, factorValue: emissionFactor.value });
+    }
+    case 'renewable': {
+      // Compatibility: legacy entries only supplied activity + a grid factor.
+      if (!input.technologyFactorCode) {
+        const grid = getFactor(input.factorCode, registry);
+        const activity = nonNegative(input.activity, 'Energi terbarukan');
+        return calculated(activity * grid.value, [grid], { selfConsumedKwh: activity, exportedKwh: 0, gridFactor: grid.value, lifecycleFactor: 0 });
+      }
+      const grid = getFactor(input.gridFactorCode, registry);
+      const technology = getFactor(input.technologyFactorCode, registry);
+      const selfConsumedKwh = nonNegative(input.selfConsumedKwh, 'Energi dipakai sendiri');
+      const exportedKwh = nonNegative(input.exportedKwh || 0, 'Energi diekspor');
+      const avoidedPerKwh = Math.max(0, grid.value - technology.value);
+      return calculated(selfConsumedKwh * avoidedPerKwh, [grid, technology], { selfConsumedKwh, exportedKwh, gridFactor: grid.value, lifecycleFactor: technology.value, avoidedPerKwh });
     }
     case 'flight':
-    case 'train': {
-      const factor = getFactor(input.factorCode, registry);
+    case 'train':
+    case 'bus':
+    case 'taxi': {
+      const emissionFactor = getFactor(input.factorCode, registry);
       const passengers = nonNegative(input.passengers, 'Jumlah penumpang');
       const distanceKm = nonNegative(input.distanceKm, 'Jarak');
-      return result(passengers * distanceKm * factor.value, factor, { passengers, distanceKm });
+      return calculated(passengers * distanceKm * emissionFactor.value, [emissionFactor], { passengers, distanceKm });
     }
     case 'hotel': {
-      const factor = getFactor(input.factorCode, registry);
+      const emissionFactor = getFactor(input.factorCode, registry);
       const rooms = nonNegative(input.rooms, 'Jumlah kamar');
       const nights = nonNegative(input.nights, 'Jumlah malam');
-      return result(rooms * nights * factor.value, factor, { rooms, nights });
+      return calculated(rooms * nights * emissionFactor.value, [emissionFactor], { rooms, nights });
     }
     case 'financed': {
       const outstanding = nonNegative(input.outstanding, 'Outstanding');
-      const enterpriseValue = requirePositive(input.enterpriseValue, 'Nilai perusahaan');
+      const enterpriseValue = positive(input.enterpriseValue, 'Nilai perusahaan');
       const investeeEmissionKg = nonNegative(input.investeeEmissionKg, 'Emisi investee');
       const attribution = outstanding / enterpriseValue;
-      if (attribution > 1) throw new Error('Faktor atribusi harus antara 0 dan 1');
-      return result(attribution * investeeEmissionKg, null, { attribution });
+      if (attribution < 0 || attribution > 1) throw new Error('Faktor atribusi harus antara 0 dan 1');
+      return calculated(attribution * investeeEmissionKg, [], { attribution });
     }
     case 'offset': {
       const annualKg = nonNegative(input.annualKg, 'Nominal tahunan');
       inclusiveDays(input.periodStart, input.periodEnd);
       inclusiveDays(input.ownershipStart, input.ownershipEnd);
-      return result(overlapAnnualAmount(annualKg, input.periodStart, input.periodEnd, input.ownershipStart, input.ownershipEnd), null, { annualKg });
+      const offsetFactor = input.factorCode ? getFactor(input.factorCode, registry, true) : null;
+      if (offsetFactor && (!Number.isFinite(offsetFactor.value) || offsetFactor.status === FACTOR_STATUS.NEEDS_FACTOR)) return unavailable(offsetFactor, { annualKg, periodStart: input.periodStart, periodEnd: input.periodEnd, ownershipStart: input.ownershipStart, ownershipEnd: input.ownershipEnd });
+      const prorated = prorateAnnualAmount(annualKg, input.periodStart, input.periodEnd, input.ownershipStart, input.ownershipEnd);
+      return calculated(prorated * (offsetFactor?.value ?? 1), offsetFactor ? [offsetFactor] : [], { annualKg, proratedKg: prorated });
     }
     case 'ev':
     case 'kkb': {
-      const factor = getFactor(input.factorCode, registry);
+      const grid = getFactor(input.gridFactorCode || input.factorCode, registry);
+      const vehicle = input.evFactorCode ? getFactor(input.evFactorCode, registry) : null;
       const units = input.category === 'kkb' ? nonNegative(input.units, 'Jumlah unit') : 1;
       const distance = input.category === 'kkb' ? nonNegative(input.distanceKmPerUnit, 'Jarak per unit') * units : nonNegative(input.distanceKm, 'Jarak');
-      const baseline = distance * nonNegative(input.baselineKgPerKm, 'Faktor baseline');
-      const electricityKwh = distance * nonNegative(input.consumptionKwhPerKm, 'Konsumsi listrik');
-      return result(Math.max(0, baseline - electricityKwh * factor.value), factor, { distanceKm: distance, baselineKg: baseline, electricityKwh });
+      const baselineKgPerKm = nonNegative(input.baselineKgPerKm ?? vehicle?.baselineKgPerKm, 'Faktor baseline');
+      const consumptionKwhPerKm = nonNegative(input.consumptionKwhPerKm ?? vehicle?.value, 'Konsumsi listrik');
+      const baselineKg = distance * baselineKgPerKm;
+      const electricityKwh = distance * consumptionKwhPerKm;
+      return calculated(Math.max(0, baselineKg - electricityKwh * grid.value), [grid, vehicle], { distanceKm: distance, baselineKg, electricityKwh, electricityEmissionKg: electricityKwh * grid.value });
     }
     case 'green_security': {
       const holdingRupiah = nonNegative(input.holdingRupiah, 'Nilai kepemilikan');
-      const factor = getFactor(input.factorCode, registry, true);
-      if (!Number.isFinite(factor.value)) return { kgCo2e: null, status: 'needs_factor', factorSnapshot: structuredClone(factor), details: { holdingRupiah } };
-      return result(holdingRupiah * factor.value, factor, { holdingRupiah });
+      const pendingFactor = getFactor(input.factorCode, registry, true);
+      if (!Number.isFinite(pendingFactor.value) || pendingFactor.status === FACTOR_STATUS.NEEDS_FACTOR) return unavailable(pendingFactor, { holdingRupiah });
+      return calculated(holdingRupiah * pendingFactor.value, [pendingFactor], { holdingRupiah });
     }
     default:
       throw new Error('Kategori kalkulasi tidak dikenali');
@@ -142,5 +221,7 @@ export function summarizeEntries(entries) {
     netKg: totalAdditionKg - totalReductionKg,
     reductionPct: totalAdditionKg > 0 ? totalReductionKg / totalAdditionKg * 100 : null,
     byCategory,
+    unavailableCount: entries.filter(entry => entry.status === 'needs_factor').length,
+    temporaryCount: entries.filter(entry => (entry.factorSnapshots || [entry.factorSnapshot]).filter(Boolean).some(item => item.status === FACTOR_STATUS.TEMPORARY)).length,
   };
 }
