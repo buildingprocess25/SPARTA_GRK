@@ -20,6 +20,11 @@ export const notify = Object.freeze({
   info: (input, description) => publish('info', input, description),
 });
 
+export function useToast() {
+  return notify;
+}
+
+
 const STYLES = {
   success: { Icon: CheckCircle2, shell: 'border-emerald-200 bg-emerald-50', icon: 'text-emerald-600' },
   error: { Icon: XCircle, shell: 'border-rose-200 bg-rose-50', icon: 'text-rose-600' },

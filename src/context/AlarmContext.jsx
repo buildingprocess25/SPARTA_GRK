@@ -131,9 +131,9 @@ export function AlarmProvider({ children }) {
       const result = await Notification.requestPermission();
       setNotificationPermission(result);
       if (result === 'granted') {
-        toast.success('Notifikasi browser untuk alarm iSolar aktif.', { title: 'Notifikasi Aktif' });
+        toast.success({ title: 'Notifikasi Aktif', description: 'Notifikasi browser untuk alarm iSolar aktif.' });
       } else if (result === 'denied') {
-        toast.warning('Notifikasi diblokir oleh setelan browser.', { title: 'Notifikasi Ditolak' });
+        toast.warning({ title: 'Notifikasi Ditolak', description: 'Notifikasi diblokir oleh setelan browser.' });
       }
       return result;
     } catch (e) {
@@ -176,9 +176,9 @@ export function AlarmProvider({ children }) {
           if (notif) {
             // 1. Toast in-app
             if (notif.variant === 'error') {
-              toast.error(notif.message, { title: notif.title });
+              toast.error({ title: notif.title, description: notif.message });
             } else {
-              toast.warning(notif.message, { title: notif.title });
+              toast.warning({ title: notif.title, description: notif.message });
             }
 
             // 2. Browser Web Notification API (only if granted)
