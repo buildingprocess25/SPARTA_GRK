@@ -1,0 +1,17 @@
+node_modules
+.git
+.next
+.next-*
+out
+coverage
+test-results
+playwright-report
+.env*
+!.env.example
+npm-debug.log*
+*.log
+.superpowers
+.agents
+.codex
+.vscode
+.idea

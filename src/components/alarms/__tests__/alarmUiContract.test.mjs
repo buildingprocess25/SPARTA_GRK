@@ -34,6 +34,9 @@ test('AlarmDialog uses BaseModal and exposes filtering, read actions, and notifi
   assert.match(dialog, /Aktifkan notifikasi browser/);
   assert.match(dialog, /useAlarms/);
   assert.match(dialog, /filter/i);
+  assert.match(dialog, /pollError/);
+  assert.match(dialog, /role="alert"/);
+  assert.match(dialog, /Pembaruan alarm tertunda/);
 });
 
 test('AlarmBadges renders distinct FAULT and ALERT counters and handles click to open dialog', () => {
@@ -42,4 +45,5 @@ test('AlarmBadges renders distinct FAULT and ALERT counters and handles click to
   assert.match(badges, /faultCount/);
   assert.match(badges, /alertCount/);
   assert.match(badges, /openPanel/);
+  assert.match(badges, /interactive/);
 });

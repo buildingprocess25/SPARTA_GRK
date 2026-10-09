@@ -56,6 +56,7 @@ export default function AlarmDialog() {
     lastSuccessfulPollAt,
     refreshAlarms,
     isLoading,
+    pollError,
   } = useAlarms();
 
   const filterOptions = [
@@ -83,6 +84,11 @@ export default function AlarmDialog() {
               <span className="inline-flex items-center gap-1.5 text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
                 <ShieldCheck size={14} className="text-emerald-600 shrink-0" />
                 <span>Notifikasi browser aktif</span>
+              </span>
+            ) : notificationPermission === 'disabled' ? (
+              <span className="inline-flex items-center gap-1.5 text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg">
+                <Bell size={13} className="text-slate-400 shrink-0" />
+                <span>Notifikasi browser dinonaktifkan pada build</span>
               </span>
             ) : notificationPermission === 'denied' ? (
               <span className="inline-flex items-center gap-1.5 text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg">
@@ -137,6 +143,20 @@ export default function AlarmDialog() {
           </div>
         </div>
 
+        {pollError && (
+          <div role="alert" className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-900">
+            <AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-600" />
+            <div>
+              <p className="font-bold">Pembaruan alarm tertunda</p>
+              <p className="mt-0.5 text-amber-800">
+                {lastSuccessfulPollAt
+                  ? 'Data terakhir tetap ditampilkan. Sistem akan mencoba lagi secara otomatis.'
+                  : 'Status alarm belum berhasil dimuat. Jangan anggap kondisi plant normal sampai pembaruan berhasil.'}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Filter Segmented Control */}
         <div className="flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl overflow-x-auto text-xs">
           {filterOptions.map((f) => {
@@ -173,7 +193,13 @@ export default function AlarmDialog() {
 
         {/* List of Alarms */}
         <div className="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1">
-          {filteredAlarms.length === 0 ? (
+          {isLoading && !lastSuccessfulPollAt ? (
+            <div className="py-10 text-center text-sm text-slate-500">Memuat status alarm iSolar...</div>
+          ) : pollError && !lastSuccessfulPollAt ? (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-10 text-center text-sm font-semibold text-amber-900">
+              Status alarm belum tersedia.
+            </div>
+          ) : filteredAlarms.length === 0 ? (
             <div className="text-center py-10 px-4 bg-slate-50 border border-slate-200/60 rounded-2xl">
               <ShieldCheck size={36} className="mx-auto text-emerald-500 mb-2" />
               <h4 className="text-sm font-bold text-slate-800">Kondisi Normal</h4>

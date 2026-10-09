@@ -11,6 +11,7 @@ test('Sidebar renders AlarmBadges for sub navigation items', () => {
   const sidebar = read('../Sidebar.jsx');
   assert.match(sidebar, /AlarmBadges/);
   assert.match(sidebar, /sourceTab/);
+  assert.match(sidebar, /interactive=\{false\}/);
 });
 
 test('PLTSTab replaces Plant offline title with clickable Status alarm iSolar summary', () => {

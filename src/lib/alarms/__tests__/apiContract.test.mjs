@@ -23,4 +23,5 @@ test('alarm service reads active records and limits its payload', () => {
   assert.match(service, /take:\s*safeLimit/);
   assert.match(service, /processStatus:\s*['"]8['"]/);
   assert.doesNotMatch(service, /create\s*\(|update\s*\(|delete\s*\(|upsert\s*\(/);
+  assert.doesNotMatch(service, /stationAlarms|statusCategory|isOffline|new Date\s*\(/);
 });

@@ -4,7 +4,7 @@ import React from 'react';
 import { AlertTriangle, AlertOctagon } from 'lucide-react';
 import { useAlarms } from '@/context/AlarmContext';
 
-export default function AlarmBadges({ sourceTab = 'plts', onClick, className = '' }) {
+export default function AlarmBadges({ sourceTab = 'plts', onClick, className = '', interactive = true }) {
   const { summary, openPanel } = useAlarms();
   const tabSummary = summary?.byTab?.[sourceTab] || { alertCount: 0, faultCount: 0, activeCount: 0 };
   const { faultCount, alertCount } = tabSummary;
@@ -22,21 +22,8 @@ export default function AlarmBadges({ sourceTab = 'plts', onClick, className = '
     }
   };
 
-  return (
-    <div
-      onClick={handleClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleClick(e);
-        }
-      }}
-      className={`inline-flex items-center gap-1.5 cursor-pointer select-none transition-transform active:scale-95 ${className}`}
-      title={`Alarm iSolar: ${faultCount} Fault, ${alertCount} Alert. Klik untuk melihat daftar.`}
-      aria-label={`Status alarm ${sourceTab}: ${faultCount} Fault, ${alertCount} Alert`}
-    >
+  const badges = (
+    <>
       {faultCount > 0 && (
         <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] px-2 py-0.5 shadow-xs transition animate-pulse">
           <AlertOctagon size={11} className="shrink-0" />
@@ -49,6 +36,23 @@ export default function AlarmBadges({ sourceTab = 'plts', onClick, className = '
           <span>{alertCount} Alert</span>
         </span>
       )}
-    </div>
+    </>
+  );
+
+  const label = `Status alarm ${sourceTab}: ${faultCount} Fault, ${alertCount} Alert`;
+  if (!interactive) {
+    return <span className={`inline-flex items-center gap-1.5 ${className}`} title={label}>{badges}</span>;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      className={`inline-flex items-center gap-1.5 cursor-pointer select-none transition-transform active:scale-95 ${className}`}
+      title={`${label}. Klik untuk melihat daftar.`}
+      aria-label={label}
+    >
+      {badges}
+    </button>
   );
 }

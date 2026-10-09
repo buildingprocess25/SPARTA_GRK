@@ -3,9 +3,36 @@ import test from 'node:test';
 import {
   deduplicateIncomingAlarms,
   filterAlarms,
+  identifyAlarmsToNotify,
   pruneReadIds,
   summarizeNotification,
 } from '../alarmState.js';
+
+test('identifyAlarmsToNotify treats the first successful poll as baseline and only emits later IDs once', () => {
+  const baseline = [
+    { id: 'OLD-1', kind: 'FAULT' },
+    { id: 'OLD-2', kind: 'ALERT' },
+  ];
+  const first = identifyAlarmsToNotify(baseline, {}, 1000, { initialSnapshot: true });
+  assert.deepEqual(first.toNotify, []);
+  assert.deepEqual(first.updatedNotifiedMap, { 'OLD-1': 1000, 'OLD-2': 1000 });
+
+  const second = identifyAlarmsToNotify(
+    [...baseline, { id: 'NEW-1', kind: 'FAULT' }],
+    first.updatedNotifiedMap,
+    2000,
+    { initialSnapshot: false },
+  );
+  assert.deepEqual(second.toNotify.map((alarm) => alarm.id), ['NEW-1']);
+
+  const repeated = identifyAlarmsToNotify(
+    [...baseline, { id: 'NEW-1', kind: 'FAULT' }],
+    second.updatedNotifiedMap,
+    2000 + (2 * 60 * 60 * 1000),
+    { initialSnapshot: false },
+  );
+  assert.deepEqual(repeated.toNotify, []);
+});
 
 test('deduplicateIncomingAlarms differentiates baseline snapshot from subsequent new alarms', () => {
   const initial = [
