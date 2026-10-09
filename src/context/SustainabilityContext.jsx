@@ -57,12 +57,16 @@ export function SustainabilityProvider({ children }) {
   ]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [backendMeta, setBackendMeta] = useState(null);
+  const [mutationsAllowed, setMutationsAllowed] = useState(true);
 
   const fetchBackendData = React.useCallback(async () => {
     try {
       const res = await fetch('/api/sustainability');
       const data = await res.json();
       if (data && data.status === 'success') {
+        if (data.mutationsAllowed !== undefined) {
+          setMutationsAllowed(Boolean(data.mutationsAllowed));
+        }
         setBackendMeta({
           source: data.source,
           timestamp: data.timestamp,
@@ -398,7 +402,8 @@ export function SustainabilityProvider({ children }) {
       deleteHistoryItem,
       refreshData: fetchBackendData,
       backendMeta,
-      isLoaded
+      isLoaded,
+      mutationsAllowed,
     }}>
       {children}
     </SustainabilityContext.Provider>

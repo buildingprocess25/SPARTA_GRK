@@ -8,7 +8,7 @@ import {
   Sparkles, CheckCircle2, ChevronRight, Download, Radio,
   RefreshCw, KeyRound, Globe, Server, Check, ArrowUpRight,
   Cpu, Thermometer, Search, Filter, FileSpreadsheet, ShieldCheck,
-  Info, List, MapPin, Activity, X, ChevronDown, ChevronUp, AlertCircle, AlertTriangle, AlertOctagon
+  Info, List, MapPin, Activity, X, ChevronDown, ChevronUp, AlertCircle, AlertTriangle, AlertOctagon, Clock
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -118,13 +118,23 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
     };
   }
 
-  // 4. Server iSolar Down / 503 / 502 / 504 / MUTATIONS_DISABLED
-  if (statusNum === 503 || statusNum === 502 || statusNum === 504 || errStr.includes('503') || errStr.includes('502') || codeStr === 'MUTATIONS_DISABLED' || codeStr.includes('GATEWAY') || codeStr.includes('SERVER')) {
+  // 3.8 Mode Hanya-Baca / MUTATIONS_DISABLED
+  if (statusNum === 403 || codeStr === 'MUTATIONS_DISABLED' || errStr.includes('hanya-baca') || errStr.includes('read-only')) {
+    return {
+      category: 'READ_ONLY',
+      badge: 'Mode Hanya-Baca',
+      message: `Mode hanya-baca aktif. Menampilkan data snapshot terakhir ${timeLabel}. Sinkronisasi berjalan otomatis via scheduler.`,
+      advice: 'Mutasi manual dinonaktifkan di domain publik untuk perlindungan kuota dan keamanan. Scheduler server memperbarui data otomatis tiap 15 menit.',
+    };
+  }
+
+  // 4. Server iSolar Down / 503 / 502 / 504
+  if (statusNum === 503 || statusNum === 502 || statusNum === 504 || errStr.includes('503') || errStr.includes('502') || codeStr.includes('GATEWAY') || codeStr.includes('SERVER')) {
     return {
       category: 'SERVER',
       badge: 'Server iSolar / Gateway',
       message: `Gagal terhubung ke iSolarCloud. Menampilkan data terakhir ${timeLabel}. Mencoba lagi otomatis.`,
-      advice: 'Server iSolarCloud sedang sibuk, dalam pemeliharaan, atau akses mutasi manual dibatasi. Snapshot lokal tetap aman ditampilkan.',
+      advice: 'Server iSolarCloud sedang sibuk, dalam pemeliharaan, atau akses vendor terbatas. Snapshot lokal tetap aman ditampilkan.',
     };
   }
 
@@ -447,10 +457,15 @@ export default function PLTSTab() {
           timestampWib: nowWib,
         };
 
-        setSyncErrorDetails(errorObj);
-        setRefreshError(errorObj.message);
-        setCooldownRemaining(30);
-        notify.error('Gagal Menyinkronkan', errorObj.message);
+        if (classified.category === 'READ_ONLY') {
+          notify.info('Mode Hanya-Baca Aktif', 'Sinkronisasi manual dinonaktifkan di domain publik. Scheduler server memperbarui data otomatis tiap 15 menit.');
+          setCooldownRemaining(15);
+        } else {
+          setSyncErrorDetails(errorObj);
+          setRefreshError(errorObj.message);
+          setCooldownRemaining(30);
+          notify.error('Gagal Menyinkronkan', errorObj.message);
+        }
       }
     } catch (e) {
       if (force) {
@@ -771,28 +786,38 @@ export default function PLTSTab() {
                 </div>
               </div>
 
-              <button
-                type="button"
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-sm transition-all active:scale-95 disabled:opacity-50 shrink-0 self-start sm:self-center"
-                onClick={handleManualSync}
-                disabled={isRefreshing || cooldownRemaining > 0 || isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'}
-                title={
-                  cooldownRemaining > 0
-                    ? `Cooldown aktif: tunggu ${cooldownRemaining}s`
-                    : isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'
-                      ? 'Refresh dinonaktifkan (Hard Quota Guard)'
-                      : 'Refresh Telemetri'
-                }
-              >
-                <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
-                <span>
-                  {isRefreshing
-                    ? 'Menyinkronkan...'
-                    : cooldownRemaining > 0
-                      ? `Tunggu ${cooldownRemaining}s`
-                      : 'Refresh Sekarang'}
-                </span>
-              </button>
+              {isolarLiveState && (isolarLiveState.canManualSync === false || isolarLiveState.mutationsAllowed === false) ? (
+                <div
+                  className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 text-slate-300 font-semibold text-xs border border-slate-700/60 shrink-0 self-start sm:self-center"
+                  title="Mode hanya-baca aktif di domain publik. Sinkronisasi data berjalan otomatis tiap 15 menit via scheduler."
+                >
+                  <Clock size={14} className="text-blue-400" />
+                  <span>Jadwal Otomatis (15m)</span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-sm transition-all active:scale-95 disabled:opacity-50 shrink-0 self-start sm:self-center"
+                  onClick={handleManualSync}
+                  disabled={isRefreshing || cooldownRemaining > 0 || isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'}
+                  title={
+                    cooldownRemaining > 0
+                      ? `Cooldown aktif: tunggu ${cooldownRemaining}s`
+                      : isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'
+                        ? 'Refresh dinonaktifkan (Hard Quota Guard)'
+                        : 'Refresh Telemetri'
+                  }
+                >
+                  <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+                  <span>
+                    {isRefreshing
+                      ? 'Menyinkronkan...'
+                      : cooldownRemaining > 0
+                        ? `Tunggu ${cooldownRemaining}s`
+                        : 'Refresh Sekarang'}
+                  </span>
+                </button>
+              )}
             </div>
 
             {/* Baris 2: Grid 4 Stat Kecil */}

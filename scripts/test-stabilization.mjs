@@ -43,7 +43,7 @@ async function testGuards() {
   assert.equal(evaluateMutationAccess({ nodeEnv: 'development', hostname: 'example.test' }).code, 'LOCAL_ONLY');
   assert.deepEqual(
     evaluateMutationAccess({ nodeEnv: 'production', hostname: 'localhost' }),
-    { allowed: false, status: 503, code: 'MUTATIONS_DISABLED' }
+    { allowed: false, status: 403, code: 'MUTATIONS_DISABLED' }
   );
 }
 

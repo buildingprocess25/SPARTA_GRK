@@ -62,7 +62,12 @@ export async function POST(request) {
       if (mode === 'COMMIT') {
         const mutationDecision = mutationDecisionForRequest(request);
         if (!mutationDecision.allowed) {
-          return NextResponse.json({ success: false, error: mutationDecision.code, code: mutationDecision.code }, { status: mutationDecision.status });
+          return NextResponse.json({
+            success: false,
+            error: mutationDecision.message || mutationDecision.code,
+            message: mutationDecision.message || 'Mode hanya-baca aktif; operasi ini dinonaktifkan di server ini.',
+            code: mutationDecision.code
+          }, { status: mutationDecision.status });
         }
         const commitResult = await commitBatchToDatabase({
           records: validationResult.records,

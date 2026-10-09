@@ -20,7 +20,7 @@ import * as XLSX from 'xlsx';
 import { MASTER_FACILITIES, BRANCH_LIST, FACILITY_TYPES, getFilteredFacilities, findFacilityById } from '@/lib/master/facilityMaster';
 
 export default function InputDataTab({ setActiveTab }) {
-  const { dcLocations, addDataEntry, pltsData, refreshData } = useSustainability();
+  const { dcLocations, addDataEntry, pltsData, refreshData, mutationsAllowed } = useSustainability();
 
   // Multi-step state: 1 (Identitas Lokasi & Periode), 2 (Parameter Teknis & Kalkulator), 3 (Review & Simpan)
   const [currentStep, setCurrentStep] = useState(1);
@@ -776,6 +776,16 @@ export default function InputDataTab({ setActiveTab }) {
         </div>
       </div>
 
+      {/* READ-ONLY MODE BANNER */}
+      {mutationsAllowed === false && (
+        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/70 p-4 text-xs sm:text-sm text-amber-900 flex items-start sm:items-center gap-3 shadow-xs">
+          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
+          <div className="leading-relaxed">
+            <span className="font-semibold">Mode Hanya-Baca Aktif:</span> Server ini beroperasi dalam mode baca (mutasi dinonaktifkan di domain publik). Anda tetap dapat menggunakan kalkulator emisi dan simulasi, namun penyimpanan ke database dibatasi.
+          </div>
+        </div>
+      )}
+
       {/* JIKA MODE EXCEL AKTIF */}
       {inputMode === 'excel' && (
         <div className="space-y-6 animate-in fade-in duration-300">
@@ -1248,9 +1258,10 @@ export default function InputDataTab({ setActiveTab }) {
 
                 <button
                   type="button"
-                  disabled={isCommitting || (previewResult.errorCount > 0 && !allowPartialImport)}
+                  disabled={isCommitting || (previewResult.errorCount > 0 && !allowPartialImport) || mutationsAllowed === false}
+                  title={mutationsAllowed === false ? 'Mode hanya-baca aktif di server ini' : undefined}
                   className={`inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-xs font-bold transition-all shadow-sm ${
-                    isCommitting || (previewResult.errorCount > 0 && !allowPartialImport)
+                    isCommitting || (previewResult.errorCount > 0 && !allowPartialImport) || mutationsAllowed === false
                       ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
                       : 'bg-slate-900 text-white hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500'
                   }`}
@@ -2160,18 +2171,20 @@ export default function InputDataTab({ setActiveTab }) {
                 <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                   <button
                     type="button"
-                    className="w-full sm:w-auto rounded-xl border border-slate-300 bg-white text-slate-700 px-5 py-3 text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm"
+                    className="w-full sm:w-auto rounded-xl border border-slate-300 bg-white text-slate-700 px-5 py-3 text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => handleSaveTransaction(true)}
-                    disabled={isSaving}
+                    disabled={isSaving || mutationsAllowed === false}
+                    title={mutationsAllowed === false ? 'Mode hanya-baca aktif di server ini' : undefined}
                   >
                     Simpan Draf (Simulasi)
                   </button>
 
                   <button
                     type="button"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white px-6 py-3 text-sm font-bold hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-50"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white px-6 py-3 text-sm font-bold hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => handleSaveTransaction(false)}
-                    disabled={isSaving}
+                    disabled={isSaving || mutationsAllowed === false}
+                    title={mutationsAllowed === false ? 'Mode hanya-baca aktif di server ini' : undefined}
                   >
                     {isSaving ? (
                       <>

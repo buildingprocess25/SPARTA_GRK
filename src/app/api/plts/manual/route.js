@@ -14,7 +14,10 @@ const finite = (value) => {
 export async function POST(request) {
   const decision = mutationDecisionForRequest(request);
   if (!decision.allowed) {
-    return NextResponse.json({ success: false, error: decision.code, code: decision.code }, { status: decision.status });
+    return NextResponse.json(
+      { success: false, error: decision.message || 'Mode hanya-baca aktif; operasi ini dinonaktifkan di server ini.', code: decision.code },
+      { status: decision.status }
+    );
   }
 
   try {

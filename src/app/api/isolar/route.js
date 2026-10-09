@@ -309,6 +309,8 @@ export async function buildFullDashboardPayload(now = new Date()) {
         hoursElapsed: Number(hoursElapsedThisMonth.toFixed(1))
       }
     },
+    canManualSync: Boolean(process.env.ALLOW_MANUAL_SYNC === 'true' || process.env.NODE_ENV !== 'production'),
+    mutationsAllowed: Boolean(process.env.ALLOW_MANUAL_SYNC === 'true' || process.env.NODE_ENV !== 'production'),
     summaryNationwide,
     stationList: canonicalStations,
   };
@@ -362,7 +364,11 @@ export async function GET(request) {
 export async function POST(request) {
   const decision = mutationDecisionForRequest(request);
   if (!decision.allowed) {
-    return NextResponse.json({ success: false, error: decision.code, code: decision.code }, { status: decision.status });
+    return NextResponse.json({
+      success: false,
+      error: decision.message || 'Mode hanya-baca aktif; operasi ini dinonaktifkan di server ini.',
+      code: decision.code
+    }, { status: decision.status });
   }
 
   const now = Date.now();
@@ -379,7 +385,7 @@ export async function POST(request) {
     } catch (error) {
       console.error('[isolar/route] Manual sync failed:', error?.code || error?.name || error.message);
       // Even if vendor call fails, we still return latest DB data with error flag
-      syncResult = { status: 'failed', error: error.message };
+      syncResult = { status: 'failed', error: sanitizeErrorMessage(error?.message || 'Sinkronisasi vendor gagal.') };
     }
   }
 

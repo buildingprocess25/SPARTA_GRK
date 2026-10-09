@@ -13,9 +13,12 @@ export function evaluateCronAuthorization({ configuredSecret, authorization } = 
   return { allowed: true, status: 200, code: null };
 }
 
-export function evaluateMutationAccess({ nodeEnv, hostname } = {}) {
+export function evaluateMutationAccess({ nodeEnv, hostname, allowManualSync = false } = {}) {
   if (nodeEnv === 'production') {
-    return { allowed: false, status: 503, code: 'MUTATIONS_DISABLED' };
+    if (allowManualSync) {
+      return { allowed: true, status: 200, code: null };
+    }
+    return { allowed: false, status: 403, code: 'MUTATIONS_DISABLED' };
   }
 
   const normalizedHost = String(hostname || '').trim().toLowerCase();
@@ -26,9 +29,20 @@ export function evaluateMutationAccess({ nodeEnv, hostname } = {}) {
   return { allowed: true, status: 200, code: null };
 }
 
-export function mutationDecisionForRequest(request) {
-  return evaluateMutationAccess({
+export function mutationDecisionForRequest(request, { allowManualSync } = {}) {
+  const isAllowed = allowManualSync ?? (process.env.ALLOW_MANUAL_SYNC === 'true');
+  const decision = evaluateMutationAccess({
     nodeEnv: process.env.NODE_ENV,
     hostname: new URL(request.url).hostname,
+    allowManualSync: isAllowed,
   });
+
+  if (!decision.allowed) {
+    const message = decision.code === 'MUTATIONS_DISABLED'
+      ? 'Mode hanya-baca aktif; operasi ini dinonaktifkan di server ini.'
+      : 'Akses mutasi hanya diizinkan melalui localhost.';
+    return { ...decision, message };
+  }
+
+  return decision;
 }
