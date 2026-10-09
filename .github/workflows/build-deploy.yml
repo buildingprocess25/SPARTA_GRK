@@ -36,5 +36,11 @@ jobs:
             ghcr.io/${{ env.REPO }}:${{ github.sha }}
 
       - name: Trigger Deployment Webhook (Dokploy)
-        if: ${{ secrets.DOKPLOY_WEBHOOK != '' }}
-        run: curl -X POST ${{ secrets.DOKPLOY_WEBHOOK }}
+        env:
+          DOKPLOY_WEBHOOK: ${{ secrets.DOKPLOY_WEBHOOK }}
+        run: |
+          if [ -n "$DOKPLOY_WEBHOOK" ]; then
+            curl -X POST "$DOKPLOY_WEBHOOK"
+          else
+            echo "DOKPLOY_WEBHOOK is not set, skipping webhook trigger."
+          fi

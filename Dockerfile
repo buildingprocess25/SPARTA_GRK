@@ -10,11 +10,11 @@ FROM base AS deps
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma
 RUN npm ci
-RUN npx prisma generate
 
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN npx prisma generate
 
 # Provide non-secret placeholders so Next.js/Prisma imports that validate
 # env variables do not fail during image build.
@@ -28,7 +28,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV TZ=Asia/Jakarta
-ENV PORT=3000
+ENV PORT=3001
 ENV HOSTNAME=0.0.0.0
 
 RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 --gid 1001 nextjs
@@ -36,9 +36,10 @@ RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 --gid 100
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/src/generated/prisma ./src/generated/prisma
 
 USER nextjs
 
-EXPOSE 3000
+EXPOSE 3001
 
 CMD ["node", "server.js"]
