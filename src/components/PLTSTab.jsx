@@ -655,7 +655,7 @@ export default function PLTSTab() {
               <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/40">
                 <span className="text-[11px] uppercase font-semibold text-slate-400 block">Sinkron Berikutnya</span>
                 <span className="text-sm font-bold font-mono text-blue-300 truncate block mt-0.5">
-                  Sinkronisasi manual — jadwal otomatis nonaktif
+                  {isolarLiveState?.nextSyncLabel || isolarLiveState?.quota?.nextSyncLabel || 'Tiap 15 menit'}
                 </span>
               </div>
 
@@ -696,8 +696,14 @@ export default function PLTSTab() {
             {/* Baris Kecil Abu-abu di Bawah */}
             <p className="text-xs text-slate-400 mt-3 pt-2 border-t border-slate-800/50 flex flex-wrap items-center gap-x-4 gap-y-1">
               <span>Host: <strong className="text-slate-300">{isolarLiveState?.gatewayUrl || 'gateway.isolarcloud.com.hk'}</strong></span>
-              <span>Token: <strong className={isolarLiveState?.tokenStatus === 'expired' ? 'text-rose-300' : 'text-emerald-300'}>
-                {isolarLiveState?.tokenStatus === 'expired' ? 'Perlu login ulang' : isolarLiveState?.tokenExpiresLabel || 'Memuat...'}
+              <span>Token: <strong className={
+                isolarLiveState?.tokenStatus === 'refreshing'
+                  ? 'text-amber-400'
+                  : isolarLiveState?.tokenStatus === 'expired'
+                    ? 'text-rose-400'
+                    : 'text-emerald-400'
+              }>
+                {isolarLiveState?.tokenExpiresLabel || (isolarLiveState?.tokenStatus === 'expired' ? 'Kedaluwarsa' : 'Memuat...')}
               </strong></span>
               <span>Zona Kuota: <strong className="text-slate-300">{isolarLiveState?.quota?.bucketLabel || 'UTC Reset'}</strong></span>
               {isolarLiveState?.quota?.previousMonthSummary && (

@@ -13,6 +13,7 @@ import { CANONICAL_DC_ENTITIES } from '@/lib/solar/plantMap.js';
 import { QUOTA_CONFIG } from '@/lib/solar/endpoints.js';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig.js';
 import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
+import { isTokenRefreshing } from '@/lib/solar/tokenManager.js';
 
 const MANUAL_COOLDOWN_MS = 60_000;
 const CACHE_TTL_MS = 10_000; // 10s micro-cache to protect DB connection pool
@@ -261,10 +262,22 @@ export async function buildFullDashboardPayload(now = new Date()) {
     lastSyncStatus: data.lastSyncStatus,
     lastSyncErrorCode: data.lastSyncErrorCode,
     lastSyncHttpCalls: data.lastSyncHttpCalls,
-    tokenStatus: (!data.apiToken || data.apiToken.loginBlocked || !data.apiToken.expiresAt || new Date(data.apiToken.expiresAt) < now) ? 'expired' : 'active',
-    tokenExpiresLabel: (data.apiToken && data.apiToken.expiresAt && !isNaN(new Date(data.apiToken.expiresAt).getTime()) && new Date(data.apiToken.expiresAt) > now)
-      ? `Aktif (exp. ${new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }).format(new Date(data.apiToken.expiresAt))} WIB)`
-      : 'Perlu login ulang',
+    tokenStatus: isTokenRefreshing()
+      ? 'refreshing'
+      : (!data.apiToken || !data.apiToken.token || data.apiToken.loginBlocked || !data.apiToken.expiresAt || new Date(data.apiToken.expiresAt) <= now)
+        ? 'expired'
+        : 'active',
+    tokenExpiresLabel: isTokenRefreshing()
+      ? 'Memperbarui...'
+      : (!data.apiToken || !data.apiToken.token || data.apiToken.loginBlocked || !data.apiToken.expiresAt || new Date(data.apiToken.expiresAt) <= now)
+        ? (data.apiToken?.loginBlocked ? 'Kedaluwarsa (Login diblokir)' : 'Kedaluwarsa')
+        : `Aktif (exp. ${new Intl.DateTimeFormat('id-ID', {
+            timeZone: 'Asia/Jakarta',
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+          }).format(new Date(data.apiToken.expiresAt))} WIB)`,
     portalPrReferences: data.portalPrReferences || [],
     monthlyAccumulation: {
       isAccumulated: monthToDate.daysRecorded > 0,

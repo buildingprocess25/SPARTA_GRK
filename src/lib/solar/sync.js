@@ -24,6 +24,7 @@ import { parseEnergyKwh, parsePowerKw, parseTotalEnergyMwh } from './processor.j
 import { parseFreshnessThreshold, resolveTelemetryFreshness } from './freshness.js';
 import { classifyVendorPlantStatus } from './status.js';
 import { isDcLocation } from './plantMap.js';
+import { getValidToken } from './tokenManager.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const SYNC_WINDOW = { start: 5, end: 18, startMinute: 30, endMinute: 30 };
@@ -189,103 +190,9 @@ function checkQuotaGuardFromCounts(hourly, monthly) {
 
 // ─── Token Management ────────────────────────────────────────────────────────
 
-async function getOrRefreshToken() {
-  // 1. Check DB for valid token
-  const existing = await prisma.apiToken.findUnique({ where: { id: 1 } });
-  const now = new Date();
-  
-  if (existing) {
-    // Check if credentials changed → unblock
-    const currentHash = computeCredentialHash();
-    if (existing.loginBlocked && existing.credentialsHash !== currentHash) {
-      await prisma.apiToken.update({
-        where: { id: 1 },
-        data: { loginBlocked: false, blockReason: null, credentialsHash: currentHash },
-      });
-    } else if (existing.loginBlocked) {
-      throw new Error(`Login diblokir: ${existing.blockReason || 'Kredensial ditolak vendor'}`);
-    }
-    
-    // Valid token? (>5 min remaining)
-    if (existing.token && existing.expiresAt > new Date(now.getTime() + 300_000)) {
-      return existing.token;
-    }
-  }
-  
-  // 2. Login required
-  const baseUrl = process.env.ISOLAR_BASE_URL || 'https://gateway.isolarcloud.com.hk';
-  const appKey = process.env.ISOLAR_APP_KEY;
-  const secretKey = process.env.ISOLAR_SECRET_KEY;
-  const userAccount = process.env.ISOLAR_USER_ACCOUNT;
-  const userPassword = process.env.ISOLAR_USER_PASSWORD;
-  
-  if (!appKey || !secretKey || !userAccount || !userPassword) {
-    throw new Error('Kredensial OpenAPI belum lengkap di .env.local');
-  }
-  
-  // Validate endpoint
-  const loginPath = ISOLAR_ENDPOINTS_META.LOGIN.path;
-  if (!ALLOWED_ENDPOINTS.includes(loginPath)) {
-    throw new Error('Login endpoint not in allowlist');
-  }
-  
-  await incrementQuota(now, 1);
-  
-  const response = await fetch(`${baseUrl}${loginPath}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json;charset=UTF-8',
-      'sys_code': QUOTA_CONFIG.SYS_CODE,
-      'x-access-key': secretKey,
-    },
-    body: JSON.stringify({ appkey: appKey, user_account: userAccount, user_password: userPassword }),
-  });
-  
-  if (!response.ok) {
-    const credHash = computeCredentialHash();
-    await prisma.apiToken.upsert({
-      where: { id: 1 },
-      update: { loginBlocked: true, blockReason: `HTTP ${response.status}`, credentialsHash: credHash },
-      create: { id: 1, token: '', expiresAt: now, credentialsHash: credHash, loginBlocked: true, blockReason: `HTTP ${response.status}` },
-    });
-    throw new Error(`Login gagal: HTTP ${response.status}`);
-  }
-  
-  const json = await response.json();
-  const resultCode = String(json.result_code ?? '');
-  const resultData = json.result_data || {};
-  const loginState = String(resultData.login_state ?? '');
-  const tokenStr = resultData.token;
-  const disableTime = resultData.disable_time;
-  const credHash = computeCredentialHash();
-  
-  if (disableTime) {
-    await prisma.apiToken.upsert({
-      where: { id: 1 },
-      update: { loginBlocked: true, blockReason: `Akun terkunci sampai ${disableTime}`, credentialsHash: credHash },
-      create: { id: 1, token: '', expiresAt: now, credentialsHash: credHash, loginBlocked: true, blockReason: `Akun terkunci sampai ${disableTime}` },
-    });
-    throw new Error(`Akun iSolarCloud terkunci oleh vendor sampai ${disableTime}`);
-  }
-  
-  if (resultCode !== '1' || !tokenStr) {
-    await prisma.apiToken.upsert({
-      where: { id: 1 },
-      update: { loginBlocked: true, blockReason: `Login ditolak: code=${resultCode}, state=${loginState}`, credentialsHash: credHash },
-      create: { id: 1, token: '', expiresAt: now, credentialsHash: credHash, loginBlocked: true, blockReason: `Login ditolak: code=${resultCode}` },
-    });
-    throw new Error(`Login ditolak: result_code=${resultCode}`);
-  }
-  
-  // Success - save token
-  const expiresAt = new Date(now.getTime() + 24 * 3600_000);
-  await prisma.apiToken.upsert({
-    where: { id: 1 },
-    update: { token: tokenStr, expiresAt, credentialsHash: credHash, loginBlocked: false, blockReason: null },
-    create: { id: 1, token: tokenStr, expiresAt, credentialsHash: credHash, loginBlocked: false },
-  });
-  
-  return tokenStr;
+async function getOrRefreshToken({ force = false } = {}) {
+  const tokenObj = await getValidToken({ isLive: true, forceRefresh: force });
+  return tokenObj.token;
 }
 
 // ─── Main Sync Function ─────────────────────────────────────────────────────
@@ -336,11 +243,10 @@ export async function runSync({ trigger = 'cron' } = {}) {
         return { syncRun: { ...syncRun, status: 'skipped' }, plantCount: 0, httpCalls: 0 };
       }
       
-      // 4. Token
-      const token = await getOrRefreshToken();
-      // Note: login call already counted in incrementQuota inside getOrRefreshToken
+      // 4. Token (checks DB, auto-refreshes if remaining life < 5 minutes)
+      let token = await getOrRefreshToken({ force: false });
       
-      // 5. Fetch plant list (1 call)
+      // 5. Fetch plant list (1 call) with retry on token error / 401
       const baseUrl = process.env.ISOLAR_BASE_URL || 'https://gateway.isolarcloud.com.hk';
       const appKey = process.env.ISOLAR_APP_KEY;
       const secretKey = process.env.ISOLAR_SECRET_KEY;
@@ -356,47 +262,91 @@ export async function runSync({ trigger = 'cron' } = {}) {
       
       await incrementQuota(now, 1);
       httpCalls++;
+
+      const fetchPlantList = async (activeToken) => {
+        return await fetch(`${baseUrl}${plantListPath}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'sys_code': QUOTA_CONFIG.SYS_CODE,
+            'x-access-key': secretKey,
+          },
+          body: JSON.stringify({
+            appkey: appKey,
+            token: activeToken,
+            lang: '_en_US',
+            curPage: 1,
+            size: 100,
+          }),
+          signal: AbortSignal.timeout(30_000),
+        });
+      };
       
-      const res = await fetch(`${baseUrl}${plantListPath}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'sys_code': QUOTA_CONFIG.SYS_CODE,
-          'x-access-key': secretKey,
-        },
-        body: JSON.stringify({
-          appkey: appKey,
-          token,
-          lang: '_en_US',
-          curPage: 1,
-          size: 100,
-        }),
-      });
-      
-      if (!res.ok) {
-        throw new Error(`Gateway HTTP ${res.status}`);
-      }
-      
-      const json = await res.json();
-      const resultCode = String(json.result_code ?? '');
-      
-      if (resultCode !== '1') {
-        // If token expired, try re-login once
-        if (resultCode === '2' || resultCode === '-1' || String(json.result_msg || '').includes('token')) {
-          // Token invalid, clear and retry next cycle
-          await prisma.apiToken.update({
-            where: { id: 1 },
-            data: { token: '', expiresAt: new Date(0) },
-          }).catch(() => {});
-          throw new Error(`Token ditolak vendor (code=${resultCode}). Will re-login next cycle.`);
+      // Retry logic with backoff (up to 3 attempts)
+      const MAX_ATTEMPTS = 3;
+      const BACKOFF_DELAYS = [1000, 2000, 4000]; // ms
+      let lastFetchError = null;
+      let rawPlants = null;
+
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        try {
+          await incrementQuota(now, 1);
+          httpCalls++;
+
+          let res = await fetchPlantList(token);
+          let json = null;
+          let resultCode = '';
+
+          if (res.ok) {
+            json = await res.json().catch(() => null);
+            resultCode = String(json?.result_code ?? '');
+          }
+
+          // Check if upstream rejected token: 401 or token error result codes
+          const isTokenRejected = res.status === 401 ||
+            resultCode === '2' ||
+            resultCode === '-1' ||
+            String(json?.result_msg || '').toLowerCase().includes('token') ||
+            String(json?.result_msg || '').toLowerCase().includes('unauthorized');
+
+          if (isTokenRejected) {
+            console.log(`[Sync] Upstream menolak token (HTTP ${res.status}, Code ${resultCode}, attempt ${attempt}/${MAX_ATTEMPTS}). Mengambil token baru dan mengulangi... Waktu: ${new Date().toISOString()}`);
+            token = await getOrRefreshToken({ force: true });
+            res = await fetchPlantList(token);
+            if (res.ok) {
+              json = await res.json().catch(() => null);
+              resultCode = String(json?.result_code ?? '');
+            }
+          }
+
+          if (!res.ok) {
+            throw new Error(`Gateway HTTP ${res.status}`);
+          }
+
+          if (resultCode !== '1' || !json) {
+            throw new Error(`Vendor result_code=${resultCode}: ${json?.result_msg || 'unknown'}`);
+          }
+
+          // Extract plants
+          rawPlants = json.result_data?.pageList 
+            || json.pageList 
+            || (Array.isArray(json.result_data) ? json.result_data : []);
+
+          lastFetchError = null;
+          break; // Success
+        } catch (err) {
+          lastFetchError = err;
+          console.warn(`[Sync] Attempt ${attempt}/${MAX_ATTEMPTS} gagal: ${err.message}. Waktu: ${new Date().toISOString()}`);
+          if (attempt < MAX_ATTEMPTS) {
+            const delay = BACKOFF_DELAYS[attempt - 1] || 1000;
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
         }
-        throw new Error(`Vendor result_code=${resultCode}: ${json.result_msg || 'unknown'}`);
       }
-      
-      // 6. Extract plants
-      const rawPlants = json.result_data?.pageList 
-        || json.pageList 
-        || (Array.isArray(json.result_data) ? json.result_data : []);
+
+      if (lastFetchError || !rawPlants) {
+        throw new Error(lastFetchError ? `Gagal mengambil data plant setelah 3x percobaan: ${lastFetchError.message}` : 'Data iSolar kosong setelah retry');
+      }
       
       // 7. Validate before write
       const lastSuccess = await prisma.syncRun.findFirst({
@@ -837,12 +787,12 @@ export async function readDashboardPayload() {
   });
   const { dataAgeMinutes } = freshness;
   
-  // Next sync calculation
+  // Next sync calculation (15-minute scheduled intervals)
   const isInWindow = isInSyncWindow(now);
   let nextSyncLabel = 'Berikutnya 05:30 WIB';
   if (isInWindow) {
-    const minutesSinceLastSync = dataAgeMinutes || 30;
-    const remainingMin = Math.max(0, 30 - minutesSinceLastSync);
+    const ageMin = Number.isFinite(dataAgeMinutes) ? dataAgeMinutes : 0;
+    const remainingMin = Math.max(0, 15 - (ageMin % 15));
     nextSyncLabel = remainingMin > 0 ? `~${remainingMin} menit` : 'Segera';
   }
   

@@ -28,8 +28,14 @@ export async function POST(request) {
 
   try {
     const url = new URL(request.url);
-    const forceSync = url.searchParams.get('forceSync') === 'true';
-    const forceSnapshot = url.searchParams.get('forceSnapshot') === 'true';
+    let forceSync = url.searchParams.get('forceSync') === 'true';
+    let forceSnapshot = url.searchParams.get('forceSnapshot') === 'true';
+
+    if (request.headers.get('content-type')?.includes('application/json')) {
+      const body = await request.json().catch(() => ({}));
+      if (body?.forceSync !== undefined) forceSync = Boolean(body.forceSync);
+      if (body?.forceSnapshot !== undefined) forceSnapshot = Boolean(body.forceSnapshot);
+    }
 
     const result = await runSchedulerCycle({
       trigger: 'cron',

@@ -28,6 +28,8 @@ const unitTestScripts = [
   ['--test', 'src/components/alarms/__tests__/alarmUiContract.test.mjs'],
   ['--test', 'src/components/__tests__/alarmIntegrationContract.test.mjs'],
   ['--test', 'src/components/__tests__/dockerAlarmDeploymentContract.test.mjs'],
+  ['--test', 'src/lib/solar/__tests__/tokenManager.test.mjs'],
+  ['--test', 'src/app/api/__tests__/cronAndHealthContract.test.mjs'],
 ];
 
 // If inverterTempPipeline.test.mjs exists, run it too
