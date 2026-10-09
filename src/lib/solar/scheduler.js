@@ -69,8 +69,13 @@ export async function runSchedulerCycle({
     snapshotAlreadyExists = false;
   }
 
-  // Execute snapshot if force requested OR if this is a slot boundary (or missing slot)
-  const shouldTakeSnapshot = forceSnapshot || (!snapshotAlreadyExists && inWindow) || (trigger === 'manual');
+  // Execute snapshot if force requested OR if this slot hasn't been recorded yet.
+  // Unlike the vendor sync above, this reads PlantLatest from our own DB (no
+  // vendor API call, no quota cost), so it is safe to keep running outside the
+  // 05:30-18:30 WIB production window. That keeps a continuous 30-minute audit
+  // trail overnight too - proof the pipeline is alive and what the last known
+  // grid/PLTS state was, instead of going silent until the next sync window.
+  const shouldTakeSnapshot = forceSnapshot || !snapshotAlreadyExists || (trigger === 'manual');
 
   if (shouldTakeSnapshot) {
     try {
@@ -85,7 +90,7 @@ export async function runSchedulerCycle({
   } else {
     cycleReport.snapshotResult = {
       status: 'skipped',
-      reason: snapshotAlreadyExists ? `Snapshot slot ${slotInfo.slotWib} already recorded` : 'Not in sync window'
+      reason: `Snapshot slot ${slotInfo.slotWib} already recorded`
     };
   }
 

@@ -31,7 +31,11 @@ export function evaluateMutationAccess({ nodeEnv, hostname, allowManualSync = fa
 }
 
 export function mutationDecisionForRequest(request, { allowManualSync } = {}) {
-  const isAllowed = allowManualSync ?? (process.env.DISABLE_MUTATIONS !== 'true' && process.env.ALLOW_MANUAL_SYNC !== 'false');
+  // Fail-closed by default: without an explicit opt-in, production stays
+  // read-only (per the stabilization design doc) since there is no real user
+  // auth layer yet. Set ALLOW_MANUAL_SYNC=true (e.g. temporarily, for testing)
+  // to open the manual "Sync Now" / mutation endpoints back up.
+  const isAllowed = allowManualSync ?? (process.env.DISABLE_MUTATIONS !== 'true' && process.env.ALLOW_MANUAL_SYNC === 'true');
   const decision = evaluateMutationAccess({
     nodeEnv: process.env.NODE_ENV,
     hostname: new URL(request.url).hostname,

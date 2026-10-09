@@ -108,21 +108,28 @@ function normalizeTotalEnergyKwh(metricObj) {
 }
 
 // ─── Lock Management ─────────────────────────────────────────────────────────
+// Single shared lock (sync_lock row id=1) used by BOTH the in-app scheduler
+// (runSync below) and the standalone scripts/sync-isolar.mjs job. They must
+// share one implementation/duration so a run by either side is recognized
+// and released consistently by the other - two independent lock durations
+// on the same row previously caused spurious "locked" rejections.
 
-async function acquireLock() {
+/** @param {string} [clientName] identifies the lock holder in locked_by for diagnostics */
+export async function acquireLock(clientName) {
   const now = new Date();
   const lockedUntil = new Date(now.getTime() + LOCK_DURATION_MS);
-  
+  const owner = clientName || `sync-${now.getTime()}`;
+
   try {
     // Attempt atomic conditional update: only succeed if lock is expired or absent
     const result = await prisma.$executeRaw`
       INSERT INTO sync_lock (id, locked_until, locked_by, updated_at)
-      VALUES (1, ${lockedUntil}, ${`sync-${now.getTime()}`}, ${now})
+      VALUES (1, ${lockedUntil}, ${owner}, ${now})
       ON CONFLICT (id) DO UPDATE
       SET locked_until = ${lockedUntil},
-          locked_by = ${`sync-${now.getTime()}`},
+          locked_by = ${owner},
           updated_at = ${now}
-      WHERE sync_lock.locked_until IS NULL 
+      WHERE sync_lock.locked_until IS NULL
          OR sync_lock.locked_until < ${now}
     `;
     return result > 0;
@@ -132,7 +139,7 @@ async function acquireLock() {
   }
 }
 
-async function releaseLock() {
+export async function releaseLock() {
   try {
     await prisma.syncLock.upsert({
       where: { id: 1 },
@@ -141,6 +148,8 @@ async function releaseLock() {
     });
   } catch (_) { /* best effort */ }
 }
+
+export { LOCK_DURATION_MS };
 
 // ─── Quota Management ────────────────────────────────────────────────────────
 

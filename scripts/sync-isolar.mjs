@@ -22,9 +22,8 @@ import { ISOLAR_ENDPOINTS_META, QUOTA_CONFIG } from '../src/lib/solar/endpoints.
 import { CONVERSION_CONFIG } from '../src/lib/solar/conversionConfig.js';
 import { parseEnergyKwh, parsePowerKw } from '../src/lib/solar/processor.js';
 import { classifyVendorPlantStatus } from '../src/lib/solar/status.js';
+import { acquireLock, releaseLock } from '../src/lib/solar/sync.js';
 
-const SYNC_LOCK_ID = 1;
-const LOCK_TIMEOUT_MS = 300_000; // 5 minutes max lock duration
 const DEFAULT_PORT = process.env.PORT || '3000';
 const REVALIDATE_URL = process.env.REVALIDATE_URL || `http://127.0.0.1:${DEFAULT_PORT}/api/plts/revalidate`;
 const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET_TOKEN || process.env.CRON_SECRET || 'plts_internal_secret_key_2026';
@@ -108,38 +107,12 @@ export function normalizeEnergyKwhRaw(metricObj) {
 }
 
 // ─── Anti-Overlap Distributed Lock ──────────────────────────────────────────
-
-async function acquireDistributedLock(clientName) {
-  const now = new Date();
-  const lockedUntil = new Date(now.getTime() + LOCK_TIMEOUT_MS);
-
-  try {
-    const result = await prisma.$executeRaw`
-      INSERT INTO sync_lock (id, locked_until, locked_by, updated_at)
-      VALUES (${SYNC_LOCK_ID}, ${lockedUntil}, ${clientName}, ${now})
-      ON CONFLICT (id) DO UPDATE
-      SET locked_until = ${lockedUntil},
-          locked_by = ${clientName},
-          updated_at = ${now}
-      WHERE sync_lock.locked_until IS NULL 
-         OR sync_lock.locked_until < ${now}
-    `;
-    return result > 0;
-  } catch (err) {
-    console.error(`[LOCK ERROR] Gagal memperoleh lock: ${err.message}`);
-    return false;
-  }
-}
-
-async function releaseDistributedLock() {
-  try {
-    await prisma.syncLock.upsert({
-      where: { id: SYNC_LOCK_ID },
-      update: { lockedUntil: null, lockedBy: null, updatedAt: new Date() },
-      create: { id: SYNC_LOCK_ID, lockedUntil: null, lockedBy: null, updatedAt: new Date() },
-    });
-  } catch (_) {}
-}
+// Reuses src/lib/solar/sync.js's acquireLock/releaseLock so this standalone
+// job and the in-app scheduler (runSync, triggered every 5 min by the daemon
+// / cron) contend for the exact same sync_lock row with one consistent
+// duration, instead of racing with mismatched timeouts.
+const acquireDistributedLock = (clientName) => acquireLock(clientName);
+const releaseDistributedLock = () => releaseLock();
 
 // ─── CLI Argument Parser ────────────────────────────────────────────────────
 
