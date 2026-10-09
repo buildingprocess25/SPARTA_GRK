@@ -85,10 +85,63 @@ function aggregateByPlant(rows) {
 function Scope2ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   const row = payload[0]?.payload;
-  return <div className="rounded-xl border border-slate-200 bg-white p-3 text-xs shadow-xl">
-    <p className="mb-2 font-bold text-slate-900">{label} {row?.periodStatus === 'partial' ? '• Parsial' : ''}</p>
-    {payload.map(item => <p key={item.dataKey} className="mt-1 flex justify-between gap-5"><span style={{ color: item.color }}>{item.name}</span><strong>{show(item.value)} {item.dataKey === 'emissionTon' ? 'tCO₂e' : 'MWh'}</strong></p>)}
-  </div>;
+  const isPartial = row?.periodStatus === 'partial';
+
+  return (
+    <div className="bg-slate-900 text-white rounded-xl p-3 shadow-xl border border-slate-800 text-xs space-y-1.5 min-w-[240px]">
+      <div className="flex items-center justify-between border-b border-slate-700 pb-1 mb-1">
+        <span className="font-bold text-slate-200">
+          Bulan: {label} {row?.yearMonth ? row.yearMonth.slice(0, 4) : '2026'}
+        </span>
+        {isPartial && (
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            Parsial
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-1">
+        <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Energi Listrik (MWh)</div>
+        <div className="flex items-center justify-between gap-3 text-slate-300 font-mono">
+          <span className="flex items-center gap-1.5">
+            <span className="size-2 rounded-full bg-slate-400" />
+            Dibeli PLN:
+          </span>
+          <strong>{row?.electricityMwh != null ? `${show(row.electricityMwh)} MWh` : '—'}</strong>
+        </div>
+        <div className="flex items-center justify-between gap-3 text-amber-300 font-mono">
+          <span className="flex items-center gap-1.5">
+            <span className="size-2 rounded-full bg-amber-500" />
+            Pakai Sendiri (PLTS):
+          </span>
+          <strong>{row?.selfMwh != null ? `${show(row.selfMwh)} MWh` : '—'}</strong>
+        </div>
+        {row?.loadMwh != null && (
+          <div className="flex items-center justify-between gap-3 text-slate-400 text-[11px] font-mono pt-0.5 border-t border-slate-800">
+            <span>Beban Total:</span>
+            <span>{show(row.loadMwh)} MWh</span>
+          </div>
+        )}
+      </div>
+
+      <div className="pt-1.5 border-t border-slate-800 space-y-1">
+        <div className="text-[10px] uppercase tracking-wider text-rose-400 font-semibold">Emisi Karbon (tCO₂e)</div>
+        <div className="flex items-center justify-between gap-3 text-rose-300 font-mono">
+          <span className="flex items-center gap-1.5">
+            <span className="size-2 rounded-full bg-rose-500" />
+            Emisi Scope 2:
+          </span>
+          <strong>{row?.emissionTon != null ? `${show(row.emissionTon)} tCO₂e` : '—'}</strong>
+        </div>
+        {row?.cumulativeEmissionTon != null && (
+          <div className="flex items-center justify-between gap-3 text-slate-300 text-[11px] font-mono">
+            <span className="text-slate-400">Akumulasi YTD:</span>
+            <strong className="text-rose-400">{show(row.cumulativeEmissionTon)} tCO₂e</strong>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default function Scope2AnnualLoadDashboard() {
@@ -218,6 +271,19 @@ export default function Scope2AnnualLoadDashboard() {
     return m;
   }, [filteredRows, monitoredCount, data]);
 
+  const chartYAxisMax = useMemo(() => {
+    if (!monthly || monthly.length === 0) return 2000;
+    const maxVal = Math.max(
+      ...monthly.map(d => Math.max(
+        d.electricityMwh || 0,
+        d.selfMwh || 0,
+        d.loadMwh || 0,
+        d.emissionTon || 0
+      ))
+    );
+    return Math.ceil((maxVal * 1.1) / 200) * 200 || 2000;
+  }, [monthly]);
+
   const projection = useMemo(() => {
     const p = buildProjection(filteredRows, { year: 2026, field: 'scope2EmissionTon' });
     if (!p.baseAnnual && data?.projection) return data.projection;
@@ -313,7 +379,115 @@ export default function Scope2AnnualLoadDashboard() {
       <Scope2Waterfall summary={summary} />
     </CardBox>
 
-    <CardBox className="space-y-4"><div><h2 className="font-bold text-slate-900">Tren emisi bulanan</h2><p className="text-xs text-slate-500">Energi memakai sumbu kiri (MWh), emisi memakai sumbu kanan (tCO₂e). Bulan berjalan ditandai Parsial dan tidak digunakan sebagai bulan lengkap dalam proyeksi.</p></div>{monthly.length ? <><div className="h-[360px] max-w-full"><ResponsiveContainer width="100%" height="100%"><ComposedChart data={monthly} margin={{ top: 18, left: 10, right: 28 }}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="label" tickFormatter={(label, index) => `${label}${monthly[index]?.periodStatus === 'partial' ? '*' : ''}`} /><YAxis yAxisId="energy" label={{ value: 'Energi (MWh)', angle: -90, position: 'insideLeft' }} /><YAxis yAxisId="emission" orientation="right" label={{ value: 'Emisi (tCO₂e)', angle: 90, position: 'insideRight' }} /><Tooltip content={<Scope2ChartTooltip />} /><Legend /><Bar yAxisId="energy" stackId="energy" dataKey="electricityMwh" name="Listrik dibeli PLN" fill="#2563EB" /><Bar yAxisId="energy" stackId="energy" dataKey="selfMwh" name="PLTS dipakai sendiri" fill="#059669" /><Line yAxisId="emission" dataKey="emissionTon" name="Emisi Scope 2" stroke="#E11D48" strokeWidth={3} dot={{ r: 4 }} connectNulls={false} /></ComposedChart></ResponsiveContainer></div><div className="overflow-x-auto rounded-xl border"><table className="min-w-[900px] w-full text-xs"><thead className="sticky top-0 z-10 bg-slate-900 text-white"><tr><th className="p-3 text-left">Bulan</th><th className="p-3 text-right">Beban total</th><th className="p-3 text-right">PLTS dipakai sendiri</th><th className="p-3 text-right">Dibeli PLN</th><th className="p-3 text-right">Emisi (tCO₂e)</th><th className="p-3 text-right">Cakupan DC</th><th className="p-3 text-right">Perubahan vs bulan lalu (%)</th></tr></thead><tbody>{monthly.map(row => <tr key={row.yearMonth} className={row.periodStatus === 'partial' ? 'border-b bg-amber-50/70' : 'border-b'}><td className="p-3 font-semibold">{row.label} {row.yearMonth.slice(0, 4)}{row.periodStatus === 'partial' && <span className="ml-2 rounded-full border border-amber-300 bg-amber-100 px-2 py-0.5 text-[10px] text-amber-900">Parsial</span>}</td><td className="p-3 text-right">{show(row.loadMwh)} MWh</td><td className="p-3 text-right">{show(row.selfMwh)} MWh</td><td className="p-3 text-right">{show(row.electricityMwh)} MWh</td><td className="p-3 text-right font-semibold text-rose-700">{show(row.emissionTon)} tCO₂e</td><td className="p-3 text-right">{row.plantCount}/{row.monitoredCount}</td><td className="p-3 text-right">{row.changePct === null ? '—' : `${row.changePct > 0 ? '+' : ''}${show(row.changePct)}%`}</td></tr>)}</tbody></table></div></> : <div className="rounded-xl border border-dashed p-10 text-center text-sm text-slate-500">Tidak ada data pada filter yang dipilih.</div>}</CardBox>
+    <CardBox className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100">
+        <div>
+          <h2 className="font-bold text-slate-900 text-base">Tren emisi bulanan</h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Energi memakai sumbu kiri (MWh), emisi memakai sumbu kanan (tCO₂e). Bulan berjalan ditandai Parsial dan tidak digunakan sebagai bulan lengkap dalam proyeksi.
+          </p>
+        </div>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 text-xs font-semibold shrink-0">
+          <span className="text-rose-700 font-medium">Faktor Emisi Rata-rata:</span>
+          <span className="font-bold font-mono">{formatFactor(summary.weightedFactorKgPerKwh || 0.87)} tCO₂e/MWh</span>
+        </div>
+      </div>
+
+      {monthly.length ? (
+        <>
+          <div className="w-full h-80 lg:h-96 pt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={monthly} margin={{ top: 10, right: 15, bottom: 0, left: 10 }} barGap={3}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                <XAxis
+                  dataKey="label"
+                  tick={{ fontSize: 12, fill: '#64748B' }}
+                  stroke="#E2E8F0"
+                  tickFormatter={(label, index) => `${label}${monthly[index]?.periodStatus === 'partial' ? '*' : ''}`}
+                />
+                <YAxis
+                  yAxisId="left"
+                  orientation="left"
+                  domain={[0, chartYAxisMax]}
+                  tick={{ fontSize: 10, fill: '#64748B' }}
+                  stroke="#E2E8F0"
+                  tickFormatter={v => `${v} MWh`}
+                  width={70}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  domain={[0, chartYAxisMax]}
+                  tick={{ fontSize: 10, fill: '#E11D48' }}
+                  stroke="#E2E8F0"
+                  tickFormatter={v => `${v} t`}
+                  width={55}
+                />
+                <Tooltip content={<Scope2ChartTooltip />} />
+                <Bar yAxisId="left" dataKey="electricityMwh" stackId="pln" name="Listrik dibeli PLN" fill="#94A3B8" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                <Bar yAxisId="left" dataKey="selfMwh" stackId="plts" name="PLTS dipakai sendiri" fill="#F59E0B" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                <Bar yAxisId="right" dataKey="emissionTon" stackId="emission" name="Emisi Scope 2" fill="#E11D48" radius={[4, 4, 0, 0]} maxBarSize={16} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+            <div className="flex items-center gap-2">
+              <span className="size-3 rounded bg-slate-400" />
+              <span>Listrik dibeli PLN (MWh)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="size-3 rounded bg-amber-500" />
+              <span>PLTS dipakai sendiri (MWh)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="size-3 rounded bg-rose-600" />
+              <span className="font-semibold text-rose-700">Emisi Scope 2 (tCO₂e)</span>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border mt-4">
+            <table className="min-w-[900px] w-full text-xs">
+              <thead className="sticky top-0 z-10 bg-slate-900 text-white">
+                <tr>
+                  <th className="p-3 text-left">Bulan</th>
+                  <th className="p-3 text-right">Beban total</th>
+                  <th className="p-3 text-right">PLTS dipakai sendiri</th>
+                  <th className="p-3 text-right">Dibeli PLN</th>
+                  <th className="p-3 text-right">Emisi (tCO₂e)</th>
+                  <th className="p-3 text-right">Cakupan DC</th>
+                  <th className="p-3 text-right">Perubahan vs bulan lalu (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {monthly.map(row => (
+                  <tr key={row.yearMonth} className={row.periodStatus === 'partial' ? 'border-b bg-amber-50/70' : 'border-b'}>
+                    <td className="p-3 font-semibold">
+                      {row.label} {row.yearMonth.slice(0, 4)}
+                      {row.periodStatus === 'partial' && (
+                        <span className="ml-2 rounded-full border border-amber-300 bg-amber-100 px-2 py-0.5 text-[10px] text-amber-900">
+                          Parsial
+                        </span>
+                      )}
+                    </td>
+                    <td className="p-3 text-right">{show(row.loadMwh)} MWh</td>
+                    <td className="p-3 text-right">{show(row.selfMwh)} MWh</td>
+                    <td className="p-3 text-right">{show(row.electricityMwh)} MWh</td>
+                    <td className="p-3 text-right font-semibold text-rose-700">{show(row.emissionTon)} tCO₂e</td>
+                    <td className="p-3 text-right">{row.plantCount}/{row.monitoredCount}</td>
+                    <td className="p-3 text-right">{row.changePct === null ? '—' : `${row.changePct > 0 ? '+' : ''}${show(row.changePct)}%`}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        <div className="rounded-xl border border-dashed p-10 text-center text-sm text-slate-500">
+          Tidak ada data pada filter yang dipilih.
+        </div>
+      )}
+    </CardBox>
 
     <CardBox className="space-y-4"><div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="font-bold text-slate-900">Emisi per DC</h2><p className="text-xs text-slate-500">Klik baris untuk melihat tren bulanan DC.</p></div><div className="flex items-center gap-2 text-xs text-slate-500"><Search size={15} />{ranking.length} DC</div></div>{ranking.length ? <><div className="max-h-[560px] overflow-auto rounded-xl border"><table className="min-w-[840px] w-full text-xs"><thead className="sticky top-0 z-10 bg-slate-900 text-white"><tr><th className="p-3 text-left"><button onClick={() => updateSort('dcName')} className="font-semibold">Cabang / DC ↕</button></th><th className="p-3 text-left"><button onClick={() => updateSort('grid')} className="font-semibold">Grid ↕</button></th><th className="p-3 text-right"><button onClick={() => updateSort('emissionFactor')} className="font-semibold" title="Faktor Emisi Grid (tCO₂e/MWh) / Faktor Perkalian">Faktor Emisi ↕</button></th><th className="p-3 text-right"><button onClick={() => updateSort('electricityEnergyKwh')} className="font-semibold">Dibeli PLN (MWh) ↕</button></th><th className="p-3 text-right"><button onClick={() => updateSort('scope2EmissionTon')} className="font-semibold">Emisi YTD (tCO₂e) ↕</button></th></tr></thead><tbody>{rankingPage.map(row => <tr key={row.psId} onClick={() => setSelectedPlant(row)} tabIndex="0" onKeyDown={event => { if (event.key === 'Enter') setSelectedPlant(row); }} className="cursor-pointer border-b hover:bg-blue-50 focus:bg-blue-50 focus:outline-none"><td className="p-3 font-semibold text-slate-900">{row.dcName}</td><td className="p-3 font-mono text-slate-600">{row.grid}</td><td className="p-3 text-right font-mono font-medium text-slate-700">{formatFactor(row.emissionFactor)}</td><td className="p-3 text-right font-mono text-slate-700">{show(row.electricityEnergyKwh / 1_000)}</td><td className="p-3 text-right font-mono font-bold text-rose-700">{show(row.scope2EmissionTon)}</td></tr>)}</tbody></table></div><div className="flex items-center justify-between text-xs text-slate-600"><span>Halaman {currentPage} dari {pageCount}</span><div className="flex gap-2"><button aria-label="Halaman sebelumnya" disabled={currentPage === 1} onClick={() => setCurrentPage(page => Math.max(1, page - 1))} className="rounded-lg border p-2 disabled:opacity-40"><ChevronLeft size={16} /></button><button aria-label="Halaman berikutnya" disabled={currentPage === pageCount} onClick={() => setCurrentPage(page => Math.min(pageCount, page + 1))} className="rounded-lg border p-2 disabled:opacity-40"><ChevronRight size={16} /></button></div></div></> : <div className="rounded-xl border border-dashed p-10 text-center text-sm text-slate-500">Tidak ada DC yang cocok dengan filter.</div>}</CardBox>
 
