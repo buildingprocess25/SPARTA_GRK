@@ -14,8 +14,17 @@ import { isValidPltsHistoryPeriod } from '@/lib/solar/cacheKey';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
 import { normalizePlantStatus, getPlantStatusMeta } from '@/lib/solar/status';
 import {
-  BarChart, Bar, ComposedChart, Line, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis
+  BarChart, Bar, ComposedChart, Line, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell
 } from 'recharts';
+import {
+  CHART_PALETTE,
+  CHART_GRID_PROPS,
+  CHART_AXIS_PROPS,
+  PARTIAL_OPACITY,
+  formatYAxisNumber,
+  ChartTooltipCard,
+  ChartPillLegend,
+} from '@/components/ui/ChartTheme';
 
 const PLTS_EMISSION_FACTOR_LABEL = String(PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH).replace('.', ',');
 
@@ -954,7 +963,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
         {compareYears && comparison && (
           <div className="rounded-2xl border border-blue-100 bg-blue-50/40 p-4 relative z-0" data-yoy-comparison="true">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
               <div className="flex items-center gap-2">
                 <div>
                   <h4 className="text-sm font-black text-slate-900">Perbandingan Produksi {comparison.years[0]} vs {comparison.years[1]}</h4>
@@ -962,34 +971,70 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 </div>
                 <MetricInfoIcon infoKey="plts_summary_yoy" />
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <div className={`text-sm font-black ${comparison.deltaKwh >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <div className={`text-sm font-black font-mono ${comparison.deltaKwh >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
                   {comparison.deltaKwh == null ? 'Belum tersedia' : `${comparison.deltaKwh >= 0 ? '+' : ''}${formatNum(comparison.deltaKwh / 1000, 2, 2)} MWh`}
                   {comparison.changePct == null ? '' : ` (${comparison.changePct >= 0 ? '+' : ''}${comparison.changePct}%)`}
                 </div>
-                <div className="inline-flex rounded-lg bg-white p-0.5 text-[10px] font-bold">
-                  <button type="button" onClick={() => setChartType('bar')} className={`rounded px-2 py-1 ${chartType === 'bar' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>Bar</button>
-                  <button type="button" onClick={() => setChartType('line')} className={`rounded px-2 py-1 ${chartType === 'line' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>Garis</button>
+                <ChartPillLegend
+                  items={[
+                    { label: String(comparison.years[0]), color: CHART_PALETTE.pln, type: chartType === 'line' ? 'line' : 'bar' },
+                    { label: String(comparison.years[1]), color: CHART_PALETTE.plts, type: chartType === 'line' ? 'line' : 'bar' },
+                    ...(isNational && showTarget ? [{ label: 'Target 2026', color: CHART_PALETTE.target, type: 'line' }] : []),
+                  ]}
+                />
+                <div className="inline-flex rounded-lg bg-white p-0.5 text-[10px] font-bold border border-slate-200">
+                  <button type="button" onClick={() => setChartType('bar')} className={`rounded px-2 py-1 transition-all ${chartType === 'bar' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}>Bar</button>
+                  <button type="button" onClick={() => setChartType('line')} className={`rounded px-2 py-1 transition-all ${chartType === 'line' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}>Garis</button>
                 </div>
                 {isNational && <label className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-700"><input type="checkbox" checked={showTarget} onChange={event => setShowTarget(event.target.checked)} />Target</label>}
               </div>
             </div>
-            <div className="h-56 w-full">
+            <div className="h-56 w-full pt-1">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={comparisonChartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#dbeafe" />
-                  <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} unit=" MWh" width={70} />
-                  <Tooltip formatter={(value) => value == null ? 'Belum tersedia' : `${formatNum(value, 2, 2)} MWh`} />
-                  <Legend />
+                <ComposedChart data={comparisonChartData} margin={{ top: 12, right: 16, left: 16, bottom: 4 }}>
+                  <CartesianGrid {...CHART_GRID_PROPS} />
+                  <XAxis dataKey="month" {...CHART_AXIS_PROPS} />
+                  <YAxis
+                    stroke="#E2E8F0"
+                    tick={{ fontSize: 10, fill: '#64748B' }}
+                    tickFormatter={v => `${formatYAxisNumber(v)} MWh`}
+                    width={72}
+                  />
+                  <Tooltip
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <ChartTooltipCard
+                            title={`Bulan: ${label}`}
+                            items={payload.map(p => ({
+                              label: p.name || p.dataKey,
+                              value: p.value != null ? `${formatNum(p.value, 2, 2)} MWh` : '—',
+                              dotColor: p.color,
+                            }))}
+                            footer={label?.includes('*') ? 'Data parsial bulan berjalan' : null}
+                          />
+                        );
+                      }
+                      return null;
+                    }}
+                  />
                   {chartType === 'bar' ? <>
-                    <Bar dataKey={String(comparison.years[0])} fill="#94a3b8" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey={String(comparison.years[1])} fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey={String(comparison.years[0])} fill={CHART_PALETTE.pln} radius={[4, 4, 0, 0]} animationDuration={800} animationEasing="ease-out">
+                      {comparisonChartData.map((d, i) => (
+                        <Cell key={`bar-0-${i}`} opacity={d.month?.includes('*') ? PARTIAL_OPACITY : 1} />
+                      ))}
+                    </Bar>
+                    <Bar dataKey={String(comparison.years[1])} fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} animationDuration={800} animationEasing="ease-out">
+                      {comparisonChartData.map((d, i) => (
+                        <Cell key={`bar-1-${i}`} opacity={d.month?.includes('*') ? PARTIAL_OPACITY : 1} />
+                      ))}
+                    </Bar>
                   </> : <>
-                    <Line type="monotone" dataKey={String(comparison.years[0])} stroke="#64748b" strokeWidth={2} />
-                    <Line type="monotone" dataKey={String(comparison.years[1])} stroke="#f59e0b" strokeWidth={2} />
+                    <Line type="monotone" dataKey={String(comparison.years[0])} stroke={CHART_PALETTE.pln} strokeWidth={2.5} dot={{ r: 3 }} animationDuration={800} animationEasing="ease-out" />
+                    <Line type="monotone" dataKey={String(comparison.years[1])} stroke={CHART_PALETTE.plts} strokeWidth={2.5} dot={{ r: 3 }} animationDuration={800} animationEasing="ease-out" />
                   </>}
-                  {isNational && showTarget && <Line type="monotone" dataKey="target2026" name="Target 2026" stroke="#7c3aed" strokeWidth={2} strokeDasharray="5 4" />}
+                  {isNational && showTarget && <Line type="monotone" dataKey="target2026" name="Target 2026" stroke={CHART_PALETTE.target} strokeWidth={2} strokeDasharray="4 4" dot={{ r: 3 }} animationDuration={800} animationEasing="ease-out" />}
                 </ComposedChart>
               </ResponsiveContainer>
             </div>

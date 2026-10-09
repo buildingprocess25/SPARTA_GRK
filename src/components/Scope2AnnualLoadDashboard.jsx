@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Activity, AlertCircle, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Database, Flame, Search, Zap } from 'lucide-react';
 import {
-  Bar, CartesianGrid, ComposedChart, Legend, Line, LineChart,
+  Area, AreaChart, Bar, CartesianGrid, Cell, ComposedChart, Line,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
 
@@ -16,6 +16,15 @@ import Scope2Filters from '@/components/scope2/Scope2Filters';
 import Scope2Waterfall from '@/components/scope2/Scope2Waterfall';
 import Scope2InputModal from '@/components/scope2/Scope2InputModal';
 import InputDataButton from '@/components/ui/InputDataButton';
+import {
+  CHART_PALETTE,
+  CHART_GRID_PROPS,
+  CHART_AXIS_PROPS,
+  PARTIAL_OPACITY,
+  formatYAxisNumber,
+  ChartTooltipCard,
+  ChartPillLegend,
+} from '@/components/ui/ChartTheme';
 import { buildProjection, filterCanonicalRows, parseScope2Query } from '@/lib/scope2/analytics.js';
 import { aggregateCanonicalRows } from '@/lib/scope2/energyReconciliation.js';
 import { getGridFactor } from '@/lib/emission-factors.js';
@@ -91,13 +100,13 @@ function Scope2ChartTooltip({ active, payload, label }) {
   const isPartial = row?.periodStatus === 'partial';
 
   return (
-    <div className="bg-slate-900 text-white rounded-xl p-3 shadow-xl border border-slate-800 text-xs space-y-1.5 min-w-[240px]">
-      <div className="flex items-center justify-between border-b border-slate-700 pb-1 mb-1">
-        <span className="font-bold text-slate-200">
+    <div className="bg-white text-slate-800 rounded-xl p-3 shadow-xl border border-slate-200 text-xs space-y-1.5 min-w-[240px] select-text">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
+        <span className="font-bold text-slate-800">
           Bulan: {label} {row?.yearMonth ? row.yearMonth.slice(0, 4) : '2026'}
         </span>
         {isPartial && (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
             Parsial
           </span>
         )}
@@ -105,41 +114,41 @@ function Scope2ChartTooltip({ active, payload, label }) {
 
       <div className="space-y-1">
         <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Energi Listrik (MWh)</div>
-        <div className="flex items-center justify-between gap-3 text-slate-300 font-mono">
+        <div className="flex items-center justify-between gap-3 text-slate-600 font-mono">
           <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-slate-400" />
-            Dibeli PLN:
+            <span className="size-2 rounded-full bg-slate-400 shrink-0" />
+            <span className="text-slate-600 font-sans">Dibeli PLN:</span>
           </span>
-          <strong>{row?.electricityMwh != null ? `${show(row.electricityMwh)} MWh` : '—'}</strong>
+          <strong className="text-slate-900">{row?.electricityMwh != null ? `${show(row.electricityMwh)} MWh` : '—'}</strong>
         </div>
-        <div className="flex items-center justify-between gap-3 text-amber-300 font-mono">
+        <div className="flex items-center justify-between gap-3 text-slate-600 font-mono">
           <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-amber-500" />
-            Pakai Sendiri (PLTS):
+            <span className="size-2 rounded-full bg-amber-500 shrink-0" />
+            <span className="text-slate-600 font-sans">Pakai Sendiri (PLTS):</span>
           </span>
-          <strong>{row?.selfMwh != null ? `${show(row.selfMwh)} MWh` : '—'}</strong>
+          <strong className="text-amber-700">{row?.selfMwh != null ? `${show(row.selfMwh)} MWh` : '—'}</strong>
         </div>
         {row?.loadMwh != null && (
-          <div className="flex items-center justify-between gap-3 text-slate-400 text-[11px] font-mono pt-0.5 border-t border-slate-800">
-            <span>Beban Total:</span>
+          <div className="flex items-center justify-between gap-3 text-slate-500 text-[11px] font-mono pt-0.5 border-t border-slate-100">
+            <span className="font-sans">Beban Total:</span>
             <span>{show(row.loadMwh)} MWh</span>
           </div>
         )}
       </div>
 
-      <div className="pt-1.5 border-t border-slate-800 space-y-1">
-        <div className="text-[10px] uppercase tracking-wider text-rose-400 font-semibold">Emisi Karbon (tCO₂e)</div>
-        <div className="flex items-center justify-between gap-3 text-rose-300 font-mono">
+      <div className="pt-1.5 border-t border-slate-100 space-y-1">
+        <div className="text-[10px] uppercase tracking-wider text-rose-500 font-semibold">Emisi Karbon (tCO₂e)</div>
+        <div className="flex items-center justify-between gap-3 text-slate-600 font-mono">
           <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-rose-500" />
-            Emisi Scope 2:
+            <span className="size-2 rounded-full bg-rose-500 shrink-0" />
+            <span className="text-slate-600 font-sans">Emisi Scope 2:</span>
           </span>
-          <strong>{row?.emissionTon != null ? `${show(row.emissionTon)} tCO₂e` : '—'}</strong>
+          <strong className="text-rose-700">{row?.emissionTon != null ? `${show(row.emissionTon)} tCO₂e` : '—'}</strong>
         </div>
         {row?.cumulativeEmissionTon != null && (
-          <div className="flex items-center justify-between gap-3 text-slate-300 text-[11px] font-mono">
-            <span className="text-slate-400">Akumulasi YTD:</span>
-            <strong className="text-rose-400">{show(row.cumulativeEmissionTon)} tCO₂e</strong>
+          <div className="flex items-center justify-between gap-3 text-slate-600 text-[11px] font-mono">
+            <span className="text-slate-500 font-sans">Akumulasi YTD:</span>
+            <strong className="text-rose-600">{show(row.cumulativeEmissionTon)} tCO₂e</strong>
           </div>
         )}
       </div>
@@ -415,9 +424,18 @@ export default function Scope2AnnualLoadDashboard() {
             Energi memakai sumbu kiri (MWh), emisi memakai sumbu kanan (tCO₂e). Bulan berjalan ditandai Parsial dan tidak digunakan sebagai bulan lengkap dalam proyeksi.
           </p>
         </div>
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 text-xs font-semibold shrink-0">
-          <span className="text-rose-700 font-medium">Faktor Emisi Rata-rata:</span>
-          <span className="font-bold font-mono">{formatFactor(summary.weightedFactorKgPerKwh || 0.87)} tCO₂e/MWh</span>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <ChartPillLegend
+            items={[
+              { label: 'Listrik PLN', color: CHART_PALETTE.pln },
+              { label: 'PLTS Pakai Sendiri', color: CHART_PALETTE.plts },
+              { label: 'Emisi Scope 2', color: CHART_PALETTE.emission },
+            ]}
+          />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 text-xs font-semibold shrink-0">
+            <span className="text-rose-700 font-medium">Faktor Rata-rata:</span>
+            <span className="font-bold font-mono">{formatFactor(summary.weightedFactorKgPerKwh || 0.87)} tCO₂e/MWh</span>
+          </div>
         </div>
       </div>
 
@@ -425,12 +443,11 @@ export default function Scope2AnnualLoadDashboard() {
         <>
           <div className="w-full h-80 lg:h-96 pt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={monthly} margin={{ top: 10, right: 15, bottom: 0, left: 10 }} barGap={3}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+              <ComposedChart data={monthly} margin={{ top: 12, right: 16, bottom: 0, left: 16 }} barGap={3}>
+                <CartesianGrid {...CHART_GRID_PROPS} />
                 <XAxis
                   dataKey="label"
-                  tick={{ fontSize: 12, fill: '#64748B' }}
-                  stroke="#E2E8F0"
+                  {...CHART_AXIS_PROPS}
                   tickFormatter={(label, index) => `${label}${monthly[index]?.periodStatus === 'partial' ? '*' : ''}`}
                 />
                 <YAxis
@@ -439,22 +456,34 @@ export default function Scope2AnnualLoadDashboard() {
                   domain={[0, chartYAxisMax]}
                   tick={{ fontSize: 10, fill: '#64748B' }}
                   stroke="#E2E8F0"
-                  tickFormatter={v => `${v} MWh`}
-                  width={70}
+                  tickFormatter={v => `${formatYAxisNumber(v)} MWh`}
+                  width={72}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
                   domain={[0, chartYAxisMax]}
-                  tick={{ fontSize: 10, fill: '#E11D48' }}
+                  tick={{ fontSize: 10, fill: CHART_PALETTE.emission }}
                   stroke="#E2E8F0"
-                  tickFormatter={v => `${v} t`}
+                  tickFormatter={v => `${formatYAxisNumber(v)} t`}
                   width={55}
                 />
                 <Tooltip content={<Scope2ChartTooltip />} />
-                <Bar yAxisId="left" dataKey="electricityMwh" stackId="pln" name="Listrik dibeli PLN" fill="#94A3B8" radius={[4, 4, 0, 0]} maxBarSize={16} />
-                <Bar yAxisId="left" dataKey="selfMwh" stackId="plts" name="PLTS dipakai sendiri" fill="#F59E0B" radius={[4, 4, 0, 0]} maxBarSize={16} />
-                <Bar yAxisId="right" dataKey="emissionTon" stackId="emission" name="Emisi Scope 2" fill="#E11D48" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                <Bar yAxisId="left" dataKey="electricityMwh" stackId="pln" name="Listrik dibeli PLN" fill={CHART_PALETTE.pln} radius={[4, 4, 0, 0]} maxBarSize={18} animationDuration={800} animationEasing="ease-out">
+                  {monthly.map((entry, idx) => (
+                    <Cell key={`pln-cell-${idx}`} opacity={entry.periodStatus === 'partial' ? PARTIAL_OPACITY : 1} />
+                  ))}
+                </Bar>
+                <Bar yAxisId="left" dataKey="selfMwh" stackId="plts" name="PLTS dipakai sendiri" fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} maxBarSize={18} animationDuration={800} animationEasing="ease-out">
+                  {monthly.map((entry, idx) => (
+                    <Cell key={`plts-cell-${idx}`} opacity={entry.periodStatus === 'partial' ? PARTIAL_OPACITY : 1} />
+                  ))}
+                </Bar>
+                <Bar yAxisId="right" dataKey="emissionTon" stackId="emission" name="Emisi Scope 2" fill={CHART_PALETTE.emission} radius={[4, 4, 0, 0]} maxBarSize={18} animationDuration={800} animationEasing="ease-out">
+                  {monthly.map((entry, idx) => (
+                    <Cell key={`emi-cell-${idx}`} opacity={entry.periodStatus === 'partial' ? PARTIAL_OPACITY : 1} />
+                  ))}
+                </Bar>
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -571,13 +600,106 @@ export default function Scope2AnnualLoadDashboard() {
     </CardBox>
 
     <CardBox className="space-y-4">
-      <div>
-        <div className="flex items-center gap-2">
-          <h2 className="font-bold text-slate-900">Resume akumulasi karbon YTD</h2>
-          <MetricInfoIcon infoKey="scope2_annual_projection" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="font-bold text-slate-900 text-base">Resume akumulasi karbon YTD</h2>
+            <MetricInfoIcon infoKey="scope2_annual_projection" />
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5">Ringkasan hanya memakai bulan lengkap untuk rata-rata, tertinggi, dan terendah.</p>
         </div>
-        <p className="text-xs text-slate-500">Ringkasan hanya memakai bulan lengkap untuk rata-rata, tertinggi, dan terendah.</p>
-      </div><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><div className="rounded-xl bg-rose-50 p-4"><p className="text-xs text-rose-700">Total emisi YTD</p><p className="mt-1 text-xl font-bold text-rose-900">{show(summary.scope2EmissionTon)} tCO₂e</p></div><div className="rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-600">Rata-rata per bulan</p><p className="mt-1 text-xl font-bold">{show(averageEmission)} tCO₂e</p></div><div className="rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-600">Bulan tertinggi / terendah</p><p className="mt-1 font-bold">{highest?.label || '—'} / {lowest?.label || '—'}</p></div><div className="rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-600">Proyeksi akhir tahun</p><p className="mt-1 text-xl font-bold">{show(projection.baseAnnual)} tCO₂e</p></div></div><div className="h-64"><ResponsiveContainer width="100%" height="100%"><LineChart data={monthly}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="label" /><YAxis label={{ value: 'Akumulasi (tCO₂e)', angle: -90, position: 'insideLeft' }} /><Tooltip formatter={value => [`${show(value)} tCO₂e`, 'Akumulasi emisi']} /><Line dataKey="cumulativeEmissionTon" name="Akumulasi emisi" stroke="#E11D48" strokeWidth={3} dot={{ r: 4 }} /></LineChart></ResponsiveContainer></div></CardBox>
+        <ChartPillLegend
+          items={[
+            { label: 'Akumulasi Emisi YTD (tCO₂e)', color: CHART_PALETTE.emission, type: 'line' },
+          ]}
+        />
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-xl bg-rose-50 p-4 border border-rose-100">
+          <p className="text-xs text-rose-700 font-medium">Total emisi YTD</p>
+          <p className="mt-1 text-xl font-bold font-mono text-rose-900">{show(summary.scope2EmissionTon)} tCO₂e</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4 border border-slate-200/60">
+          <p className="text-xs text-slate-600 font-medium">Rata-rata per bulan</p>
+          <p className="mt-1 text-xl font-bold font-mono text-slate-900">{show(averageEmission)} tCO₂e</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4 border border-slate-200/60">
+          <p className="text-xs text-slate-600 font-medium">Bulan tertinggi / terendah</p>
+          <p className="mt-1 font-bold text-slate-900">{highest?.label || '—'} / {lowest?.label || '—'}</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4 border border-slate-200/60">
+          <p className="text-xs text-slate-600 font-medium">Proyeksi akhir tahun</p>
+          <p className="mt-1 text-xl font-bold font-mono text-slate-900">{show(projection.baseAnnual)} tCO₂e</p>
+        </div>
+      </div>
+
+      <div className="h-64 w-full pt-2">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={monthly} margin={{ top: 12, right: 16, left: 16, bottom: 4 }}>
+            <defs>
+              <linearGradient id="roseGradientScope2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={CHART_PALETTE.emission} stopOpacity={0.25} />
+                <stop offset="95%" stopColor={CHART_PALETTE.emission} stopOpacity={0.01} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid {...CHART_GRID_PROPS} />
+            <XAxis
+              dataKey="label"
+              {...CHART_AXIS_PROPS}
+              tickFormatter={(label, index) => `${label}${monthly[index]?.periodStatus === 'partial' ? '*' : ''}`}
+            />
+            <YAxis
+              stroke="#E2E8F0"
+              tick={{ fontSize: 10, fill: '#64748B' }}
+              width={75}
+              tickFormatter={formatYAxisNumber}
+              label={{
+                value: 'Akumulasi (tCO₂e)',
+                angle: -90,
+                position: 'insideLeft',
+                offset: 0,
+                style: { fill: '#94A3B8', fontSize: 10, textAnchor: 'middle' },
+              }}
+            />
+            <Tooltip
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  const item = payload[0];
+                  return (
+                    <ChartTooltipCard
+                      title={`Bulan: ${label} 2026`}
+                      items={[
+                        {
+                          label: 'Akumulasi emisi',
+                          value: `${formatYAxisNumber(item.value)} tCO₂e`,
+                          dotColor: CHART_PALETTE.emission,
+                        },
+                      ]}
+                      footer={item.payload?.periodStatus === 'partial' ? 'Data parsial bulan berjalan' : null}
+                    />
+                  );
+                }
+                return null;
+              }}
+            />
+            <Area
+              type="monotone"
+              dataKey="cumulativeEmissionTon"
+              name="Akumulasi emisi"
+              stroke={CHART_PALETTE.emission}
+              strokeWidth={2.5}
+              fill="url(#roseGradientScope2)"
+              fillOpacity={1}
+              dot={{ r: 3.5, fill: CHART_PALETTE.emission }}
+              activeDot={{ r: 5 }}
+              animationDuration={800}
+              animationEasing="ease-out"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </CardBox>
 
     <details className="rounded-xl border border-slate-200 bg-white shadow-sm [&_summary::-webkit-details-marker]:hidden"><summary className="flex cursor-pointer items-center justify-between p-4"><span className="flex items-center gap-2 text-sm font-semibold"><Database size={18} className="text-blue-600" />Sumber dan cara membaca angka</span><ChevronDown size={17} aria-hidden="true" /></summary><div className="space-y-2 border-t bg-slate-50 p-4 text-sm text-slate-600"><p><strong>Sumber:</strong> laporan Monthly load consumption (kWh), produksi bulanan, metadata koneksi, dan registry faktor emisi aplikasi.</p><p><strong>Emisi Scope 2:</strong> listrik dibeli PLN dikalikan faktor emisi grid resmi. Rumus dan faktor emisi tidak diubah oleh tampilan ini.</p><p><strong>Bulan berjalan:</strong> data sampai {data.current.partialDataThroughDate} ditandai Parsial agar tidak dibaca sebagai penurunan satu bulan penuh.</p><p><strong>Kualitas faktor:</strong> {summary.temporaryFactorCount} observasi berfaktor sementara tidak masuk perhitungan emisi.</p></div></details>
 

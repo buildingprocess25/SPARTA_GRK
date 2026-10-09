@@ -4,6 +4,7 @@ import React from 'react';
 
 export const CHART_PALETTE = Object.freeze({
   emission: '#E11D48',       // Rose-600
+  emissionLight: '#FDA4AF',  // Rose-300
   pln: '#94A3B8',            // Slate-400
   plts: '#F59E0B',           // Amber-500
   feedIn: '#FDE68A',         // Amber-200
@@ -27,17 +28,24 @@ export const CHART_AXIS_PROPS = Object.freeze({
   stroke: '#E2E8F0',
 });
 
+export const PARTIAL_OPACITY = 0.45;
+
+export function formatYAxisNumber(val) {
+  if (val == null || !Number.isFinite(val)) return '—';
+  return Number(val).toLocaleString('id-ID');
+}
+
 export function ChartTooltipCard({ title, items = [], footer = null, className = '' }) {
   return (
     <div
-      className={`rounded-xl border border-slate-200 bg-white/95 p-3 text-xs shadow-lg backdrop-blur-xs min-w-[210px] space-y-1.5 ${className}`}
+      className={`rounded-xl border border-slate-200 bg-white p-3 text-xs shadow-xl min-w-[220px] space-y-1.5 select-text ${className}`}
     >
       {title && (
         <p className="font-bold text-slate-800 border-b border-slate-100 pb-1 mb-1">
           {title}
         </p>
       )}
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         {items.map((item, idx) => (
           <div
             key={idx}
@@ -69,10 +77,13 @@ export function ChartTooltipCard({ title, items = [], footer = null, className =
 export function ChartPillLegend({ items = [], className = '' }) {
   return (
     <div
-      className={`flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4 text-xs text-slate-600 ${className}`}
+      className={`flex flex-wrap items-center justify-center sm:justify-end gap-2 text-xs text-slate-600 ${className}`}
     >
       {items.map((item, idx) => (
-        <div key={idx} className="flex items-center gap-1.5">
+        <div
+          key={idx}
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200/70 shadow-2xs text-[11px] font-medium text-slate-700"
+        >
           {item.type === 'line' ? (
             <span
               className="w-3.5 h-0.5 border-t border-dashed"
@@ -80,11 +91,11 @@ export function ChartPillLegend({ items = [], className = '' }) {
             />
           ) : (
             <span
-              className="size-2.5 rounded-sm shrink-0"
+              className="size-2 rounded-full shrink-0"
               style={{ backgroundColor: item.color }}
             />
           )}
-          <span className="font-medium text-slate-700">{item.label}</span>
+          <span>{item.label}</span>
         </div>
       ))}
     </div>

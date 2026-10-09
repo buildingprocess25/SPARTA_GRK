@@ -8,8 +8,16 @@ import {
 } from 'lucide-react';
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis,
-  CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart
+  CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart, Cell
 } from 'recharts';
+import {
+  CHART_PALETTE,
+  CHART_GRID_PROPS,
+  CHART_AXIS_PROPS,
+  PARTIAL_OPACITY,
+  formatYAxisNumber,
+  ChartPillLegend,
+} from '@/components/ui/ChartTheme';
 import { useSustainability } from '@/context/SustainabilityContext';
 import PageHeader from '@/components/ui/PageHeader';
 import KpiCard from '@/components/ui/KpiCard';
@@ -352,7 +360,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
 
       {/* 4. Card Chart: Tren Bulanan */}
       <CardBox className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div>
             <h3 className="font-bold text-slate-900 text-base">
               {activeSubScope === 'scope1'
@@ -365,86 +373,144 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 : 'Pola konsumsi listrik bulanan PLN (kWh) dan kalkulasi emisi Scope 2 (tCO₂e)'}
             </p>
           </div>
+          <ChartPillLegend
+            items={activeSubScope === 'scope1' ? [
+              { label: 'Konsumsi Solar', color: CHART_PALETTE.genset },
+              { label: 'Emisi CO₂e', color: CHART_PALETTE.emission },
+            ] : [
+              { label: 'Konsumsi Listrik PLN', color: CHART_PALETTE.plts },
+              { label: 'Emisi Scope 2', color: CHART_PALETTE.emission, type: 'line' },
+            ]}
+          />
         </div>
 
         <div className="w-full h-80 lg:h-96 pt-2">
           <ResponsiveContainer width="100%" height="100%">
             {activeSubScope === 'scope1' ? (
-              <BarChart data={scope1.monthlyTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748B' }} stroke="#E2E8F0" />
+              <BarChart data={scope1.monthlyTrend} margin={{ top: 12, right: 16, left: 16, bottom: 4 }}>
+                <CartesianGrid {...CHART_GRID_PROPS} />
+                <XAxis dataKey="month" {...CHART_AXIS_PROPS} />
                 <YAxis
                   yAxisId="left"
-                  tick={{ fontSize: 11, fill: '#64748B' }}
                   stroke="#E2E8F0"
-                  label={{ value: 'Liter Solar', angle: -90, position: 'insideLeft', style: { fill: '#94A3B8', fontSize: 11 } }}
+                  tick={{ fontSize: 10, fill: '#64748B' }}
+                  width={72}
+                  tickFormatter={v => `${formatYAxisNumber(v)} L`}
+                  label={{ value: 'Liter Solar', angle: -90, position: 'insideLeft', offset: 0, style: { fill: '#94A3B8', fontSize: 10, textAnchor: 'middle' } }}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
-                  tick={{ fontSize: 11, fill: '#E11D48' }}
                   stroke="#E2E8F0"
-                  label={{ value: 'Emisi (tCO₂e)', angle: 90, position: 'insideRight', style: { fill: '#E11D48', fontSize: 11 } }}
+                  tick={{ fontSize: 10, fill: CHART_PALETTE.emission }}
+                  width={55}
+                  tickFormatter={v => `${formatYAxisNumber(v)} t`}
+                  label={{ value: 'Emisi (tCO₂e)', angle: 90, position: 'insideRight', offset: 0, style: { fill: CHART_PALETTE.emission, fontSize: 10, textAnchor: 'middle' } }}
                 />
                 <Tooltip
                   content={({ active, payload, label }) => {
                     if (active && payload && payload.length) {
+                      const isPartial = label?.includes('*') || label === 'Okt';
                       return (
-                        <div className="bg-slate-900 text-white rounded-xl p-3 shadow-lg border border-slate-800 text-xs space-y-1">
-                          <p className="font-bold text-slate-200 border-b border-slate-700 pb-1 mb-1.5">Bulan: {label} 2026</p>
-                          {payload.map((entry, idx) => (
-                            <p key={idx} className="font-mono text-xs" style={{ color: entry.color }}>
-                              • {entry.name}: <strong>{entry.value?.toLocaleString()}</strong>
-                            </p>
-                          ))}
+                        <div className="bg-white text-slate-800 rounded-xl p-3 shadow-xl border border-slate-200 text-xs space-y-1.5 min-w-[220px] select-text">
+                          <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
+                            <span className="font-bold text-slate-800">Bulan: {label} 2026</span>
+                            {isPartial && (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                Parsial
+                              </span>
+                            )}
+                          </div>
+                          <div className="space-y-1 font-mono">
+                            {payload.map((entry, idx) => (
+                              <div key={idx} className="flex items-center justify-between gap-3 text-slate-600">
+                                <div className="flex items-center gap-1.5 font-sans">
+                                  <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
+                                  <span>{entry.name}:</span>
+                                </div>
+                                <strong className="text-slate-900">
+                                  {formatYAxisNumber(entry.value)} {entry.dataKey === 'fuelLiters' ? 'Liter' : 'tCO₂e'}
+                                </strong>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       );
                     }
                     return null;
                   }}
                 />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '16px' }} />
-                <Bar yAxisId="left" dataKey="fuelLiters" name="Konsumsi Solar (Liter)" fill="#0EA5E9" radius={[4, 4, 0, 0]} maxBarSize={32} />
-                <Bar yAxisId="right" dataKey="emissionTon" name="Emisi CO₂e (Ton)" fill="#E11D48" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                <Bar yAxisId="left" dataKey="fuelLiters" name="Konsumsi Solar (Liter)" fill={CHART_PALETTE.genset} radius={[4, 4, 0, 0]} maxBarSize={32} animationDuration={800} animationEasing="ease-out">
+                  {scope1.monthlyTrend.map((d, i) => (
+                    <Cell key={`genset-cell-${i}`} opacity={d.month?.includes('*') || d.month === 'Okt' ? PARTIAL_OPACITY : 1} />
+                  ))}
+                </Bar>
+                <Bar yAxisId="right" dataKey="emissionTon" name="Emisi CO₂e (Ton)" fill={CHART_PALETTE.emission} radius={[4, 4, 0, 0]} maxBarSize={32} animationDuration={800} animationEasing="ease-out">
+                  {scope1.monthlyTrend.map((d, i) => (
+                    <Cell key={`emi-cell-${i}`} opacity={d.month?.includes('*') || d.month === 'Okt' ? PARTIAL_OPACITY : 1} />
+                  ))}
+                </Bar>
               </BarChart>
             ) : (
-              <ComposedChart data={hierarchyStats.monthlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748B' }} stroke="#E2E8F0" />
+              <ComposedChart data={hierarchyStats.monthlyData} margin={{ top: 12, right: 16, left: 16, bottom: 4 }}>
+                <CartesianGrid {...CHART_GRID_PROPS} />
+                <XAxis dataKey="month" {...CHART_AXIS_PROPS} />
                 <YAxis
                   yAxisId="left"
-                  tick={{ fontSize: 11, fill: '#64748B' }}
                   stroke="#E2E8F0"
-                  tickFormatter={v => `${(v / 1000).toFixed(0)}k`}
-                  label={{ value: 'Listrik (kWh)', angle: -90, position: 'insideLeft', style: { fill: '#94A3B8', fontSize: 11 } }}
+                  tick={{ fontSize: 10, fill: '#64748B' }}
+                  width={72}
+                  tickFormatter={v => `${formatYAxisNumber(v)} kWh`}
+                  label={{ value: 'Listrik (kWh)', angle: -90, position: 'insideLeft', offset: 0, style: { fill: '#94A3B8', fontSize: 10, textAnchor: 'middle' } }}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
-                  tick={{ fontSize: 11, fill: '#E11D48' }}
                   stroke="#E2E8F0"
-                  label={{ value: 'Emisi (tCO₂e)', angle: 90, position: 'insideRight', style: { fill: '#E11D48', fontSize: 11 } }}
+                  tick={{ fontSize: 10, fill: CHART_PALETTE.emission }}
+                  width={55}
+                  tickFormatter={v => `${formatYAxisNumber(v)} t`}
+                  label={{ value: 'Emisi (tCO₂e)', angle: 90, position: 'insideRight', offset: 0, style: { fill: CHART_PALETTE.emission, fontSize: 10, textAnchor: 'middle' } }}
                 />
                 <Tooltip
                   content={({ active, payload, label }) => {
                     if (active && payload && payload.length) {
+                      const isPartial = label?.includes('*') || label === 'Okt';
                       return (
-                        <div className="bg-slate-900 text-white rounded-xl p-3 shadow-lg border border-slate-800 text-xs space-y-1">
-                          <p className="font-bold text-slate-200 border-b border-slate-700 pb-1 mb-1.5">Bulan: {label} 2026</p>
-                          {payload.map((entry, idx) => (
-                            <p key={idx} className="font-mono text-xs" style={{ color: entry.color }}>
-                              • {entry.name}: <strong>{typeof entry.value === 'number' ? formatNum(entry.value, 1) : entry.value}</strong>
-                            </p>
-                          ))}
+                        <div className="bg-white text-slate-800 rounded-xl p-3 shadow-xl border border-slate-200 text-xs space-y-1.5 min-w-[220px] select-text">
+                          <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
+                            <span className="font-bold text-slate-800">Bulan: {label} 2026</span>
+                            {isPartial && (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                Parsial
+                              </span>
+                            )}
+                          </div>
+                          <div className="space-y-1 font-mono">
+                            {payload.map((entry, idx) => (
+                              <div key={idx} className="flex items-center justify-between gap-3 text-slate-600">
+                                <div className="flex items-center gap-1.5 font-sans">
+                                  <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
+                                  <span>{entry.name}:</span>
+                                </div>
+                                <strong className="text-slate-900">
+                                  {typeof entry.value === 'number' ? formatYAxisNumber(entry.value) : entry.value} {entry.dataKey === 'plnKwh' ? 'kWh' : 'tCO₂e'}
+                                </strong>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       );
                     }
                     return null;
                   }}
                 />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '16px' }} />
-                <Bar yAxisId="left" dataKey="plnKwh" name="Konsumsi Listrik PLN (kWh)" fill="#F59E0B" radius={[4, 4, 0, 0]} maxBarSize={32} />
-                <Line yAxisId="right" type="monotone" dataKey="emissionTon" name="Emisi Scope 2 (tCO₂e)" stroke="#E11D48" strokeWidth={2.5} dot={{ r: 4, fill: '#E11D48' }} />
+                <Bar yAxisId="left" dataKey="plnKwh" name="Konsumsi Listrik PLN (kWh)" fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} maxBarSize={32} animationDuration={800} animationEasing="ease-out">
+                  {hierarchyStats.monthlyData.map((d, i) => (
+                    <Cell key={`pln-cell-${i}`} opacity={d.month?.includes('*') || d.month === 'Okt' ? PARTIAL_OPACITY : 1} />
+                  ))}
+                </Bar>
+                <Line yAxisId="right" type="monotone" dataKey="emissionTon" name="Emisi Scope 2 (tCO₂e)" stroke={CHART_PALETTE.emission} strokeWidth={2.5} dot={{ r: 3.5, fill: CHART_PALETTE.emission }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
               </ComposedChart>
             )}
           </ResponsiveContainer>

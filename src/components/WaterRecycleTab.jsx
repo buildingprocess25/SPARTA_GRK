@@ -9,6 +9,14 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell, Line
 } from 'recharts';
+import {
+  CHART_PALETTE,
+  CHART_GRID_PROPS,
+  CHART_AXIS_PROPS,
+  PARTIAL_OPACITY,
+  formatYAxisNumber,
+  ChartPillLegend,
+} from '@/components/ui/ChartTheme';
 import { useSustainability } from '@/context/SustainabilityContext';
 import PageHeader from '@/components/ui/PageHeader';
 import KpiCard from '@/components/ui/KpiCard';
@@ -84,63 +92,83 @@ export default function WaterRecycleTab() {
         {/* Kiri: Monthly Trend (xl:col-span-2) */}
         <CardBox className="xl:col-span-2 flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="size-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0">
-                <Waves size={20} />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0">
+                  <Waves size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    Tren Bulanan Water Recycle vs Fresh Water
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Volume air daur ulang dibandingkan konsumsi air bersih PDAM per bulan
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900">
-                  Tren Bulanan Water Recycle vs Fresh Water
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Volume air daur ulang dibandingkan konsumsi air bersih PDAM per bulan
-                </p>
-              </div>
+              <ChartPillLegend
+                items={[
+                  { label: 'Air Daur Ulang', color: CHART_PALETTE.water },
+                  { label: 'Air Bersih (PDAM)', color: CHART_PALETTE.freshWater },
+                ]}
+              />
             </div>
 
             <div className="w-full h-80 pt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} barGap={6} margin={{ top: 10, right: 10, bottom: 0, left: -10 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748B' }} stroke="#E2E8F0" />
+                <BarChart data={chartData} barGap={6} margin={{ top: 12, right: 16, bottom: 0, left: 16 }}>
+                  <CartesianGrid {...CHART_GRID_PROPS} />
+                  <XAxis dataKey="month" {...CHART_AXIS_PROPS} />
                   <YAxis
-                    tick={{ fontSize: 11, fill: '#64748B' }}
                     stroke="#E2E8F0"
-                    tickFormatter={v => `${(v / 1000).toFixed(0)}k`}
-                    label={{ value: 'Volume (m³)', angle: -90, position: 'insideLeft', style: { fill: '#94A3B8', fontSize: 11 } }}
+                    tick={{ fontSize: 10, fill: '#64748B' }}
+                    width={72}
+                    tickFormatter={v => `${formatYAxisNumber(v)} m³`}
+                    label={{ value: 'Volume (m³)', angle: -90, position: 'insideLeft', offset: 0, style: { fill: '#94A3B8', fontSize: 10, textAnchor: 'middle' } }}
                   />
                   <Tooltip
                     content={({ active, payload, label }) => {
                       if (active && payload && payload.length) {
+                        const isPartial = label?.includes('*') || label === 'Okt';
                         return (
-                          <div className="bg-slate-900 text-white rounded-xl p-3 shadow-lg border border-slate-800 text-xs space-y-1">
-                            <p className="font-bold text-slate-200 border-b border-slate-700 pb-1 mb-1.5">Bulan: {label}</p>
-                            {payload.map((entry, idx) => (
-                              <p key={idx} className="font-mono text-xs" style={{ color: entry.color }}>
-                                • {entry.name}: <strong>{entry.value?.toLocaleString()} m³</strong>
-                              </p>
-                            ))}
+                          <div className="bg-white text-slate-800 rounded-xl p-3 shadow-xl border border-slate-200 text-xs space-y-1.5 min-w-[220px] select-text">
+                            <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
+                              <span className="font-bold text-slate-800">Bulan: {label} 2026</span>
+                              {isPartial && (
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                  Parsial
+                                </span>
+                              )}
+                            </div>
+                            <div className="space-y-1 font-mono">
+                              {payload.map((entry, idx) => (
+                                <div key={idx} className="flex items-center justify-between gap-3 text-slate-600">
+                                  <div className="flex items-center gap-1.5 font-sans">
+                                    <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
+                                    <span>{entry.name}:</span>
+                                  </div>
+                                  <strong className="text-slate-900">{formatYAxisNumber(entry.value)} m³</strong>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         );
                       }
                       return null;
                     }}
                   />
-                  <Bar dataKey="recycled" name="Air Daur Ulang" fill="#0EA5E9" radius={[4, 4, 0, 0]} maxBarSize={32} />
-                  <Bar dataKey="freshWater" name="Air Bersih (PDAM)" fill="#CBD5E1" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                  <Bar dataKey="recycled" name="Air Daur Ulang" fill={CHART_PALETTE.water} radius={[4, 4, 0, 0]} maxBarSize={32} animationDuration={800} animationEasing="ease-out">
+                    {chartData.map((d, i) => (
+                      <Cell key={`water-cell-${i}`} opacity={d.month?.includes('*') || d.month === 'Okt' ? PARTIAL_OPACITY : 1} />
+                    ))}
+                  </Bar>
+                  <Bar dataKey="freshWater" name="Air Bersih (PDAM)" fill={CHART_PALETTE.freshWater} radius={[4, 4, 0, 0]} maxBarSize={32} animationDuration={800} animationEasing="ease-out">
+                    {chartData.map((d, i) => (
+                      <Cell key={`fresh-cell-${i}`} opacity={d.month?.includes('*') || d.month === 'Okt' ? PARTIAL_OPACITY : 1} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-5 mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
-            <div className="flex items-center gap-2">
-              <span className="size-3 rounded bg-cyan-500" />
-              <span>Air Daur Ulang ()</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="size-3 rounded bg-slate-300" />
-              <span>Air Bersih (PDAM)</span>
             </div>
           </div>
         </CardBox>

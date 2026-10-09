@@ -12,8 +12,16 @@ import {
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend, ComposedChart, Line
+  Tooltip, ResponsiveContainer, Legend, ComposedChart, Line, Cell
 } from 'recharts';
+import {
+  CHART_PALETTE,
+  CHART_GRID_PROPS,
+  CHART_AXIS_PROPS,
+  PARTIAL_OPACITY,
+  formatYAxisNumber,
+  ChartPillLegend,
+} from '@/components/ui/ChartTheme';
 import {
   isolarDCBranches, formatNum
 } from '@/data/sustainabilityData';
@@ -1049,9 +1057,20 @@ export default function PLTSTab() {
                       </p>
                     </div>
                   </div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold shrink-0" title={`Perhitungan Emisi Terhindar: Produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
-                    <span className="text-emerald-700 font-medium">Faktor Emisi:</span>
-                    <span className="font-bold font-mono">1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂</span>
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <ChartPillLegend
+                      items={[
+                        { label: 'Konsumsi PLN', color: CHART_PALETTE.pln },
+                        { label: 'Pakai Sendiri', color: CHART_PALETTE.plts },
+                        { label: 'Ekspor', color: CHART_PALETTE.feedIn },
+                        { label: 'Emisi Terhindar', color: CHART_PALETTE.savings },
+                        { label: 'Target PLTS', color: CHART_PALETTE.target, type: 'line' },
+                      ]}
+                    />
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold shrink-0" title={`Perhitungan Emisi Terhindar: Produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
+                      <span className="text-emerald-700 font-medium">Faktor Emisi:</span>
+                      <span className="font-bold font-mono">1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂</span>
+                    </div>
                   </div>
                 </div>
 
@@ -1064,60 +1083,75 @@ export default function PLTSTab() {
                 ) : (
                   <div className="w-full h-72 lg:h-[300px] pt-2">
                     <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={chartData} margin={{ top: 10, right: 15, bottom: 0, left: 10 }} barGap={3}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                        <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748B' }} stroke="#E2E8F0" />
+                      <ComposedChart data={chartData} margin={{ top: 12, right: 16, bottom: 0, left: 16 }} barGap={3}>
+                        <CartesianGrid {...CHART_GRID_PROPS} />
+                        <XAxis dataKey="month" {...CHART_AXIS_PROPS} />
                         <YAxis
                           yAxisId="left"
                           orientation="left"
                           domain={[0, chartYAxisMax]}
                           tick={{ fontSize: 10, fill: '#64748B' }}
                           stroke="#E2E8F0"
-                          tickFormatter={v => `${v} MWh`}
-                          width={70}
+                          tickFormatter={v => `${formatYAxisNumber(v)} MWh`}
+                          width={72}
                         />
                         <YAxis
                           yAxisId="right"
                           orientation="right"
                           domain={[0, chartYAxisMax]}
-                          tick={{ fontSize: 10, fill: '#059669' }}
+                          tick={{ fontSize: 10, fill: CHART_PALETTE.savings }}
                           stroke="#E2E8F0"
-                          tickFormatter={v => `${v} t`}
+                          tickFormatter={v => `${formatYAxisNumber(v)} t`}
                           width={55}
                         />
                         <Tooltip
                           content={({ active, payload, label }) => {
                             if (active && payload && payload.length) {
                               const currentPoint = chartData.find(d => d.month === label || d.yearMonth === label);
+                              const isPartial = label?.includes('*') || currentPoint?.isPartial;
                               return (
-                                <div className="bg-slate-900 text-white rounded-xl p-3 shadow-lg border border-slate-800 text-xs space-y-1.5 min-w-[220px]">
-                                  <p className="font-bold text-slate-200 border-b border-slate-700 pb-1 mb-1">Bulan: {label}</p>
-                                  {payload.map((entry, idx) => {
-                                    const isEmission = entry.dataKey === 'avoidedEmissionTon';
-                                    const unit = isEmission ? ' tCO₂e' : ' MWh';
-                                    const nameMap = {
-                                      plnConsumption: 'Konsumsi PLN',
-                                      selfConsumption: 'Pakai Sendiri',
-                                      feedIn: 'Ekspor (Feed-in)',
-                                      pltsGen: 'Produksi PLTS',
-                                      avoidedEmissionTon: 'Emisi Terhindar',
-                                      target: 'Target PLTS',
-                                    };
-                                    return (
-                                      <p key={idx} className="font-mono text-xs flex items-center justify-between gap-2" style={{ color: entry.color }}>
-                                        <span>• {nameMap[entry.dataKey] || entry.name}:</span>
-                                        <strong>{entry.value != null ? `${Number(entry.value).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 2 })}${unit}` : '—'}</strong>
-                                      </p>
-                                    );
-                                  })}
+                                <div className="bg-white text-slate-800 rounded-xl p-3 shadow-xl border border-slate-200 text-xs space-y-1.5 min-w-[240px] select-text">
+                                  <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
+                                    <span className="font-bold text-slate-800">Bulan: {label}</span>
+                                    {isPartial && (
+                                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                        Parsial
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="space-y-1">
+                                    {payload.map((entry, idx) => {
+                                      const isEmission = entry.dataKey === 'avoidedEmissionTon';
+                                      const unit = isEmission ? ' tCO₂e' : ' MWh';
+                                      const nameMap = {
+                                        plnConsumption: 'Konsumsi PLN',
+                                        selfConsumption: 'Pakai Sendiri',
+                                        feedIn: 'Ekspor (Feed-in)',
+                                        pltsGen: 'Produksi PLTS',
+                                        avoidedEmissionTon: 'Emisi Terhindar',
+                                        target: 'Target PLTS',
+                                      };
+                                      return (
+                                        <div key={idx} className="font-mono text-xs flex items-center justify-between gap-3 text-slate-600">
+                                          <div className="flex items-center gap-1.5 font-sans">
+                                            <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
+                                            <span>{nameMap[entry.dataKey] || entry.name}:</span>
+                                          </div>
+                                          <strong className={isEmission ? 'text-emerald-700' : 'text-slate-900'}>
+                                            {entry.value != null ? `${Number(entry.value).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 2 })}${unit}` : '—'}
+                                          </strong>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
                                   {currentPoint && currentPoint.cumAvoidedEmissionTon != null && (
-                                    <div className="pt-1.5 mt-1 border-t border-slate-800 text-[11px] text-slate-300 space-y-0.5">
-                                      <div className="flex justify-between items-center">
-                                        <span className="text-slate-400">Kumulatif YTD:</span>
-                                        <strong className="text-emerald-400 font-mono">{Number(currentPoint.cumAvoidedEmissionTon).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} tCO₂e</strong>
+                                    <div className="pt-1.5 mt-1 border-t border-slate-100 text-[11px] text-slate-600 space-y-0.5">
+                                      <div className="flex justify-between items-center font-mono">
+                                        <span className="text-slate-500 font-sans">Kumulatif YTD:</span>
+                                        <strong className="text-emerald-700 font-semibold">{Number(currentPoint.cumAvoidedEmissionTon).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} tCO₂e</strong>
                                       </div>
                                       <div className="text-[10px] text-slate-400">
-                                        Faktor 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂ (Pakai Sendiri) &middot; {currentPoint.includedPlantCount ?? 37} plant dihitung ({currentPoint.excludedPlantCount ?? 2} dikecualikan)
+                                        Faktor 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂ &middot; {currentPoint.includedPlantCount ?? 37} plant dihitung
                                       </div>
                                     </div>
                                   )}
@@ -1127,38 +1161,31 @@ export default function PLTSTab() {
                             return null;
                           }}
                         />
-                        <Bar yAxisId="left" dataKey="plnConsumption" stackId="pln" name="Konsumsi PLN" fill="#94A3B8" radius={[4, 4, 0, 0]} maxBarSize={16} />
-                        <Bar yAxisId="left" dataKey="selfConsumption" stackId="plts" name="Pakai Sendiri" fill="#F59E0B" radius={[0, 0, 0, 0]} maxBarSize={16} />
-                        <Bar yAxisId="left" dataKey="feedIn" stackId="plts" name="Ekspor" fill="#FDE68A" radius={[4, 4, 0, 0]} maxBarSize={16} />
-                        <Bar yAxisId="right" dataKey="avoidedEmissionTon" stackId="emission" name="Emisi Terhindar" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={16} />
-                        <Line yAxisId="left" type="monotone" dataKey="target" name="Target PLTS" stroke="#8B5CF6" strokeDasharray="4 4" strokeWidth={2.5} dot={{ r: 3, fill: '#8B5CF6' }} />
+                        <Bar yAxisId="left" dataKey="plnConsumption" stackId="pln" name="Konsumsi PLN" fill={CHART_PALETTE.pln} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
+                          {chartData.map((d, i) => (
+                            <Cell key={`pln-cell-${i}`} opacity={d.month?.includes('*') || d.isPartial ? PARTIAL_OPACITY : 1} />
+                          ))}
+                        </Bar>
+                        <Bar yAxisId="left" dataKey="selfConsumption" stackId="plts" name="Pakai Sendiri" fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
+                          {chartData.map((d, i) => (
+                            <Cell key={`self-cell-${i}`} opacity={d.month?.includes('*') || d.isPartial ? PARTIAL_OPACITY : 1} />
+                          ))}
+                        </Bar>
+                        <Bar yAxisId="left" dataKey="feedIn" stackId="plts" name="Ekspor" fill={CHART_PALETTE.feedIn} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
+                          {chartData.map((d, i) => (
+                            <Cell key={`feed-cell-${i}`} opacity={d.month?.includes('*') || d.isPartial ? PARTIAL_OPACITY : 1} />
+                          ))}
+                        </Bar>
+                        <Bar yAxisId="right" dataKey="avoidedEmissionTon" stackId="emission" name="Emisi Terhindar" fill={CHART_PALETTE.savings} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
+                          {chartData.map((d, i) => (
+                            <Cell key={`emi-cell-${i}`} opacity={d.month?.includes('*') || d.isPartial ? PARTIAL_OPACITY : 1} />
+                          ))}
+                        </Bar>
+                        <Line yAxisId="left" type="monotone" dataKey="target" name="Target PLTS" stroke={CHART_PALETTE.target} strokeDasharray="4 4" strokeWidth={2} dot={{ r: 3, fill: CHART_PALETTE.target }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
                       </ComposedChart>
                     </ResponsiveContainer>
                   </div>
                 )}
-              </div>
-
-              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
-                <div className="flex items-center gap-2">
-                  <span className="size-3 rounded bg-slate-400" />
-                  <span>Konsumsi PLN (MWh)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="size-3 rounded bg-amber-500" />
-                  <span>Pakai Sendiri (MWh)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="size-3 rounded bg-amber-200" />
-                  <span>Ekspor (MWh)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="size-3 rounded bg-emerald-500" />
-                  <span className="font-semibold text-emerald-700">Emisi Terhindar (tCO₂e · 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-4 h-0.5 bg-purple-500 border-t border-dashed border-purple-500" />
-                  <span>Target PLTS (MWh)</span>
-                </div>
               </div>
             </CardBox>
 

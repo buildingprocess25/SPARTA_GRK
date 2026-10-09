@@ -10,8 +10,16 @@ import {
 } from 'lucide-react';
 import {
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis,
-  CartesianGrid, Tooltip, Legend, ReferenceLine
+  CartesianGrid, Tooltip, Legend, ReferenceLine, Cell,
 } from 'recharts';
+import {
+  CHART_PALETTE,
+  CHART_GRID_PROPS,
+  CHART_AXIS_PROPS,
+  PARTIAL_OPACITY,
+  formatYAxisNumber,
+  ChartPillLegend,
+} from '@/components/ui/ChartTheme';
 import { useSustainability } from '@/context/SustainabilityContext';
 import { formatNum } from '@/data/sustainabilityData';
 import { CARBON_FACTORS } from '@/lib/carbon/carbonEngine';
@@ -295,48 +303,60 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             </div>
           </div>
 
-          {/* Filter Segmented Control */}
-          <div className="inline-flex gap-1 rounded-full bg-slate-100 p-1 flex-wrap">
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${chartMetricView === 'net'
-                ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                : 'text-slate-500 hover:text-slate-900'
-                }`}
-              onClick={() => setChartMetricView('net')}
-            >
-              Emisi Bersih (Net)
-            </button>
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${chartMetricView === 'penambahan'
-                ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                : 'text-slate-500 hover:text-slate-900'
-                }`}
-              onClick={() => setChartMetricView('penambahan')}
-            >
-              Penambahan (S1+S2)
-            </button>
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${chartMetricView === 'pengurangan'
-                ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                : 'text-slate-500 hover:text-slate-900'
-                }`}
-              onClick={() => setChartMetricView('pengurangan')}
-            >
-              Offset (PLTS+Air)
-            </button>
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${chartMetricView === 'all'
-                ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                : 'text-slate-500 hover:text-slate-900'
-                }`}
-              onClick={() => setChartMetricView('all')}
-            >
-              Semua Komparasi
-            </button>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Pill Legend terpadu */}
+            <ChartPillLegend
+              items={[
+                { label: 'Penambahan (S1+S2)', color: CHART_PALETTE.emission },
+                { label: 'Pengurangan (PLTS+Air)', color: CHART_PALETTE.savings },
+                { label: 'Emisi Bersih', color: CHART_PALETTE.net, type: 'line' },
+                { label: 'Rasio Offset', color: CHART_PALETTE.target, type: 'line' },
+              ]}
+            />
+
+            {/* Filter Segmented Control */}
+            <div className="inline-flex gap-1 rounded-full bg-slate-100 p-1 flex-wrap">
+              <button
+                type="button"
+                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${chartMetricView === 'net'
+                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                  : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                onClick={() => setChartMetricView('net')}
+              >
+                Emisi Bersih
+              </button>
+              <button
+                type="button"
+                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${chartMetricView === 'penambahan'
+                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                  : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                onClick={() => setChartMetricView('penambahan')}
+              >
+                Penambahan
+              </button>
+              <button
+                type="button"
+                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${chartMetricView === 'pengurangan'
+                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                  : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                onClick={() => setChartMetricView('pengurangan')}
+              >
+                Pengurangan
+              </button>
+              <button
+                type="button"
+                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${chartMetricView === 'all'
+                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                  : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                onClick={() => setChartMetricView('all')}
+              >
+                Semua
+              </button>
+            </div>
           </div>
         </div>
 
@@ -344,17 +364,17 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         <div className="flex flex-wrap items-center gap-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-xl text-sm">
           <div className="flex flex-col">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rata-Rata Penambahan</span>
-            <span className="font-mono font-bold text-slate-900">{avgPenambahan.toLocaleString()} <span className="text-xs text-slate-500 font-sans font-medium">tCO₂e/bln</span></span>
+            <span className="font-mono font-bold text-slate-900">{formatYAxisNumber(avgPenambahan)} <span className="text-xs text-slate-500 font-sans font-medium">tCO₂e/bln</span></span>
           </div>
           <div className="h-8 w-px bg-slate-200 hidden sm:block"></div>
           <div className="flex flex-col">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rata-Rata Pengurangan</span>
-            <span className="font-mono font-bold text-emerald-600">-{avgPengurangan.toLocaleString()} <span className="text-xs font-sans font-medium">tCO₂e/bln</span></span>
+            <span className="font-mono font-bold text-emerald-600">-{formatYAxisNumber(avgPengurangan)} <span className="text-xs font-sans font-medium">tCO₂e/bln</span></span>
           </div>
           <div className="h-8 w-px bg-slate-200 hidden sm:block"></div>
           <div className="flex flex-col">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rata-Rata Emisi Bersih</span>
-            <span className="font-mono font-bold text-slate-900">{avgNet.toLocaleString()} <span className="text-xs text-slate-500 font-sans font-medium">tCO₂e/bln</span></span>
+            <span className="font-mono font-bold text-slate-900">{formatYAxisNumber(avgNet)} <span className="text-xs text-slate-500 font-sans font-medium">tCO₂e/bln</span></span>
           </div>
           <div className="h-8 w-px bg-slate-200 hidden sm:block"></div>
           <div className="flex flex-col">
@@ -366,71 +386,115 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         {/* Grafik Utama Recharts */}
         <div className="w-full h-72 lg:h-[300px] pt-2">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={monthlyComparisonData} margin={{ top: 10, right: 10, bottom: 0, left: -10 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748B' }} stroke="#E2E8F0" />
+            <ComposedChart data={monthlyComparisonData} margin={{ top: 12, right: 16, bottom: 0, left: 16 }}>
+              <CartesianGrid {...CHART_GRID_PROPS} />
+              <XAxis dataKey="month" {...CHART_AXIS_PROPS} />
               <YAxis
                 yAxisId="left"
-                tick={{ fontSize: 11, fill: '#64748B' }}
                 stroke="#E2E8F0"
-                label={{ value: 'Emisi (tCO₂e)', angle: -90, position: 'insideLeft', style: { fill: '#94A3B8', fontSize: 11 } }}
+                tick={{ fontSize: 10, fill: '#64748B' }}
+                width={72}
+                tickFormatter={formatYAxisNumber}
+                label={{ value: 'Emisi (tCO₂e)', angle: -90, position: 'insideLeft', offset: 0, style: { fill: '#94A3B8', fontSize: 10, textAnchor: 'middle' } }}
               />
               <YAxis
                 yAxisId="right"
                 orientation="right"
                 domain={[0, 20]}
-                tick={{ fontSize: 11, fill: '#7C3AED' }}
                 stroke="#E2E8F0"
-                label={{ value: 'Rasio Offset (%)', angle: 90, position: 'insideRight', style: { fill: '#7C3AED', fontSize: 11 } }}
+                tick={{ fontSize: 10, fill: CHART_PALETTE.target }}
+                tickFormatter={v => `${v}%`}
+                width={55}
+                label={{ value: 'Rasio Offset (%)', angle: 90, position: 'insideRight', offset: 0, style: { fill: CHART_PALETTE.target, fontSize: 10, textAnchor: 'middle' } }}
               />
               <Tooltip
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
+                    const isPartial = data.month?.includes('*') || data.month === 'Okt';
                     return (
-                      <div className="bg-slate-900 text-white rounded-xl p-3 shadow-lg border border-slate-800 text-xs space-y-1">
-                        <p className="font-bold text-slate-200 border-b border-slate-700 pb-1 mb-1.5">Bulan: {label} 2026</p>
-                        <p className="text-red-400 font-mono">
-                          • Penambahan: <strong className="text-white">+{data.penambahanTon} tCO₂e</strong>
-                          <span className="text-slate-400 text-[10px] block"> (Genset: {data.scope1Ton} | PLN: {data.scope2Ton})</span>
-                        </p>
-                        <p className="text-emerald-400 font-mono">
-                          • Pengurangan: <strong className="text-white">-{data.penguranganTon} tCO₂e</strong>
-                          <span className="text-slate-400 text-[10px] block"> (PLTS: {data.pltsAvoided} | Air: {data.waterAvoided})</span>
-                        </p>
-                        <p className="text-blue-300 font-bold font-mono border-t border-slate-700 pt-1">
-                          • Emisi Bersih: <strong>{data.netTon} tCO₂e</strong>
-                        </p>
-                        <p className="text-purple-300 font-bold font-mono">
-                          • Rasio Offset: <strong>{data.offsetRatioPct}%</strong>
-                        </p>
+                      <div className="bg-white text-slate-800 rounded-xl p-3 shadow-xl border border-slate-200 text-xs space-y-1.5 min-w-[240px] select-text">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
+                          <span className="font-bold text-slate-800">Bulan: {label} 2026</span>
+                          {isPartial && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                              Parsial
+                            </span>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between gap-3 font-mono">
+                            <span className="flex items-center gap-1.5 font-sans text-slate-600">
+                              <span className="size-2 rounded-full bg-rose-500 shrink-0" />
+                              Penambahan:
+                            </span>
+                            <strong className="text-rose-700">+{formatYAxisNumber(data.penambahanTon)} tCO₂e</strong>
+                          </div>
+                          <div className="text-[10px] text-slate-400 pl-3.5">
+                            Genset: {formatYAxisNumber(data.scope1Ton)} &middot; PLN: {formatYAxisNumber(data.scope2Ton)}
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3 font-mono pt-1">
+                            <span className="flex items-center gap-1.5 font-sans text-slate-600">
+                              <span className="size-2 rounded-full bg-emerald-500 shrink-0" />
+                              Pengurangan:
+                            </span>
+                            <strong className="text-emerald-700">-{formatYAxisNumber(data.penguranganTon)} tCO₂e</strong>
+                          </div>
+                          <div className="text-[10px] text-slate-400 pl-3.5">
+                            PLTS: {formatYAxisNumber(data.pltsAvoided)} &middot; Air: {formatYAxisNumber(data.waterAvoided)}
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3 font-mono pt-1.5 border-t border-slate-100">
+                            <span className="flex items-center gap-1.5 font-sans font-semibold text-slate-700">
+                              <span className="size-2 rounded-full bg-slate-900 shrink-0" />
+                              Emisi Bersih:
+                            </span>
+                            <strong className="text-slate-900">{formatYAxisNumber(data.netTon)} tCO₂e</strong>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3 font-mono pt-0.5">
+                            <span className="flex items-center gap-1.5 font-sans text-purple-700 font-semibold">
+                              <span className="size-2 rounded-full bg-purple-500 shrink-0" />
+                              Rasio Offset:
+                            </span>
+                            <strong className="text-purple-700">{data.offsetRatioPct}%</strong>
+                          </div>
+                        </div>
                       </div>
                     );
                   }
                   return null;
                 }}
               />
-              <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '16px' }} />
 
               {/* Rata-rata reference lines */}
               {(chartMetricView === 'all' || chartMetricView === 'penambahan') && (
-                <ReferenceLine yAxisId="left" y={avgPenambahan} stroke="#EF4444" strokeDasharray="4 4" label={{ value: `Avg Kotor: ${avgPenambahan}`, fill: '#DC2626', fontSize: 10, position: 'insideTopLeft' }} />
+                <ReferenceLine yAxisId="left" y={avgPenambahan} stroke={CHART_PALETTE.emission} strokeDasharray="4 4" label={{ value: `Avg Penambahan: ${avgPenambahan}`, fill: CHART_PALETTE.emission, fontSize: 10, position: 'insideTopLeft' }} />
               )}
               {(chartMetricView === 'all' || chartMetricView === 'pengurangan') && (
-                <ReferenceLine yAxisId="left" y={avgPengurangan} stroke="#10B981" strokeDasharray="4 4" label={{ value: `Avg Offset: ${avgPengurangan}`, fill: '#059669', fontSize: 10, position: 'insideBottomLeft' }} />
+                <ReferenceLine yAxisId="left" y={avgPengurangan} stroke={CHART_PALETTE.savings} strokeDasharray="4 4" label={{ value: `Avg Pengurangan: ${avgPengurangan}`, fill: CHART_PALETTE.savings, fontSize: 10, position: 'insideBottomLeft' }} />
               )}
 
               {(chartMetricView === 'all' || chartMetricView === 'penambahan') && (
-                <Bar yAxisId="left" dataKey="penambahanTon" name="Penambahan Emisi (Scope 1+2)" fill="#F87171" radius={[4, 4, 0, 0]} maxBarSize={36} />
+                <Bar yAxisId="left" dataKey="penambahanTon" name="Penambahan Emisi (Scope 1+2)" fill={CHART_PALETTE.emission} radius={[4, 4, 0, 0]} maxBarSize={36} animationDuration={800} animationEasing="ease-out">
+                  {monthlyComparisonData.map((d, i) => (
+                    <Cell key={`pen-cell-${i}`} opacity={d.month?.includes('*') || d.month === 'Okt' ? PARTIAL_OPACITY : 1} />
+                  ))}
+                </Bar>
               )}
               {(chartMetricView === 'all' || chartMetricView === 'pengurangan') && (
-                <Bar yAxisId="left" dataKey="penguranganTon" name="Pengurangan Emisi (PLTS+Air)" fill="#34D399" radius={[4, 4, 0, 0]} maxBarSize={36} />
+                <Bar yAxisId="left" dataKey="penguranganTon" name="Pengurangan Emisi (PLTS+Air)" fill={CHART_PALETTE.savings} radius={[4, 4, 0, 0]} maxBarSize={36} animationDuration={800} animationEasing="ease-out">
+                  {monthlyComparisonData.map((d, i) => (
+                    <Cell key={`peng-cell-${i}`} opacity={d.month?.includes('*') || d.month === 'Okt' ? PARTIAL_OPACITY : 1} />
+                  ))}
+                </Bar>
               )}
               {(chartMetricView === 'all' || chartMetricView === 'net') && (
-                <Line yAxisId="left" type="monotone" dataKey="netTon" name="Emisi Bersih (Net)" stroke="#0F172A" strokeWidth={2.5} dot={{ r: 4, fill: '#0F172A' }} />
+                <Line yAxisId="left" type="monotone" dataKey="netTon" name="Emisi Bersih (Net)" stroke={CHART_PALETTE.net} strokeWidth={2.5} dot={{ r: 3.5, fill: CHART_PALETTE.net }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
               )}
               {(chartMetricView === 'all' || chartMetricView === 'net') && (
-                <Line yAxisId="right" type="monotone" dataKey="offsetRatioPct" name="Rasio Offset (%)" stroke="#7C3AED" strokeWidth={2} strokeDasharray="3 3" dot={{ r: 3, fill: '#7C3AED' }} />
+                <Line yAxisId="right" type="monotone" dataKey="offsetRatioPct" name="Rasio Offset (%)" stroke={CHART_PALETTE.target} strokeWidth={2} strokeDasharray="3 3" dot={{ r: 3, fill: CHART_PALETTE.target }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
               )}
             </ComposedChart>
           </ResponsiveContainer>
