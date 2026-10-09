@@ -11,6 +11,42 @@
   --color-eco-green: #10B981;
   --color-water-blue: #0EA5E9;
   --color-solar-amber: #F59E0B;
+
+  /* Semantic Theme Tokens */
+  --color-accent-primary: #005697;
+  --color-semantic-emission: #F43F5E;
+  --color-semantic-pln: #64748B;
+  --color-semantic-plts: #F59E0B;
+  --color-semantic-genset: #EA580C;
+  --color-semantic-water: #0EA5E9;
+  --color-semantic-savings: #10B981;
+  --color-semantic-calc: #6366F1;
+}
+
+:root {
+  /* Surface & Border Tokens */
+  --card-bg: #FFFFFF;
+  --card-border: rgba(226, 232, 240, 0.85);
+  --section-bg-muted: #F8FAFC;
+  --section-border: #F1F5F9;
+
+  /* Elevation Tokens */
+  --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow-card-hover: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
+
+  /* Radius Tokens */
+  --radius-card: 1rem;
+  --radius-subcard: 0.75rem;
+
+  /* Overlay Z-Index Hierarchy */
+  --z-sticky-table: 20;
+  --z-sticky-bar: 30;
+  --z-popover: 50;
+  --z-drawer: 80;
+  --z-modal-backdrop: 100;
+  --z-modal: 110;
+  --z-toast: 120;
 }
 
 @layer base {
