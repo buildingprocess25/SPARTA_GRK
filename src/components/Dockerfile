@@ -1,5 +1,6 @@
-# Use Docker BuildKit for better layer caching during rebuild
-# Enable with: DOCKER_BUILDKIT=1 docker build .
+# syntax=docker/dockerfile:1
+# Build from the repository root:
+# docker build -f src/components/Dockerfile -t alfamart-esg .
 
 FROM node:22-bookworm-slim AS base
 WORKDIR /app
@@ -7,50 +8,44 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 FROM base AS deps
-COPY package.json package-lock.json* ./
-COPY prisma ./prisma
+COPY package.json package-lock.json ./
 RUN npm ci
-RUN npx prisma generate
 
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_OUTPUT_MODE=standalone
-
-# Provide non-secret placeholders so Next.js/Prisma imports that validate
-# env variables do not fail during image build.
-ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
-ENV DIRECT_URL=postgresql://postgres:postgres@localhost:5432/postgres
-ENV SESSION_SECRET=build-time-session-secret-at-least-32-chars
-ENV APP_BASE_URL=http://localhost:3000
-ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
-ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_NOTIFICATIONS_ENABLED=true
-ENV NEXT_PUBLIC_NOTIFICATIONS_ENABLED=$NEXT_PUBLIC_NOTIFICATIONS_ENABLED
-ENV GMAIL_USER=build@example.com
-ENV GOOGLE_CLIENT_ID=build-client-id
-ENV GOOGLE_CLIENT_SECRET=build-client-secret
-ENV GOOGLE_REFRESH_TOKEN=build-refresh-token
-ENV GOOGLE_DRIVE_ROOT_FOLDER_ID=build-folder-id
+ENV NEXT_PUBLIC_NOTIFICATIONS_ENABLED=${NEXT_PUBLIC_NOTIFICATIONS_ENABLED}
 
-RUN npm run build
+# Prisma Client uses a project-local output directory, so generate it only
+# after the complete source tree is available in this Linux build stage.
+RUN npx prisma generate
+# This non-secret URL only satisfies build-time Prisma module initialization.
+# Supply the real DATABASE_URL and iSolar/cron credentials at runtime.
+RUN DATABASE_URL=postgresql://docker-build:docker-build@127.0.0.1:5432/docker-build npm run build
 
 FROM base AS runner
 WORKDIR /app
+ARG APP_PORT=3001
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV TZ=UTC
-ENV PORT=3000
+ENV PORT=${APP_PORT}
 ENV HOSTNAME=0.0.0.0
 
 RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 --gid 1001 nextjs
 
-COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/src/generated/prisma ./src/generated/prisma
 
 USER nextjs
 
-EXPOSE 3000
+EXPOSE ${APP_PORT}
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:' + process.env.PORT + '/').then(response => { if (!response.ok) process.exit(1) }).catch(() => process.exit(1))"
 
 CMD ["node", "server.js"]
