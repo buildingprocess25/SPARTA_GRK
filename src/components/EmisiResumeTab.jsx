@@ -35,19 +35,19 @@ const EmissionCalculatorPage = lazy(() => import('@/components/calculator/Emissi
 function CalculatorLoadingSkeleton() {
   return (
     <div className="space-y-4 py-4" aria-label="Memuat kalkulator emisi">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
         <div className="space-y-2">
-          <div className="h-4 w-28 animate-pulse rounded bg-blue-100" />
-          <div className="h-8 w-60 animate-pulse rounded bg-slate-200" />
-          <div className="h-3.5 w-80 max-w-full animate-pulse rounded bg-slate-100" />
+          <div className="h-4 w-28 animate-pulse rounded bg-blue-100 dark:bg-blue-500/15" />
+          <div className="h-8 w-60 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+          <div className="h-3.5 w-80 max-w-full animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
         </div>
-        <div className="h-10 w-24 animate-pulse rounded-xl bg-slate-100" />
+        <div className="h-10 w-24 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />
       </div>
-      <div className="h-12 animate-pulse rounded-2xl bg-amber-50 border border-amber-100" />
-      <div className="h-12 animate-pulse rounded-2xl bg-slate-100" />
+      <div className="h-12 animate-pulse rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20" />
+      <div className="h-12 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800" />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="h-96 animate-pulse rounded-2xl bg-slate-100" />
-        <div className="h-96 animate-pulse rounded-2xl bg-slate-100" />
+        <div className="h-96 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800" />
+        <div className="h-96 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800" />
       </div>
     </div>
   );
@@ -206,7 +206,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
 
       {/* 2b. Card Ringkas & Panel Accordion: Kalkulator Emisi GRK (Lazy-loaded) */}
       <div ref={calculatorRef} className="scroll-mt-6">
-        <CardBox className="border-blue-100/90 bg-gradient-to-r from-blue-50/40 via-white to-slate-50/50 shadow-sm transition-all">
+        <CardBox className="border-blue-100/90 dark:border-blue-500/20 bg-gradient-to-r from-blue-50/40 via-white to-slate-50/50 shadow-sm transition-all">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
               <div className="size-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-blue-200">
@@ -214,12 +214,12 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-base font-bold text-slate-900">Kalkulator Emisi GRK</h3>
-                  <span className="rounded-full bg-blue-100 text-blue-700 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Kalkulator Emisi GRK</h3>
+                  <span className="rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
                     Simulasi
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Simulasikan kalkulasi penambah, pengurangan, dan emisi bersih DC/operasional tanpa memengaruhi data dashboard resmi.
                 </p>
               </div>
@@ -230,7 +230,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 onClick={() => setIsCalculatorOpen(prev => !prev)}
                 className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition shadow-sm ${
                   isCalculatorOpen
-                    ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+                    ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                     : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-100'
                 }`}
                 aria-expanded={isCalculatorOpen}
@@ -247,15 +247,15 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
 
           {/* Panel Accordion Konten Kalkulator (Lazy-loaded) */}
           {isCalculatorOpen && (
-            <div className="mt-6 pt-6 border-t border-slate-200 animate-in fade-in duration-300">
-              <div className="mb-5 flex items-center justify-between rounded-xl bg-blue-50/70 border border-blue-100 px-4 py-2.5 text-xs text-blue-800">
+            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 animate-in fade-in duration-300">
+              <div className="mb-5 flex items-center justify-between rounded-xl bg-blue-50/70 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 px-4 py-2.5 text-xs text-blue-800 dark:text-blue-200">
                 <span className="font-semibold">
                   Panel Simulasi Aktif — Seluruh entri dan perhitungan tersimpan otomatis secara lokal tanpa mengubah data master.
                 </span>
                 <button
                   type="button"
                   onClick={() => setIsCalculatorOpen(false)}
-                  className="font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition"
+                  className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 flex items-center gap-1 transition"
                   title="Tutup panel kalkulator"
                 >
                   <X size={14} />
@@ -265,14 +265,14 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
               <Suspense fallback={<CalculatorLoadingSkeleton />}>
                 <EmissionCalculatorPage />
               </Suspense>
-              <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
                 <button
                   type="button"
                   onClick={() => {
                     setIsCalculatorOpen(false);
                     calculatorRef.current?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition"
                 >
                   <ChevronUp size={14} />
                   <span>Tutup Panel Kalkulator</span>
@@ -288,16 +288,16 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
           Lengkap dengan Rata-rata & Analisis Perbandingan Rasio
           ============================================================ */}
       <CardBox className="space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-4 pb-4 border-b border-slate-100">
+        <div className="flex flex-wrap items-start justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <BarChart3 size={20} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                 Tren Bulanan Penambahan vs Pengurangan Emisi (2026)
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Komparasi emisi operasional kotor (Scope 1 & 2) terhadap pengurang (PLTS & Water Recycle) per bulan
               </p>
             </div>
@@ -315,12 +315,12 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             />
 
             {/* Filter Segmented Control */}
-            <div className="inline-flex gap-1 rounded-full bg-slate-100 p-1 flex-wrap">
+            <div className="inline-flex gap-1 rounded-full bg-slate-100 dark:bg-slate-800 p-1 flex-wrap">
               <button
                 type="button"
                 className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${chartMetricView === 'net'
-                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-semibold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 onClick={() => setChartMetricView('net')}
               >
@@ -329,8 +329,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
               <button
                 type="button"
                 className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${chartMetricView === 'penambahan'
-                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-semibold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 onClick={() => setChartMetricView('penambahan')}
               >
@@ -339,8 +339,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
               <button
                 type="button"
                 className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${chartMetricView === 'pengurangan'
-                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-semibold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 onClick={() => setChartMetricView('pengurangan')}
               >
@@ -349,8 +349,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
               <button
                 type="button"
                 className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${chartMetricView === 'all'
-                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-semibold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 onClick={() => setChartMetricView('all')}
               >
@@ -361,25 +361,25 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         </div>
 
         {/* Compact Average & Comparison Summary */}
-        <div className="flex flex-wrap items-center gap-6 py-3 px-4 bg-slate-50 border border-slate-100 rounded-xl text-sm">
+        <div className="flex flex-wrap items-center gap-6 py-3 px-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 rounded-xl text-sm">
           <div className="flex flex-col">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rata-Rata Penambahan</span>
-            <span className="font-mono font-bold text-slate-900">{formatYAxisNumber(avgPenambahan)} <span className="text-xs text-slate-500 font-sans font-medium">tCO₂e/bln</span></span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Rata-Rata Penambahan</span>
+            <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{formatYAxisNumber(avgPenambahan)} <span className="text-xs text-slate-500 dark:text-slate-400 font-sans font-medium">tCO₂e/bln</span></span>
           </div>
-          <div className="h-8 w-px bg-slate-200 hidden sm:block"></div>
+          <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
           <div className="flex flex-col">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rata-Rata Pengurangan</span>
-            <span className="font-mono font-bold text-emerald-600">-{formatYAxisNumber(avgPengurangan)} <span className="text-xs font-sans font-medium">tCO₂e/bln</span></span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Rata-Rata Pengurangan</span>
+            <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">-{formatYAxisNumber(avgPengurangan)} <span className="text-xs font-sans font-medium">tCO₂e/bln</span></span>
           </div>
-          <div className="h-8 w-px bg-slate-200 hidden sm:block"></div>
+          <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
           <div className="flex flex-col">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rata-Rata Emisi Bersih</span>
-            <span className="font-mono font-bold text-slate-900">{formatYAxisNumber(avgNet)} <span className="text-xs text-slate-500 font-sans font-medium">tCO₂e/bln</span></span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Rata-Rata Emisi Bersih</span>
+            <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{formatYAxisNumber(avgNet)} <span className="text-xs text-slate-500 dark:text-slate-400 font-sans font-medium">tCO₂e/bln</span></span>
           </div>
-          <div className="h-8 w-px bg-slate-200 hidden sm:block"></div>
+          <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
           <div className="flex flex-col">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rasio Offset</span>
-            <span className="font-mono font-bold text-slate-900">{avgOffsetRatio}%</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Rasio Offset</span>
+            <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{avgOffsetRatio}%</span>
           </div>
         </div>
 
@@ -413,52 +413,52 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                     const data = payload[0].payload;
                     const isPartial = data.month?.includes('*') || data.month === 'Okt';
                     return (
-                      <div className="bg-white text-slate-800 rounded-xl p-3 shadow-xl border border-slate-200 text-xs space-y-1.5 min-w-[240px] select-text">
-                        <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
-                          <span className="font-bold text-slate-800">Bulan: {label} 2026</span>
+                      <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs space-y-1.5 min-w-[240px] select-text">
+                        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1 mb-1">
+                          <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {label} 2026</span>
                           {isPartial && (
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
                               Parsial
                             </span>
                           )}
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center justify-between gap-3 font-mono">
-                            <span className="flex items-center gap-1.5 font-sans text-slate-600">
+                            <span className="flex items-center gap-1.5 font-sans text-slate-600 dark:text-slate-400">
                               <span className="size-2 rounded-full bg-rose-500 shrink-0" />
                               Penambahan:
                             </span>
-                            <strong className="text-rose-700">+{formatYAxisNumber(data.penambahanTon)} tCO₂e</strong>
+                            <strong className="text-rose-700 dark:text-rose-300">+{formatYAxisNumber(data.penambahanTon)} tCO₂e</strong>
                           </div>
-                          <div className="text-[10px] text-slate-400 pl-3.5">
+                          <div className="text-[10px] text-slate-400 dark:text-slate-500 pl-3.5">
                             Genset: {formatYAxisNumber(data.scope1Ton)} &middot; PLN: {formatYAxisNumber(data.scope2Ton)}
                           </div>
 
                           <div className="flex items-center justify-between gap-3 font-mono pt-1">
-                            <span className="flex items-center gap-1.5 font-sans text-slate-600">
+                            <span className="flex items-center gap-1.5 font-sans text-slate-600 dark:text-slate-400">
                               <span className="size-2 rounded-full bg-emerald-500 shrink-0" />
                               Pengurangan:
                             </span>
-                            <strong className="text-emerald-700">-{formatYAxisNumber(data.penguranganTon)} tCO₂e</strong>
+                            <strong className="text-emerald-700 dark:text-emerald-300">-{formatYAxisNumber(data.penguranganTon)} tCO₂e</strong>
                           </div>
-                          <div className="text-[10px] text-slate-400 pl-3.5">
+                          <div className="text-[10px] text-slate-400 dark:text-slate-500 pl-3.5">
                             PLTS: {formatYAxisNumber(data.pltsAvoided)} &middot; Air: {formatYAxisNumber(data.waterAvoided)}
                           </div>
 
-                          <div className="flex items-center justify-between gap-3 font-mono pt-1.5 border-t border-slate-100">
-                            <span className="flex items-center gap-1.5 font-sans font-semibold text-slate-700">
-                              <span className="size-2 rounded-full bg-slate-900 shrink-0" />
+                          <div className="flex items-center justify-between gap-3 font-mono pt-1.5 border-t border-slate-100 dark:border-slate-800">
+                            <span className="flex items-center gap-1.5 font-sans font-semibold text-slate-700 dark:text-slate-300">
+                              <span className="size-2 rounded-full bg-slate-900 dark:bg-slate-950 shrink-0" />
                               Emisi Bersih:
                             </span>
-                            <strong className="text-slate-900">{formatYAxisNumber(data.netTon)} tCO₂e</strong>
+                            <strong className="text-slate-900 dark:text-slate-100">{formatYAxisNumber(data.netTon)} tCO₂e</strong>
                           </div>
 
                           <div className="flex items-center justify-between gap-3 font-mono pt-0.5">
-                            <span className="flex items-center gap-1.5 font-sans text-purple-700 font-semibold">
+                            <span className="flex items-center gap-1.5 font-sans text-purple-700 dark:text-purple-300 font-semibold">
                               <span className="size-2 rounded-full bg-purple-500 shrink-0" />
                               Rasio Offset:
                             </span>
-                            <strong className="text-purple-700">{data.offsetRatioPct}%</strong>
+                            <strong className="text-purple-700 dark:text-purple-300">{data.offsetRatioPct}%</strong>
                           </div>
                         </div>
                       </div>
@@ -501,11 +501,11 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         </div>
 
         {/* Tabel Perbandingan Bulanan */}
-        <div className="overflow-x-auto rounded-2xl border border-slate-100">
+        <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
           <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-slate-900 text-white text-xs uppercase">
+            <thead className="bg-slate-900 dark:bg-slate-950 text-white text-xs uppercase">
               <tr>
-                <th className="sticky left-0 bg-slate-900 px-4 py-3 font-semibold z-10">Bulan 2026</th>
+                <th className="sticky left-0 bg-slate-900 dark:bg-slate-950 px-4 py-3 font-semibold z-10">Bulan 2026</th>
                 <th className="text-right px-4 py-3 font-semibold">Scope 1 (Genset)</th>
                 <th className="text-right px-4 py-3 font-semibold">Scope 2 (Grid PLN)</th>
                 <th className="text-right px-4 py-3 font-semibold bg-red-950 text-red-100">Total Penambahan (tCO₂e)</th>
@@ -518,17 +518,17 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             </thead>
             <tbody>
               {monthlyComparisonData.map((d, i) => (
-                <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                  <td className="sticky left-0 bg-white group-hover:bg-slate-50 font-bold text-slate-900 px-4 py-3 z-10 border-r border-slate-100">{d.month} 2026</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-500 font-mono">{d.scope1Ton.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-700 font-mono">{d.scope2Ton.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-red-600 bg-red-50/30 font-mono">+{d.penambahanTon.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right text-emerald-600 font-mono">{d.pltsAvoided.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right text-cyan-600 font-mono">{d.waterAvoided.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-emerald-600 bg-emerald-50/30 font-mono">-{d.penguranganTon.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-slate-900 font-mono">{d.netTon.toFixed(1)}</td>
+                <tr key={i} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                  <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800">{d.month} 2026</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-500 dark:text-slate-400 font-mono">{d.scope1Ton.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 font-mono">{d.scope2Ton.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-red-600 dark:text-red-400 bg-red-50/30 dark:bg-red-500/10 font-mono">+{d.penambahanTon.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right text-emerald-600 dark:text-emerald-400 font-mono">{d.pltsAvoided.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right text-cyan-600 dark:text-cyan-400 font-mono">{d.waterAvoided.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50/30 dark:bg-emerald-500/10 font-mono">-{d.penguranganTon.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-slate-900 dark:text-slate-100 font-mono">{d.netTon.toFixed(1)}</td>
                   <td className="px-4 py-3 text-center">
-                    <span className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-100 font-mono">
+                    <span className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-500/20 font-mono">
                       {d.offsetRatioPct}%
                     </span>
                   </td>
@@ -536,16 +536,16 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
               ))}
             </tbody>
             <tfoot>
-              <tr className="bg-slate-50 font-semibold border-t-2 border-slate-200">
-                <td className="sticky left-0 bg-slate-50 font-bold text-slate-900 px-4 py-3.5 z-10 border-r border-slate-100">RATA-RATA BULANAN</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-500 font-mono">{(scope1.summary.totalEmissionCO2e / totalMonths).toFixed(1)}</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-700 font-mono">{(scope2.summary.totalEmissionCO2e / totalMonths).toFixed(1)}</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-red-700 bg-red-50/50 font-mono">+{avgPenambahan} tCO₂e</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-emerald-600 font-mono">{(pltsData.summary.co2Avoided / totalMonths).toFixed(1)}</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-cyan-600 font-mono">{(waterData.summary.co2Avoided / totalMonths).toFixed(1)}</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-emerald-700 bg-emerald-50/50 font-mono">-{avgPengurangan} tCO₂e</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-slate-900 font-mono">{avgNet} tCO₂e</td>
-                <td className="px-4 py-3.5 text-center font-bold text-purple-900 font-mono">{avgOffsetRatio}%</td>
+              <tr className="bg-slate-50 dark:bg-slate-800/40 font-semibold border-t-2 border-slate-200 dark:border-slate-700">
+                <td className="sticky left-0 bg-slate-50 dark:bg-slate-800/40 font-bold text-slate-900 dark:text-slate-100 px-4 py-3.5 z-10 border-r border-slate-100 dark:border-slate-800">RATA-RATA BULANAN</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-500 dark:text-slate-400 font-mono">{(scope1.summary.totalEmissionCO2e / totalMonths).toFixed(1)}</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 font-mono">{(scope2.summary.totalEmissionCO2e / totalMonths).toFixed(1)}</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-red-700 dark:text-red-300 bg-red-50/50 dark:bg-red-500/10 font-mono">+{avgPenambahan} tCO₂e</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-emerald-600 dark:text-emerald-400 font-mono">{(pltsData.summary.co2Avoided / totalMonths).toFixed(1)}</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-cyan-600 dark:text-cyan-400 font-mono">{(waterData.summary.co2Avoided / totalMonths).toFixed(1)}</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50/50 dark:bg-emerald-500/10 font-mono">-{avgPengurangan} tCO₂e</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-slate-900 dark:text-slate-100 font-mono">{avgNet} tCO₂e</td>
+                <td className="px-4 py-3.5 text-center font-bold text-purple-900 dark:text-purple-200 font-mono">{avgOffsetRatio}%</td>
               </tr>
             </tfoot>
           </table>
@@ -562,106 +562,106 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
           onClick={() => setShowDetailedMapping(!showDetailedMapping)}
         >
           <div className="flex items-center gap-3">
-            <div className="size-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <div className="size-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <BarChart3 size={18} />
             </div>
             <div>
-              <h4 className="font-bold text-sm text-slate-900">
+              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">
                 Rincian Komparasi Emisi Berdasarkan GHG Protocol
               </h4>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Klik untuk {showDetailedMapping ? 'menyembunyikan' : 'melihat'} pemetaan lengkap Scope 1, Scope 2, dan program reduksi emisi
               </p>
             </div>
           </div>
-          <div className="size-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 transition-colors">
+          <div className="size-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 flex items-center justify-center shrink-0 transition-colors">
             {showDetailedMapping ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </div>
         </button>
 
         {showDetailedMapping && (
-          <div className="mt-5 pt-5 border-t border-slate-100 space-y-6 animate-in">
+          <div className="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800 space-y-6 animate-in">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* KOLOM KIRI: PENGURANG EMISI */}
-              <div className="space-y-4 rounded-2xl border border-blue-100 bg-blue-50/30 p-5">
-                <div className="inline-flex items-center gap-2 rounded-full bg-blue-100/80 px-3 py-1 text-xs font-bold text-blue-800">
+              <div className="space-y-4 rounded-2xl border border-blue-100 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/10 p-5">
+                <div className="inline-flex items-center gap-2 rounded-full bg-blue-100/80 dark:bg-blue-500/15 px-3 py-1 text-xs font-bold text-blue-800 dark:text-blue-200">
                   <TrendingDown size={16} />
                   <span>Pengurang Emisi</span>
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Energi Terbarukan</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Energi Terbarukan</h4>
                   <ul className="space-y-2 text-xs">
                     <li
-                      className="p-3 bg-white rounded-xl border border-slate-100 hover:border-blue-200 transition-colors cursor-pointer flex items-start gap-2.5"
+                      className="p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-500/30 transition-colors cursor-pointer flex items-start gap-2.5"
                       onClick={() => handleNav('pengurang', 'plts')}
                     >
                       <div className="size-2 rounded-full bg-blue-500 mt-1 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-slate-900">Produksi PLTS</span>
-                          <span className="text-[10px] text-slate-400">IsolarCloud Gateway</span>
+                          <span className="font-bold text-slate-900 dark:text-slate-100">Produksi PLTS</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">IsolarCloud Gateway</span>
                         </div>
-                        <p className="text-blue-700 font-mono font-semibold mt-1">
+                        <p className="text-blue-700 dark:text-blue-300 font-mono font-semibold mt-1">
                           {formatNum(pltsData.summary.energyGeneratedYTD / 1000)} MWh YTD • Avoided {formatNum(pltsData.summary.co2Avoided)} tCO₂e
                         </p>
                       </div>
                     </li>
-                    <li className="p-3 bg-white rounded-xl border border-slate-100 flex items-start gap-2.5">
+                    <li className="p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 flex items-start gap-2.5">
                       <div className="size-2 rounded-full bg-blue-500 mt-1 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-slate-900">Penggunaan Molis</span>
-                          <span className="text-[10px] text-slate-400">Logistik Delivery</span>
+                          <span className="font-bold text-slate-900 dark:text-slate-100">Penggunaan Molis</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">Logistik Delivery</span>
                         </div>
-                        <p className="text-slate-500 text-[11px] mt-0.5">Peralihan armada kurir DC ramah lingkungan</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">Peralihan armada kurir DC ramah lingkungan</p>
                       </div>
                     </li>
                   </ul>
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Konservasi Energi & Air</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Konservasi Energi & Air</h4>
                   <ul className="space-y-2 text-xs">
                     <li
-                      className="p-3 bg-white rounded-xl border border-slate-100 hover:border-cyan-200 transition-colors cursor-pointer flex items-start gap-2.5"
+                      className="p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-cyan-200 dark:hover:border-cyan-500/30 transition-colors cursor-pointer flex items-start gap-2.5"
                       onClick={() => handleNav('pengurang', 'water')}
                     >
                       <div className="size-2 rounded-full bg-cyan-500 mt-1 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-slate-900">Water Recycle</span>
-                          <span className="text-[10px] text-slate-400">Monitoring Meteran</span>
+                          <span className="font-bold text-slate-900 dark:text-slate-100">Water Recycle</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">Monitoring Meteran</span>
                         </div>
-                        <p className="text-cyan-700 font-mono font-semibold mt-1">
+                        <p className="text-cyan-700 dark:text-cyan-300 font-mono font-semibold mt-1">
                           {formatNum(waterData.summary.waterSavedYTD)} m³ YTD • Avoided {waterData.summary.co2Avoided} tCO₂e
                         </p>
                       </div>
                     </li>
-                    <li className="p-3 bg-white rounded-xl border border-slate-100 flex items-start gap-2.5">
+                    <li className="p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 flex items-start gap-2.5">
                       <div className="size-2 rounded-full bg-cyan-500 mt-1 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-slate-900">Project Relokasi AC & LED</span>
-                          <span className="text-[10px] text-slate-400">Efisiensi Chiller</span>
+                          <span className="font-bold text-slate-900 dark:text-slate-100">Project Relokasi AC & LED</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">Efisiensi Chiller</span>
                         </div>
                       </div>
                     </li>
                   </ul>
                 </div>
 
-                <div className="p-4 rounded-xl bg-blue-50 border border-blue-100 text-blue-900 flex flex-col justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-blue-700">TOTAL PENGURANG EMISI YTD</span>
-                  <span className="text-2xl font-bold font-mono text-blue-900 mt-1">
+                <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 text-blue-900 dark:text-blue-200 flex flex-col justify-between">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-300">TOTAL PENGURANG EMISI YTD</span>
+                  <span className="text-2xl font-bold font-mono text-blue-900 dark:text-blue-200 mt-1">
                     {formatNum(resumeKPI.avoidedEmissionTon, 1)} tCO₂e
                   </span>
-                  <span className="text-xs text-blue-600 mt-1">Mengurangi {resumeKPI.netReductionPct} dari total emisi kotor</span>
+                  <span className="text-xs text-blue-600 dark:text-blue-400 mt-1">Mengurangi {resumeKPI.netReductionPct} dari total emisi kotor</span>
                 </div>
               </div>
 
               {/* KOLOM KANAN: PENAMBAH EMISI */}
-              <div className="space-y-4 rounded-2xl border border-red-100 bg-red-50/30 p-5">
-                <div className="inline-flex items-center gap-2 rounded-full bg-red-100/80 px-3 py-1 text-xs font-bold text-red-800">
+              <div className="space-y-4 rounded-2xl border border-red-100 dark:border-red-500/20 bg-red-50/30 dark:bg-red-500/10 p-5">
+                <div className="inline-flex items-center gap-2 rounded-full bg-red-100/80 dark:bg-red-500/15 px-3 py-1 text-xs font-bold text-red-800 dark:text-red-200">
                   <TrendingUp size={16} />
                   <span>Penambah Emisi</span>
                 </div>
@@ -669,31 +669,31 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 {/* Scope 1 */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-red-100 text-red-800 text-[10px] font-bold">Scope 1</span>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Emisi Langsung</h4>
+                    <span className="px-2 py-0.5 rounded bg-red-100 dark:bg-red-500/15 text-red-800 dark:text-red-200 text-[10px] font-bold">Scope 1</span>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Emisi Langsung</h4>
                   </div>
                   <ul className="space-y-2 text-xs">
                     <li
-                      className="p-3 bg-white rounded-xl border border-slate-100 hover:border-red-200 transition-colors cursor-pointer flex items-start gap-2.5"
+                      className="p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-red-200 dark:hover:border-red-500/30 transition-colors cursor-pointer flex items-start gap-2.5"
                       onClick={() => handleNav('penambah', 'scope1')}
                     >
                       <div className="size-2 rounded-full bg-red-500 mt-1 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-slate-900">Solar Genset Toko & DC</span>
-                          <span className="text-[10px] text-slate-400">Solar Genset</span>
+                          <span className="font-bold text-slate-900 dark:text-slate-100">Solar Genset Toko & DC</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">Solar Genset</span>
                         </div>
-                        <p className="text-red-700 font-mono font-semibold mt-1">
+                        <p className="text-red-700 dark:text-red-300 font-mono font-semibold mt-1">
                           {formatNum(scope1.summary.totalFuelLitersYTD)} Liter • Emisi {formatNum(scope1.summary.totalEmissionCO2e, 1)} tCO₂e
                         </p>
                       </div>
                     </li>
-                    <li className="p-3 bg-white rounded-xl border border-slate-100 flex items-start gap-2.5">
+                    <li className="p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 flex items-start gap-2.5">
                       <div className="size-2 rounded-full bg-red-500 mt-1 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-slate-900">BBM Kendaraan Operasional</span>
-                          <span className="text-[10px] text-slate-400">Intranet</span>
+                          <span className="font-bold text-slate-900 dark:text-slate-100">BBM Kendaraan Operasional</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">Intranet</span>
                         </div>
                       </div>
                     </li>
@@ -703,21 +703,21 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 {/* Scope 2 */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">Scope 2</span>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Energi Tidak Langsung</h4>
+                    <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-200 text-[10px] font-bold">Scope 2</span>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Energi Tidak Langsung</h4>
                   </div>
                   <ul className="space-y-2 text-xs">
                     <li
-                      className="p-3 bg-white rounded-xl border border-amber-200 bg-amber-50/20 hover:border-amber-300 transition-colors cursor-pointer flex items-start gap-2.5"
+                      className="p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50/20 dark:bg-amber-500/10 hover:border-amber-300 dark:hover:border-amber-500/50 transition-colors cursor-pointer flex items-start gap-2.5"
                       onClick={() => handleNav('penambah', 'scope2')}
                     >
                       <div className="size-2 rounded-full bg-amber-500 mt-1 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-slate-900">Konsumsi Listrik DC & Toko</span>
-                          <span className="text-[10px] text-amber-700 font-semibold">Grid PLN (AMR IoT)</span>
+                          <span className="font-bold text-slate-900 dark:text-slate-100">Konsumsi Listrik DC & Toko</span>
+                          <span className="text-[10px] text-amber-700 dark:text-amber-300 font-semibold">Grid PLN (AMR IoT)</span>
                         </div>
-                        <p className="text-amber-800 font-mono font-semibold mt-1">
+                        <p className="text-amber-800 dark:text-amber-200 font-mono font-semibold mt-1">
                           {(scope2.summary.totalPlnKwhYTD / 1000000).toFixed(2)} GWh • Emisi {formatNum(scope2.summary.totalEmissionCO2e, 1)} tCO₂e
                         </p>
                       </div>
@@ -725,31 +725,31 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                   </ul>
                 </div>
 
-                <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-900 flex flex-col justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-red-700">TOTAL EMISI KOTOR (SCOPE 1 & 2)</span>
-                  <span className="text-2xl font-bold font-mono text-red-900 mt-1">
+                <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-red-900 dark:text-red-200 flex flex-col justify-between">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-red-700 dark:text-red-300">TOTAL EMISI KOTOR (SCOPE 1 & 2)</span>
+                  <span className="text-2xl font-bold font-mono text-red-900 dark:text-red-200 mt-1">
                     {formatNum(resumeKPI.grossEmissionTon, 1)} tCO₂e
                   </span>
-                  <span className="text-xs text-red-600 mt-1">Beban emisi operasional sebelum offset</span>
+                  <span className="text-xs text-red-600 dark:text-red-400 mt-1">Beban emisi operasional sebelum offset</span>
                 </div>
               </div>
             </div>
 
             {/* NET ZERO BALANCE FOOTER */}
-            <div className="p-5 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="p-5 rounded-2xl bg-slate-900 dark:bg-slate-950 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <span className="inline-flex rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider mb-2">
                   NET GHG BALANCE
                 </span>
                 <h3 className="text-base font-bold text-white">Total Emisi Bersih Alfamart (Net Emissions)</h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                   Perhitungan: Emisi Kotor (Scope 1 + 2) dikurangi Total Pengurang Emisi (PLTS & Water)
                 </p>
               </div>
               <div className="flex items-center gap-5 shrink-0">
                 <div className="text-right">
                   <div className="text-2xl font-black font-mono text-white">
-                    {formatNum(resumeKPI.netEmissionTon, 1)} <span className="text-sm font-medium text-slate-400">tCO₂e</span>
+                    {formatNum(resumeKPI.netEmissionTon, 1)} <span className="text-sm font-medium text-slate-400 dark:text-slate-500">tCO₂e</span>
                   </div>
                   <div className="text-xs text-emerald-400 font-semibold mt-0.5">
                     Saving: Rp {formatNum(resumeKPI.totalCostSavingJuta, 1)} Juta
@@ -759,12 +759,12 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             </div>
 
             {/* REPORTING COMPLIANCE STRIP */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2 text-slate-800 font-bold">
-                <ShieldCheck size={18} className="text-emerald-600 shrink-0" />
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-bold">
+                <ShieldCheck size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>Report Standards Ready</span>
               </div>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-500">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-500 dark:text-slate-400">
                 <span>• SRN-PPI (KLHK)</span>
                 <span>• Sustainability Report POJK 51</span>
                 <span>• GHG Protocol Corporate Standard</span>

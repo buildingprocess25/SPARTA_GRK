@@ -399,24 +399,24 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
       onClose={handleCloseRequest}
       title="Input Data Scope 1 — Solar Genset"
       subtitle="Pencatatan konsumsi BBM solar genset cadangan operasional DC & fasilitas."
-      icon={<Fuel size={20} className="text-rose-600" />}
+      icon={<Fuel size={20} className="text-rose-600 dark:text-rose-400" />}
       badge="BBM Stasioner"
       size="md"
       loading={isSubmitting || isProcessingExcel}
     >
         {/* Segmented Control Switcher */}
-        <div className="px-6 pt-3 pb-2.5 border-b border-slate-100 bg-slate-50/60 shrink-0">
-          <div className="inline-flex bg-slate-200/60 p-1 rounded-xl gap-1 w-full sm:w-auto">
+        <div className="px-6 pt-3 pb-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 shrink-0">
+          <div className="inline-flex bg-slate-200/60 dark:bg-slate-800/60 p-1 rounded-xl gap-1 w-full sm:w-auto">
             <button
               type="button"
               onClick={() => { setActiveTab('manual'); setStatusMessage(null); }}
               className={`flex items-center justify-center gap-2 py-1.5 px-4 rounded-lg text-xs font-bold transition-all flex-1 sm:flex-initial ${
                 activeTab === 'manual'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
               }`}
             >
-              <Fuel size={14} className={activeTab === 'manual' ? 'text-rose-500' : 'text-slate-400'} />
+              <Fuel size={14} className={activeTab === 'manual' ? 'text-rose-500 dark:text-rose-400' : 'text-slate-400 dark:text-slate-500'} />
               <span>Input Manual</span>
             </button>
 
@@ -425,11 +425,11 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
               onClick={() => { setActiveTab('excel'); setStatusMessage(null); }}
               className={`flex items-center justify-center gap-2 py-1.5 px-4 rounded-lg text-xs font-bold transition-all flex-1 sm:flex-initial ${
                 activeTab === 'excel'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
               }`}
             >
-              <FileSpreadsheet size={14} className={activeTab === 'excel' ? 'text-emerald-600' : 'text-slate-400'} />
+              <FileSpreadsheet size={14} className={activeTab === 'excel' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} />
               <span>Upload Excel (.xlsx / .csv)</span>
             </button>
           </div>
@@ -439,13 +439,13 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
         {statusMessage && (
           <div className={`mx-6 mt-4 p-3 rounded-xl flex items-center gap-2.5 text-xs font-semibold animate-in fade-in duration-200 ${
             statusMessage.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'bg-rose-50 text-rose-800 border border-rose-200'
+              ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30'
+              : 'bg-rose-50 dark:bg-rose-500/10 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30'
           }`}>
             {statusMessage.type === 'success' ? (
-              <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+              <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
             ) : (
-              <AlertCircle size={16} className="text-rose-600 shrink-0" />
+              <AlertCircle size={16} className="text-rose-600 dark:text-rose-400 shrink-0" />
             )}
             <span className="flex-1">{statusMessage.text}</span>
           </div>
@@ -458,11 +458,11 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
               {/* Bagian 1: Lokasi / Fasilitas Operasional */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label htmlFor="modal-dc-select" className="text-xs font-bold text-slate-700 uppercase tracking-wide">
-                    Lokasi / Fasilitas Operasional <span className="text-rose-500">*</span>
+                  <label htmlFor="modal-dc-select" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                    Lokasi / Fasilitas Operasional <span className="text-rose-500 dark:text-rose-400">*</span>
                   </label>
-                  <span className="text-[11px] font-semibold text-slate-500">
-                    {selectedDC.region} • Grid: <strong className="text-slate-800">{selectedDC.grid || selectedDC.gridRegion || 'JAMALI'}</strong>
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    {selectedDC.region} • Grid: <strong className="text-slate-800 dark:text-slate-200">{selectedDC.grid || selectedDC.gridRegion || 'JAMALI'}</strong>
                   </span>
                 </div>
 
@@ -472,7 +472,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                     value={facilitySearch}
                     onChange={(e) => setFacilitySearch(e.target.value)}
                     placeholder="Cari DC/kode..."
-                    className="sm:col-span-1 rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-rose-500"
+                    className="sm:col-span-1 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-rose-500"
                   />
                   <select
                     id="modal-dc-select"
@@ -485,8 +485,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                         setGensetAssetCode(`GEN-${fac.code || 'DC'}-01`);
                       }
                     }}
-                    className={`sm:col-span-2 rounded-xl border bg-white px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-rose-500 ${
-                      formErrors.facility ? 'border-rose-400 bg-rose-50/30' : 'border-slate-200'
+                    className={`sm:col-span-2 rounded-xl border bg-white dark:bg-slate-900 px-3 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-rose-500 ${
+                      formErrors.facility ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     {filteredFacilities.map((fac) => (
@@ -497,22 +497,22 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                   </select>
                 </div>
                 {formErrors.facility && (
-                  <p className="text-[11px] font-semibold text-rose-600 mt-1">{formErrors.facility}</p>
+                  <p className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 mt-1">{formErrors.facility}</p>
                 )}
               </div>
 
               {/* Bagian 2: Periode Pelaporan (Bulan, Tahun, Tanggal Pengisian dalam 1 Baris Rapat) */}
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                 <div className="grid grid-cols-12 gap-2">
                   <div className="col-span-12 sm:col-span-5">
-                    <label htmlFor="modal-month-select" className="text-[11px] font-bold text-slate-600 block mb-1">
-                      Bulan Pelaporan <span className="text-rose-500">*</span>
+                    <label htmlFor="modal-month-select" className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
+                      Bulan Pelaporan <span className="text-rose-500 dark:text-rose-400">*</span>
                     </label>
                     <select
                       id="modal-month-select"
                       value={periodMonth}
                       onChange={(e) => handlePeriodChange(e.target.value, periodYear)}
-                      className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-rose-500"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-rose-500"
                     >
                       <option value="01">01 - Januari</option>
                       <option value="02">02 - Februari</option>
@@ -530,14 +530,14 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                   </div>
 
                   <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="modal-year-select" className="text-[11px] font-bold text-slate-600 block mb-1">
-                      Tahun <span className="text-rose-500">*</span>
+                    <label htmlFor="modal-year-select" className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
+                      Tahun <span className="text-rose-500 dark:text-rose-400">*</span>
                     </label>
                     <select
                       id="modal-year-select"
                       value={periodYear}
                       onChange={(e) => handlePeriodChange(periodMonth, e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-rose-500"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-rose-500"
                     >
                       <option value="2026">2026</option>
                       <option value="2025">2025</option>
@@ -546,7 +546,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                   </div>
 
                   <div className="col-span-6 sm:col-span-4">
-                    <label htmlFor="modal-date-input" className="text-[11px] font-bold text-slate-600 block mb-1">
+                    <label htmlFor="modal-date-input" className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
                       Tanggal Pengisian
                     </label>
                     <input
@@ -554,9 +554,9 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                       type="date"
                       value={activityDate}
                       onChange={(e) => setActivityDate(e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:border-rose-500"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-rose-500"
                     />
-                    {formErrors.date && <p className="mt-1 text-[10px] font-semibold text-rose-600">{formErrors.date}</p>}
+                    {formErrors.date && <p className="mt-1 text-[10px] font-semibold text-rose-600 dark:text-rose-400">{formErrors.date}</p>}
                   </div>
                 </div>
               </div>
@@ -564,17 +564,17 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
               {/* Bagian 3: Jenis BBM & Jumlah Konsumsi */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
-                    Jenis BBM & Jumlah <span className="text-rose-500">*</span>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                    Jenis BBM & Jumlah <span className="text-rose-500 dark:text-rose-400">*</span>
                   </label>
-                  <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg">
+                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
                     <button
                       type="button"
                       onClick={() => setFuelInputMode('liter')}
                       className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all ${
                         fuelInputMode === 'liter'
-                          ? 'bg-white text-slate-900 shadow-xs'
-                          : 'text-slate-500 hover:text-slate-800'
+                          ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs'
+                          : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                       }`}
                     >
                       Volume (Liter)
@@ -584,8 +584,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                       onClick={() => setFuelInputMode('rupiah')}
                       className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all ${
                         fuelInputMode === 'rupiah'
-                          ? 'bg-white text-slate-900 shadow-xs'
-                          : 'text-slate-500 hover:text-slate-800'
+                          ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs'
+                          : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
                       }`}
                     >
                       Total Biaya (Rp)
@@ -600,12 +600,12 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                     onClick={() => setFuelType('SOLAR')}
                     className={`p-3 rounded-xl border-2 text-left transition-all relative flex flex-col justify-between h-[78px] ${
                       fuelType === 'SOLAR'
-                        ? 'bg-rose-50/40 border-rose-500 shadow-xs'
-                        : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                        ? 'bg-rose-50/40 dark:bg-rose-500/10 border-rose-500 dark:border-rose-500/60 shadow-xs'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/40'
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <span className="font-bold text-xs text-slate-900 leading-tight">Solar / Biosolar B35</span>
+                      <span className="font-bold text-xs text-slate-900 dark:text-slate-100 leading-tight">Solar / Biosolar B35</span>
                       {fuelType === 'SOLAR' && (
                         <span className="size-4.5 rounded-full bg-rose-500 text-white flex items-center justify-center shrink-0">
                           <Check size={11} strokeWidth={3} />
@@ -613,8 +613,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                       )}
                     </div>
                     <div>
-                      <div className="text-[11px] text-amber-700 font-mono font-semibold">2.6685 kgCO₂e/L</div>
-                      <div className="text-[10px] text-slate-500 leading-tight">Genset Utama DC (ESDM)</div>
+                      <div className="text-[11px] text-amber-700 dark:text-amber-400 font-mono font-semibold">2.6685 kgCO₂e/L</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Genset Utama DC (ESDM)</div>
                     </div>
                   </button>
 
@@ -623,12 +623,12 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                     onClick={() => setFuelType('PERTALITE')}
                     className={`p-3 rounded-xl border-2 text-left transition-all relative flex flex-col justify-between h-[78px] ${
                       fuelType === 'PERTALITE'
-                        ? 'bg-rose-50/40 border-rose-500 shadow-xs'
-                        : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                        ? 'bg-rose-50/40 dark:bg-rose-500/10 border-rose-500 dark:border-rose-500/60 shadow-xs'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/40'
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <span className="font-bold text-xs text-slate-900 leading-tight">Pertalite (RON 90)</span>
+                      <span className="font-bold text-xs text-slate-900 dark:text-slate-100 leading-tight">Pertalite (RON 90)</span>
                       {fuelType === 'PERTALITE' && (
                         <span className="size-4.5 rounded-full bg-rose-500 text-white flex items-center justify-center shrink-0">
                           <Check size={11} strokeWidth={3} />
@@ -636,8 +636,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                       )}
                     </div>
                     <div>
-                      <div className="text-[11px] text-emerald-700 font-mono font-semibold">2.2951 kgCO₂e/L</div>
-                      <div className="text-[10px] text-slate-500 leading-tight">Genset Portable Toko</div>
+                      <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-mono font-semibold">2.2951 kgCO₂e/L</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Genset Portable Toko</div>
                     </div>
                   </button>
 
@@ -646,12 +646,12 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                     onClick={() => setFuelType('PERTAMAX')}
                     className={`p-3 rounded-xl border-2 text-left transition-all relative flex flex-col justify-between h-[78px] ${
                       fuelType === 'PERTAMAX'
-                        ? 'bg-rose-50/40 border-rose-500 shadow-xs'
-                        : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                        ? 'bg-rose-50/40 dark:bg-rose-500/10 border-rose-500 dark:border-rose-500/60 shadow-xs'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/40'
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <span className="font-bold text-xs text-slate-900 leading-tight">Pertamax (RON 92)</span>
+                      <span className="font-bold text-xs text-slate-900 dark:text-slate-100 leading-tight">Pertamax (RON 92)</span>
                       {fuelType === 'PERTAMAX' && (
                         <span className="size-4.5 rounded-full bg-rose-500 text-white flex items-center justify-center shrink-0">
                           <Check size={11} strokeWidth={3} />
@@ -659,8 +659,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                       )}
                     </div>
                     <div>
-                      <div className="text-[11px] text-blue-700 font-mono font-semibold">2.2868 kgCO₂e/L</div>
-                      <div className="text-[10px] text-slate-500 leading-tight">Cadangan Khusus</div>
+                      <div className="text-[11px] text-blue-700 dark:text-blue-400 font-mono font-semibold">2.2868 kgCO₂e/L</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Cadangan Khusus</div>
                     </div>
                   </button>
                 </div>
@@ -676,23 +676,23 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                         value={fuelLiters}
                         onChange={(e) => setFuelLiters(e.target.value)}
                         placeholder={`Jumlah liter ${fuelType === 'SOLAR' ? 'Solar' : fuelType === 'PERTALITE' ? 'Pertalite' : 'Pertamax'} (contoh: 1850)`}
-                        className={`w-full rounded-xl border px-3.5 py-2.5 pr-14 text-sm font-bold text-slate-900 focus:outline-none focus:border-rose-500 ${
-                          formErrors.liters ? 'border-rose-400 bg-rose-50/30' : 'border-slate-200'
+                        className={`w-full rounded-xl border px-3.5 py-2.5 pr-14 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-rose-500 ${
+                          formErrors.liters ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700 dark:bg-slate-900'
                         }`}
                       />
-                      <span className="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400">
+                      <span className="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400 dark:text-slate-500">
                         Liter
                       </span>
                     </div>
                     {formErrors.liters && (
-                      <p className="text-[11px] font-semibold text-rose-600 mt-1">{formErrors.liters}</p>
+                      <p className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 mt-1">{formErrors.liters}</p>
                     )}
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div className="space-y-1">
-                      <label htmlFor="modal-cost-rupiah" className="text-[11px] font-semibold text-slate-700">
-                        Total Biaya Pembelian (Rp) <span className="text-rose-500">*</span>
+                      <label htmlFor="modal-cost-rupiah" className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Total Biaya Pembelian (Rp) <span className="text-rose-500 dark:text-rose-400">*</span>
                       </label>
                       <input
                         id="modal-cost-rupiah"
@@ -701,17 +701,17 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                         value={costRupiah}
                         onChange={(e) => setCostRupiah(e.target.value)}
                         placeholder="Contoh: 27750000"
-                        className={`w-full rounded-xl border px-3 py-2 text-sm font-bold text-slate-900 focus:outline-none focus:border-rose-500 ${
-                          formErrors.cost ? 'border-rose-400 bg-rose-50/30' : 'border-slate-200'
+                        className={`w-full rounded-xl border px-3 py-2 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-rose-500 ${
+                          formErrors.cost ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700 dark:bg-slate-900'
                         }`}
                       />
                       {formErrors.cost && (
-                        <p className="text-[11px] font-semibold text-rose-600 mt-1">{formErrors.cost}</p>
+                        <p className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 mt-1">{formErrors.cost}</p>
                       )}
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="modal-price-liter" className="text-[11px] font-semibold text-slate-700">
-                        Harga per Liter (Rp/L) <span className="text-rose-500">*</span>
+                      <label htmlFor="modal-price-liter" className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Harga per Liter (Rp/L) <span className="text-rose-500 dark:text-rose-400">*</span>
                       </label>
                       <input
                         id="modal-price-liter"
@@ -720,7 +720,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                         value={pricePerLiter}
                         onChange={(e) => setPricePerLiter(e.target.value)}
                         placeholder="Contoh: 15000"
-                        className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:border-rose-500"
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-rose-500"
                       />
                     </div>
                   </div>
@@ -728,26 +728,26 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
               </div>
 
               {/* Bagian 4: Detail Teknis Mesin Genset (Collapsible, Default Tertutup) */}
-              <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/60">
+              <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-slate-50/60 dark:bg-slate-800/40">
                 <button
                   type="button"
                   onClick={() => setIsGensetDetailsOpen(!isGensetDetailsOpen)}
-                  className="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-bold text-slate-700 hover:bg-slate-100/70 transition-colors"
+                  className="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-colors"
                 >
                   <span className="flex items-center gap-2">
-                    <Settings2 size={14} className="text-slate-400" />
+                    <Settings2 size={14} className="text-slate-400 dark:text-slate-500" />
                     <span>Detail Teknis Mesin Genset (Opsional)</span>
                   </span>
-                  <span className="text-slate-500 text-[11px] flex items-center gap-1 font-semibold">
+                  <span className="text-slate-500 dark:text-slate-400 text-[11px] flex items-center gap-1 font-semibold">
                     {isGensetDetailsOpen ? 'Sembunyikan' : 'Buka Detail'}
                     <ChevronDown size={14} className={`transition-transform duration-200 ${isGensetDetailsOpen ? 'rotate-180' : ''}`} />
                   </span>
                 </button>
 
                 {isGensetDetailsOpen && (
-                  <div className="p-3.5 pt-1 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-2.5 animate-in fade-in duration-150">
+                  <div className="p-3.5 pt-1 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-2.5 animate-in fade-in duration-150">
                     <div>
-                      <label htmlFor="modal-asset-code" className="text-[11px] font-semibold text-slate-600 block mb-1">
+                      <label htmlFor="modal-asset-code" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
                         Kode Aset Genset
                       </label>
                       <input
@@ -756,11 +756,11 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                         value={gensetAssetCode}
                         onChange={(e) => setGensetAssetCode(e.target.value)}
                         placeholder="GEN-DC-500KVA"
-                        className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-mono font-bold text-slate-800"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-bold text-slate-800 dark:text-slate-200"
                       />
                     </div>
                     <div>
-                      <label htmlFor="modal-kva-rating" className="text-[11px] font-semibold text-slate-600 block mb-1">
+                      <label htmlFor="modal-kva-rating" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
                         Kapasitas (kVA)
                       </label>
                       <input
@@ -769,11 +769,11 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                         value={gensetKva}
                         onChange={(e) => setGensetKva(e.target.value)}
                         placeholder="500"
-                        className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200"
                       />
                     </div>
                     <div>
-                      <label htmlFor="modal-run-hours" className="text-[11px] font-semibold text-slate-600 block mb-1">
+                      <label htmlFor="modal-run-hours" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
                         Jam Operasi (Hour Meter)
                       </label>
                       <input
@@ -782,7 +782,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                         value={runHours}
                         onChange={(e) => setRunHours(e.target.value)}
                         placeholder="40"
-                        className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200"
                       />
                     </div>
                   </div>
@@ -791,7 +791,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
 
               {/* Bagian 5: Bukti Transaksi */}
               <div className="space-y-1">
-                <label htmlFor="modal-proof-ref" className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                <label htmlFor="modal-proof-ref" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
                   Nomor Bukti Transaksi / Invoice (Opsional)
                 </label>
                 <input
@@ -800,7 +800,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                   value={proofRef}
                   onChange={(e) => setProofRef(e.target.value)}
                   placeholder={`Contoh: INV-SOLAR-${selectedDC.code || 'DC'}-${periodMonth}26-001`}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-rose-500"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:border-rose-500"
                 />
               </div>
 
@@ -853,20 +853,20 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
           ) : (
             /* Upload Excel Tab */
             <div className="space-y-5">
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-0.5">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                    <FileSpreadsheet size={15} className="text-emerald-600" />
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+                    <FileSpreadsheet size={15} className="text-emerald-600 dark:text-emerald-400" />
                     <span>Template Resmi Excel Scope 1 (Genset)</span>
                   </div>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     Gunakan template standar agar format kolom dan kode fasilitas langsung valid.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={handleDownloadTemplate}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 px-3.5 py-2 text-xs font-bold shadow-xs transition-all shrink-0"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-300 text-slate-700 dark:text-slate-300 px-3.5 py-2 text-xs font-bold shadow-xs transition-all shrink-0"
                 >
                   <Download size={14} />
                   <span>Unduh .xlsx</span>
@@ -885,8 +885,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                 }}
                 className={`rounded-2xl border-2 border-dashed p-7 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-2.5 ${
                   isDragging
-                    ? 'border-rose-500 bg-rose-50/50'
-                    : 'border-slate-200 bg-slate-50/50 hover:bg-rose-50/30 hover:border-rose-400'
+                    ? 'border-rose-500 bg-rose-50/50 dark:bg-rose-500/10'
+                    : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-rose-50/30 dark:hover:bg-rose-500/10 hover:border-rose-400 dark:hover:border-rose-500/60'
                 }`}
               >
                 <input
@@ -900,20 +900,20 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                   }}
                 />
                 <label htmlFor="scope1-excel-file-input" className="cursor-pointer flex flex-col items-center space-y-2">
-                  <div className="size-12 rounded-xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center shadow-xs">
+                  <div className="size-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 flex items-center justify-center shadow-xs">
                     {isProcessingExcel ? (
-                      <RefreshCw size={22} className="animate-spin text-rose-600" />
+                      <RefreshCw size={22} className="animate-spin text-rose-600 dark:text-rose-400" />
                     ) : (
-                      <UploadCloud size={24} className="text-rose-600" />
+                      <UploadCloud size={24} className="text-rose-600 dark:text-rose-400" />
                     )}
                   </div>
                   <div className="space-y-0.5">
-                    <h4 className="text-xs font-bold text-slate-800">
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
                       {isProcessingExcel
                         ? 'Sedang Memvalidasi & Menghitung Data...'
                         : 'Klik atau Tarik File Excel (.xlsx / .csv) ke Sini'}
                     </h4>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       Format didukung: SPARTA Template Genset v2026.1 atau rekapan logbook BBM DC
                     </p>
                   </div>
@@ -922,44 +922,44 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
 
               {/* Preview Result Summary */}
               {previewResult && (
-                <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <span className="text-xs font-bold text-slate-800">
+                <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                       Hasil Validasi File: {excelFile?.name}
                     </span>
-                    <span className="text-[11px] font-semibold text-slate-500">
+                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                       {excelFile?.size}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-500 block">Total Baris</span>
-                      <strong className="text-sm font-bold text-slate-900 font-mono">
+                    <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Total Baris</span>
+                      <strong className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">
                         {previewResult.totalRows || 0}
                       </strong>
                     </div>
-                    <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-100">
-                      <span className="text-[10px] text-emerald-700 block">Valid</span>
-                      <strong className="text-sm font-bold text-emerald-700 font-mono">
+                    <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
+                      <span className="text-[10px] text-emerald-700 dark:text-emerald-300 block">Valid</span>
+                      <strong className="text-sm font-bold text-emerald-700 dark:text-emerald-300 font-mono">
                         {previewResult.validCount || 0}
                       </strong>
                     </div>
-                    <div className="p-2 rounded-lg bg-rose-50 border border-rose-100">
-                      <span className="text-[10px] text-rose-700 block">Error</span>
-                      <strong className="text-sm font-bold text-rose-700 font-mono">
+                    <div className="p-2 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20">
+                      <span className="text-[10px] text-rose-700 dark:text-rose-300 block">Error</span>
+                      <strong className="text-sm font-bold text-rose-700 dark:text-rose-300 font-mono">
                         {previewResult.errorCount || 0}
                       </strong>
                     </div>
                   </div>
 
                   {previewResult.errorCount > 0 && (
-                    <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 space-y-2">
-                      <div className="flex items-center gap-2 text-xs font-bold text-amber-800">
+                    <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 space-y-2">
+                      <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300">
                         <AlertTriangle size={15} className="shrink-0" />
                         <span>Terdapat {previewResult.errorCount} baris tidak valid</span>
                       </div>
-                      <label className="flex items-center gap-2 cursor-pointer text-xs text-amber-900">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs text-amber-900 dark:text-amber-200">
                         <input
                           type="checkbox"
                           checked={allowPartialImport}
@@ -977,12 +977,12 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 z-10 flex shrink-0 flex-col-reverse gap-2 border-t border-slate-100 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="sticky bottom-0 z-10 flex shrink-0 flex-col-reverse gap-2 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <button
             type="button"
             onClick={handleCloseRequest}
             disabled={isSubmitting}
-            className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-900 transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 transition-colors disabled:opacity-50"
           >
             Batal
           </button>
@@ -992,7 +992,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
               type="submit"
               form="scope1-manual-form"
               disabled={isSubmitting}
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white px-5 py-2 text-xs font-bold shadow-sm transition-all disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:bg-slate-950 dark:bg-slate-100 dark:hover:bg-white dark:active:bg-slate-200 text-white dark:text-slate-900 px-5 py-2 text-xs font-bold shadow-sm transition-all disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
@@ -1011,7 +1011,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
               type="button"
               onClick={handleCommitExcelBatch}
               disabled={isSubmitting || !previewResult || (previewResult.errorCount > 0 && !allowPartialImport)}
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white px-5 py-2 text-xs font-bold shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 px-5 py-2 text-xs font-bold shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>

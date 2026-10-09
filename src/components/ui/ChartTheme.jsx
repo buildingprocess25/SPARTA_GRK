@@ -17,15 +17,19 @@ export const CHART_PALETTE = Object.freeze({
   net: '#0F172A',            // Slate-900
 });
 
+// Values reference CSS custom properties (see globals.css :root / .dark) so
+// chart gridlines/axis text stay readable in dark mode without every chart
+// call site needing to know the current theme - SVG stroke/fill presentation
+// attributes resolve var() just like any other CSS property.
 export const CHART_GRID_PROPS = Object.freeze({
   strokeDasharray: '3 3',
-  stroke: '#F1F5F9',
+  stroke: 'var(--chart-grid)',
   vertical: false,
 });
 
 export const CHART_AXIS_PROPS = Object.freeze({
-  tick: { fontSize: 11, fill: '#64748B' },
-  stroke: '#E2E8F0',
+  tick: { fontSize: 11, fill: 'var(--chart-axis)' },
+  stroke: 'var(--chart-axis-line)',
 });
 
 export const PARTIAL_OPACITY = 0.45;
@@ -38,10 +42,10 @@ export function formatYAxisNumber(val) {
 export function ChartTooltipCard({ title, items = [], footer = null, className = '' }) {
   return (
     <div
-      className={`rounded-xl border border-slate-200 bg-white p-3 text-xs shadow-xl min-w-[220px] space-y-1.5 select-text ${className}`}
+      className={`rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 text-xs shadow-xl min-w-[220px] space-y-1.5 select-text ${className}`}
     >
       {title && (
-        <p className="font-bold text-slate-800 border-b border-slate-100 pb-1 mb-1">
+        <p className="font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1 mb-1">
           {title}
         </p>
       )}
@@ -49,7 +53,7 @@ export function ChartTooltipCard({ title, items = [], footer = null, className =
         {items.map((item, idx) => (
           <div
             key={idx}
-            className="flex items-center justify-between gap-3 text-slate-600 font-mono"
+            className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 font-mono"
             style={item.color ? { color: item.color } : undefined}
           >
             <div className="flex items-center gap-1.5">
@@ -59,14 +63,14 @@ export function ChartTooltipCard({ title, items = [], footer = null, className =
                   style={{ backgroundColor: item.dotColor }}
                 />
               )}
-              <span className="text-slate-600 font-sans">{item.label}:</span>
+              <span className="text-slate-600 dark:text-slate-400 font-sans">{item.label}:</span>
             </div>
-            <strong className="text-slate-900">{item.value}</strong>
+            <strong className="text-slate-900 dark:text-slate-100">{item.value}</strong>
           </div>
         ))}
       </div>
       {footer && (
-        <div className="pt-1.5 mt-1 border-t border-slate-100 text-[10px] text-slate-500">
+        <div className="pt-1.5 mt-1 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-500 dark:text-slate-400">
           {footer}
         </div>
       )}
@@ -77,12 +81,12 @@ export function ChartTooltipCard({ title, items = [], footer = null, className =
 export function ChartPillLegend({ items = [], className = '' }) {
   return (
     <div
-      className={`flex flex-wrap items-center justify-center sm:justify-end gap-2 text-xs text-slate-600 ${className}`}
+      className={`flex flex-wrap items-center justify-center sm:justify-end gap-2 text-xs text-slate-600 dark:text-slate-400 ${className}`}
     >
       {items.map((item, idx) => (
         <div
           key={idx}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200/70 shadow-2xs text-[11px] font-medium text-slate-700"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700 shadow-2xs text-[11px] font-medium text-slate-700 dark:text-slate-300"
         >
           {item.type === 'line' ? (
             <span

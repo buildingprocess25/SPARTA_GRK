@@ -72,27 +72,27 @@ export default function AlarmDialog() {
       onClose={closePanel}
       title="Daftar Alarm & Peringatan iSolar"
       subtitle="Pemantauan telemetri gangguan dan peringatan operasional PLTS Atap secara terpusat."
-      icon={<AlertOctagon size={20} className="text-rose-600" />}
+      icon={<AlertOctagon size={20} className="text-rose-600 dark:text-rose-400" />}
       badge={`${summary.activeCount} Alarm Aktif`}
       size="lg"
     >
       <div className="flex flex-col h-full space-y-4">
         {/* Bar Notifikasi Browser & Quick Action */}
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs">
           <div className="flex items-center gap-2">
             {notificationPermission === 'granted' ? (
-              <span className="inline-flex items-center gap-1.5 text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
-                <ShieldCheck size={14} className="text-emerald-600 shrink-0" />
+              <span className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-semibold bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-1 rounded-lg">
+                <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>Notifikasi browser aktif</span>
               </span>
             ) : notificationPermission === 'disabled' ? (
-              <span className="inline-flex items-center gap-1.5 text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg">
-                <Bell size={13} className="text-slate-400 shrink-0" />
+              <span className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
+                <Bell size={13} className="text-slate-400 dark:text-slate-500 shrink-0" />
                 <span>Notifikasi browser dinonaktifkan pada build</span>
               </span>
             ) : notificationPermission === 'denied' ? (
-              <span className="inline-flex items-center gap-1.5 text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg">
-                <Bell size={13} className="text-slate-400 shrink-0" />
+              <span className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
+                <Bell size={13} className="text-slate-400 dark:text-slate-500 shrink-0" />
                 <span>Notifikasi browser diblokir di setelan</span>
               </span>
             ) : (
@@ -108,13 +108,13 @@ export default function AlarmDialog() {
             <button
               type="button"
               onClick={sendTestNotification}
-              className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 font-semibold px-2 py-1 rounded-lg transition"
+              className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold px-2 py-1 rounded-lg transition"
               title="Kirim notifikasi uji coba"
             >
-              <Bell size={12} className="text-slate-400" />
+              <Bell size={12} className="text-slate-400 dark:text-slate-500" />
               <span>Tes Notifikasi</span>
             </button>
-            <span className="text-slate-500 hidden sm:inline">
+            <span className="text-slate-500 dark:text-slate-400 hidden sm:inline">
               {summary.faultCount} Fault • {summary.alertCount} Alert
             </span>
           </div>
@@ -124,9 +124,9 @@ export default function AlarmDialog() {
               <button
                 type="button"
                 onClick={markAllAsRead}
-                className="inline-flex items-center gap-1.5 text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 font-semibold px-2.5 py-1.5 rounded-lg transition shadow-2xs"
+                className="inline-flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold px-2.5 py-1.5 rounded-lg transition shadow-2xs"
               >
-                <CheckCheck size={14} className="text-blue-600" />
+                <CheckCheck size={14} className="text-blue-600 dark:text-blue-400" />
                 <span>Tandai semua sudah dibaca</span>
               </button>
             )}
@@ -134,7 +134,7 @@ export default function AlarmDialog() {
               type="button"
               onClick={refreshAlarms}
               disabled={isLoading}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition"
+              className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
               title="Perbarui daftar alarm sekarang"
               aria-label="Segarkan alarm"
             >
@@ -144,11 +144,11 @@ export default function AlarmDialog() {
         </div>
 
         {pollError && (
-          <div role="alert" className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-900">
-            <AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-600" />
+          <div role="alert" className="flex items-start gap-2 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-3 py-2.5 text-xs text-amber-900 dark:text-amber-200">
+            <AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
             <div>
               <p className="font-bold">Pembaruan alarm tertunda</p>
-              <p className="mt-0.5 text-amber-800">
+              <p className="mt-0.5 text-amber-800 dark:text-amber-300">
                 {lastSuccessfulPollAt
                   ? 'Data terakhir tetap ditampilkan. Sistem akan mencoba lagi secara otomatis.'
                   : 'Status alarm belum berhasil dimuat. Jangan anggap kondisi plant normal sampai pembaruan berhasil.'}
@@ -158,7 +158,7 @@ export default function AlarmDialog() {
         )}
 
         {/* Filter Segmented Control */}
-        <div className="flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl overflow-x-auto text-xs">
+        <div className="flex items-center gap-1 bg-slate-100/90 dark:bg-slate-800/60 p-1 rounded-xl overflow-x-auto text-xs">
           {filterOptions.map((f) => {
             const isActive = activeFilter === f.id;
             return (
@@ -168,8 +168,8 @@ export default function AlarmDialog() {
                 onClick={() => setActiveFilter(f.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition whitespace-nowrap ${
                   isActive
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'
                 }`}
               >
                 <span>{f.label}</span>
@@ -177,11 +177,11 @@ export default function AlarmDialog() {
                   className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
                     isActive
                       ? f.isDanger
-                        ? 'bg-rose-100 text-rose-700'
+                        ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300'
                         : f.isWarning
-                        ? 'bg-amber-100 text-amber-700'
-                        : 'bg-slate-100 text-slate-700'
-                      : 'bg-slate-200 text-slate-600'
+                        ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300'
+                        : 'bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200'
+                      : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                   }`}
                 >
                   {f.count}
@@ -194,16 +194,16 @@ export default function AlarmDialog() {
         {/* List of Alarms */}
         <div className="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1">
           {isLoading && !lastSuccessfulPollAt ? (
-            <div className="py-10 text-center text-sm text-slate-500">Memuat status alarm iSolar...</div>
+            <div className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">Memuat status alarm iSolar...</div>
           ) : pollError && !lastSuccessfulPollAt ? (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-10 text-center text-sm font-semibold text-amber-900">
+            <div className="rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-4 py-10 text-center text-sm font-semibold text-amber-900 dark:text-amber-200">
               Status alarm belum tersedia.
             </div>
           ) : filteredAlarms.length === 0 ? (
-            <div className="text-center py-10 px-4 bg-slate-50 border border-slate-200/60 rounded-2xl">
-              <ShieldCheck size={36} className="mx-auto text-emerald-500 mb-2" />
-              <h4 className="text-sm font-bold text-slate-800">Kondisi Normal</h4>
-              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+            <div className="text-center py-10 px-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 rounded-2xl">
+              <ShieldCheck size={36} className="mx-auto text-emerald-500 dark:text-emerald-400 mb-2" />
+              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Kondisi Normal</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
                 {activeFilter === 'UNREAD'
                   ? 'Semua alarm aktif sudah ditandai dibaca.'
                   : 'Tidak ada alarm atau peringatan aktif yang sesuai filter.'}
@@ -219,10 +219,10 @@ export default function AlarmDialog() {
                   key={alarm.id}
                   className={`p-3.5 rounded-xl border transition-all ${
                     isRead
-                      ? 'bg-white/80 border-slate-200 text-slate-600'
+                      ? 'bg-white/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
                       : isFault
-                      ? 'bg-rose-50/40 border-rose-200 shadow-xs'
-                      : 'bg-amber-50/30 border-amber-200 shadow-xs'
+                      ? 'bg-rose-50/40 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 shadow-xs'
+                      : 'bg-amber-50/30 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 shadow-xs'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -240,33 +240,33 @@ export default function AlarmDialog() {
                           </span>
                         )}
 
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-900 truncate">
-                          <MapPin size={12} className="text-slate-400 shrink-0" />
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                          <MapPin size={12} className="text-slate-400 dark:text-slate-500 shrink-0" />
                           <span>{alarm.dcName}</span>
                         </span>
 
                         {!isRead ? (
-                          <span className="rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.2">
+                          <span className="rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-[10px] font-bold px-2 py-0.2">
                             Baru
                           </span>
                         ) : (
-                          <span className="text-slate-400 text-[10px]">Sudah dibaca</span>
+                          <span className="text-slate-400 dark:text-slate-500 text-[10px]">Sudah dibaca</span>
                         )}
                       </div>
 
-                      <h4 className="text-sm font-semibold text-slate-900 leading-snug">
+                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-snug">
                         {alarm.title}
                       </h4>
 
-                      <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 pt-0.5">
+                      <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 pt-0.5">
                         <span className="inline-flex items-center gap-1">
-                          <Clock size={12} className="text-slate-400 shrink-0" />
+                          <Clock size={12} className="text-slate-400 dark:text-slate-500 shrink-0" />
                           <span>{formatWibDate(alarm.occurredAt)}</span>
                         </span>
-                        <span className="text-slate-300">•</span>
+                        <span className="text-slate-300 dark:text-slate-600">•</span>
                         <span>Kode: <code className="font-mono">{alarm.id}</code></span>
-                        <span className="text-slate-300">•</span>
-                        <span className="text-emerald-700 font-medium">Status: Aktif</span>
+                        <span className="text-slate-300 dark:text-slate-600">•</span>
+                        <span className="text-emerald-700 dark:text-emerald-400 font-medium">Status: Aktif</span>
                       </div>
                     </div>
 
@@ -275,10 +275,10 @@ export default function AlarmDialog() {
                         <button
                           type="button"
                           onClick={() => markAsRead(alarm.id)}
-                          className="inline-flex items-center gap-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold px-2.5 py-1.5 rounded-lg text-xs transition shadow-2xs"
+                          className="inline-flex items-center gap-1 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold px-2.5 py-1.5 rounded-lg text-xs transition shadow-2xs"
                           title="Tandai alarm ini sudah dibaca"
                         >
-                          <Check size={12} className="text-emerald-600" />
+                          <Check size={12} className="text-emerald-600 dark:text-emerald-400" />
                           <span>Tandai dibaca</span>
                         </button>
                       )}
@@ -291,17 +291,17 @@ export default function AlarmDialog() {
         </div>
 
         {/* Footer info */}
-        <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
           <span>
             Pemeriksaan terakhir:{' '}
-            <strong className="text-slate-700">
+            <strong className="text-slate-700 dark:text-slate-300">
               {lastSuccessfulPollAt ? formatWibDate(lastSuccessfulPollAt) : 'Sedang memuat...'}
             </strong>
           </span>
           <button
             type="button"
             onClick={closePanel}
-            className="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition"
+            className="px-4 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-lg transition"
           >
             Tutup
           </button>

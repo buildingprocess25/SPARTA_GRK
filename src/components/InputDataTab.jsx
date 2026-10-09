@@ -712,7 +712,7 @@ export default function InputDataTab({ setActiveTab }) {
     <div className="space-y-6">
       {/* Toast Notification */}
       {toastMsg && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-slate-900 text-white rounded-xl shadow-xl text-sm font-medium animate-in fade-in slide-in-from-bottom-5 border border-slate-700">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-slate-900 dark:bg-slate-950 text-white rounded-xl shadow-xl text-sm font-medium animate-in fade-in slide-in-from-bottom-5 border border-slate-700">
           <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
           <span>{toastMsg}</span>
         </div>
@@ -724,7 +724,7 @@ export default function InputDataTab({ setActiveTab }) {
           {inputMode === 'manual' && currentStep > 1 && (
             <button
               type="button"
-              className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+              className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
               onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
               aria-label="Kembali ke langkah sebelumnya"
             >
@@ -733,30 +733,30 @@ export default function InputDataTab({ setActiveTab }) {
           )}
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide bg-blue-50 text-blue-700 border border-blue-200/60">
+              <span className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-500/30">
                 AUDIT & KALKULATOR EMISI
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+              <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-500/30">
                 <ShieldCheck size={12} />
                 ESDM & IPCC Verified
               </span>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               Kalkulator & Input Data Emisi
             </h1>
-            <p className="text-sm text-slate-500 max-w-3xl">
+            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-3xl">
               Alur 3 langkah perhitungan emisi terverifikasi: Scope 1 (BBM), Scope 2 (Listrik PLN), dan Pengurang (PLTS & Water Recycle)
             </p>
           </div>
         </div>
 
         {/* TOGGLE MODE */}
-        <div className="inline-flex gap-1 rounded-full bg-slate-100 p-1 self-start md:self-auto shadow-sm border border-slate-200/60">
+        <div className="inline-flex gap-1 rounded-full bg-slate-100 dark:bg-slate-800 p-1 self-start md:self-auto shadow-sm border border-slate-200/60 dark:border-slate-700">
           <button
             type="button"
             className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${inputMode === 'manual'
-                ? 'bg-white text-slate-900 shadow-sm border border-slate-200/60'
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent'
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm border border-slate-200/60 dark:border-slate-700'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 border border-transparent'
               }`}
             onClick={() => setInputMode('manual')}
           >
@@ -765,12 +765,12 @@ export default function InputDataTab({ setActiveTab }) {
           <button
             type="button"
             className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${inputMode === 'excel'
-                ? 'bg-white text-slate-900 shadow-sm border border-slate-200/60'
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent'
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm border border-slate-200/60 dark:border-slate-700'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 border border-transparent'
               }`}
             onClick={() => setInputMode('excel')}
           >
-            <FileSpreadsheet size={15} className="text-emerald-600" />
+            <FileSpreadsheet size={15} className="text-emerald-600 dark:text-emerald-400" />
             <span>Upload Excel / CSV</span>
           </button>
         </div>
@@ -778,8 +778,8 @@ export default function InputDataTab({ setActiveTab }) {
 
       {/* READ-ONLY MODE BANNER */}
       {mutationsAllowed === false && (
-        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/70 p-4 text-xs sm:text-sm text-amber-900 flex items-start sm:items-center gap-3 shadow-xs">
-          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
+        <div className="rounded-2xl border border-amber-200/80 dark:border-amber-500/30 bg-amber-50/70 dark:bg-amber-500/10 p-4 text-xs sm:text-sm text-amber-900 dark:text-amber-200 flex items-start sm:items-center gap-3 shadow-xs">
+          <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
           <div className="leading-relaxed">
             <span className="font-semibold">Mode Hanya-Baca Aktif:</span> Server ini beroperasi dalam mode baca (mutasi dinonaktifkan di domain publik). Anda tetap dapat menggunakan kalkulator emisi dan simulasi, namun penyimpanan ke database dibatasi.
           </div>
@@ -791,22 +791,22 @@ export default function InputDataTab({ setActiveTab }) {
         <div className="space-y-6 animate-in fade-in duration-300">
           
           {/* SECTION 1: UNDUH TEMPLATE RESMI BERDASARKAN AKTIVITAS */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 lg:p-6 space-y-4">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm p-5 lg:p-6 space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
                   1
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                     Unduh Template Resmi (Per Kategori Aktivitas)
                   </h3>
-                  <p className="text-xs text-slate-500">
-                    Setiap template memuat sheet <strong className="text-slate-700">Petunjuk</strong>, sheet <strong className="text-slate-700">Data</strong>, dan sheet <strong className="text-slate-700">Referensi Fasilitas</strong> dari master database.
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Setiap template memuat sheet <strong className="text-slate-700 dark:text-slate-300">Petunjuk</strong>, sheet <strong className="text-slate-700 dark:text-slate-300">Data</strong>, dan sheet <strong className="text-slate-700 dark:text-slate-300">Referensi Fasilitas</strong> dari master database.
                   </p>
                 </div>
               </div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 rounded-full shrink-0">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-500/10 border border-blue-200/60 dark:border-blue-500/30 rounded-full shrink-0">
                 <FileSpreadsheet size={13} />
                 Versi Template: v2026.1
               </span>
@@ -814,20 +814,20 @@ export default function InputDataTab({ setActiveTab }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               {/* Scope 1 - Genset */}
-              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between gap-3">
+              <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col justify-between gap-3">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-300">
                     <Fuel size={14} />
                     <span>Scope 1 — Genset</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 line-clamp-2">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                     Solar/Bio, mode LITER / RUPIAH, kode aset & jam operasi.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleDownloadOfficialTemplate('GENSET')}
-                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-slate-200 hover:bg-amber-50 hover:text-amber-700 text-slate-700 px-3 py-1.5 text-xs font-semibold shadow-sm transition-all"
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:text-amber-700 dark:hover:text-amber-300 text-slate-700 dark:text-slate-300 px-3 py-1.5 text-xs font-semibold shadow-sm transition-all"
                 >
                   <Download size={13} />
                   <span>Unduh .xlsx</span>
@@ -835,20 +835,20 @@ export default function InputDataTab({ setActiveTab }) {
               </div>
 
               {/* Scope 1 - Kendaraan */}
-              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between gap-3">
+              <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col justify-between gap-3">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-rose-700">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-rose-700 dark:text-rose-300">
                     <Fuel size={14} />
                     <span>Scope 1 — Kendaraan</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 line-clamp-2">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                     Pertalite, Solar, Pertamax (Draft), nopol & unit kerja.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleDownloadOfficialTemplate('VEHICLE')}
-                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-slate-200 hover:bg-rose-50 hover:text-rose-700 text-slate-700 px-3 py-1.5 text-xs font-semibold shadow-sm transition-all"
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-700 dark:hover:text-rose-300 text-slate-700 dark:text-slate-300 px-3 py-1.5 text-xs font-semibold shadow-sm transition-all"
                 >
                   <Download size={13} />
                   <span>Unduh .xlsx</span>
@@ -856,20 +856,20 @@ export default function InputDataTab({ setActiveTab }) {
               </div>
 
               {/* Scope 2 - Listrik PLN */}
-              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between gap-3">
+              <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col justify-between gap-3">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-blue-700">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-blue-700 dark:text-blue-300">
                     <Zap size={14} />
                     <span>Scope 2 — Listrik PLN</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 line-clamp-2">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                     ID Pelanggan/Meter, kWh konsumsi, biaya tagihan PLN.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleDownloadOfficialTemplate('PLN')}
-                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-slate-200 hover:bg-blue-50 hover:text-blue-700 text-slate-700 px-3 py-1.5 text-xs font-semibold shadow-sm transition-all"
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-700 dark:hover:text-blue-300 text-slate-700 dark:text-slate-300 px-3 py-1.5 text-xs font-semibold shadow-sm transition-all"
                 >
                   <Download size={13} />
                   <span>Unduh .xlsx</span>
@@ -877,20 +877,20 @@ export default function InputDataTab({ setActiveTab }) {
               </div>
 
               {/* Pengurang - PLTS */}
-              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between gap-3">
+              <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col justify-between gap-3">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
                     <Sun size={14} />
                     <span>Pengurang — PLTS</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 line-clamp-2">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                     39 Plant iSolar, kWh produksi actual, yield & avoided ton.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleDownloadOfficialTemplate('PLTS')}
-                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 px-3 py-1.5 text-xs font-semibold shadow-sm transition-all"
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-300 text-slate-700 dark:text-slate-300 px-3 py-1.5 text-xs font-semibold shadow-sm transition-all"
                 >
                   <Download size={13} />
                   <span>Unduh .xlsx</span>
@@ -898,20 +898,20 @@ export default function InputDataTab({ setActiveTab }) {
               </div>
 
               {/* Pengurang - Water Recycle */}
-              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between gap-3">
+              <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col justify-between gap-3">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-cyan-700">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-cyan-700 dark:text-cyan-300">
                     <Droplets size={14} />
                     <span>Pengurang — Air</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 line-clamp-2">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                     Mode VOLUME / METER, m³ air terolah, hemat biaya PDAM.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleDownloadOfficialTemplate('WATER')}
-                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white border border-slate-200 hover:bg-cyan-50 hover:text-cyan-700 text-slate-700 px-3 py-1.5 text-xs font-semibold shadow-sm transition-all"
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-cyan-50 dark:hover:bg-cyan-500/10 hover:text-cyan-700 dark:hover:text-cyan-300 text-slate-700 dark:text-slate-300 px-3 py-1.5 text-xs font-semibold shadow-sm transition-all"
                 >
                   <Download size={13} />
                   <span>Unduh .xlsx</span>
@@ -920,31 +920,31 @@ export default function InputDataTab({ setActiveTab }) {
             </div>
 
             {/* Program Tertunda / Belum Tersedia Note */}
-            <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-slate-600">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/40 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-slate-600 dark:text-slate-400">
               <div className="flex items-center gap-2">
-                <Info size={15} className="text-slate-400 shrink-0" />
+                <Info size={15} className="text-slate-400 dark:text-slate-500 shrink-0" />
                 <span>
                   <strong>Status Kategori Lain:</strong> Scope 3 ditunda sesuai kebijakan perusahaan. EV & Efisiensi Energi berstatus <em>Pending Validasi Model Database</em>.
                 </span>
               </div>
-              <span className="text-[11px] text-slate-500 shrink-0 font-medium">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 shrink-0 font-medium">
                 Scope 1, 2 & Pengurang Aktif
               </span>
             </div>
           </div>
 
           {/* SECTION 2: UPLOAD FILE & SELECT CATEGORY */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 lg:p-6 space-y-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm p-5 lg:p-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
                   2
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                     Unggah File Excel atau CSV
                   </h3>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Sistem akan memvalidasi header, tipe data, kode fasilitas, dan menghitung emisi di server.
                   </p>
                 </div>
@@ -952,11 +952,11 @@ export default function InputDataTab({ setActiveTab }) {
 
               {/* Category Hint Selector */}
               <div className="flex items-center gap-2">
-                <label className="text-xs font-semibold text-slate-600 shrink-0">Kategori File:</label>
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 shrink-0">Kategori File:</label>
                 <select
                   value={uploadCategory}
                   onChange={(e) => setUploadCategory(e.target.value)}
-                  className="text-xs font-medium bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="text-xs font-medium bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="AUTO">Deteksi Otomatis (Auto-Detect)</option>
                   <option value="GENSET">Scope 1 — Genset</option>
@@ -980,8 +980,8 @@ export default function InputDataTab({ setActiveTab }) {
               }}
               className={`rounded-2xl border-2 border-dashed p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-3 ${
                 isDragging
-                  ? 'border-blue-500 bg-blue-50/50'
-                  : 'border-slate-200 bg-slate-50/50 hover:bg-blue-50/30 hover:border-blue-400'
+                  ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-500/10'
+                  : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-blue-50/30 dark:hover:bg-blue-500/10 hover:border-blue-400'
               }`}
             >
               <input
@@ -992,20 +992,20 @@ export default function InputDataTab({ setActiveTab }) {
                 onChange={handleFileInputChange}
               />
               <label htmlFor="excel-file-input" className="cursor-pointer flex flex-col items-center space-y-2">
-                <div className="size-14 rounded-2xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center shadow-sm">
+                <div className="size-14 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 flex items-center justify-center shadow-sm">
                   {isProcessingExcel ? (
-                    <RefreshCw size={26} className="animate-spin text-blue-600" />
+                    <RefreshCw size={26} className="animate-spin text-blue-600 dark:text-blue-400" />
                   ) : (
-                    <FileSpreadsheet size={28} className="text-emerald-600" />
+                    <FileSpreadsheet size={28} className="text-emerald-600 dark:text-emerald-400" />
                   )}
                 </div>
                 <div className="space-y-1">
-                  <h4 className="text-sm font-bold text-slate-800">
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
                     {isProcessingExcel
                       ? 'Sedang Memvalidasi & Menghitung di Server...'
                       : 'Klik atau Tarik File Excel (.xlsx / .xls / .csv) ke Sini'}
                   </h4>
-                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                     Mendukung template SPARTA v2026.1, rekapan iSolarCloud, log BBM genset/kendaraan, atau tagihan PLN.
                   </p>
                 </div>
@@ -1015,40 +1015,40 @@ export default function InputDataTab({ setActiveTab }) {
 
           {/* SECTION 3: PREVIEW & SERVER VALIDATION RESULTS */}
           {previewResult && (
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 lg:p-6 space-y-5 animate-in fade-in duration-300">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm p-5 lg:p-6 space-y-5 animate-in fade-in duration-300">
               
               {/* Preview Header & Metadata */}
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase bg-slate-100 text-slate-800 border border-slate-200">
+                    <span className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
                       Hasil Preview & Validasi Server
                     </span>
-                    <span className="text-xs font-medium text-slate-500">
-                      File: <strong className="text-slate-800">{excelFile?.name}</strong> ({excelFile?.size})
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                      File: <strong className="text-slate-800 dark:text-slate-200">{excelFile?.name}</strong> ({excelFile?.size})
                     </span>
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <span>Kategori Terdeteksi: <strong className="text-blue-600">{previewResult.category}</strong></span>
-                    <span className="text-xs text-slate-400 font-normal">| Versi: {previewResult.templateVersion || 'v2026.1'}</span>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                    <span>Kategori Terdeteksi: <strong className="text-blue-600 dark:text-blue-400">{previewResult.category}</strong></span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500 font-normal">| Versi: {previewResult.templateVersion || 'v2026.1'}</span>
                   </h3>
                 </div>
 
                 {/* Status Badges */}
                 <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <span className="px-3 py-1.5 rounded-xl font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                  <span className="px-3 py-1.5 rounded-xl font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                     Total: {previewResult.totalRows} Baris
                   </span>
-                  <span className="px-3 py-1.5 rounded-xl font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="px-3 py-1.5 rounded-xl font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
                     {previewResult.validCount} Valid
                   </span>
                   {previewResult.errorCount > 0 && (
-                    <span className="px-3 py-1.5 rounded-xl font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                    <span className="px-3 py-1.5 rounded-xl font-bold bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30">
                       {previewResult.errorCount} Error
                     </span>
                   )}
                   {previewResult.draftCount > 0 && (
-                    <span className="px-3 py-1.5 rounded-xl font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                    <span className="px-3 py-1.5 rounded-xl font-bold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
                       {previewResult.draftCount} Draft (Pertamax)
                     </span>
                   )}
@@ -1057,21 +1057,21 @@ export default function InputDataTab({ setActiveTab }) {
 
               {/* Calculation Summary Bar */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                  <span className="text-xs text-slate-500 font-medium">Estimasi Emisi Gross:</span>
-                  <div className="text-lg font-bold text-slate-900 mt-0.5">
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Estimasi Emisi Gross:</span>
+                  <div className="text-lg font-bold text-slate-900 dark:text-slate-100 mt-0.5">
                     {previewResult.totalEmissionTon !== undefined ? `${previewResult.totalEmissionTon.toFixed(2)} tCO₂e` : '0.00 tCO₂e'}
                   </div>
                 </div>
-                <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200">
-                  <span className="text-xs text-emerald-700 font-medium">Pengurang Emisi (Avoided):</span>
-                  <div className="text-lg font-bold text-emerald-700 mt-0.5">
+                <div className="p-3.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30">
+                  <span className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">Pengurang Emisi (Avoided):</span>
+                  <div className="text-lg font-bold text-emerald-700 dark:text-emerald-300 mt-0.5">
                     {previewResult.totalAvoidedTon !== undefined ? `-${previewResult.totalAvoidedTon.toFixed(2)} tCO₂e` : '0.00 tCO₂e'}
                   </div>
                 </div>
-                <div className="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200 flex flex-col justify-between">
-                  <span className="text-xs text-blue-700 font-medium">Status Kesiapan Simpan:</span>
-                  <div className="text-sm font-bold text-blue-900 mt-0.5">
+                <div className="p-3.5 rounded-xl bg-blue-50/60 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 flex flex-col justify-between">
+                  <span className="text-xs text-blue-700 dark:text-blue-300 font-medium">Status Kesiapan Simpan:</span>
+                  <div className="text-sm font-bold text-blue-900 dark:text-blue-200 mt-0.5">
                     {previewResult.errorCount === 0 ? 'Siap Commit 100%' : allowPartialImport ? 'Siap Commit Parsial (Baris Valid)' : 'Perlu Koreksi / Opsi Parsial'}
                   </div>
                 </div>
@@ -1079,18 +1079,18 @@ export default function InputDataTab({ setActiveTab }) {
 
               {/* Table Controls & Filter Tabs */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-                <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+                <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold">
                   <button
                     type="button"
                     onClick={() => setFilterView('ALL')}
-                    className={`px-3 py-1 rounded-lg transition-all ${filterView === 'ALL' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                    className={`px-3 py-1 rounded-lg transition-all ${filterView === 'ALL' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'}`}
                   >
                     Semua ({previewResult.records?.length || 0})
                   </button>
                   <button
                     type="button"
                     onClick={() => setFilterView('VALID')}
-                    className={`px-3 py-1 rounded-lg transition-all ${filterView === 'VALID' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                    className={`px-3 py-1 rounded-lg transition-all ${filterView === 'VALID' ? 'bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-300 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'}`}
                   >
                     Hanya Valid ({previewResult.validCount || 0})
                   </button>
@@ -1098,7 +1098,7 @@ export default function InputDataTab({ setActiveTab }) {
                     <button
                       type="button"
                       onClick={() => setFilterView('ERROR')}
-                      className={`px-3 py-1 rounded-lg transition-all ${filterView === 'ERROR' ? 'bg-white text-rose-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                      className={`px-3 py-1 rounded-lg transition-all ${filterView === 'ERROR' ? 'bg-white dark:bg-slate-700 text-rose-700 dark:text-rose-300 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'}`}
                     >
                       Bermasalah ({previewResult.errorCount})
                     </button>
@@ -1107,7 +1107,7 @@ export default function InputDataTab({ setActiveTab }) {
                     <button
                       type="button"
                       onClick={() => setFilterView('DRAFT')}
-                      className={`px-3 py-1 rounded-lg transition-all ${filterView === 'DRAFT' ? 'bg-white text-amber-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                      className={`px-3 py-1 rounded-lg transition-all ${filterView === 'DRAFT' ? 'bg-white dark:bg-slate-700 text-amber-700 dark:text-amber-300 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'}`}
                     >
                       Draft ({previewResult.draftCount})
                     </button>
@@ -1118,7 +1118,7 @@ export default function InputDataTab({ setActiveTab }) {
                   <button
                     type="button"
                     onClick={handleDownloadErrorReport}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-xl transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/15 border border-rose-200 dark:border-rose-500/30 px-3 py-1.5 rounded-xl transition-colors"
                   >
                     <Download size={13} />
                     <span>Unduh Laporan Error (.csv)</span>
@@ -1127,9 +1127,9 @@ export default function InputDataTab({ setActiveTab }) {
               </div>
 
               {/* Data Table */}
-              <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-[420px]">
+              <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 max-h-[420px]">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-900 text-white uppercase sticky top-0 z-10">
+                  <thead className="bg-slate-900 dark:bg-slate-950 text-white uppercase sticky top-0 z-10">
                     <tr>
                       <th className="px-3.5 py-3 font-semibold">Baris</th>
                       <th className="px-3.5 py-3 font-semibold">Fasilitas / DC</th>
@@ -1141,7 +1141,7 @@ export default function InputDataTab({ setActiveTab }) {
                       <th className="px-3.5 py-3 font-semibold text-center">Status Validasi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-medium">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                     {displayedPreviewRows.map((r, idx) => {
                       const isError = !r.isValid;
                       const isDraft = r.isDraft;
@@ -1153,51 +1153,51 @@ export default function InputDataTab({ setActiveTab }) {
                           key={r.rowNumber || idx}
                           className={`border-b transition-colors ${
                             isError
-                              ? 'bg-rose-50/50 hover:bg-rose-50'
+                              ? 'bg-rose-50/50 dark:bg-rose-500/10 hover:bg-rose-50 dark:hover:bg-rose-500/10'
                               : isDraft
-                              ? 'bg-amber-50/40 hover:bg-amber-50'
-                              : 'hover:bg-slate-50'
+                              ? 'bg-amber-50/40 dark:bg-amber-500/10 hover:bg-amber-50 dark:hover:bg-amber-500/10'
+                              : 'hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                         >
-                          <td className="px-3.5 py-2.5 font-mono text-slate-500">{r.rowNumber}</td>
-                          <td className="px-3.5 py-2.5 font-bold text-slate-900">
+                          <td className="px-3.5 py-2.5 font-mono text-slate-500 dark:text-slate-400">{r.rowNumber}</td>
+                          <td className="px-3.5 py-2.5 font-bold text-slate-900 dark:text-slate-100">
                             <div>{r.facilityName || r.facilityCode || '-'}</div>
-                            <span className="font-mono text-[10px] text-slate-400">{r.facilityCode}</span>
+                            <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">{r.facilityCode}</span>
                           </td>
-                          <td className="px-3.5 py-2.5 text-slate-600">{r.period || r.date || '-'}</td>
-                          <td className="px-3.5 py-2.5 text-slate-700">
+                          <td className="px-3.5 py-2.5 text-slate-600 dark:text-slate-400">{r.period || r.date || '-'}</td>
+                          <td className="px-3.5 py-2.5 text-slate-700 dark:text-slate-300">
                             {r.categoryData?.fuelType || r.categoryData?.activityType || r.category}
                           </td>
-                          <td className="px-3.5 py-2.5 text-right font-mono text-slate-800">
+                          <td className="px-3.5 py-2.5 text-right font-mono text-slate-800 dark:text-slate-200">
                             {r.rawInput?.liter ? `${r.rawInput.liter} Liter` : r.rawInput?.kwh ? `${r.rawInput.kwh} kWh` : r.rawInput?.m3 ? `${r.rawInput.m3} m³` : JSON.stringify(r.rawInput || '')}
                           </td>
-                          <td className="px-3.5 py-2.5 text-right font-mono text-slate-700">
+                          <td className="px-3.5 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300">
                             {r.normalizedCalculation?.liters ? `${r.normalizedCalculation.liters.toLocaleString()} L` : r.normalizedCalculation?.kwh ? `${r.normalizedCalculation.kwh.toLocaleString()} kWh` : r.normalizedCalculation?.volumeM3 ? `${r.normalizedCalculation.volumeM3.toLocaleString()} m³` : '-'}
                           </td>
-                          <td className={`px-3.5 py-2.5 text-right font-mono font-bold ${isAvoided ? 'text-emerald-700' : 'text-slate-900'}`}>
+                          <td className={`px-3.5 py-2.5 text-right font-mono font-bold ${isAvoided ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-900 dark:text-slate-100'}`}>
                             {isAvoided ? `-${tonVal.toFixed(2)} tCO₂e` : `+${tonVal.toFixed(2)} tCO₂e`}
                           </td>
                           <td className="px-3.5 py-2.5 text-center">
                             {isError ? (
                               <div className="inline-flex flex-col items-center">
-                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 bg-rose-100/80 px-2 py-0.5 rounded-md">
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 dark:text-rose-300 bg-rose-100/80 dark:bg-rose-500/15 px-2 py-0.5 rounded-md">
                                   <AlertCircle size={11} />
                                   Error
                                 </span>
-                                <span className="text-[10px] text-rose-600 max-w-[160px] truncate mt-0.5" title={r.errors?.join(', ')}>
+                                <span className="text-[10px] text-rose-600 dark:text-rose-400 max-w-[160px] truncate mt-0.5" title={r.errors?.join(', ')}>
                                   {r.errors?.[0]}
                                 </span>
                               </div>
                             ) : isDraft ? (
                               <div className="inline-flex flex-col items-center">
-                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-md">
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 dark:text-amber-200 bg-amber-100/80 dark:bg-amber-500/15 px-2 py-0.5 rounded-md">
                                   <AlertTriangle size={11} />
                                   Draft (Pertamax)
                                 </span>
-                                <span className="text-[10px] text-amber-700">Pending Factor</span>
+                                <span className="text-[10px] text-amber-700 dark:text-amber-300">Pending Factor</span>
                               </div>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md">
+                              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-500/15 px-2 py-0.5 rounded-md">
                                 <CheckCircle2 size={11} />
                                 Valid
                               </span>
@@ -1212,15 +1212,15 @@ export default function InputDataTab({ setActiveTab }) {
 
               {/* Partial Import Option (if errors present) */}
               {previewResult.errorCount > 0 && (
-                <div className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/60 flex items-start gap-3">
+                <div className="p-3.5 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50/60 dark:bg-amber-500/10 flex items-start gap-3">
                   <input
                     type="checkbox"
                     id="partial-import-checkbox"
                     checked={allowPartialImport}
                     onChange={(e) => setAllowPartialImport(e.target.checked)}
-                    className="mt-0.5 size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    className="mt-0.5 size-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 cursor-pointer"
                   />
-                  <label htmlFor="partial-import-checkbox" className="text-xs text-amber-900 cursor-pointer space-y-0.5">
+                  <label htmlFor="partial-import-checkbox" className="text-xs text-amber-900 dark:text-amber-200 cursor-pointer space-y-0.5">
                     <strong className="font-semibold block">Izinkan Impor Parsial (Hanya simpan {previewResult.validCount} baris yang valid)</strong>
                     <span>Baris error ({previewResult.errorCount} baris) akan diabaikan dan dicatat dalam log audit. Anda dapat mengunduh laporan error di atas untuk memperbaiki data.</span>
                   </label>
@@ -1229,15 +1229,15 @@ export default function InputDataTab({ setActiveTab }) {
 
               {/* Commit Batch Result Notification */}
               {commitBatchSummary && (
-                <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-900 space-y-2 animate-in fade-in">
+                <div className="p-4 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-900 dark:text-emerald-200 space-y-2 animate-in fade-in">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+                    <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <h4 className="text-sm font-bold">
                       Transaksi Berhasil Diimpor ke PostgreSQL!
                     </h4>
                   </div>
-                  <p className="text-xs text-emerald-800">
-                    Batch ID: <code className="font-mono bg-emerald-100 px-1.5 py-0.5 rounded">{commitBatchSummary.batchId}</code> • Sebanyak <strong className="font-semibold">{commitBatchSummary.committedCount} transaksi</strong> telah masuk ke database operasional.
+                  <p className="text-xs text-emerald-800 dark:text-emerald-200">
+                    Batch ID: <code className="font-mono bg-emerald-100 dark:bg-emerald-500/15 px-1.5 py-0.5 rounded">{commitBatchSummary.batchId}</code> • Sebanyak <strong className="font-semibold">{commitBatchSummary.committedCount} transaksi</strong> telah masuk ke database operasional.
                   </p>
                 </div>
               )}
@@ -1246,7 +1246,7 @@ export default function InputDataTab({ setActiveTab }) {
               <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                 <button
                   type="button"
-                  className="rounded-xl border border-slate-200 bg-white text-slate-700 px-4 py-2.5 text-xs font-medium hover:bg-slate-50 transition-colors"
+                  className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-4 py-2.5 text-xs font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                   onClick={() => {
                     setPreviewResult(null);
                     setExcelFile(null);
@@ -1262,8 +1262,8 @@ export default function InputDataTab({ setActiveTab }) {
                   title={mutationsAllowed === false ? 'Mode hanya-baca aktif di server ini' : undefined}
                   className={`inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-xs font-bold transition-all shadow-sm ${
                     isCommitting || (previewResult.errorCount > 0 && !allowPartialImport) || mutationsAllowed === false
-                      ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                      : 'bg-slate-900 text-white hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500'
+                      ? 'bg-slate-300 dark:bg-slate-600 text-slate-500 dark:text-slate-400 cursor-not-allowed'
+                      : 'bg-slate-900 dark:bg-slate-950 text-white hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500'
                   }`}
                   onClick={handleCommitBatch}
                 >
@@ -1291,39 +1291,39 @@ export default function InputDataTab({ setActiveTab }) {
       {inputMode === 'manual' && (
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* Step Indicator Header */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 lg:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-4 lg:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setCurrentStep(1)}
                 className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
-                  currentStep === 1 ? 'bg-slate-900 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  currentStep === 1 ? 'bg-slate-900 dark:bg-slate-950 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 <span className="size-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">1</span>
                 <span>Lokasi & Periode</span>
               </button>
 
-              <div className="h-0.5 w-6 bg-slate-200" />
+              <div className="h-0.5 w-6 bg-slate-200 dark:bg-slate-700" />
 
               <button
                 type="button"
                 onClick={() => setCurrentStep(2)}
                 className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
-                  currentStep === 2 ? 'bg-slate-900 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  currentStep === 2 ? 'bg-slate-900 dark:bg-slate-950 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 <span className="size-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">2</span>
                 <span>Input Teknis & Hitung</span>
               </button>
 
-              <div className="h-0.5 w-6 bg-slate-200" />
+              <div className="h-0.5 w-6 bg-slate-200 dark:bg-slate-700" />
 
               <button
                 type="button"
                 onClick={() => setCurrentStep(3)}
                 className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
-                  currentStep === 3 ? 'bg-slate-900 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  currentStep === 3 ? 'bg-slate-900 dark:bg-slate-950 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 <span className="size-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">3</span>
@@ -1331,9 +1331,9 @@ export default function InputDataTab({ setActiveTab }) {
               </button>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
               <span>Langkah Aktif:</span>
-              <strong className="text-slate-800">
+              <strong className="text-slate-800 dark:text-slate-200">
                 {currentStep === 1 && 'Step 1 — Lokasi, Kategori & Periode'}
                 {currentStep === 2 && 'Step 2 — Parameter Teknis & Rumus Emisi'}
                 {currentStep === 3 && 'Step 3 — Hasil Hitung & Konfirmasi Simpan'}
@@ -1345,31 +1345,31 @@ export default function InputDataTab({ setActiveTab }) {
           {currentStep === 1 && (
             <div className="space-y-6 animate-in fade-in duration-300">
               {/* Form Filter & Select Fasilitas */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 lg:p-6 space-y-5">
-                <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-5 lg:p-6 space-y-5">
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                       Pilih Lokasi / Fasilitas Operasional
                     </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       Pilih dari Head Office (HO), Kantor Cabang, DC, Warehouse, Depo, atau Jaringan Toko Ritel
                     </p>
                   </div>
-                  <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
                     {filteredFacilities.length} dari {MASTER_FACILITIES.length} Fasilitas Tersedia
                   </span>
                 </div>
 
                 {/* Filter Toolbar: Jenis Fasilitas + Cabang + Cari */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                   <div>
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                       Filter Jenis Fasilitas:
                     </label>
                     <select
                       value={facilityTypeFilter}
                       onChange={(e) => setFacilityTypeFilter(e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 shadow-sm"
                     >
                       <option value="all">Semua Jenis Fasilitas</option>
                       <option value="HO">🏢 Head Office (Kantor Pusat)</option>
@@ -1383,13 +1383,13 @@ export default function InputDataTab({ setActiveTab }) {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                       Filter Wilayah / Cabang:
                     </label>
                     <select
                       value={branchFilter}
                       onChange={(e) => setBranchFilter(e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 shadow-sm"
                     >
                       <option value="all">Semua Cabang / Wilayah</option>
                       {BRANCH_LIST.map(b => (
@@ -1399,7 +1399,7 @@ export default function InputDataTab({ setActiveTab }) {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                       Cari Nama / Kode Lokasi:
                     </label>
                     <input
@@ -1407,7 +1407,7 @@ export default function InputDataTab({ setActiveTab }) {
                       value={facilitySearch}
                       onChange={(e) => setFacilitySearch(e.target.value)}
                       placeholder="Ketik Balaraja, Maros, HO..."
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-800 dark:text-slate-200 shadow-sm"
                     />
                   </div>
                 </div>
@@ -1415,7 +1415,7 @@ export default function InputDataTab({ setActiveTab }) {
                 {/* Dropdown Lokasi Terpilih & Periode */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <div className="space-y-2 md:col-span-2">
-                    <label htmlFor="facility-select" className="text-sm font-semibold text-slate-800 block">
+                    <label htmlFor="facility-select" className="text-sm font-semibold text-slate-800 dark:text-slate-200 block">
                       Pilih Lokasi / Fasilitas:
                     </label>
                     <select
@@ -1432,7 +1432,7 @@ export default function InputDataTab({ setActiveTab }) {
                           }));
                         }
                       }}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all shadow-sm"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all shadow-sm"
                     >
                       {filteredFacilities.map((fac) => (
                         <option key={fac.id} value={fac.id}>
@@ -1443,14 +1443,14 @@ export default function InputDataTab({ setActiveTab }) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-800 block">
+                    <label className="text-sm font-semibold text-slate-800 dark:text-slate-200 block">
                       Periode Pelaporan Aktivitas
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       <select
                         value={inputValues.periodMonth}
                         onChange={(e) => setInputValues({ ...inputValues, periodMonth: e.target.value })}
-                        className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 shadow-sm"
+                        className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 shadow-sm"
                       >
                         <option value="01">Januari</option>
                         <option value="02">Februari</option>
@@ -1468,7 +1468,7 @@ export default function InputDataTab({ setActiveTab }) {
                       <select
                         value={inputValues.periodYear}
                         onChange={(e) => setInputValues({ ...inputValues, periodYear: e.target.value })}
-                        className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-900 shadow-sm"
+                        className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 shadow-sm"
                       >
                         {availableYears.map(y => (
                           <option key={y} value={y}>{y}</option>
@@ -1480,7 +1480,7 @@ export default function InputDataTab({ setActiveTab }) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-800 block">
+                    <label className="text-sm font-semibold text-slate-800 dark:text-slate-200 block">
                       Nomor Bukti Dokumen / Invoice / SPK
                     </label>
                     <input
@@ -1488,18 +1488,18 @@ export default function InputDataTab({ setActiveTab }) {
                       value={inputValues.proofRef}
                       onChange={(e) => setInputValues({ ...inputValues, proofRef: e.target.value })}
                       placeholder="Contoh: INV-PLN-2026-08/42 atau PO-BBM-884"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 shadow-sm"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 shadow-sm"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-800 block">
+                    <label className="text-sm font-semibold text-slate-800 dark:text-slate-200 block">
                       Sumber Verifikasi Data
                     </label>
                     <select
                       value={inputValues.sourceType}
                       onChange={(e) => setInputValues({ ...inputValues, sourceType: e.target.value })}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 shadow-sm"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 shadow-sm"
                     >
                       <option value="MANUAL_AUDIT">Input & Audit Manual Lapangan (Log Sheet Terverifikasi)</option>
                       <option value="INTRANET_MANUAL">Rekapitulasi BBM Online Intranet (Input Manual / CSV)</option>
@@ -1512,31 +1512,31 @@ export default function InputDataTab({ setActiveTab }) {
               </div>
 
               {/* CARD IDENTITAS FASILITAS TERPILIH */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 lg:p-6 space-y-4">
-                <h4 className="text-sm font-bold text-slate-900">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-5 lg:p-6 space-y-4">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                   Identitas Lokasi / Fasilitas Terpilih
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 block">KODE & JENIS</span>
+                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 block">KODE & JENIS</span>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-bold font-mono text-slate-900">{selectedDC.code}</span>
-                      <span className="text-[10px] font-bold uppercase bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
+                      <span className="text-sm font-bold font-mono text-slate-900 dark:text-slate-100">{selectedDC.code}</span>
+                      <span className="text-[10px] font-bold uppercase bg-blue-100 dark:bg-blue-500/15 text-blue-800 dark:text-blue-200 px-1.5 py-0.5 rounded">
                         {selectedDC.facilityType}
                       </span>
                     </div>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 block">NAMA FASILITAS</span>
-                    <span className="text-sm font-bold text-slate-900 block truncate">{selectedDC.name}</span>
+                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 block">NAMA FASILITAS</span>
+                    <span className="text-sm font-bold text-slate-900 dark:text-slate-100 block truncate">{selectedDC.name}</span>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 block">WILAYAH & CABANG</span>
-                    <span className="text-sm font-medium text-slate-700 block">{selectedDC.region} • {selectedDC.branchName || 'Head Office'}</span>
+                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 block">WILAYAH & CABANG</span>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 block">{selectedDC.region} • {selectedDC.branchName || 'Head Office'}</span>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 block">SISTEM GRID & FAKTOR</span>
-                    <span className="text-sm font-bold text-emerald-600 font-mono block">
+                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 block">SISTEM GRID & FAKTOR</span>
+                    <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 font-mono block">
                       {selectedDC.gridRegion} ({currentGridFactor} kgCO₂e/kWh)
                     </span>
                   </div>
@@ -1544,13 +1544,13 @@ export default function InputDataTab({ setActiveTab }) {
               </div>
 
               {/* PILIHAN KATEGORI EMISI */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 lg:p-6 space-y-4">
-                <h4 className="text-sm font-bold text-slate-900">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-5 lg:p-6 space-y-4">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                   Pilih Kategori Indikator Emisi Karbon
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="p-4 rounded-xl bg-rose-50/40 border border-rose-100 space-y-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-rose-800 block">
+                  <div className="p-4 rounded-xl bg-rose-50/40 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 space-y-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-rose-800 dark:text-rose-200 block">
                       Penambah Emisi GRK (Scope 1 & Scope 2):
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -1559,7 +1559,7 @@ export default function InputDataTab({ setActiveTab }) {
                         className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                           selectedCategory === 'genset'
                             ? 'bg-rose-600 text-white shadow-md ring-2 ring-rose-300'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                         }`}
                         onClick={() => setSelectedCategory('genset')}
                       >
@@ -1571,7 +1571,7 @@ export default function InputDataTab({ setActiveTab }) {
                         className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                           selectedCategory === 'vehicle'
                             ? 'bg-rose-700 text-white shadow-md ring-2 ring-rose-400'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                         }`}
                         onClick={() => setSelectedCategory('vehicle')}
                       >
@@ -1583,7 +1583,7 @@ export default function InputDataTab({ setActiveTab }) {
                         className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                           selectedCategory === 'pln'
                             ? 'bg-amber-600 text-white shadow-md ring-2 ring-amber-300'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                         }`}
                         onClick={() => setSelectedCategory('pln')}
                       >
@@ -1593,8 +1593,8 @@ export default function InputDataTab({ setActiveTab }) {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-emerald-50/40 border border-emerald-100 space-y-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 block">
+                  <div className="p-4 rounded-xl bg-emerald-50/40 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 space-y-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-200 block">
                       Program Pengurang Emisi (Avoided Emissions):
                     </span>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -1603,7 +1603,7 @@ export default function InputDataTab({ setActiveTab }) {
                         className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                           selectedCategory === 'plts'
                             ? 'bg-emerald-600 text-white shadow-md ring-2 ring-emerald-300'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                         }`}
                         onClick={() => setSelectedCategory('plts')}
                       >
@@ -1615,7 +1615,7 @@ export default function InputDataTab({ setActiveTab }) {
                         className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                           selectedCategory === 'water'
                             ? 'bg-cyan-600 text-white shadow-md ring-2 ring-cyan-300'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                         }`}
                         onClick={() => setSelectedCategory('water')}
                       >
@@ -1627,7 +1627,7 @@ export default function InputDataTab({ setActiveTab }) {
                         className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                           selectedCategory === 'ev'
                             ? 'bg-teal-600 text-white shadow-md ring-2 ring-teal-300'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                         }`}
                         onClick={() => setSelectedCategory('ev')}
                       >
@@ -1639,7 +1639,7 @@ export default function InputDataTab({ setActiveTab }) {
                         className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                           selectedCategory === 'efficiency'
                             ? 'bg-indigo-600 text-white shadow-md ring-2 ring-indigo-300'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                         }`}
                         onClick={() => setSelectedCategory('efficiency')}
                       >
@@ -1655,7 +1655,7 @@ export default function InputDataTab({ setActiveTab }) {
               <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
                 <button
                   type="button"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white px-6 py-3 text-sm font-bold hover:bg-slate-800 transition-colors shadow-sm"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 dark:bg-slate-950 text-white px-6 py-3 text-sm font-bold hover:bg-slate-800 transition-colors shadow-sm"
                   onClick={() => setCurrentStep(2)}
                 >
                   <span>Lanjut ke Input Teknis Emisi</span>
@@ -1668,13 +1668,13 @@ export default function InputDataTab({ setActiveTab }) {
           {/* STEP 2: INPUT TEKNIS & HITUNG EMISI */}
           {currentStep === 2 && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 lg:p-6 space-y-6">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-5 lg:p-6 space-y-6">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full border border-blue-200/60">
+                    <span className="text-xs font-bold uppercase tracking-wider bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 px-2.5 py-1 rounded-full border border-blue-200/60 dark:border-blue-500/30">
                       STEP 2: PARAMETER TEKNIS
                     </span>
-                    <h4 className="text-base font-bold text-slate-900">
+                    <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">
                       {selectedCategory === 'genset' ? 'Scope 1A: Pembakaran Stasioner (Genset Cadangan)' :
                        selectedCategory === 'vehicle' ? 'Scope 1B: Pembakaran Bergerak (Kendaraan Operasional)' :
                        selectedCategory === 'pln' ? 'Scope 2: Konsumsi Listrik PLN Regional' :
@@ -1685,39 +1685,39 @@ export default function InputDataTab({ setActiveTab }) {
                     </h4>
                   </div>
 
-                  <span className="text-xs font-semibold text-slate-500">
-                    Lokasi: <strong className="text-slate-800">{selectedDC.name}</strong> ({inputValues.periodMonth}/{inputValues.periodYear})
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    Lokasi: <strong className="text-slate-800 dark:text-slate-200">{selectedDC.name}</strong> ({inputValues.periodMonth}/{inputValues.periodYear})
                   </span>
                 </div>
 
                 {/* SCOPE 1A BBM GENSET */}
                 {selectedCategory === 'genset' && (
                   <div className="space-y-5">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700">
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-700 uppercase">Kode Aset Genset</label>
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Kode Aset Genset</label>
                         <input
                           type="text"
                           value={inputValues.gensetAssetCode}
                           onChange={(e) => setInputValues({ ...inputValues, gensetAssetCode: e.target.value })}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-mono font-bold text-slate-900"
+                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-mono font-bold text-slate-900 dark:text-slate-100"
                           placeholder="Contoh: GEN-HO-500KVA-01"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-700 uppercase">Kapasitas Genset (kVA)</label>
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Kapasitas Genset (kVA)</label>
                         <input
                           type="number"
                           value={inputValues.gensetKva}
                           onChange={(e) => setInputValues({ ...inputValues, gensetKva: e.target.value })}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-mono font-bold text-slate-900"
+                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-mono font-bold text-slate-900 dark:text-slate-100"
                           placeholder="500"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 block mb-2">
                         Pilih Jenis Bahan Bakar Minyak (BBM)
                       </label>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1726,13 +1726,13 @@ export default function InputDataTab({ setActiveTab }) {
                           onClick={() => setInputValues({ ...inputValues, fuelType: 'SOLAR' })}
                           className={`p-3.5 rounded-xl border text-left transition-all ${
                             inputValues.fuelType === 'SOLAR'
-                              ? 'bg-amber-50/80 border-amber-300 ring-2 ring-amber-400'
-                              : 'bg-white border-slate-200 hover:bg-slate-50'
+                              ? 'bg-amber-50/80 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/40 ring-2 ring-amber-400'
+                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                         >
-                          <div className="font-bold text-sm text-slate-900">Solar / Biosolar (B35)</div>
-                          <div className="text-xs text-amber-800 font-mono font-semibold mt-0.5">EF: 2.6685 kgCO₂/L</div>
-                          <div className="text-[11px] text-slate-500 mt-1">Standar Genset Utama (ESDM Valid)</div>
+                          <div className="font-bold text-sm text-slate-900 dark:text-slate-100">Solar / Biosolar (B35)</div>
+                          <div className="text-xs text-amber-800 dark:text-amber-200 font-mono font-semibold mt-0.5">EF: 2.6685 kgCO₂/L</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Standar Genset Utama (ESDM Valid)</div>
                         </button>
 
                         <button
@@ -1740,13 +1740,13 @@ export default function InputDataTab({ setActiveTab }) {
                           onClick={() => setInputValues({ ...inputValues, fuelType: 'PERTALITE' })}
                           className={`p-3.5 rounded-xl border text-left transition-all ${
                             inputValues.fuelType === 'PERTALITE'
-                              ? 'bg-emerald-50/80 border-emerald-300 ring-2 ring-emerald-400'
-                              : 'bg-white border-slate-200 hover:bg-slate-50'
+                              ? 'bg-emerald-50/80 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-500/40 ring-2 ring-emerald-400'
+                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                         >
-                          <div className="font-bold text-sm text-slate-900">Pertalite (RON 90)</div>
-                          <div className="text-xs text-emerald-800 font-mono font-semibold mt-0.5">EF: 2.2951 kgCO₂/L</div>
-                          <div className="text-[11px] text-slate-500 mt-1">Genset Portable Toko / Depo</div>
+                          <div className="font-bold text-sm text-slate-900 dark:text-slate-100">Pertalite (RON 90)</div>
+                          <div className="text-xs text-emerald-800 dark:text-emerald-200 font-mono font-semibold mt-0.5">EF: 2.2951 kgCO₂/L</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Genset Portable Toko / Depo</div>
                         </button>
 
                         <button
@@ -1754,27 +1754,27 @@ export default function InputDataTab({ setActiveTab }) {
                           onClick={() => setInputValues({ ...inputValues, fuelType: 'PERTAMAX' })}
                           className={`p-3.5 rounded-xl border text-left transition-all ${
                             inputValues.fuelType === 'PERTAMAX'
-                              ? 'bg-blue-50/80 border-blue-300 ring-2 ring-blue-400'
-                              : 'bg-white border-slate-200 hover:bg-slate-50'
+                              ? 'bg-blue-50/80 dark:bg-blue-500/10 border-blue-300 dark:border-blue-500/40 ring-2 ring-blue-400'
+                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-sm text-slate-900">Pertamax (RON 92)</span>
-                            <span className="text-[10px] font-bold uppercase bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">Audit Note</span>
+                            <span className="font-bold text-sm text-slate-900 dark:text-slate-100">Pertamax (RON 92)</span>
+                            <span className="text-[10px] font-bold uppercase bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 rounded">Audit Note</span>
                           </div>
-                          <div className="text-xs text-blue-800 font-mono font-semibold mt-0.5">EF: 2.2868 kgCO₂/L</div>
-                          <div className="text-[11px] text-slate-500 mt-1">Status: Pending Validation</div>
+                          <div className="text-xs text-blue-800 dark:text-blue-200 font-mono font-semibold mt-0.5">EF: 2.2868 kgCO₂/L</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Status: Pending Validation</div>
                         </button>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3 pt-2">
-                      <span className="text-xs font-bold text-slate-700">Metode Pengukuran:</span>
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Metode Pengukuran:</span>
                       <button
                         type="button"
                         onClick={() => setInputValues({ ...inputValues, fuelInputMode: 'liter' })}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                          inputValues.fuelInputMode === 'liter' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600'
+                          inputValues.fuelInputMode === 'liter' ? 'bg-slate-900 dark:bg-slate-950 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                         }`}
                       >
                         Berdasarkan Volume (Liter)
@@ -1783,7 +1783,7 @@ export default function InputDataTab({ setActiveTab }) {
                         type="button"
                         onClick={() => setInputValues({ ...inputValues, fuelInputMode: 'rupiah' })}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                          inputValues.fuelInputMode === 'rupiah' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600'
+                          inputValues.fuelInputMode === 'rupiah' ? 'bg-slate-900 dark:bg-slate-950 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                         }`}
                       >
                         Berdasarkan Biaya (Rupiah) & Harga
@@ -1793,7 +1793,7 @@ export default function InputDataTab({ setActiveTab }) {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                       {inputValues.fuelInputMode === 'liter' ? (
                         <div className="space-y-1.5">
-                          <label className="text-sm font-semibold text-slate-800 block">
+                          <label className="text-sm font-semibold text-slate-800 dark:text-slate-200 block">
                             Volume BBM Dikonsumsi (Liter)
                           </label>
                           <div className="relative flex items-center">
@@ -1801,9 +1801,9 @@ export default function InputDataTab({ setActiveTab }) {
                               type="number"
                               value={inputValues.fuelLiters}
                               onChange={(e) => setInputValues({ ...inputValues, fuelLiters: e.target.value })}
-                              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 pr-16 text-sm font-bold text-slate-900 tabular-nums focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all shadow-sm"
+                              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 pr-16 text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all shadow-sm"
                             />
-                            <span className="absolute right-3 text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                            <span className="absolute right-3 text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
                               Liter
                             </span>
                           </div>
@@ -1811,32 +1811,32 @@ export default function InputDataTab({ setActiveTab }) {
                       ) : (
                         <>
                           <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-800 block">
+                            <label className="text-sm font-semibold text-slate-800 dark:text-slate-200 block">
                               Total Biaya BBM (Rp)
                             </label>
                             <input
                               type="number"
                               value={inputValues.costRupiah}
                               onChange={(e) => setInputValues({ ...inputValues, costRupiah: e.target.value })}
-                              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-900 tabular-nums shadow-sm"
+                              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums shadow-sm"
                             />
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-800 block">
+                            <label className="text-sm font-semibold text-slate-800 dark:text-slate-200 block">
                               Harga per Liter (Rp/L)
                             </label>
                             <input
                               type="number"
                               value={inputValues.pricePerLiter}
                               onChange={(e) => setInputValues({ ...inputValues, pricePerLiter: e.target.value })}
-                              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 tabular-nums shadow-sm"
+                              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-900 dark:text-slate-100 tabular-nums shadow-sm"
                             />
                           </div>
                         </>
                       )}
 
                       <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-slate-800 block">
+                        <label className="text-sm font-semibold text-slate-800 dark:text-slate-200 block">
                           Jam Operasional Genset (Hour Meter)
                         </label>
                         <div className="relative flex items-center">
@@ -1844,9 +1844,9 @@ export default function InputDataTab({ setActiveTab }) {
                             type="number"
                             value={inputValues.runHours}
                             onChange={(e) => setInputValues({ ...inputValues, runHours: e.target.value })}
-                            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 pr-16 text-sm font-semibold text-slate-900 tabular-nums shadow-sm"
+                            className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 pr-16 text-sm font-semibold text-slate-900 dark:text-slate-100 tabular-nums shadow-sm"
                           />
-                          <span className="absolute right-3 text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                          <span className="absolute right-3 text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
                             Jam
                           </span>
                         </div>
@@ -1858,33 +1858,33 @@ export default function InputDataTab({ setActiveTab }) {
                 {/* SCOPE 1B BBM KENDARAAN OPERASIONAL */}
                 {selectedCategory === 'vehicle' && (
                   <div className="space-y-5">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700">
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-700 uppercase">Nomor Polisi / Plat</label>
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Nomor Polisi / Plat</label>
                         <input
                           type="text"
                           value={inputValues.vehiclePlateNo}
                           onChange={(e) => setInputValues({ ...inputValues, vehiclePlateNo: e.target.value })}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-mono font-bold text-slate-900 uppercase"
+                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-mono font-bold text-slate-900 dark:text-slate-100 uppercase"
                           placeholder="B 9142 SXT"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-700 uppercase">Unit Penanggung Jawab</label>
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Unit Penanggung Jawab</label>
                         <input
                           type="text"
                           value={inputValues.operatorUnit}
                           onChange={(e) => setInputValues({ ...inputValues, operatorUnit: e.target.value })}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-900"
+                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-medium text-slate-900 dark:text-slate-100"
                           placeholder="Logistik DC / Operasional HO"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-700 uppercase">Tipe Kendaraan</label>
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Tipe Kendaraan</label>
                         <select
                           value={inputValues.vehicleType}
                           onChange={(e) => setInputValues({ ...inputValues, vehicleType: e.target.value })}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900"
+                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-900 dark:text-slate-100"
                         >
                           <option value="TRUCK_LOGISTICS">Truk Logistik / Box (Solar)</option>
                           <option value="OPERATIONAL_CAR">Mobil Operasional (Pertalite/Pertamax)</option>
@@ -1894,7 +1894,7 @@ export default function InputDataTab({ setActiveTab }) {
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 block mb-2">
                         Pilih Jenis Bahan Bakar Kendaraan
                       </label>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1903,13 +1903,13 @@ export default function InputDataTab({ setActiveTab }) {
                           onClick={() => setInputValues({ ...inputValues, fuelType: 'SOLAR' })}
                           className={`p-3.5 rounded-xl border text-left transition-all ${
                             inputValues.fuelType === 'SOLAR'
-                              ? 'bg-amber-50/80 border-amber-300 ring-2 ring-amber-400'
-                              : 'bg-white border-slate-200 hover:bg-slate-50'
+                              ? 'bg-amber-50/80 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/40 ring-2 ring-amber-400'
+                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                         >
-                          <div className="font-bold text-sm text-slate-900">Solar / Biosolar (B35)</div>
-                          <div className="text-xs text-amber-800 font-mono font-semibold mt-0.5">EF: 2.6685 kgCO₂/L</div>
-                          <div className="text-[11px] text-slate-500 mt-1">Armada Truk Logistik & Distribusi</div>
+                          <div className="font-bold text-sm text-slate-900 dark:text-slate-100">Solar / Biosolar (B35)</div>
+                          <div className="text-xs text-amber-800 dark:text-amber-200 font-mono font-semibold mt-0.5">EF: 2.6685 kgCO₂/L</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Armada Truk Logistik & Distribusi</div>
                         </button>
 
                         <button
@@ -1917,13 +1917,13 @@ export default function InputDataTab({ setActiveTab }) {
                           onClick={() => setInputValues({ ...inputValues, fuelType: 'PERTALITE' })}
                           className={`p-3.5 rounded-xl border text-left transition-all ${
                             inputValues.fuelType === 'PERTALITE'
-                              ? 'bg-emerald-50/80 border-emerald-300 ring-2 ring-emerald-400'
-                              : 'bg-white border-slate-200 hover:bg-slate-50'
+                              ? 'bg-emerald-50/80 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-500/40 ring-2 ring-emerald-400'
+                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                         >
-                          <div className="font-bold text-sm text-slate-900">Pertalite (RON 90)</div>
-                          <div className="text-xs text-emerald-800 font-mono font-semibold mt-0.5">EF: 2.2951 kgCO₂/L</div>
-                          <div className="text-[11px] text-slate-500 mt-1">Mobil Supervisi & Motor Area</div>
+                          <div className="font-bold text-sm text-slate-900 dark:text-slate-100">Pertalite (RON 90)</div>
+                          <div className="text-xs text-emerald-800 dark:text-emerald-200 font-mono font-semibold mt-0.5">EF: 2.2951 kgCO₂/L</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Mobil Supervisi & Motor Area</div>
                         </button>
 
                         <button
@@ -1931,23 +1931,23 @@ export default function InputDataTab({ setActiveTab }) {
                           onClick={() => setInputValues({ ...inputValues, fuelType: 'PERTAMAX' })}
                           className={`p-3.5 rounded-xl border text-left transition-all ${
                             inputValues.fuelType === 'PERTAMAX'
-                              ? 'bg-blue-50/80 border-blue-300 ring-2 ring-blue-400'
-                              : 'bg-white border-slate-200 hover:bg-slate-50'
+                              ? 'bg-blue-50/80 dark:bg-blue-500/10 border-blue-300 dark:border-blue-500/40 ring-2 ring-blue-400'
+                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-sm text-slate-900">Pertamax (RON 92)</span>
-                            <span className="text-[10px] font-bold uppercase bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">Audit Note</span>
+                            <span className="font-bold text-sm text-slate-900 dark:text-slate-100">Pertamax (RON 92)</span>
+                            <span className="text-[10px] font-bold uppercase bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 rounded">Audit Note</span>
                           </div>
-                          <div className="text-xs text-blue-800 font-mono font-semibold mt-0.5">EF: 2.2868 kgCO₂/L</div>
-                          <div className="text-[11px] text-slate-500 mt-1">Status: Pending Validation</div>
+                          <div className="text-xs text-blue-800 dark:text-blue-200 font-mono font-semibold mt-0.5">EF: 2.2868 kgCO₂/L</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Status: Pending Validation</div>
                         </button>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-slate-800 block">
+                        <label className="text-sm font-semibold text-slate-800 dark:text-slate-200 block">
                           Volume BBM Dikonsumsi Kendaraan (Liter)
                         </label>
                         <div className="relative flex items-center">
@@ -1955,16 +1955,16 @@ export default function InputDataTab({ setActiveTab }) {
                             type="number"
                             value={inputValues.fuelLiters}
                             onChange={(e) => setInputValues({ ...inputValues, fuelLiters: e.target.value })}
-                            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 pr-16 text-sm font-bold text-slate-900 tabular-nums shadow-sm"
+                            className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 pr-16 text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums shadow-sm"
                           />
-                          <span className="absolute right-3 text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                          <span className="absolute right-3 text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
                             Liter
                           </span>
                         </div>
                       </div>
 
-                      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex flex-col justify-center">
-                        <span className="font-bold text-slate-800 mb-1">Catatan Audit Sumber Data:</span>
+                      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400 flex flex-col justify-center">
+                        <span className="font-bold text-slate-800 dark:text-slate-200 mb-1">Catatan Audit Sumber Data:</span>
                         <span>Input manual atau impor CSV data SPBU/reimburse. Sistem Intranet BBM Online belum terintegrasi API otomatis.</span>
                       </div>
                     </div>
@@ -1996,28 +1996,28 @@ export default function InputDataTab({ setActiveTab }) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                       <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1">
-                        <span className="text-slate-400 font-semibold uppercase tracking-wider block">Nilai Aktivitas</span>
+                        <span className="text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider block">Nilai Aktivitas</span>
                         <div className="text-base font-bold font-mono text-white">
                           {liveCalculation.activityValue.toLocaleString('id-ID', { maximumFractionDigits: 2 })} {liveCalculation.activityUnit}
                         </div>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1">
-                        <span className="text-slate-400 font-semibold uppercase tracking-wider block">Faktor Emisi</span>
+                        <span className="text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider block">Faktor Emisi</span>
                         <div className="text-base font-bold font-mono text-amber-400">
                           {liveCalculation.factorValue} {liveCalculation.factorUnit}
                         </div>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1">
-                        <span className="text-slate-400 font-semibold uppercase tracking-wider block">Hasil Emisi (kg)</span>
+                        <span className="text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider block">Hasil Emisi (kg)</span>
                         <div className="text-base font-bold font-mono text-cyan-300">
                           {liveCalculation.impactSign}{liveCalculation.resultKg.toLocaleString('id-ID', { maximumFractionDigits: 2 })} kgCO₂e
                         </div>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1">
-                        <span className="text-slate-400 font-semibold uppercase tracking-wider block">Hasil Emisi (Ton)</span>
+                        <span className="text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider block">Hasil Emisi (Ton)</span>
                         <div className={`text-base font-bold font-mono ${liveCalculation.impactSign === '+' ? 'text-rose-400' : 'text-emerald-400'}`}>
                           {liveCalculation.impactSign}{liveCalculation.resultTon.toFixed(4)} Ton CO₂e
                         </div>
@@ -2026,7 +2026,7 @@ export default function InputDataTab({ setActiveTab }) {
 
                     {/* Mathematical substitution formula */}
                     <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 space-y-1">
-                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
                         Rumus Substitusi Matematis:
                       </span>
                       <div className="font-mono text-xs font-semibold text-emerald-400">
@@ -2035,7 +2035,7 @@ export default function InputDataTab({ setActiveTab }) {
                     </div>
 
                     {/* Source & Audit Notes */}
-                    <div className="text-xs text-slate-400 space-y-1 pt-1">
+                    <div className="text-xs text-slate-400 dark:text-slate-500 space-y-1 pt-1">
                       <div>Sumber Faktor: <strong className="text-slate-200">{liveCalculation.factorSource}</strong></div>
                       <div>Catatan Metrik: {liveCalculation.statusNote}</div>
                     </div>
@@ -2047,7 +2047,7 @@ export default function InputDataTab({ setActiveTab }) {
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
                 <button
                   type="button"
-                  className="w-full sm:w-auto rounded-xl border border-slate-200 bg-white text-slate-700 px-5 py-3 text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm"
+                  className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-5 py-3 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
                   onClick={() => setCurrentStep(1)}
                 >
                   Kembali ke Step 1
@@ -2055,7 +2055,7 @@ export default function InputDataTab({ setActiveTab }) {
 
                 <button
                   type="button"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white px-6 py-3 text-sm font-bold hover:bg-slate-800 transition-colors shadow-sm"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 dark:bg-slate-950 text-white px-6 py-3 text-sm font-bold hover:bg-slate-800 transition-colors shadow-sm"
                   onClick={() => setCurrentStep(3)}
                 >
                   <span>Lanjut ke Review & Simpan</span>
@@ -2068,89 +2068,89 @@ export default function InputDataTab({ setActiveTab }) {
           {/* STEP 3: AUDIT & SIMPAN DATA */}
           {currentStep === 3 && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 lg:p-6 space-y-6">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-5 lg:p-6 space-y-6">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-200/60">
+                    <span className="text-xs font-bold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-500/30">
                       STEP 3: KONFIRMASI & PENYIMPANAN
                     </span>
-                    <h4 className="text-base font-bold text-slate-900">
+                    <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">
                       Ringkasan Audit Transaksi Emisi
                     </h4>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 block">LOKASI DC</span>
-                    <span className="text-sm font-bold text-slate-900 block">{selectedDC.name} ({selectedDC.code})</span>
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 block">LOKASI DC</span>
+                    <span className="text-sm font-bold text-slate-900 dark:text-slate-100 block">{selectedDC.name} ({selectedDC.code})</span>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 block">KATEGORI</span>
-                    <span className="text-sm font-bold text-slate-900 block">{selectedCategory.toUpperCase()}</span>
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 block">KATEGORI</span>
+                    <span className="text-sm font-bold text-slate-900 dark:text-slate-100 block">{selectedCategory.toUpperCase()}</span>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 block">PERIODE</span>
-                    <span className="text-sm font-bold text-slate-900 block">{inputValues.periodMonth}/{inputValues.periodYear}</span>
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 block">PERIODE</span>
+                    <span className="text-sm font-bold text-slate-900 dark:text-slate-100 block">{inputValues.periodMonth}/{inputValues.periodYear}</span>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 block">NO. BUKTI REF</span>
-                    <span className="text-sm font-bold font-mono text-slate-900 block truncate">{inputValues.proofRef || '-'}</span>
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 block">NO. BUKTI REF</span>
+                    <span className="text-sm font-bold font-mono text-slate-900 dark:text-slate-100 block truncate">{inputValues.proofRef || '-'}</span>
                   </div>
                 </div>
 
                 {/* Audit summary card */}
                 {liveCalculation && (
-                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4">
+                  <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700 space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+                      <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                         Rincian Perhitungan Emisi
                       </span>
-                      <span className="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                      <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-500/15 px-2.5 py-0.5 rounded-full">
                         {liveCalculation.statusValidation}
                       </span>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div className="space-y-1">
-                        <span className="text-xs text-slate-500 block">Aktivitas Terukur</span>
-                        <strong className="text-slate-900 font-mono">
+                        <span className="text-xs text-slate-500 dark:text-slate-400 block">Aktivitas Terukur</span>
+                        <strong className="text-slate-900 dark:text-slate-100 font-mono">
                           {liveCalculation.activityValue.toLocaleString('id-ID')} {liveCalculation.activityUnit}
                         </strong>
                       </div>
 
                       <div className="space-y-1">
-                        <span className="text-xs text-slate-500 block">Faktor Emisi & Sumber</span>
-                        <strong className="text-slate-900 font-mono">
+                        <span className="text-xs text-slate-500 dark:text-slate-400 block">Faktor Emisi & Sumber</span>
+                        <strong className="text-slate-900 dark:text-slate-100 font-mono">
                           {liveCalculation.factorValue} {liveCalculation.factorUnit}
                         </strong>
-                        <span className="text-xs text-slate-500 block truncate">{liveCalculation.factorSource}</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400 block truncate">{liveCalculation.factorSource}</span>
                       </div>
 
                       <div className="space-y-1">
-                        <span className="text-xs text-slate-500 block">Dampak Bersih Emisi GRK</span>
-                        <strong className={`font-mono text-base ${liveCalculation.impactSign === '+' ? 'text-rose-600' : 'text-emerald-600'}`}>
+                        <span className="text-xs text-slate-500 dark:text-slate-400 block">Dampak Bersih Emisi GRK</span>
+                        <strong className={`font-mono text-base ${liveCalculation.impactSign === '+' ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                           {liveCalculation.impactSign}{liveCalculation.resultTon.toFixed(4)} Ton CO₂e
                         </strong>
                       </div>
                     </div>
 
-                    <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs font-mono text-slate-800">
+                    <div className="p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-mono text-slate-800 dark:text-slate-200">
                       Rumus Substitusi: <strong>{liveCalculation.formulaSubstituted}</strong>
                     </div>
                   </div>
                 )}
 
-                <div className="p-4 rounded-xl bg-blue-50 border border-blue-100 flex items-start gap-3">
-                  <Database size={20} className="text-blue-600 shrink-0 mt-0.5" />
-                  <div className="text-xs text-blue-900 leading-relaxed space-y-1">
+                <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 flex items-start gap-3">
+                  <Database size={20} className="text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                  <div className="text-xs text-blue-900 dark:text-blue-200 leading-relaxed space-y-1">
                     <p>
                       <strong>Integritas Database PostgreSQL & Prisma:</strong> Transaksi final diverifikasi dan dihitung ulang di backend server sebelum disimpan secara permanen.
                     </p>
-                    <p className="text-blue-700">
+                    <p className="text-blue-700 dark:text-blue-300">
                       Pilihan <em>Simpan Draf</em> hanya menyimpan simulasi tanpa mengubah angka aktual dashboard. Pilihan <em>Simpan Final Transaksi</em> akan mengagregasi data ke Resume Emisi, Overview, dan Scope terkait.
                     </p>
                   </div>
@@ -2161,7 +2161,7 @@ export default function InputDataTab({ setActiveTab }) {
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
                 <button
                   type="button"
-                  className="w-full sm:w-auto rounded-xl border border-slate-200 bg-white text-slate-700 px-5 py-3 text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm"
+                  className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-5 py-3 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
                   onClick={() => setCurrentStep(2)}
                   disabled={isSaving}
                 >
@@ -2171,7 +2171,7 @@ export default function InputDataTab({ setActiveTab }) {
                 <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                   <button
                     type="button"
-                    className="w-full sm:w-auto rounded-xl border border-slate-300 bg-white text-slate-700 px-5 py-3 text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-5 py-3 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => handleSaveTransaction(true)}
                     disabled={isSaving || mutationsAllowed === false}
                     title={mutationsAllowed === false ? 'Mode hanya-baca aktif di server ini' : undefined}
@@ -2181,7 +2181,7 @@ export default function InputDataTab({ setActiveTab }) {
 
                   <button
                     type="button"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white px-6 py-3 text-sm font-bold hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 dark:bg-slate-950 text-white px-6 py-3 text-sm font-bold hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => handleSaveTransaction(false)}
                     disabled={isSaving || mutationsAllowed === false}
                     title={mutationsAllowed === false ? 'Mode hanya-baca aktif di server ini' : undefined}

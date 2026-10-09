@@ -31,9 +31,9 @@ export default function InputDataButton({
         disabled
         title={reason}
         aria-disabled="true"
-        className={`inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 border border-slate-200/90 px-4 py-2.5 text-sm font-semibold text-slate-400 cursor-not-allowed opacity-80 ${className}`}
+        className={`inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-80 ${className}`}
       >
-        <Lock size={15} className="text-slate-400" />
+        <Lock size={15} className="text-slate-400 dark:text-slate-500" />
         <span>{label}</span>
       </button>
     );

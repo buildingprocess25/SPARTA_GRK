@@ -614,7 +614,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
   if (loading && !data) {
     return (
       <CardBox className="p-6">
-        <div className="flex items-center justify-center py-16 text-slate-500 gap-3">
+        <div className="flex items-center justify-center py-16 text-slate-500 dark:text-slate-400 gap-3">
           <div className="size-5 rounded-full border-2 border-amber-500 border-t-transparent animate-spin" />
           <span className="text-sm font-medium">Memuat ringkasan performa 37 plant PLTS...</span>
         </div>
@@ -624,11 +624,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
   if (error && !data) {
     return (
-      <CardBox className="p-6 border-rose-200 bg-rose-50/40">
+      <CardBox className="p-6 border-rose-200 dark:border-rose-500/30 bg-rose-50/40 dark:bg-rose-500/10">
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <AlertCircle size={36} className="text-rose-500 mb-3" />
           <h3 className="text-base font-bold text-rose-900">Gagal Memuat Ringkasan PLTS</h3>
-          <p className="text-xs text-rose-700 max-w-md mt-1">{error}</p>
+          <p className="text-xs text-rose-700 dark:text-rose-300 max-w-md mt-1">{error}</p>
           <button
             type="button"
             onClick={() => fetchSummary(true)}
@@ -672,19 +672,19 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
     <div className="space-y-4">
       {/* 1. HEADER CARD WITH CASCADE SELECTION FILTER: Periode → Wilayah Grid → Cabang/DC */}
       <CardBox className="space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+            <div className="size-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
               <Sun size={20} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                   Ringkasan PLTS (37 Lokasi DC)
                 </h3>
                 <MetricInfoIcon infoKey="plts_multi_dc_analytics" />
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Monitoring energi tersimpan, kapasitas terpasang, dan emisi terhindar
               </p>
             </div>
@@ -692,11 +692,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
           {/* Period Selector */}
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Periode:</span>
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Periode:</span>
             <select
               value={data?.history?.activePeriod?.value || period}
               onChange={(e) => handlePeriodChange(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-500 focus:bg-white transition-colors cursor-pointer"
+              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
             >
               {(data?.history?.periodOptions || []).map(p => (
                 <option key={p.value} value={p.value}>{p.label}</option>
@@ -706,7 +706,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               aria-label="Mode periode"
               value={periodMode}
               onChange={(event) => handleModeChange(event.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700"
+              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-300"
             >
               <option value="YTD">Jan–bulan (YTD)</option>
               <option value="MONTH">Bulan terpilih</option>
@@ -716,12 +716,12 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 aria-label="Bulan terpilih"
                 value={selectedMonth}
                 onChange={(event) => handleModeChange('MONTH', Number(event.target.value))}
-                className="rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700"
+                className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-300"
               >
                 {Array.from({ length: 12 }, (_, index) => <option key={index + 1} value={index + 1}>{['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][index]}</option>)}
               </select>
             )}
-            <label className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-bold text-blue-800 cursor-pointer">
+            <label className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1.5 text-xs font-bold text-blue-800 dark:text-blue-300 cursor-pointer">
               <input
                 type="checkbox"
                 checked={compareYears}
@@ -734,7 +734,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 aria-label="Batas bulan perbandingan"
                 value={throughMonth}
                 onChange={(event) => handleThroughMonthChange(Number(event.target.value))}
-                className="rounded-xl border border-blue-200 bg-white px-2.5 py-1.5 text-xs font-bold text-blue-800"
+                className="rounded-xl border border-blue-200 dark:border-blue-500/30 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-blue-800 dark:text-blue-300"
               >
                 {Array.from({ length: 12 }, (_, index) => (
                   <option key={index + 1} value={index + 1}>s.d. {['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][index]}</option>
@@ -745,38 +745,38 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         </div>
 
         {/* CASCADE SELECTION TOOLBAR: Periode → Wilayah Grid → Cabang/DC */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50/70 p-3 rounded-2xl border border-slate-200/80">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50/70 dark:bg-slate-800/40 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700">
           {/* 1. Wilayah Grid */}
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-wider ml-1 flex items-center gap-1">
-              <Globe size={11} className="text-blue-600" />
+            <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-1">
+              <Globe size={11} className="text-blue-600 dark:text-blue-400" />
               1. Wilayah Grid
             </label>
             <div className="relative">
               <select
                 value={selectedGrid}
                 onChange={(e) => handleGridChange(e.target.value)}
-                className="w-full pl-3 pr-8 py-2 text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none shadow-2xs cursor-pointer"
+                className="w-full pl-3 pr-8 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none shadow-2xs cursor-pointer"
               >
                 {GRID_OPTIONS.map(g => (
                   <option key={g.value} value={g.value}>{g.label}</option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" size={14} />
             </div>
           </div>
 
           {/* 2. Cabang / DC / Fasilitas */}
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-wider ml-1 flex items-center gap-1">
-              <Building2 size={11} className="text-amber-600" />
+            <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-1">
+              <Building2 size={11} className="text-amber-600 dark:text-amber-400" />
               2. Cabang / DC / Fasilitas
             </label>
             <div className="relative">
               <select
                 value={selectedDc}
                 onChange={(e) => handleDcChange(e.target.value)}
-                className="w-full pl-3 pr-8 py-2 text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 appearance-none shadow-2xs cursor-pointer"
+                className="w-full pl-3 pr-8 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 appearance-none shadow-2xs cursor-pointer"
               >
                 <option value="ALL">Semua Cabang / DC {selectedGrid !== 'ALL' ? `(${selectedGrid})` : ''}</option>
                 {availableDcOptions.map(dc => (
@@ -785,23 +785,23 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" size={14} />
             </div>
           </div>
 
           {/* 3. Status Filter & Reset */}
           <div className="space-y-1 flex flex-col justify-between">
-            <label className="text-[10px] font-bold text-slate-600 uppercase tracking-wider ml-1 flex items-center gap-1">
-              <Filter size={11} className="text-emerald-600" />
+            <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-1">
+              <Filter size={11} className="text-emerald-600 dark:text-emerald-400" />
               3. Filter Aktif & Reset
             </label>
             <div className="flex items-center gap-2">
-              <div className="flex-1 text-xs text-slate-600 bg-white border border-slate-200 rounded-xl px-3 py-1.5 flex items-center justify-between">
+              <div className="flex-1 text-xs text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 flex items-center justify-between">
                 <span className="font-semibold truncate">
                   {selectedGrid === 'ALL' ? 'Semua Grid' : selectedGrid}
                   {selectedDc !== 'ALL' ? ` • ${data?.locations?.find(l => l.dcId === selectedDc)?.canonicalName || selectedDc}` : ''}
                 </span>
-                <span className="text-[10px] font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded">
                   {filteredRows.length} Lokasi
                 </span>
               </div>
@@ -816,7 +816,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                     syncUrlParam('grid', '');
                     syncUrlParam('dc', '');
                   }}
-                  className="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 shrink-0"
+                  className="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 shrink-0"
                   title="Reset semua filter"
                 >
                   <RotateCcw size={12} />
@@ -829,8 +829,8 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
         {/* Lightweight safety warning for unmatched/partial data rows */}
         {unmatchedOrPartialRows.length > 0 && (
-          <div className="flex items-center gap-2 rounded-xl bg-amber-50/70 border border-amber-200/80 px-3 py-1.5 text-[11px] text-amber-800">
-            <AlertCircle size={13} className="text-amber-600 shrink-0" />
+          <div className="flex items-center gap-2 rounded-xl bg-amber-50/70 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/30 px-3 py-1.5 text-[11px] text-amber-800 dark:text-amber-300">
+            <AlertCircle size={13} className="text-amber-600 dark:text-amber-400 shrink-0" />
             <span>
               <strong>Perhatian Data:</strong> {unmatchedOrPartialRows.length} lokasi memiliki catatan histori parsial ({unmatchedOrPartialRows.map(r => r.canonicalName).slice(0, 3).join(', ')}{unmatchedOrPartialRows.length > 3 ? ` +${unmatchedOrPartialRows.length - 3} lainnya` : ''}).
             </span>
@@ -858,9 +858,9 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             subtitle={
               <div className="space-y-1">
                 <span>Periode {data?.history?.activePeriod?.label || data?.period}</span>
-                <div className="border-t border-slate-100 pt-1 text-[10px] text-slate-500">
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400">
                   {isNational && dashboardData?.summary?.targetMwh != null
-                    ? <>Target {Math.round(dashboardData.summary.targetMwh * 1000).toLocaleString('id-ID')} kWh · Capai <strong className="text-emerald-700">{formatNum(dashboardData.summary.achievementPct, 1, 1)}%</strong></>
+                    ? <>Target {Math.round(dashboardData.summary.targetMwh * 1000).toLocaleString('id-ID')} kWh · Capai <strong className="text-emerald-700 dark:text-emerald-300">{formatNum(dashboardData.summary.achievementPct, 1, 1)}%</strong></>
                     : 'Target nasional'}
                   {isNational && dashboardData?.summary?.achievementPct != null && (
                     <div className="mt-1 h-1 overflow-hidden rounded-full bg-amber-100">
@@ -882,10 +882,10 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             unit="kWh"
             subtitle={
               <div className="space-y-1">
-                <span className="text-[10px] text-emerald-700 font-semibold block">
+                <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold block">
                   {dashboardData?.summary?.emission?.coalAvoidedTon ? `~${formatNum(dashboardData.summary.emission.coalAvoidedTon, 1, 1)} Ton Batubara (estimasi)` : 'Batubara Terhindar'}
                 </span>
-                <div className="border-t border-slate-100 pt-1 text-[10px] text-slate-500" title="Estimasi SFC PLTU 0,40 kg batubara/kWh untuk energi pakai sendiri 37 plant resmi ESDM">
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400" title="Estimasi SFC PLTU 0,40 kg batubara/kWh untuk energi pakai sendiri 37 plant resmi ESDM">
                   Ekuivalen 0,40 kg batubara / kWh (37 plant resmi)
                 </div>
               </div>
@@ -903,7 +903,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             subtitle={
               <div className="space-y-1">
                 <span>Setara {formatNum(kpi.treeEquivalent, 0, 0)} pohon</span>
-                <div className="border-t border-slate-100 pt-1 text-[10px] text-slate-500" title="Energi PLTS yang dipakai sendiri dikali faktor emisi tunggal dashboard">
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400" title="Energi PLTS yang dipakai sendiri dikali faktor emisi tunggal dashboard">
                   Faktor emisi: {PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh
                 </div>
               </div>
@@ -919,28 +919,28 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             value={
               <div className="flex items-center gap-1.5 flex-wrap text-sm sm:text-base font-bold">
                 <span
-                  className="font-mono text-emerald-700 cursor-help"
+                  className="font-mono text-emerald-700 dark:text-emerald-300 cursor-help"
                   title={`Normal (${statusBreakdown.normalNames.length} lokasi):\n${statusBreakdown.normalNames.join(', ')}`}
                 >
                   {statusBreakdown.normalCount} Normal
                 </span>
                 <span className="text-slate-300">·</span>
                 <span
-                  className={`font-mono ${statusBreakdown.faultCount > 0 ? 'text-red-600' : 'text-slate-400'} cursor-help`}
+                  className={`font-mono ${statusBreakdown.faultCount > 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-400 dark:text-slate-500'} cursor-help`}
                   title={`Fault (${statusBreakdown.faultNames.length} lokasi):\n${statusBreakdown.faultNames.join(', ') || 'Tidak ada'}`}
                 >
                   {statusBreakdown.faultCount} Fault
                 </span>
                 <span className="text-slate-300">·</span>
                 <span
-                  className={`font-mono ${statusBreakdown.alarmCount > 0 ? 'text-amber-600' : 'text-slate-400'} cursor-help`}
+                  className={`font-mono ${statusBreakdown.alarmCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'} cursor-help`}
                   title={`Alarm (${statusBreakdown.alarmNames.length} lokasi):\n${statusBreakdown.alarmNames.join(', ') || 'Tidak ada'}`}
                 >
                   {statusBreakdown.alarmCount} Alarm
                 </span>
                 <span className="text-slate-300">·</span>
                 <span
-                  className={`font-mono ${statusBreakdown.offlineCount > 0 ? 'text-slate-700' : 'text-slate-400'} cursor-help`}
+                  className={`font-mono ${statusBreakdown.offlineCount > 0 ? 'text-slate-700 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500'} cursor-help`}
                   title={`Offline (${statusBreakdown.offlineNames.length} lokasi):\n${statusBreakdown.offlineNames.join(', ') || 'Tidak ada'}`}
                 >
                   {statusBreakdown.offlineCount} Offline
@@ -950,8 +950,8 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             subtitle={
               <div className="space-y-1">
                 <span>{statusBreakdown.attentionCount === 0 ? 'Semua lokasi beroperasi normal' : `${statusBreakdown.attentionCount} lokasi perlu perhatian`}</span>
-                <div className="border-t border-slate-100 pt-1 text-[10px] text-slate-500">
-                  PR: {dashboardData?.summary?.pr?.valuePct ? <strong className="text-cyan-800">{formatNum(dashboardData.summary.pr.valuePct, 1, 1)}%</strong> : 'Belum tersedia'}
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400">
+                  PR: {dashboardData?.summary?.pr?.valuePct ? <strong className="text-cyan-800 dark:text-cyan-300">{formatNum(dashboardData.summary.pr.valuePct, 1, 1)}%</strong> : 'Belum tersedia'}
                 </div>
               </div>
             }
@@ -962,17 +962,17 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         </div>
 
         {compareYears && comparison && (
-          <div className="rounded-2xl border border-blue-100 bg-blue-50/40 p-4 relative z-0" data-yoy-comparison="true">
+          <div className="rounded-2xl border border-blue-100 dark:border-blue-500/20 bg-blue-50/40 dark:bg-blue-500/10 p-4 relative z-0" data-yoy-comparison="true">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
               <div className="flex items-center gap-2">
                 <div>
-                  <h4 className="text-sm font-black text-slate-900">Perbandingan Produksi {comparison.years[0]} vs {comparison.years[1]}</h4>
-                  <p className="text-[11px] text-slate-500">Batas bulan sejajar: {comparison.label}</p>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-slate-100">Perbandingan Produksi {comparison.years[0]} vs {comparison.years[1]}</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Batas bulan sejajar: {comparison.label}</p>
                 </div>
                 <MetricInfoIcon infoKey="plts_summary_yoy" />
               </div>
               <div className="flex flex-wrap items-center gap-2.5">
-                <div className={`text-sm font-black font-mono ${comparison.deltaKwh >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                <div className={`text-sm font-black font-mono ${comparison.deltaKwh >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'}`}>
                   {comparison.deltaKwh == null ? 'Belum tersedia' : `${comparison.deltaKwh >= 0 ? '+' : ''}${formatNum(comparison.deltaKwh / 1000, 2, 2)} MWh`}
                   {comparison.changePct == null ? '' : ` (${comparison.changePct >= 0 ? '+' : ''}${comparison.changePct}%)`}
                 </div>
@@ -983,11 +983,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                     ...(isNational && showTarget ? [{ label: 'Target 2026', color: CHART_PALETTE.target, type: 'line' }] : []),
                   ]}
                 />
-                <div className="inline-flex rounded-lg bg-white p-0.5 text-[10px] font-bold border border-slate-200">
-                  <button type="button" onClick={() => setChartType('bar')} className={`rounded px-2 py-1 transition-all ${chartType === 'bar' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}>Bar</button>
-                  <button type="button" onClick={() => setChartType('line')} className={`rounded px-2 py-1 transition-all ${chartType === 'line' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}>Garis</button>
+                <div className="inline-flex rounded-lg bg-white dark:bg-slate-900 p-0.5 text-[10px] font-bold border border-slate-200 dark:border-slate-700">
+                  <button type="button" onClick={() => setChartType('bar')} className={`rounded px-2 py-1 transition-all ${chartType === 'bar' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'}`}>Bar</button>
+                  <button type="button" onClick={() => setChartType('line')} className={`rounded px-2 py-1 transition-all ${chartType === 'line' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'}`}>Garis</button>
                 </div>
-                {isNational && <label className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-700"><input type="checkbox" checked={showTarget} onChange={event => setShowTarget(event.target.checked)} />Target</label>}
+                {isNational && <label className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-700 dark:text-purple-300"><input type="checkbox" checked={showTarget} onChange={event => setShowTarget(event.target.checked)} />Target</label>}
               </div>
             </div>
             <div className="h-56 w-full pt-1">
@@ -1043,7 +1043,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       </CardBox>
 
       {/* 3. TOOLBAR: CHIPS & SEARCH */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs">
         {/* Quick Analytical Chips */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 [scrollbar-width:none]">
           <button
@@ -1051,7 +1051,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             onClick={() => setActiveChip('all')}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${activeChip === 'all'
                 ? 'bg-slate-900 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
           >
             Semua ({filteredRows.length})
@@ -1061,7 +1061,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             onClick={() => setActiveChip('top5')}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${activeChip === 'top5'
                 ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50'
+                : 'text-emerald-700 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
               }`}
           >
             Top 5 Produksi
@@ -1071,7 +1071,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             onClick={() => setActiveChip('bottom5')}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${activeChip === 'bottom5'
                 ? 'bg-amber-600 text-white shadow-xs'
-                : 'text-amber-700 hover:text-amber-900 hover:bg-amber-50'
+                : 'text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-200 hover:bg-amber-50 dark:hover:bg-amber-500/10'
               }`}
           >
             Bottom 5 Produksi
@@ -1081,7 +1081,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             onClick={() => setActiveChip('attention')}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${activeChip === 'attention'
                 ? 'bg-rose-600 text-white shadow-xs'
-                : 'text-rose-700 hover:text-rose-900 hover:bg-rose-50'
+                : 'text-rose-700 dark:text-rose-300 hover:text-rose-900 dark:hover:text-rose-200 hover:bg-rose-50 dark:hover:bg-rose-500/10'
               }`}
           >
             <span className="size-1.5 rounded-full bg-rose-500" />
@@ -1092,10 +1092,10 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             onClick={() => setActiveChip('fault')}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${activeChip === 'fault'
                 ? 'bg-red-600 text-white shadow-xs'
-                : 'text-red-700 hover:text-red-900 hover:bg-red-50'
+                : 'text-red-700 dark:text-red-300 hover:text-red-900 dark:hover:text-red-200 hover:bg-red-50 dark:hover:bg-red-500/10'
               }`}
           >
-            <AlertTriangle size={12} className={activeChip === 'fault' ? 'text-white' : 'text-red-600'} />
+            <AlertTriangle size={12} className={activeChip === 'fault' ? 'text-white' : 'text-red-600 dark:text-red-400'} />
             Fault ({statusBreakdown.faultCount})
           </button>
           <button
@@ -1103,10 +1103,10 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             onClick={() => setActiveChip('alarm')}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${activeChip === 'alarm'
                 ? 'bg-amber-600 text-white shadow-xs'
-                : 'text-amber-700 hover:text-amber-900 hover:bg-amber-50'
+                : 'text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-200 hover:bg-amber-50 dark:hover:bg-amber-500/10'
               }`}
           >
-            <AlertCircle size={12} className={activeChip === 'alarm' ? 'text-white' : 'text-amber-600'} />
+            <AlertCircle size={12} className={activeChip === 'alarm' ? 'text-white' : 'text-amber-600 dark:text-amber-400'} />
             Alarm ({statusBreakdown.alarmCount})
           </button>
         </div>
@@ -1114,17 +1114,17 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         {/* Search Box & Actions */}
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:w-64">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari nama lokasi DC / kota..."
-              className="h-9 w-full rounded-xl border border-slate-200 pl-8 pr-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="h-9 w-full rounded-xl border border-slate-200 dark:border-slate-700 pl-8 pr-3 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900"
             />
           </div>
-          <span className="text-xs text-slate-500 whitespace-nowrap shrink-0">
-            Menampilkan <strong className="text-slate-900">{filteredRows.length}</strong> lokasi
+          <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap shrink-0">
+            Menampilkan <strong className="text-slate-900 dark:text-slate-100">{filteredRows.length}</strong> lokasi
           </span>
 
           {/* Data Freshness Badge (SSOT Architecture - Age Tiers) */}
@@ -1137,7 +1137,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               return (
                 <div
                   data-testid="data-freshness-badge"
-                  className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800 shadow-2xs shrink-0"
+                  className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 px-3 text-xs font-semibold text-emerald-800 dark:text-emerald-300 shadow-2xs shrink-0"
                   title={`Data telemetri terbaru (disinkronkan: ${lastSyncTime || timeDisplay})`}
                 >
                   <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -1150,7 +1150,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               return (
                 <div
                   data-testid="data-freshness-badge"
-                  className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 px-3 text-xs font-semibold text-amber-800 shadow-2xs shrink-0"
+                  className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-3 text-xs font-semibold text-amber-800 dark:text-amber-300 shadow-2xs shrink-0"
                   title={lastSyncTime ? `Terakhir disinkronkan: ${lastSyncTime}` : 'Data dalam rentang 30 menit - 3 jam'}
                 >
                   <span className="size-2 rounded-full bg-amber-500" />
@@ -1162,7 +1162,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             return (
               <div
                 data-testid="data-freshness-badge"
-                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 text-xs text-rose-800 shadow-2xs shrink-0"
+                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-3 text-xs text-rose-800 dark:text-rose-300 shadow-2xs shrink-0"
               >
                 <span className="size-2 rounded-full bg-rose-500" />
                 <span className="font-semibold">Data lama</span>
@@ -1172,7 +1172,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                     <button
                       type="button"
                       onClick={onNavigateToIsolar}
-                      className="font-bold text-rose-700 underline hover:text-rose-950 transition-colors inline-flex items-center gap-0.5"
+                      className="font-bold text-rose-700 dark:text-rose-300 underline hover:text-rose-950 dark:hover:text-rose-100 transition-colors inline-flex items-center gap-0.5"
                       title="Buka tab Live iSolarCloud API untuk menyegarkan data"
                     >
                       <span>Refresh melalui tab iSolar</span>
@@ -1200,14 +1200,14 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       <div
         data-plts-table-container="true"
         style={{ maxHeight: '460px' }}
-        className="max-h-[460px] overflow-auto overscroll-contain rounded-2xl border border-slate-200 shadow-2xs bg-white"
+        className="max-h-[460px] overflow-auto overscroll-contain rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs bg-white dark:bg-slate-900"
       >
         <table className="w-full text-left text-xs border-separate border-spacing-0">
-          <thead className="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-600 sticky top-0 z-20 shadow-[0_1px_0_0_#e2e8f0]">
+          <thead className="bg-slate-50 dark:bg-slate-800/40 text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 sticky top-0 z-20 shadow-[0_1px_0_0_#e2e8f0]">
             <tr>
               <th
                 onClick={() => handleSort('canonicalName')}
-                className="px-4 py-3 font-bold sticky left-0 bg-slate-50 z-30 cursor-pointer hover:bg-slate-100 transition-colors border-r border-slate-200 select-none"
+                className="px-4 py-3 font-bold sticky left-0 bg-slate-50 dark:bg-slate-800/40 z-30 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-r border-slate-200 dark:border-slate-700 select-none"
               >
                 <div className="flex items-center gap-1.5">
                   <span>Lokasi</span>
@@ -1216,7 +1216,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               </th>
               <th
                 onClick={() => handleSort('installedKwp')}
-                className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 transition-colors select-none"
+                className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
               >
                 <div className="flex items-center justify-end gap-1.5">
                   <span>Kapasitas (kWp)</span>
@@ -1225,7 +1225,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               </th>
               <th
                 onClick={() => handleSort('productionMwh')}
-                className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 transition-colors select-none"
+                className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
               >
                 <div className="flex items-center justify-end gap-1.5">
                   <span>Produksi (MWh)</span>
@@ -1234,7 +1234,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               </th>
               <th
                 onClick={() => handleSort('specificYield')}
-                className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 transition-colors select-none"
+                className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
               >
                 <div className="flex items-center justify-end gap-1.5">
                   <span>Specific Yield</span>
@@ -1243,7 +1243,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               </th>
               <th
                 onClick={() => handleSort('prValue')}
-                className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 transition-colors select-none"
+                className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
               >
                 <div className="flex items-center justify-end gap-1.5"><span>PR</span>{sortKey === 'prValue' && (sortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}</div>
               </th>
@@ -1251,7 +1251,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               {isSingleMonth && (
                 <th
                   onClick={() => handleSort('vsPrevMonthPct')}
-                  className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 transition-colors select-none"
+                  className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
                 >
                   <div className="flex items-center justify-end gap-1.5">
                     <span>vs Bulan Lalu (%)</span>
@@ -1262,7 +1262,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
               <th
                 onClick={() => handleSort('status')}
-                className="px-3 py-3 font-bold text-center cursor-pointer hover:bg-slate-100 transition-colors select-none"
+                className="px-3 py-3 font-bold text-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
               >
                 <div className="flex items-center justify-center gap-1.5">
                   <span>Status Operasional</span>
@@ -1272,17 +1272,17 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-slate-100 bg-white">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
             {filteredRows.length === 0 ? (
               <tr>
-                <td colSpan={isSingleMonth ? 7 : 6} className="px-4 py-12 text-center text-slate-400">
+                <td colSpan={isSingleMonth ? 7 : 6} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500">
                   <AlertCircle size={28} className="mx-auto mb-2 text-slate-300" />
-                  <p className="font-medium text-slate-600">Tidak ada lokasi yang cocok dengan filter</p>
+                  <p className="font-medium text-slate-600 dark:text-slate-400">Tidak ada lokasi yang cocok dengan filter</p>
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => setSearchQuery('')}
-                      className="mt-2 text-xs font-semibold text-blue-600 hover:underline"
+                      className="mt-2 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
                     >
                       Hapus kata kunci pencarian
                     </button>
@@ -1300,15 +1300,15 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                   <React.Fragment key={loc.dcId}>
                     <tr
                       onClick={() => onSelectLocation && onSelectLocation(loc.dcId)}
-                      className={`hover:bg-slate-50/70 transition-colors group cursor-pointer ${opStatus.key === 'FAULT'
-                          ? 'bg-red-50/40 border-l-4 border-l-red-600'
+                      className={`hover:bg-slate-50/70 dark:hover:bg-slate-800 transition-colors group cursor-pointer ${opStatus.key === 'FAULT'
+                          ? 'bg-red-50/40 dark:bg-red-500/10 border-l-4 border-l-red-600'
                           : !opStatus.isNormal
-                            ? 'bg-amber-50/30 border-l-2 border-l-amber-500'
+                            ? 'bg-amber-50/30 dark:bg-amber-500/10 border-l-2 border-l-amber-500'
                             : ''
                         }`}
                     >
                       {/* Column 1: Lokasi (Sticky Left) */}
-                      <td className="px-4 py-2.5 font-bold text-slate-900 sticky left-0 bg-white group-hover:bg-slate-50 z-10 border-r border-slate-100 whitespace-nowrap">
+                      <td className="px-4 py-2.5 font-bold text-slate-900 dark:text-slate-100 sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 z-10 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           {hasSub && (
                             <button
@@ -1317,7 +1317,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                                 e.stopPropagation();
                                 setExpandedDC(isExpanded ? null : loc.dcId);
                               }}
-                              className="size-5 rounded flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+                              className="size-5 rounded flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 transition-colors"
                               title="Buka rincian sub-plant"
                             >
                               {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
@@ -1325,32 +1325,32 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                           )}
                           <div>
                             <div className="flex items-center gap-1.5">
-                              <span className="text-slate-900 hover:text-blue-600 transition-colors">
+                              <span className="text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                                 {loc.canonicalName}
                               </span>
-                              <span className="text-[10px] px-1.5 py-0.2 rounded font-medium bg-slate-100 text-slate-600">
+                              <span className="text-[10px] px-1.5 py-0.2 rounded font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                                 {loc.grid}
                               </span>
                             </div>
                             <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
                               {hasSub && (
-                                <span className="text-[9px] px-1.5 py-0.2 rounded font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                                <span className="text-[9px] px-1.5 py-0.2 rounded font-semibold bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30">
                                   {loc.subPlants.length} sub-plant
                                 </span>
                               )}
                               {loc.incompleteHistoryBadge && (
-                                <span className="text-[9px] px-1.5 py-0.2 rounded font-semibold bg-blue-50 text-blue-700 border border-blue-200" title={dq.note || "Histori parsial di periode ini"}>
+                                <span className="text-[9px] px-1.5 py-0.2 rounded font-semibold bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30" title={dq.note || "Histori parsial di periode ini"}>
                                   {loc.incompleteHistoryBadge}
                                 </span>
                               )}
                               {loc.monthsAvailable === 0 && (
-                                <span className="text-[9px] px-1.5 py-0.2 rounded font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                <span className="text-[9px] px-1.5 py-0.2 rounded font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                                   Belum tersedia
                                 </span>
                               )}
                               {loc.hasAbnormalMonth && (
                                 <span
-                                  className="text-[9px] px-1.5 py-0.2 rounded font-semibold bg-slate-100 text-slate-700 border border-slate-200 cursor-help"
+                                  className="text-[9px] px-1.5 py-0.2 rounded font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 cursor-help"
                                   title={loc.abnormalMonthTooltip || 'Variasi produksi bulanan terdeteksi'}
                                 >
                                   Data bervariasi
@@ -1362,22 +1362,22 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                       </td>
 
                       {/* Column 2: Kapasitas (kWp) */}
-                      <td className="px-3 py-2.5 text-right font-mono font-medium text-slate-700 whitespace-nowrap">
+                      <td className="px-3 py-2.5 text-right font-mono font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">
                         {formatNum(loc.installedKwp, 1, 2)}
                       </td>
 
                       {/* Column 3: Produksi (MWh) */}
-                      <td className="px-3 py-2.5 text-right font-mono font-bold text-emerald-700 whitespace-nowrap">
-                        {loc.productionMwh == null ? <span className="text-slate-400 font-sans">Belum tersedia</span> : formatNum(loc.productionMwh, 2, 2)}
+                      <td className="px-3 py-2.5 text-right font-mono font-bold text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
+                        {loc.productionMwh == null ? <span className="text-slate-400 dark:text-slate-500 font-sans">Belum tersedia</span> : formatNum(loc.productionMwh, 2, 2)}
                       </td>
 
                       {/* Column 4: Specific Yield (kWh/kWp) */}
-                      <td className="px-3 py-2.5 text-right font-mono text-slate-700 whitespace-nowrap">
-                        {formatNum(loc.specificYield, 1, 1)} <span className="text-[10px] text-slate-400">kWh/kWp</span>
+                      <td className="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                        {formatNum(loc.specificYield, 1, 1)} <span className="text-[10px] text-slate-400 dark:text-slate-500">kWh/kWp</span>
                       </td>
 
-                      <td className="px-3 py-2.5 text-right font-mono text-slate-700 whitespace-nowrap">
-                        {loc.prValue == null ? <span className="font-sans text-slate-400">—</span> : `${formatNum(loc.prValue, 1, 1)}%`}
+                      <td className="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                        {loc.prValue == null ? <span className="font-sans text-slate-400 dark:text-slate-500">—</span> : `${formatNum(loc.prValue, 1, 1)}%`}
                       </td>
 
                       {/* Column 5: vs Bulan Lalu (Only for single month) */}
@@ -1385,15 +1385,15 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                         <td className="px-3 py-2.5 text-right font-mono text-xs whitespace-nowrap">
                           {loc.vsPrevMonthPct !== null && loc.vsPrevMonthPct !== undefined ? (
                             <span className={`inline-flex items-center gap-0.5 font-bold ${loc.vsPrevMonthPct > 0
-                                ? 'text-emerald-700'
+                                ? 'text-emerald-700 dark:text-emerald-300'
                                 : loc.vsPrevMonthPct < 0
-                                  ? 'text-rose-700'
-                                  : 'text-slate-500'
+                                  ? 'text-rose-700 dark:text-rose-300'
+                                  : 'text-slate-500 dark:text-slate-400'
                               }`}>
                               {loc.vsPrevMonthPct > 0 ? '+' : ''}{loc.vsPrevMonthPct}%
                             </span>
                           ) : (
-                            <span className="text-slate-400">—</span>
+                            <span className="text-slate-400 dark:text-slate-500">—</span>
                           )}
                         </td>
                       )}
@@ -1434,20 +1434,20 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                           }
                           if (opStatus.key === 'WAITING_DATA') {
                             return (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-300" title={tooltipText}>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600" title={tooltipText}>
                                 Menunggu Data
                               </span>
                             );
                           }
                           if (opStatus.key === 'DEVICE_OFFLINE') {
                             return (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-300" title={tooltipText}>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-300" title={tooltipText}>
                                 {loc.offlineDeviceCount || 1} Device Offline
                               </span>
                             );
                           }
                           return (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200" title={tooltipText}>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30" title={tooltipText}>
                               <span className="size-1.5 rounded-full bg-emerald-500" />
                               Normal
                             </span>
@@ -1459,14 +1459,14 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                     {/* Sub-plants detail row (if expanded) */}
                     {isExpanded && hasSub && (
                       loc.subPlants.map((sp, spIdx) => (
-                        <tr key={spIdx} className="bg-purple-50/30 text-[11px] border-b border-purple-100">
-                          <td className="px-4 py-1.5 pl-11 text-slate-600 sticky left-0 bg-purple-50/50 z-10 border-r border-slate-100 font-mono">
-                            ↳ {sp.name} <span className="text-[10px] text-slate-400">({sp.psId})</span>
+                        <tr key={spIdx} className="bg-purple-50/30 dark:bg-purple-500/10 text-[11px] border-b border-purple-100 dark:border-purple-500/20">
+                          <td className="px-4 py-1.5 pl-11 text-slate-600 dark:text-slate-400 sticky left-0 bg-purple-50/50 dark:bg-purple-500/10 z-10 border-r border-slate-100 dark:border-slate-800 font-mono">
+                            ↳ {sp.name} <span className="text-[10px] text-slate-400 dark:text-slate-500">({sp.psId})</span>
                           </td>
-                          <td className="px-3 py-1.5 text-right font-mono text-slate-600">
+                          <td className="px-3 py-1.5 text-right font-mono text-slate-600 dark:text-slate-400">
                             {formatNum(sp.capacityKwp, 1, 2)}
                           </td>
-                          <td className="px-3 py-1.5 text-right font-mono text-slate-500" colSpan={isSingleMonth ? 5 : 4}>
+                          <td className="px-3 py-1.5 text-right font-mono text-slate-500 dark:text-slate-400" colSpan={isSingleMonth ? 5 : 4}>
                             Sub-plant fisik (dijumlahkan tanpa hitung ganda)
                           </td>
                         </tr>
@@ -1479,26 +1479,26 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           </tbody>
 
           {/* 5. FOOTER STICKY (TOTAL / SUBTOTAL DARI BARIS YANG TAMPIL) */}
-          <tfoot className="sticky bottom-0 bg-slate-100 font-bold z-20 shadow-[0_-2px_0_0_#cbd5e1] text-xs">
-            <tr className="border-t-2 border-slate-300">
-              <td className="px-4 py-3 sticky left-0 bg-slate-100 z-30 border-r border-slate-200 text-slate-900 font-black">
+          <tfoot className="sticky bottom-0 bg-slate-100 dark:bg-slate-800 font-bold z-20 shadow-[0_-2px_0_0_#cbd5e1] text-xs">
+            <tr className="border-t-2 border-slate-300 dark:border-slate-600">
+              <td className="px-4 py-3 sticky left-0 bg-slate-100 dark:bg-slate-800 z-30 border-r border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-black">
                 {isFiltered ? `SUBTOTAL (${filteredRows.length} LOKASI)` : `TOTAL (${filteredRows.length} LOKASI)`}
               </td>
-              <td className="px-3 py-3 text-right font-mono text-slate-900 font-black">
-                {formatNum(totalFooter.totalKwp, 1, 2)} <span className="text-[10px] text-slate-500 font-normal">kWp</span>
+              <td className="px-3 py-3 text-right font-mono text-slate-900 dark:text-slate-100 font-black">
+                {formatNum(totalFooter.totalKwp, 1, 2)} <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">kWp</span>
               </td>
-              <td className="px-3 py-3 text-right font-mono text-emerald-800 font-black">
-                {formatNum(totalFooter.totalMwh, 2, 2)} <span className="text-[10px] text-emerald-600 font-normal">MWh</span>
+              <td className="px-3 py-3 text-right font-mono text-emerald-800 dark:text-emerald-300 font-black">
+                {formatNum(totalFooter.totalMwh, 2, 2)} <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-normal">MWh</span>
               </td>
-              <td className="px-3 py-3 text-right font-mono text-slate-900 font-black">
-                {formatNum(totalFooter.avgYield, 1, 1)} <span className="text-[10px] text-slate-500 font-normal">kWh/kWp</span>
-                <span className="block text-[9px] font-normal text-slate-500">{totalFooter.coveredPlantCount || 0} dari {filteredRows.length} plant</span>
+              <td className="px-3 py-3 text-right font-mono text-slate-900 dark:text-slate-100 font-black">
+                {formatNum(totalFooter.avgYield, 1, 1)} <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">kWh/kWp</span>
+                <span className="block text-[9px] font-normal text-slate-500 dark:text-slate-400">{totalFooter.coveredPlantCount || 0} dari {filteredRows.length} plant</span>
               </td>
-              <td className="px-3 py-3 text-right font-mono font-black text-blue-800">{dashboardData?.summary?.pr?.valuePct == null ? '—' : `${formatNum(dashboardData.summary.pr.valuePct, 1, 1)}%`}</td>
+              <td className="px-3 py-3 text-right font-mono font-black text-blue-800 dark:text-blue-300">{dashboardData?.summary?.pr?.valuePct == null ? '—' : `${formatNum(dashboardData.summary.pr.valuePct, 1, 1)}%`}</td>
               {isSingleMonth && (
                 <td className="px-3 py-3 text-right font-mono font-black">
                   {totalFooter.avgVsPrev !== null ? (
-                    <span className={totalFooter.avgVsPrev >= 0 ? 'text-emerald-700' : 'text-rose-700'}>
+                    <span className={totalFooter.avgVsPrev >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'}>
                       {totalFooter.avgVsPrev >= 0 ? '+' : ''}{totalFooter.avgVsPrev}%
                     </span>
                   ) : (
@@ -1506,10 +1506,10 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                   )}
                 </td>
               )}
-              <td className="px-3 py-3 text-center text-slate-700 font-medium">
+              <td className="px-3 py-3 text-center text-slate-700 dark:text-slate-300 font-medium">
                 {filteredRows.filter(r => (r.operationalStatus?.isNormal ?? true)).length} Normal
                 {filteredRows.some(r => !(r.operationalStatus?.isNormal ?? true)) && (
-                  <span className="text-amber-800 ml-1 font-bold">
+                  <span className="text-amber-800 dark:text-amber-300 ml-1 font-bold">
                     ({filteredRows.filter(r => !(r.operationalStatus?.isNormal ?? true)).length} Perhatian)
                   </span>
                 )}

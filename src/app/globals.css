@@ -2,6 +2,9 @@
 @import "tailwindcss" source(none);
 @source "../";
 
+/* Manual (class-based) dark mode: toggled via .dark on <html>, not OS preference */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
@@ -30,6 +33,11 @@
   --section-bg-muted: #F8FAFC;
   --section-border: #F1F5F9;
 
+  /* Chart Tokens (consumed as SVG presentation attrs via var(), e.g. Recharts stroke/fill - resolves live on .dark toggle) */
+  --chart-grid: #F1F5F9;
+  --chart-axis: #64748B;
+  --chart-axis-line: #E2E8F0;
+
   /* Elevation Tokens */
   --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
   --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
@@ -49,6 +57,24 @@
   --z-toast: 120;
 }
 
+.dark {
+  /* Surface & Border Tokens (dark) */
+  --card-bg: #1E293B;
+  --card-border: rgba(51, 65, 85, 0.8);
+  --section-bg-muted: #0F172A;
+  --section-border: #1E293B;
+
+  /* Chart Tokens (dark) */
+  --chart-grid: #1E293B;
+  --chart-axis: #94A3B8;
+  --chart-axis-line: #334155;
+
+  /* Elevation Tokens (dark - subtler, screens emit their own light) */
+  --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
+}
+
 @layer base {
   *, ::before, ::after {
     box-sizing: border-box;
@@ -58,6 +84,11 @@
     font-family: var(--font-sans);
     -webkit-text-size-adjust: 100%;
     tab-size: 4;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
@@ -69,6 +100,12 @@
     margin: 0;
     padding: 0;
     overflow-x: clip;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .dark body {
+    background-color: #0B1220;
+    color: #E2E8F0;
   }
 
   button, input, select, textarea {

@@ -84,36 +84,36 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
       />
 
       {/* 2. Metode & Sumber Info */}
-      <details className="group border border-slate-200 rounded-xl bg-white shadow-sm [&_summary::-webkit-details-marker]:hidden">
-        <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-4 text-slate-900">
+      <details className="group border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 shadow-sm [&_summary::-webkit-details-marker]:hidden">
+        <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-4 text-slate-900 dark:text-slate-100">
           <div className="flex items-center gap-2">
-            <Calculator size={18} className="text-slate-400 group-open:text-blue-600 transition-colors" />
+            <Calculator size={18} className="text-slate-400 dark:text-slate-500 group-open:text-blue-600 dark:group-open:text-blue-400 transition-colors" />
             <span className="font-semibold text-sm">Metode & sumber data</span>
           </div>
           <span className="relative size-5 shrink-0">
-            <svg className="absolute inset-0 size-5 opacity-100 transition-opacity group-open:opacity-0 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+            <svg className="absolute inset-0 size-5 opacity-100 transition-opacity group-open:opacity-0 text-slate-400 dark:text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
-            <svg className="absolute inset-0 size-5 opacity-0 transition-opacity group-open:opacity-100 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+            <svg className="absolute inset-0 size-5 opacity-0 transition-opacity group-open:opacity-100 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
             </svg>
           </span>
         </summary>
-        <div className="border-t border-slate-100 p-4 text-sm text-slate-600 space-y-3 bg-slate-50 rounded-b-xl">
+        <div className="border-t border-slate-100 dark:border-slate-800 p-4 text-sm text-slate-600 dark:text-slate-400 space-y-3 bg-slate-50 dark:bg-slate-800/40 rounded-b-xl">
           <div>
-            <strong className="text-slate-900 font-semibold">Sumber:</strong>{' '}
+            <strong className="text-slate-900 dark:text-slate-100 font-semibold">Sumber:</strong>{' '}
             {activeSubScope === 'scope1'
               ? 'Konsumsi solar unit Genset cadangan di ~23.000 toko & Distribution Center serta kendaraan operasional.'
               : 'Konsumsi energi listrik gedung kantor cabang (Office), warehouse logistik (WH, Bulky, Depo, Store Hub), dan jaringan toko ritel dari PLN.'}
           </div>
           <div>
-            <strong className="text-slate-900 font-semibold">Metode Hitung:</strong>{' '}
-            <span className={`font-mono text-xs font-semibold ${activeSubScope === 'scope1' ? 'text-emerald-700' : 'text-blue-700'}`}>
+            <strong className="text-slate-900 dark:text-slate-100 font-semibold">Metode Hitung:</strong>{' '}
+            <span className={`font-mono text-xs font-semibold ${activeSubScope === 'scope1' ? 'text-emerald-700 dark:text-emerald-300' : 'text-blue-700 dark:text-blue-300'}`}>
               {activeSubScope === 'scope1' ? 'Liter BBM × Faktor Emisi' : 'kWh Listrik PLN × Grid Emission Factor'}
             </span>
           </div>
           <div>
-            <strong className="text-slate-900 font-semibold">Referensi:</strong>{' '}
+            <strong className="text-slate-900 dark:text-slate-100 font-semibold">Referensi:</strong>{' '}
             <span className="italic">Greenhouse Gas (GHG) Protocol & Pedoman Penghitungan Emisi KLHK / ESDM.</span>
           </div>
         </div>
@@ -122,25 +122,25 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
       {/* FILTER HIERARKI CABANG & FASILITAS (KHUSUS SCOPE 2 LISTRIK PLN) */}
       {activeSubScope === 'scope2' && (
         <CardBox className="p-5 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                 <Layers size={20} />
               </div>
               <div>
-                <h4 className="text-base font-bold text-slate-900">Hierarki Pemantauan Listrik & Emisi Cabang</h4>
-                <p className="text-xs text-slate-500 mt-0.5">Filter alur: Branch → Office & Warehouse (WH, Bulky, Depo, Store Hub) + Toko</p>
+                <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">Hierarki Pemantauan Listrik & Emisi Cabang</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Filter alur: Branch → Office & Warehouse (WH, Bulky, Depo, Store Hub) + Toko</p>
               </div>
             </div>
 
             {/* Periode Selector */}
             <div className="flex items-center gap-2 shrink-0">
-              <Calendar size={15} className="text-slate-400 hidden sm:block" />
-              <span className="text-xs font-semibold text-slate-600">Periode:</span>
+              <Calendar size={15} className="text-slate-400 dark:text-slate-500 hidden sm:block" />
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Periode:</span>
               <select
                 value={selectedPeriod}
                 onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="text-xs font-semibold bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-slate-800 shadow-sm focus:outline-none focus:border-blue-500"
+                className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:border-blue-500"
               >
                 <option value="ytd">YTD (Januari - Agustus 2026)</option>
                 {MONTH_NAMES_FULL.map((m, idx) => (
@@ -154,13 +154,13 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-center">
             {/* Branch Selector */}
             <div className="lg:col-span-4 flex items-center gap-2">
-              <label className="text-xs font-bold text-slate-700 shrink-0 flex items-center gap-1">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0 flex items-center gap-1">
                 <MapPin size={14} className="text-red-500" /> Cabang:
               </label>
               <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value)}
-                className="w-full text-xs font-semibold bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 shadow-sm focus:outline-none focus:border-blue-500"
+                className="w-full text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:border-blue-500"
               >
                 <option value="all">Semua Cabang (Konsolidasi Nasional)</option>
                 {branchHierarchyList.map(b => (
@@ -171,14 +171,14 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
 
             {/* Facility Level Selector */}
             <div className="lg:col-span-8 flex flex-wrap items-center gap-1.5">
-              <span className="text-xs font-bold text-slate-700 mr-1">Fasilitas:</span>
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 mr-1">Fasilitas:</span>
               <button
                 type="button"
                 onClick={() => { setSelectedFacility('all'); setSelectedWarehouseSub('all'); }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   selectedFacility === 'all'
                     ? 'bg-blue-600 text-white shadow-sm font-bold'
-                    : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'
+                    : 'bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 Semua Fasilitas
@@ -189,7 +189,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                   selectedFacility === 'office'
                     ? 'bg-blue-600 text-white shadow-sm font-bold'
-                    : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'
+                    : 'bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 <Building2 size={13} /> Office
@@ -200,7 +200,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                   selectedFacility === 'warehouse'
                     ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                    : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'
+                    : 'bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 <Factory size={13} /> Warehouse (DC)
@@ -211,7 +211,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                   selectedFacility === 'toko'
                     ? 'bg-purple-600 text-white shadow-sm font-bold'
-                    : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'
+                    : 'bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 <Store size={13} /> Jaringan Toko
@@ -221,8 +221,8 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
 
           {/* Warehouse Sub-Types Pill Selector */}
           {selectedFacility === 'warehouse' && (
-            <div className="flex flex-wrap items-center gap-1.5 pt-2 pl-2 border-t border-slate-100 bg-emerald-50/50 p-2.5 rounded-xl">
-              <span className="text-xs font-bold text-emerald-800 flex items-center gap-1 mr-1">
+            <div className="flex flex-wrap items-center gap-1.5 pt-2 pl-2 border-t border-slate-100 dark:border-slate-800 bg-emerald-50/50 dark:bg-emerald-500/10 p-2.5 rounded-xl">
+              <span className="text-xs font-bold text-emerald-800 dark:text-emerald-200 flex items-center gap-1 mr-1">
                 <ArrowRight size={13} /> Tipe Warehouse:
               </span>
               <button
@@ -231,7 +231,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                   selectedWarehouseSub === 'all'
                     ? 'bg-emerald-700 text-white font-bold'
-                    : 'bg-white text-emerald-900 border border-emerald-200 hover:bg-emerald-100'
+                    : 'bg-white dark:bg-slate-800 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/15'
                 }`}
               >
                 Semua Gudang (WH+Bulky+Depo+Hub)
@@ -242,7 +242,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                   selectedWarehouseSub === 'wh'
                     ? 'bg-emerald-700 text-white font-bold'
-                    : 'bg-white text-emerald-900 border border-emerald-200 hover:bg-emerald-100'
+                    : 'bg-white dark:bg-slate-800 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/15'
                 }`}
               >
                 WH Utama (Dry & Chilled)
@@ -253,7 +253,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                   selectedWarehouseSub === 'bulky'
                     ? 'bg-emerald-700 text-white font-bold'
-                    : 'bg-white text-emerald-900 border border-emerald-200 hover:bg-emerald-100'
+                    : 'bg-white dark:bg-slate-800 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/15'
                 }`}
               >
                 Bulky Warehouse
@@ -264,7 +264,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                   selectedWarehouseSub === 'depo'
                     ? 'bg-emerald-700 text-white font-bold'
-                    : 'bg-white text-emerald-900 border border-emerald-200 hover:bg-emerald-100'
+                    : 'bg-white dark:bg-slate-800 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/15'
                 }`}
               >
                 Depo Transit
@@ -275,7 +275,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                   selectedWarehouseSub === 'storeHub'
                     ? 'bg-emerald-700 text-white font-bold'
-                    : 'bg-white text-emerald-900 border border-emerald-200 hover:bg-emerald-100'
+                    : 'bg-white dark:bg-slate-800 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/15'
                 }`}
               >
                 Store Hub
@@ -360,14 +360,14 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
 
       {/* 4. Card Chart: Tren Bulanan */}
       <CardBox className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div>
-            <h3 className="font-bold text-slate-900 text-base">
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
               {activeSubScope === 'scope1'
                 ? 'Tren Konsumsi Solar & Emisi Genset Bulanan (2026)'
                 : `Tren Konsumsi Listrik & Emisi 12 Bulan — ${selectedBranch === 'all' ? 'Seluruh Cabang' : currentBranchObj?.name || 'Cabang'} (${selectedFacility.toUpperCase()})`}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               {activeSubScope === 'scope1'
                 ? 'Data pemakaian genset cadangan operasional'
                 : 'Pola konsumsi listrik bulanan PLN (kWh) dan kalkulasi emisi Scope 2 (tCO₂e)'}
@@ -412,23 +412,23 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     if (active && payload && payload.length) {
                       const isPartial = label?.includes('*') || label === 'Okt';
                       return (
-                        <div className="bg-white text-slate-800 rounded-xl p-3 shadow-xl border border-slate-200 text-xs space-y-1.5 min-w-[220px] select-text">
-                          <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
-                            <span className="font-bold text-slate-800">Bulan: {label} 2026</span>
+                        <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs space-y-1.5 min-w-[220px] select-text">
+                          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1 mb-1">
+                            <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {label} 2026</span>
                             {isPartial && (
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
                                 Parsial
                               </span>
                             )}
                           </div>
                           <div className="space-y-1 font-mono">
                             {payload.map((entry, idx) => (
-                              <div key={idx} className="flex items-center justify-between gap-3 text-slate-600">
+                              <div key={idx} className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400">
                                 <div className="flex items-center gap-1.5 font-sans">
                                   <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
                                   <span>{entry.name}:</span>
                                 </div>
-                                <strong className="text-slate-900">
+                                <strong className="text-slate-900 dark:text-slate-100">
                                   {formatYAxisNumber(entry.value)} {entry.dataKey === 'fuelLiters' ? 'Liter' : 'tCO₂e'}
                                 </strong>
                               </div>
@@ -477,23 +477,23 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     if (active && payload && payload.length) {
                       const isPartial = label?.includes('*') || label === 'Okt';
                       return (
-                        <div className="bg-white text-slate-800 rounded-xl p-3 shadow-xl border border-slate-200 text-xs space-y-1.5 min-w-[220px] select-text">
-                          <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
-                            <span className="font-bold text-slate-800">Bulan: {label} 2026</span>
+                        <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs space-y-1.5 min-w-[220px] select-text">
+                          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1 mb-1">
+                            <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {label} 2026</span>
                             {isPartial && (
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
                                 Parsial
                               </span>
                             )}
                           </div>
                           <div className="space-y-1 font-mono">
                             {payload.map((entry, idx) => (
-                              <div key={idx} className="flex items-center justify-between gap-3 text-slate-600">
+                              <div key={idx} className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400">
                                 <div className="flex items-center gap-1.5 font-sans">
                                   <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
                                   <span>{entry.name}:</span>
                                 </div>
-                                <strong className="text-slate-900">
+                                <strong className="text-slate-900 dark:text-slate-100">
                                   {typeof entry.value === 'number' ? formatYAxisNumber(entry.value) : entry.value} {entry.dataKey === 'plnKwh' ? 'kWh' : 'tCO₂e'}
                                 </strong>
                               </div>
@@ -519,25 +519,25 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
 
       {/* 5. Card Tabel: Rincian Operasional */}
       <CardBox className="space-y-4">
-        <div className="pb-3 border-b border-slate-100">
-          <h3 className="font-bold text-slate-900 text-base">
+        <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
+          <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
             {activeSubScope === 'scope1'
               ? 'Rincian Operasional Genset DC'
               : 'Breakdown Konsumsi Listrik & Emisi per Cabang / Fasilitas'}
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             {activeSubScope === 'scope1'
               ? 'Status mesin genset dan konsumsi solar per cabang'
               : 'Rincian data per fasilitas (Office, WH Utama, Bulky, Depo, Store Hub, Toko) dan kalkulasi emisi'}
           </p>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-slate-100">
+        <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
           {activeSubScope === 'scope1' ? (
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-900 text-white text-xs uppercase">
+              <thead className="bg-slate-900 dark:bg-slate-950 text-white text-xs uppercase">
                 <tr>
-                  <th className="sticky left-0 bg-slate-900 px-4 py-3 font-semibold z-10">Kode</th>
+                  <th className="sticky left-0 bg-slate-900 dark:bg-slate-950 px-4 py-3 font-semibold z-10">Kode</th>
                   <th className="px-4 py-3 font-semibold">Distribution Center</th>
                   <th className="px-4 py-3 font-semibold">Wilayah / Grid</th>
                   <th className="px-4 py-3 font-semibold">Kapasitas Genset</th>
@@ -551,16 +551,16 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                   const gensetLiters = dc.genset?.monthlyFuelLiters || 0;
                   const scope1Ton = ((gensetLiters * 2.68) / 1000).toFixed(2);
                   return (
-                    <tr key={dc.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                      <td className="sticky left-0 bg-white group-hover:bg-slate-50 font-mono text-slate-500 font-bold px-4 py-3 z-10 border-r border-slate-100">
+                    <tr key={dc.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 font-mono text-slate-500 dark:text-slate-400 font-bold px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800">
                         {dc.code || 'DC'}
                       </td>
-                      <td className="px-4 py-3 font-semibold text-slate-900">{dc.name}</td>
-                      <td className="px-4 py-3 text-slate-600">{dc.region} ({dc.grid || dc.gridRegion || 'JAMALI'})</td>
-                      <td className="px-4 py-3 text-slate-600 font-mono">{dc.genset?.capacityKva || 400} kVA</td>
-                      <td className="px-4 py-3 font-mono text-right text-slate-800">{formatNum(gensetLiters)} Liter</td>
-                      <td className="px-4 py-3 font-mono text-right text-red-600 font-bold">+{scope1Ton} tCO₂e</td>
-                      <td className="px-4 py-3 font-mono text-right text-slate-600">
+                      <td className="px-4 py-3 font-semibold text-slate-900 dark:text-slate-100">{dc.name}</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{dc.region} ({dc.grid || dc.gridRegion || 'JAMALI'})</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400 font-mono">{dc.genset?.capacityKva || 400} kVA</td>
+                      <td className="px-4 py-3 font-mono text-right text-slate-800 dark:text-slate-200">{formatNum(gensetLiters)} Liter</td>
+                      <td className="px-4 py-3 font-mono text-right text-red-600 dark:text-red-400 font-bold">+{scope1Ton} tCO₂e</td>
+                      <td className="px-4 py-3 font-mono text-right text-slate-600 dark:text-slate-400">
                         {formatNum(dc.plnMonthlyKwh || 200000)} kWh
                       </td>
                     </tr>
@@ -570,9 +570,9 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
             </table>
           ) : (
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-900 text-white text-xs uppercase">
+              <thead className="bg-slate-900 dark:bg-slate-950 text-white text-xs uppercase">
                 <tr>
-                  <th className="sticky left-0 bg-slate-900 px-4 py-3 font-semibold z-10">Cabang & Fasilitas</th>
+                  <th className="sticky left-0 bg-slate-900 dark:bg-slate-950 px-4 py-3 font-semibold z-10">Cabang & Fasilitas</th>
                   <th className="px-4 py-3 font-semibold">Kategori</th>
                   <th className="px-4 py-3 font-semibold">Wilayah / Grid</th>
                   <th className="px-4 py-3 font-semibold">Faktor Emisi</th>
@@ -594,8 +594,8 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     return (
                       <React.Fragment key={branch.id}>
                         {/* Summary Header Row per Branch */}
-                        <tr className="bg-slate-100 font-bold text-slate-900 border-t-2 border-slate-200">
-                          <td className="sticky left-0 bg-slate-100 px-4 py-3 z-10 border-r border-slate-200" colSpan={2}>
+                        <tr className="bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-slate-100 border-t-2 border-slate-200 dark:border-slate-700">
+                          <td className="sticky left-0 bg-slate-100 dark:bg-slate-800 px-4 py-3 z-10 border-r border-slate-200 dark:border-slate-700" colSpan={2}>
                             <div className="flex items-center gap-1.5">
                               <MapPin size={14} className="text-red-500 shrink-0" />
                               <span>{branch.name} ({branch.code})</span>
@@ -603,75 +603,75 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                           </td>
                           <td className="px-4 py-3">{branch.region} ({branch.grid})</td>
                           <td className="px-4 py-3 font-mono">{branch.emissionFactor} tCO₂/MWh</td>
-                          <td className="px-4 py-3 font-mono font-bold text-right text-amber-800">
+                          <td className="px-4 py-3 font-mono font-bold text-right text-amber-800 dark:text-amber-200">
                             {formatNum(officeKwh + whKwh + bulkyKwh + depoKwh + tokoKwh)} kWh
                           </td>
-                          <td className="px-4 py-3 font-mono font-bold text-right text-red-600">
+                          <td className="px-4 py-3 font-mono font-bold text-right text-red-600 dark:text-red-400">
                             +{formatNum(((officeKwh + whKwh + bulkyKwh + depoKwh + tokoKwh) * branch.emissionFactor) / 1000, 1)} tCO₂e
                           </td>
-                          <td className="px-4 py-3 font-mono text-right text-slate-700">
+                          <td className="px-4 py-3 font-mono text-right text-slate-700 dark:text-slate-300">
                             Rp {formatNum(((officeKwh + whKwh + bulkyKwh + depoKwh + tokoKwh) * 1400) / 1000000, 1)} Juta
                           </td>
                         </tr>
 
                         {/* Breakdown Sub-Rows */}
                         {(selectedFacility === 'all' || selectedFacility === 'office') && (
-                          <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                            <td className="sticky left-0 bg-white group-hover:bg-slate-50 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 text-slate-800 font-medium">↳ {branch.office.name}</td>
-                            <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-blue-700 font-semibold text-[11px] border border-blue-100">Office</span></td>
-                            <td className="px-4 py-2.5 text-slate-500">{branch.office.areaSqm} m²</td>
-                            <td className="px-4 py-2.5 font-mono text-slate-500">{branch.emissionFactor}</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-700">{formatNum(officeKwh)} kWh</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-red-600 font-semibold">+{formatNum((officeKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-600">Rp {formatNum((officeKwh * 1400) / 1000000, 2)} Jt</td>
+                          <tr className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-medium">↳ {branch.office.name}</td>
+                            <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 text-blue-700 dark:text-blue-300 font-semibold text-[11px] border border-blue-100 dark:border-blue-500/20">Office</span></td>
+                            <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{branch.office.areaSqm} m²</td>
+                            <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300">{formatNum(officeKwh)} kWh</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((officeKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum((officeKwh * 1400) / 1000000, 2)} Jt</td>
                           </tr>
                         )}
 
                         {(selectedFacility === 'all' || selectedFacility === 'warehouse') && (selectedWarehouseSub === 'all' || selectedWarehouseSub === 'wh') && (
-                          <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                            <td className="sticky left-0 bg-white group-hover:bg-slate-50 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 text-slate-800 font-medium">↳ {branch.warehouse.subTypes.wh.name}</td>
-                            <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700 font-semibold text-[11px] border border-emerald-100">WH Utama</span></td>
-                            <td className="px-4 py-2.5 text-slate-500">{branch.warehouse.subTypes.wh.areaSqm} m²</td>
-                            <td className="px-4 py-2.5 font-mono text-slate-500">{branch.emissionFactor}</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-700">{formatNum(whKwh)} kWh</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-red-600 font-semibold">+{formatNum((whKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-600">Rp {formatNum((whKwh * 1400) / 1000000, 2)} Jt</td>
+                          <tr className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-medium">↳ {branch.warehouse.subTypes.wh.name}</td>
+                            <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px] border border-emerald-100 dark:border-emerald-500/20">WH Utama</span></td>
+                            <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{branch.warehouse.subTypes.wh.areaSqm} m²</td>
+                            <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300">{formatNum(whKwh)} kWh</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((whKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum((whKwh * 1400) / 1000000, 2)} Jt</td>
                           </tr>
                         )}
 
                         {(selectedFacility === 'all' || selectedFacility === 'warehouse') && (selectedWarehouseSub === 'all' || selectedWarehouseSub === 'bulky') && (
-                          <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                            <td className="sticky left-0 bg-white group-hover:bg-slate-50 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 text-slate-800 font-medium">↳ {branch.warehouse.subTypes.bulky.name}</td>
-                            <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700 font-semibold text-[11px] border border-emerald-100">Bulky WH</span></td>
-                            <td className="px-4 py-2.5 text-slate-500">{branch.warehouse.subTypes.bulky.areaSqm} m²</td>
-                            <td className="px-4 py-2.5 font-mono text-slate-500">{branch.emissionFactor}</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-700">{formatNum(bulkyKwh)} kWh</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-red-600 font-semibold">+{formatNum((bulkyKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-600">Rp {formatNum((bulkyKwh * 1400) / 1000000, 2)} Jt</td>
+                          <tr className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-medium">↳ {branch.warehouse.subTypes.bulky.name}</td>
+                            <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px] border border-emerald-100 dark:border-emerald-500/20">Bulky WH</span></td>
+                            <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{branch.warehouse.subTypes.bulky.areaSqm} m²</td>
+                            <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300">{formatNum(bulkyKwh)} kWh</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((bulkyKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum((bulkyKwh * 1400) / 1000000, 2)} Jt</td>
                           </tr>
                         )}
 
                         {(selectedFacility === 'all' || selectedFacility === 'warehouse') && (selectedWarehouseSub === 'all' || selectedWarehouseSub === 'depo') && (
-                          <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                            <td className="sticky left-0 bg-white group-hover:bg-slate-50 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 text-slate-800 font-medium">↳ {branch.warehouse.subTypes.depo.name}</td>
-                            <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700 font-semibold text-[11px] border border-emerald-100">Depo Transit</span></td>
-                            <td className="px-4 py-2.5 text-slate-500">{branch.warehouse.subTypes.depo.areaSqm} m²</td>
-                            <td className="px-4 py-2.5 font-mono text-slate-500">{branch.emissionFactor}</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-700">{formatNum(depoKwh)} kWh</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-red-600 font-semibold">+{formatNum((depoKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-600">Rp {formatNum((depoKwh * 1400) / 1000000, 2)} Jt</td>
+                          <tr className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-medium">↳ {branch.warehouse.subTypes.depo.name}</td>
+                            <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px] border border-emerald-100 dark:border-emerald-500/20">Depo Transit</span></td>
+                            <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{branch.warehouse.subTypes.depo.areaSqm} m²</td>
+                            <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300">{formatNum(depoKwh)} kWh</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((depoKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum((depoKwh * 1400) / 1000000, 2)} Jt</td>
                           </tr>
                         )}
 
                         {(selectedFacility === 'all' || selectedFacility === 'toko') && (
-                          <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                            <td className="sticky left-0 bg-white group-hover:bg-slate-50 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 text-slate-800 font-medium">↳ {branch.toko.name}</td>
-                            <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-purple-50 px-2 py-0.5 text-purple-700 font-semibold text-[11px] border border-purple-100">Jaringan Toko</span></td>
-                            <td className="px-4 py-2.5 text-slate-500">{branch.toko.storeCount} Toko Ritel</td>
-                            <td className="px-4 py-2.5 font-mono text-slate-500">{branch.emissionFactor}</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-700">{formatNum(tokoKwh)} kWh</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-red-600 font-semibold">+{formatNum((tokoKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-600">Rp {formatNum((tokoKwh * 1400) / 1000000, 2)} Jt</td>
+                          <tr className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-medium">↳ {branch.toko.name}</td>
+                            <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-purple-50 dark:bg-purple-500/10 px-2 py-0.5 text-purple-700 dark:text-purple-300 font-semibold text-[11px] border border-purple-100 dark:border-purple-500/20">Jaringan Toko</span></td>
+                            <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{branch.toko.storeCount} Toko Ritel</td>
+                            <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300">{formatNum(tokoKwh)} kWh</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((tokoKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
+                            <td className="px-4 py-2.5 font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum((tokoKwh * 1400) / 1000000, 2)} Jt</td>
                           </tr>
                         )}
                       </React.Fragment>

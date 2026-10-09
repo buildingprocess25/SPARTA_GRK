@@ -37,9 +37,9 @@ export default function Home() {
   return (
     <SustainabilityProvider>
       {!mounted ? (
-        <div className="min-h-screen bg-slate-50" />
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220]" />
       ) : (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0B1220]">
           {/* Sidebar Navigasi (Desktop Fixed di Kiri, Mobile Drawer dengan Slide-over) */}
           <Sidebar
             activeTab={activeTab}

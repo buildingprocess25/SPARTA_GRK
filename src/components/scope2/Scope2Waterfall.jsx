@@ -28,7 +28,7 @@ export default function Scope2Waterfall({ summary }) {
       unit: 'MWh',
       note: 'Total kebutuhan listrik fasilitas',
       icon: Layers,
-      iconColor: 'text-blue-600 bg-blue-50',
+      iconColor: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10',
       operator: '−',
       operatorLabel: 'Dikurangi PLTS',
       isResult: false,
@@ -42,7 +42,7 @@ export default function Scope2Waterfall({ summary }) {
       unit: 'MWh',
       note: 'Produksi PLTS dipakai sendiri',
       icon: Sun,
-      iconColor: 'text-emerald-600 bg-emerald-50',
+      iconColor: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10',
       operator: '=',
       operatorLabel: 'Sisa beban',
       isResult: false,
@@ -56,7 +56,7 @@ export default function Scope2Waterfall({ summary }) {
       unit: 'MWh',
       note: 'Kebutuhan dipasok dari PLN',
       icon: Zap,
-      iconColor: 'text-amber-600 bg-amber-50',
+      iconColor: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10',
       operator: '×',
       operatorLabel: 'Dikalikan faktor',
       isResult: false,
@@ -70,7 +70,7 @@ export default function Scope2Waterfall({ summary }) {
       unit: 'tCO₂e/MWh',
       note: 'Rata-rata tertimbang ESDM',
       icon: Calculator,
-      iconColor: 'text-indigo-600 bg-indigo-50',
+      iconColor: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10',
       operator: '→',
       operatorLabel: 'Menghasilkan',
       isResult: false,
@@ -84,7 +84,7 @@ export default function Scope2Waterfall({ summary }) {
       unit: 'tCO₂e',
       note: 'Akumulasi emisi karbon YTD',
       icon: Flame,
-      iconColor: 'text-rose-600 bg-rose-100',
+      iconColor: 'text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-500/20',
       operator: null,
       operatorLabel: null,
       isResult: true,
@@ -98,7 +98,7 @@ export default function Scope2Waterfall({ summary }) {
         const topAccent = step.isResult
           ? 'border-t-2 border-t-rose-500'
           : step.id === 'load'
-          ? 'border-t-2 border-t-slate-400'
+          ? 'border-t-2 border-t-slate-400 dark:border-t-slate-600'
           : step.id === 'plts'
           ? 'border-t-2 border-t-amber-400'
           : step.id === 'purchased'
@@ -111,8 +111,8 @@ export default function Scope2Waterfall({ summary }) {
             <div
               className={`flex-1 min-w-0 rounded-xl p-4 transition-all duration-200 flex flex-col justify-between h-full ${topAccent} ${
                 step.isResult
-                  ? 'bg-gradient-to-br from-rose-50/80 via-white to-rose-100/60 border border-rose-200 ring-2 ring-rose-200/50 shadow-sm'
-                  : 'bg-white border border-slate-200/90 shadow-2xs hover:border-slate-300'
+                  ? 'bg-gradient-to-br from-rose-50/80 via-white to-rose-100/60 dark:from-rose-500/10 dark:via-slate-900 dark:to-rose-500/15 border border-rose-200 dark:border-rose-500/30 ring-2 ring-rose-200/50 dark:ring-rose-500/20 shadow-sm'
+                  : 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-700 shadow-2xs hover:border-slate-300 dark:hover:border-slate-600'
               }`}
               title={step.note}
             >
@@ -122,8 +122,8 @@ export default function Scope2Waterfall({ summary }) {
                   <span
                     className={`size-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
                       step.isResult
-                        ? 'bg-rose-100 text-rose-700 border border-rose-200'
-                        : 'bg-slate-100 text-slate-600 border border-slate-200/80'
+                        ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/80 dark:border-slate-700'
                     }`}
                   >
                     {step.stepBadge}
@@ -131,8 +131,8 @@ export default function Scope2Waterfall({ summary }) {
                   <span
                     className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded truncate ${
                       step.isResult
-                        ? 'bg-rose-100/80 text-rose-800'
-                        : 'bg-slate-100 text-slate-600'
+                        ? 'bg-rose-100/80 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                     }`}
                   >
                     {step.role}
@@ -146,7 +146,7 @@ export default function Scope2Waterfall({ summary }) {
               {/* Title */}
               <p
                 className={`text-xs font-bold uppercase tracking-wider truncate ${
-                  step.isResult ? 'text-rose-900' : 'text-slate-600'
+                  step.isResult ? 'text-rose-900 dark:text-rose-200' : 'text-slate-600 dark:text-slate-400'
                 }`}
                 title={step.title}
               >
@@ -157,14 +157,14 @@ export default function Scope2Waterfall({ summary }) {
               <div className="mt-1.5 flex items-baseline flex-wrap">
                 <span
                   className={`text-2xl xl:text-[26px] font-bold tracking-tight tabular-nums transition-all duration-300 ${
-                    step.isResult ? 'text-rose-700' : 'text-slate-900'
+                    step.isResult ? 'text-rose-700 dark:text-rose-300' : 'text-slate-900 dark:text-slate-100'
                   }`}
                 >
                   {step.value}
                 </span>
                 <span
                   className={`ml-1.5 text-xs font-semibold ${
-                    step.isResult ? 'text-rose-600/90 font-bold' : 'text-slate-400'
+                    step.isResult ? 'text-rose-600/90 dark:text-rose-400/90 font-bold' : 'text-slate-400 dark:text-slate-500'
                   }`}
                 >
                   {step.unit}
@@ -174,7 +174,7 @@ export default function Scope2Waterfall({ summary }) {
               {/* Keterangan Singkat */}
               <p
                 className={`mt-1.5 text-[11px] leading-tight line-clamp-1 ${
-                  step.isResult ? 'text-rose-700/80 font-medium' : 'text-slate-500'
+                  step.isResult ? 'text-rose-700/80 dark:text-rose-300/80 font-medium' : 'text-slate-500 dark:text-slate-400'
                 }`}
               >
                 {step.note}
@@ -187,8 +187,8 @@ export default function Scope2Waterfall({ summary }) {
                 <span
                   className={`size-7 rounded-full flex items-center justify-center font-bold text-xs shadow-2xs transition-colors ${
                     step.operator === '→'
-                      ? 'bg-rose-50/80 border border-rose-200 text-rose-600'
-                      : 'bg-slate-100 border border-slate-200/80 text-slate-600'
+                      ? 'bg-rose-50/80 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 text-rose-600 dark:text-rose-400'
+                      : 'bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-600 dark:text-slate-400'
                   }`}
                   title={step.operatorLabel}
                   aria-label={step.operatorLabel}

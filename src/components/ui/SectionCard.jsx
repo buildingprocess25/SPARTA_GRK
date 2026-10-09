@@ -20,12 +20,12 @@ export default function SectionCard({
 
   return (
     <div
-      className={`rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 lg:p-6 shadow-2xs transition-shadow ${className}`}
+      className={`rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 lg:p-6 shadow-2xs dark:shadow-none transition-shadow ${className}`}
       {...props}
     >
       {hasHeader && (
         <div
-          className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 mb-4 ${headerClassName}`}
+          className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800 mb-4 ${headerClassName}`}
         >
           <div className="flex items-start sm:items-center gap-3 min-w-0">
             {Icon && (
@@ -38,14 +38,14 @@ export default function SectionCard({
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 {title && (
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                     {title}
                   </h3>
                 )}
                 {infoKey && <MetricInfoIcon infoKey={infoKey} />}
               </div>
               {subtitle && (
-                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
                   {subtitle}
                 </p>
               )}

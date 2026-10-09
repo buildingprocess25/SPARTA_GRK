@@ -108,7 +108,7 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
     if (dirty && !await confirm(dialogPresets.keluarTanpaSimpan)) return;
     onClose();
   };
-  const inputClass = 'mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-900 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100';
+  const inputClass = 'mt-1 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm font-semibold text-slate-900 dark:text-slate-100 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 dark:focus:ring-amber-500/20';
 
   return (
     <BaseModal
@@ -116,13 +116,13 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
       onClose={handleCloseRequest}
       title="Input Data Kelistrikan PLTS Atap"
       subtitle="Catat neraca energi PLTS per Distribution Center dan periode."
-      icon={<Sun size={21} className="text-amber-600" />}
+      icon={<Sun size={21} className="text-amber-600 dark:text-amber-400" />}
       badge="Energi Terbarukan"
       size="md"
       loading={loading}
       footer={(
         <>
-          <button type="button" onClick={handleCloseRequest} disabled={loading} className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50">Batal</button>
+          <button type="button" onClick={handleCloseRequest} disabled={loading} className="rounded-xl border border-slate-300 dark:border-slate-600 px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50">Batal</button>
           <button type="submit" form="plts-input-form" disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-slate-950 hover:bg-amber-400 disabled:opacity-50">
             {loading ? <RefreshCw size={16} className="animate-spin" /> : <Check size={16} />}
             {loading ? 'Menyimpan...' : 'Simpan Data PLTS'}
@@ -131,21 +131,21 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
       )}
     >
       <form id="plts-input-form" onSubmit={handleSubmit} className="space-y-5 p-5 sm:p-6">
-        <label className="block text-xs font-bold uppercase tracking-wide text-slate-700">
-          Distribution Center <span className="text-rose-500">*</span>
+        <label className="block text-xs font-bold uppercase tracking-wide text-slate-700 dark:text-slate-300">
+          Distribution Center <span className="text-rose-500 dark:text-rose-400">*</span>
           <select value={plantKey} onChange={(event) => setPlantKey(event.target.value)} className={inputClass}>
             {plantOptions.map((plant) => <option key={plant.key} value={plant.key}>{plant.name} · PS {plant.psId} · {plant.grid || 'Grid belum dipetakan'}</option>)}
           </select>
-          {errors.dc && <span className="mt-1 block text-[11px] normal-case text-rose-600">{errors.dc}</span>}
+          {errors.dc && <span className="mt-1 block text-[11px] normal-case text-rose-600 dark:text-rose-400">{errors.dc}</span>}
         </label>
 
-        <div className="grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-2">
-          <label className="text-xs font-bold text-slate-700">Bulan
+        <div className="grid grid-cols-1 gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 p-3 sm:grid-cols-2">
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Bulan
             <select value={month} onChange={(event) => setMonth(event.target.value)} className={inputClass}>
               {MONTHS.map((label, index) => <option key={label} value={String(index + 1).padStart(2, '0')}>{label}</option>)}
             </select>
           </label>
-          <label className="text-xs font-bold text-slate-700">Tahun
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Tahun
             <select value={year} onChange={(event) => setYear(event.target.value)} className={inputClass}>
               {[2026, 2025, 2024].map((value) => <option key={value}>{value}</option>)}
             </select>
@@ -153,25 +153,25 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <label className="text-xs font-bold text-slate-700">Produksi (kWh) <span className="text-rose-500">*</span>
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Produksi (kWh) <span className="text-rose-500 dark:text-rose-400">*</span>
             <input type="number" min="0" step="any" value={productionKwh} onChange={(event) => setProductionKwh(event.target.value)} className={inputClass} />
-            {errors.production && <span className="mt-1 block text-[11px] text-rose-600">{errors.production}</span>}
+            {errors.production && <span className="mt-1 block text-[11px] text-rose-600 dark:text-rose-400">{errors.production}</span>}
           </label>
-          <label className="text-xs font-bold text-slate-700">Pakai sendiri (kWh) <span className="text-rose-500">*</span>
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Pakai sendiri (kWh) <span className="text-rose-500 dark:text-rose-400">*</span>
             <input type="number" min="0" step="any" value={selfConsumptionKwh} onChange={(event) => setSelfConsumptionKwh(event.target.value)} className={inputClass} />
-            {errors.selfUse && <span className="mt-1 block text-[11px] text-rose-600">{errors.selfUse}</span>}
+            {errors.selfUse && <span className="mt-1 block text-[11px] text-rose-600 dark:text-rose-400">{errors.selfUse}</span>}
           </label>
-          <label className="text-xs font-bold text-slate-700">Ekspor (kWh) <span className="text-rose-500">*</span>
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Ekspor (kWh) <span className="text-rose-500 dark:text-rose-400">*</span>
             <input type="number" min="0" step="any" value={exportKwh} onChange={(event) => setExportKwh(event.target.value)} className={inputClass} />
-            {errors.export && <span className="mt-1 block text-[11px] text-rose-600">{errors.export}</span>}
+            {errors.export && <span className="mt-1 block text-[11px] text-rose-600 dark:text-rose-400">{errors.export}</span>}
           </label>
         </div>
-        {errors.balance && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700">{errors.balance}</p>}
+        {errors.balance && <p role="alert" className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-700 dark:text-rose-300">{errors.balance}</p>}
 
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">Emisi Terhindar</p>
-          <p className="mt-1 text-2xl font-black text-emerald-900">{avoidedEmissionTon.toLocaleString('id-ID', { maximumFractionDigits: 3 })} tCO₂e</p>
-          <p className="mt-1 text-[11px] text-emerald-800">{Number(selfConsumptionKwh || 0).toLocaleString('id-ID')} kWh × {PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH} kgCO₂/kWh ÷ 1.000</p>
+        <div className="rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 p-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Emisi Terhindar</p>
+          <p className="mt-1 text-2xl font-black text-emerald-900 dark:text-emerald-200">{avoidedEmissionTon.toLocaleString('id-ID', { maximumFractionDigits: 3 })} tCO₂e</p>
+          <p className="mt-1 text-[11px] text-emerald-800 dark:text-emerald-300">{Number(selfConsumptionKwh || 0).toLocaleString('id-ID')} kWh × {PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH} kgCO₂/kWh ÷ 1.000</p>
         </div>
       </form>
     </BaseModal>

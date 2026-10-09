@@ -11,19 +11,19 @@ export default function PageHeader({
 }) {
   return (
     <div
-      className={`flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-100 ${className}`}
+      className={`flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800 ${className}`}
     >
       <div className="space-y-1 min-w-0">
-        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
           {title}
         </h1>
         {subtitle && (
-          <p className="text-sm text-slate-500 leading-relaxed max-w-3xl">
+          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl">
             {subtitle}
           </p>
         )}
         {badge && (
-          <div className="pt-1 flex items-center gap-2 text-xs font-medium text-slate-500">
+          <div className="pt-1 flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
             {badge}
           </div>
         )}

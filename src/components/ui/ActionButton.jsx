@@ -5,11 +5,11 @@ import { Loader2 } from 'lucide-react';
 
 const BUTTON_VARIANTS = {
   primary: 'bg-blue-700 hover:bg-blue-800 text-white shadow-2xs focus-visible:ring-blue-500',
-  secondary: 'bg-slate-900 hover:bg-slate-800 text-white shadow-2xs focus-visible:ring-slate-700',
-  outline: 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-2xs focus-visible:ring-slate-400',
-  ghost: 'bg-transparent text-slate-700 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-slate-400',
-  danger: 'border border-rose-200 bg-white text-rose-600 hover:bg-rose-50 hover:border-rose-300 shadow-2xs focus-visible:ring-rose-500',
-  success: 'border border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50 shadow-2xs focus-visible:ring-emerald-500',
+  secondary: 'bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white dark:text-slate-900 text-white shadow-2xs focus-visible:ring-slate-700',
+  outline: 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 shadow-2xs focus-visible:ring-slate-400',
+  ghost: 'bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 focus-visible:ring-slate-400',
+  danger: 'border border-rose-200 dark:border-rose-500/30 bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:border-rose-300 dark:hover:border-rose-500/50 shadow-2xs focus-visible:ring-rose-500',
+  success: 'border border-emerald-200 dark:border-emerald-500/30 bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 shadow-2xs focus-visible:ring-emerald-500',
 };
 
 const BUTTON_SIZES = {

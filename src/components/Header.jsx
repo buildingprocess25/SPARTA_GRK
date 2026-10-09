@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import {
   ShieldCheck, User, Mail, KeyRound, CheckCircle2,
   X, ChevronDown, Lock, Shield, Sparkles, Building2,
-  Phone, BadgeCheck, Eye, EyeOff, Send, Menu, Sun, Moon
+  Phone, BadgeCheck, Eye, EyeOff, Send, Menu
 } from 'lucide-react';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function Header({ isProfileOpen: externalProfileOpen, setIsProfileOpen: setExternalProfileOpen, onToggleMobileSidebar }) {
   const [internalProfileOpen, setInternalProfileOpen] = useState(false);
@@ -67,12 +68,12 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
 
   return (
     <>
-      <header className="sticky top-0 z-40 flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-8 h-16 bg-white border-b border-slate-100 shadow-xs">
+      <header className="sticky top-0 z-40 flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-8 h-16 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-xs">
         {/* KIRI: Hamburger Menu untuk HP, Nama & Badge ESG */}
         <div className="flex items-center gap-3">
           <button
             type="button"
-            className="md:hidden size-11 -ml-2 inline-flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+            className="md:hidden size-11 -ml-2 inline-flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
             onClick={onToggleMobileSidebar}
             aria-label="Buka Navigasi Menu"
             title="Menu Navigasi"
@@ -81,24 +82,25 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
           </button>
 
           <div className="flex items-center gap-2.5">
-            <h1 className="max-w-[9rem] truncate text-sm sm:max-w-none sm:text-base font-bold text-slate-900 tracking-tight">
+            <h1 className="max-w-[9rem] truncate text-sm sm:max-w-none sm:text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               VALENS ADITYA T.
             </h1>
-            <span className="hidden lg:inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 border border-blue-100">
+            <span className="hidden lg:inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-500/10 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20">
               Sustainability ESG
             </span>
           </div>
         </div>
 
-        {/* KANAN: System Live indicator */}
-        <div className="flex items-center gap-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-100 shrink-0">
+        {/* KANAN: System Live indicator & Theme Toggle */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20 shrink-0">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
             <span className="hidden sm:inline">System Live</span>
           </div>
+          <ThemeToggle />
         </div>
       </header>
 
@@ -112,7 +114,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
           onClick={() => setIsProfileOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-lg w-full overflow-hidden max-h-[calc(100dvh-1.5rem)] sm:max-h-[90vh] flex flex-col"
+            className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-2xl max-w-lg w-full overflow-hidden max-h-[calc(100dvh-1.5rem)] sm:max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header Profil dengan Gradient Card & Avatar Badge */}
@@ -152,64 +154,64 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
 
             {/* Notification Toast */}
             {notification && (
-              <div className="bg-emerald-50 border-b border-emerald-100 px-4 py-2.5 flex items-center gap-2 text-xs font-medium text-emerald-800 animate-in">
-                <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+              <div className="bg-emerald-50 dark:bg-emerald-500/10 border-b border-emerald-100 dark:border-emerald-500/20 px-4 py-2.5 flex items-center gap-2 text-xs font-medium text-emerald-800 dark:text-emerald-300 animate-in">
+                <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>{notification}</span>
               </div>
             )}
 
             <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
               {/* 1. INFORMASI AKUN & IDENTITAS */}
-              <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 space-y-3">
+              <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 uppercase">
-                    <User size={15} className="text-emerald-600" />
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase">
+                    <User size={15} className="text-emerald-600 dark:text-emerald-400" />
                     <span>Identitas Akun Alfamart</span>
                   </div>
-                  <span className="text-[11px] text-slate-500 font-mono">{profileData.nip}</span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{profileData.nip}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
-                    <span className="text-slate-500 block text-[11px]">Username</span>
-                    <span className="font-mono font-bold text-emerald-700">@{profileData.username}</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Username</span>
+                    <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">@{profileData.username}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block text-[11px]">Departemen</span>
-                    <span className="font-semibold text-slate-900">{profileData.dept}</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Departemen</span>
+                    <span className="font-semibold text-slate-900 dark:text-slate-100">{profileData.dept}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block text-[11px]">Divisi</span>
-                    <span className="text-slate-800">{profileData.division}</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Divisi</span>
+                    <span className="text-slate-800 dark:text-slate-200">{profileData.division}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block text-[11px]">Bergabung Sejak</span>
-                    <span className="font-mono text-slate-800">{profileData.joinYear}</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Bergabung Sejak</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200">{profileData.joinYear}</span>
                   </div>
                 </div>
               </div>
 
               {/* 2. CHECK EMAIL TERDAFTAR */}
-              <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 space-y-3">
+              <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 uppercase">
-                    <Mail size={15} className="text-blue-600" />
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase">
+                    <Mail size={15} className="text-blue-600 dark:text-blue-400" />
                     <span>Check Email Terdaftar</span>
                   </div>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 border border-blue-100">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20">
                     <BadgeCheck size={11} />
                     Corporate SSO
                   </span>
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-3 rounded-lg border border-slate-200">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                   <div className="min-w-0">
-                    <span className="font-mono text-xs font-bold text-slate-900 block truncate">{profileData.email}</span>
-                    <span className="text-[11px] text-slate-500 block">Terhubung dengan sistem SSO & laporan emisi</span>
+                    <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100 block truncate">{profileData.email}</span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Terhubung dengan sistem SSO & laporan emisi</span>
                   </div>
                   <button
                     type="button"
-                    className="inline-flex min-h-11 w-full sm:w-auto items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-semibold shrink-0 disabled:opacity-70"
+                    className="inline-flex min-h-11 w-full sm:w-auto items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold shrink-0 disabled:opacity-70"
                     onClick={handleCheckEmail}
                     disabled
                   >
@@ -220,21 +222,21 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
               </div>
 
               {/* 3. RESET PASSWORD */}
-              <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 space-y-3">
+              <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 uppercase">
-                    <KeyRound size={15} className="text-amber-600" />
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase">
+                    <KeyRound size={15} className="text-amber-600 dark:text-amber-400" />
                     <span>Reset Password Akun</span>
                   </div>
-                  <span className="text-[11px] text-slate-500">Enkripsi 256-bit</span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">Enkripsi 256-bit</span>
                 </div>
 
                 <form onSubmit={handleResetPassword} className="space-y-3">
-                  <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-relaxed text-amber-800">
+                  <p className="rounded-lg border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 text-[11px] leading-relaxed text-amber-800 dark:text-amber-300">
                     Fitur ini menunggu integrasi autentikasi. Jangan masukkan password akun asli.
                   </p>
                   <div>
-                    <label className="block text-[11px] font-medium text-slate-600 mb-1">Password Saat Ini</label>
+                    <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Password Saat Ini</label>
                     <div className="relative">
                       <input
                         type={showCurrentPass ? 'text' : 'password'}
@@ -242,11 +244,11 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                         value={passwordState.currentPass}
                         onChange={(e) => setPasswordState({ ...passwordState, currentPass: e.target.value })}
                         disabled
-                        className="w-full rounded-lg border border-slate-200 px-3 py-1.5 pr-9 text-xs focus:outline-none focus:border-blue-500"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-9 text-xs focus:outline-none focus:border-blue-500 disabled:opacity-60"
                       />
                       <button
                         type="button"
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                         onClick={() => setShowCurrentPass(!showCurrentPass)}
                       >
                         {showCurrentPass ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -256,7 +258,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-600 mb-1">Password Baru</label>
+                      <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Password Baru</label>
                       <div className="relative">
                         <input
                           type={showNewPass ? 'text' : 'password'}
@@ -264,11 +266,11 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                           value={passwordState.newPass}
                           onChange={(e) => setPasswordState({ ...passwordState, newPass: e.target.value })}
                           disabled
-                          className="w-full rounded-lg border border-slate-200 px-3 py-1.5 pr-8 text-xs focus:outline-none focus:border-blue-500"
+                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-8 text-xs focus:outline-none focus:border-blue-500 disabled:opacity-60"
                         />
                         <button
                           type="button"
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                           onClick={() => setShowNewPass(!showNewPass)}
                         >
                           {showNewPass ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -277,14 +279,14 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-600 mb-1">Konfirmasi</label>
+                      <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Konfirmasi</label>
                       <input
                         type="password"
                         placeholder="Ulangi password"
                         value={passwordState.confirmPass}
                         onChange={(e) => setPasswordState({ ...passwordState, confirmPass: e.target.value })}
                         disabled
-                        className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500 disabled:opacity-60"
                       />
                     </div>
                   </div>
@@ -293,7 +295,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                     <button
                       type="submit"
                       disabled
-                      className="w-full inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-slate-300 text-slate-600 text-xs font-semibold py-2 cursor-not-allowed"
+                      className="w-full inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold py-2 cursor-not-allowed"
                     >
                       <Lock size={13} />
                       <span>Update Password</span>
@@ -304,14 +306,14 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
             </div>
 
             {/* Footer Profil */}
-            <div className="border-t border-slate-100 px-6 py-3.5 bg-slate-50 flex items-center justify-between text-xs shrink-0">
-              <span className="text-slate-500 flex items-center gap-1">
-                <Shield size={13} className="text-emerald-600" />
+            <div className="border-t border-slate-100 dark:border-slate-800 px-6 py-3.5 bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-xs shrink-0">
+              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <Shield size={13} className="text-emerald-600 dark:text-emerald-400" />
                 Terlindungi SPARTA Protocol
               </span>
               <button
                 type="button"
-                className="px-4 py-1.5 rounded-lg border border-slate-200 hover:bg-white text-slate-700 font-semibold transition-colors"
+                className="px-4 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold transition-colors"
                 onClick={() => setIsProfileOpen(false)}
               >
                 Tutup

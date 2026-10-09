@@ -94,14 +94,14 @@ export default function WaterRecycleTab() {
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0">
+                <div className="size-10 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
                   <Waves size={20} />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                     Tren Bulanan Water Recycle vs Fresh Water
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     Volume air daur ulang dibandingkan konsumsi air bersih PDAM per bulan
                   </p>
                 </div>
@@ -131,23 +131,23 @@ export default function WaterRecycleTab() {
                       if (active && payload && payload.length) {
                         const isPartial = label?.includes('*') || label === 'Okt';
                         return (
-                          <div className="bg-white text-slate-800 rounded-xl p-3 shadow-xl border border-slate-200 text-xs space-y-1.5 min-w-[220px] select-text">
-                            <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
-                              <span className="font-bold text-slate-800">Bulan: {label} 2026</span>
+                          <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs space-y-1.5 min-w-[220px] select-text">
+                            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1 mb-1">
+                              <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {label} 2026</span>
                               {isPartial && (
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
                                   Parsial
                                 </span>
                               )}
                             </div>
                             <div className="space-y-1 font-mono">
                               {payload.map((entry, idx) => (
-                                <div key={idx} className="flex items-center justify-between gap-3 text-slate-600">
+                                <div key={idx} className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400">
                                   <div className="flex items-center gap-1.5 font-sans">
                                     <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
                                     <span>{entry.name}:</span>
                                   </div>
-                                  <strong className="text-slate-900">{formatYAxisNumber(entry.value)} m³</strong>
+                                  <strong className="text-slate-900 dark:text-slate-100">{formatYAxisNumber(entry.value)} m³</strong>
                                 </div>
                               ))}
                             </div>
@@ -177,12 +177,12 @@ export default function WaterRecycleTab() {
         <CardBox className="flex flex-col justify-between h-full">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="size-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0">
+              <div className="size-10 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
                 <CloudRain size={20} />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">Sumber Air Daur Ulang</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Komposisi input instalasi</p>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Sumber Air Daur Ulang</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Komposisi input instalasi</p>
               </div>
             </div>
 
@@ -211,12 +211,12 @@ export default function WaterRecycleTab() {
 
             <div className="space-y-2 mt-3">
               {sources.map((src, i) => (
-                <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-xs">
                   <div className="flex items-center gap-2">
                     <span className="size-2.5 rounded-full" style={{ backgroundColor: WATER_COLORS[i] }} />
-                    <span className="font-semibold text-slate-800">{src.name}</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">{src.name}</span>
                   </div>
-                  <span className="font-mono font-bold text-cyan-700">
+                  <span className="font-mono font-bold text-cyan-700 dark:text-cyan-300">
                     {src.volume} m³/hari ({src.percentage}%)
                   </span>
                 </div>
@@ -228,13 +228,13 @@ export default function WaterRecycleTab() {
 
       {/* 4. DC Details Status */}
       <CardBox className="space-y-4">
-        <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
-          <div className="size-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="size-10 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
             <Factory size={20} />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900">Status Water Recycle per DC</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Fasilitas pengolahan limbah cair dan daur ulang air cabang</p>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Status Water Recycle per DC</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Fasilitas pengolahan limbah cair dan daur ulang air cabang</p>
           </div>
         </div>
 
@@ -248,23 +248,23 @@ export default function WaterRecycleTab() {
             return (
               <div
                 key={dc.id}
-                className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-200 transition-all flex items-center justify-between gap-3"
+                className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:border-slate-200 dark:hover:border-slate-700 transition-all flex items-center justify-between gap-3"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className={`size-2.5 rounded-full shrink-0 ${isWaterActive ? 'bg-cyan-500' : 'bg-slate-300'}`} />
+                  <div className={`size-2.5 rounded-full shrink-0 ${isWaterActive ? 'bg-cyan-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
                   <div className="min-w-0">
-                    <div className="text-xs font-bold text-slate-900 truncate">{dc.name}</div>
-                    <div className="text-[11px] text-slate-500 truncate mt-0.5">
+                    <div className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">{dc.name}</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
                       {dc.region} • Kapasitas: {capacityM3} m³/hari
                     </div>
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <div className={`text-xs font-bold font-mono ${isWaterActive ? 'text-cyan-600' : 'text-slate-400'}`}>
+                  <div className={`text-xs font-bold font-mono ${isWaterActive ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-400 dark:text-slate-500'}`}>
                     {isWaterActive ? `${dailyRecycledM3} m³/hari` : 'Planned'}
                   </div>
                   {isWaterActive && (
-                    <div className="text-[10px] text-emerald-600 font-semibold font-mono">
+                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold font-mono">
                       Efisiensi: {efficiencyPct}%
                     </div>
                   )}
@@ -278,46 +278,46 @@ export default function WaterRecycleTab() {
       {/* 5. Formula & Pemanfaatan Air Daur Ulang */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <CardBox className="space-y-3">
-          <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
-            <div className="size-9 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="size-9 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
               <Calculator size={18} />
             </div>
-            <h3 className="text-sm font-bold text-slate-900">Formula Perhitungan</h3>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Formula Perhitungan</h3>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-cyan-50/70 border border-cyan-100 text-xs space-y-1">
-            <div className="font-bold uppercase tracking-wider text-cyan-800 text-[10px]">PENGHEMATAN AIR</div>
-            <div className="text-cyan-900 font-bold text-xs">Volume Recycled (m³) × Tarif PDAM/m³</div>
-            <div className="text-cyan-700 text-[11px] pt-0.5">*Tarif rata-rata PDAM industri: Rp 8.000/m³ (varies per region)</div>
+          <div className="p-3.5 rounded-xl bg-cyan-50/70 dark:bg-cyan-500/10 border border-cyan-100 dark:border-cyan-500/20 text-xs space-y-1">
+            <div className="font-bold uppercase tracking-wider text-cyan-800 dark:text-cyan-200 text-[10px]">PENGHEMATAN AIR</div>
+            <div className="text-cyan-900 dark:text-cyan-200 font-bold text-xs">Volume Recycled (m³) × Tarif PDAM/m³</div>
+            <div className="text-cyan-700 dark:text-cyan-300 text-[11px] pt-0.5">*Tarif rata-rata PDAM industri: Rp 8.000/m³ (varies per region)</div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-100 text-xs space-y-1">
-            <div className="font-bold uppercase tracking-wider text-emerald-800 text-[10px]">EMISI TERHINDAR</div>
-            <div className="text-emerald-900 font-bold text-xs">Volume Recycled × EF Pengolahan Air (0.344 kgCO₂/m³)</div>
-            <div className="text-emerald-700 text-[11px] pt-0.5">*Faktor emisi berdasarkan IPCC Guidelines 2006</div>
+          <div className="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-xs space-y-1">
+            <div className="font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-200 text-[10px]">EMISI TERHINDAR</div>
+            <div className="text-emerald-900 dark:text-emerald-200 font-bold text-xs">Volume Recycled × EF Pengolahan Air (0.344 kgCO₂/m³)</div>
+            <div className="text-emerald-700 dark:text-emerald-300 text-[11px] pt-0.5">*Faktor emisi berdasarkan IPCC Guidelines 2006</div>
           </div>
         </CardBox>
 
         <CardBox className="space-y-3">
-          <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
-            <div className="size-9 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="size-9 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
               <Recycle size={18} />
             </div>
-            <h3 className="text-sm font-bold text-slate-900">Pemanfaatan Air Daur Ulang</h3>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Pemanfaatan Air Daur Ulang</h3>
           </div>
 
           <div className="space-y-2.5 pt-1">
             {usage.map((item, i) => (
-              <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-                <span className="font-medium text-slate-700">{item.name}</span>
+              <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-xs">
+                <span className="font-medium text-slate-700 dark:text-slate-300">{item.name}</span>
                 <div className="flex items-center gap-3">
-                  <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+                  <div className="w-24 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-cyan-500 rounded-full"
                       style={{ width: `${item.percentage}%` }}
                     />
                   </div>
-                  <span className="font-mono font-bold text-cyan-700 w-9 text-right">
+                  <span className="font-mono font-bold text-cyan-700 dark:text-cyan-300 w-9 text-right">
                     {item.percentage}%
                   </span>
                 </div>

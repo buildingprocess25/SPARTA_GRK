@@ -689,12 +689,12 @@ export default function PLTSTab() {
         actions={
           <div className="flex shrink-0 flex-col items-end gap-2 self-start">
             <InputDataButton label="Input Data PLTS" icon={Sun} onClick={() => setIsInputModalOpen(true)} />
-            <div className="inline-flex flex-wrap gap-1 rounded-full bg-slate-100 p-1">
+            <div className="inline-flex flex-wrap gap-1 rounded-full bg-slate-100 dark:bg-slate-800 p-1">
               <button
                 type="button"
                 className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'overview'
-                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-semibold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 onClick={() => setActivePltsSubView('overview')}
               >
@@ -704,20 +704,20 @@ export default function PLTSTab() {
                 <button
                   type="button"
                   className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'april-audit'
-                    ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-semibold'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                     }`}
                   onClick={() => setActivePltsSubView('april-audit')}
                 >
-                  <FileSpreadsheet size={14} className="text-emerald-600" />
+                  <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" />
                   <span>Audit Baseline (April 2026)</span>
                 </button>
               )}
               <button
                 type="button"
                 className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'isolar-api'
-                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-semibold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 onClick={() => setActivePltsSubView('isolar-api')}
               >
@@ -880,28 +880,28 @@ export default function PLTSTab() {
           </div>
 
           {(syncErrorDetails || refreshError) && (
-            <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 shadow-sm text-amber-950 animate-in fade-in slide-in-from-top-2">
+            <div className="rounded-2xl border-2 border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 p-4 shadow-sm text-amber-950 dark:text-amber-100 animate-in fade-in slide-in-from-top-2">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 min-w-0">
-                  <div className="p-2 rounded-xl bg-amber-200/80 text-amber-900 shrink-0 mt-0.5">
-                    <AlertTriangle className="size-5 text-amber-800" />
+                  <div className="p-2 rounded-xl bg-amber-200/80 dark:bg-amber-500/20 text-amber-900 dark:text-amber-200 shrink-0 mt-0.5">
+                    <AlertTriangle className="size-5 text-amber-800 dark:text-amber-300" />
                   </div>
                   <div className="min-w-0 space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-bold uppercase tracking-wider text-amber-850 bg-amber-200/70 px-2.5 py-0.5 rounded-full border border-amber-300">
+                      <span className="text-xs font-bold uppercase tracking-wider text-amber-850 dark:text-amber-200 bg-amber-200/70 dark:bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-300 dark:border-amber-500/40">
                         {syncErrorDetails?.badge || 'Koneksi Gateway'}
                       </span>
                       {syncErrorDetails?.timestampWib && (
-                        <span className="text-xs font-medium text-amber-800/80">
+                        <span className="text-xs font-medium text-amber-800/80 dark:text-amber-300">
                           {syncErrorDetails.timestampWib}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm font-semibold text-amber-950 leading-snug">
+                    <p className="text-sm font-semibold text-amber-950 dark:text-amber-100 leading-snug">
                       {syncErrorDetails?.message || refreshError}
                     </p>
                     {syncErrorDetails?.advice && (
-                      <p className="text-xs text-amber-900/90 leading-relaxed">
+                      <p className="text-xs text-amber-900/90 dark:text-amber-200 leading-relaxed">
                         💡 <strong>Saran:</strong> {syncErrorDetails.advice}
                       </p>
                     )}
@@ -913,7 +913,7 @@ export default function PLTSTab() {
                     setSyncErrorDetails(null);
                     setRefreshError(null);
                   }}
-                  className="p-1 rounded-lg text-amber-700 hover:text-amber-950 hover:bg-amber-200/60 shrink-0 transition-colors"
+                  className="p-1 rounded-lg text-amber-700 dark:text-amber-300 hover:text-amber-950 dark:hover:text-amber-100 hover:bg-amber-200/60 shrink-0 transition-colors"
                   title="Tutup banner"
                 >
                   <X size={16} />
@@ -921,27 +921,27 @@ export default function PLTSTab() {
               </div>
 
               {/* Collapsible: Lihat detail teknis */}
-              <div className="mt-3 pt-3 border-t border-amber-200/80">
+              <div className="mt-3 pt-3 border-t border-amber-200/80 dark:border-amber-500/30">
                 <button
                   type="button"
                   onClick={() => setShowTechnicalDetails(prev => !prev)}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-900 hover:text-amber-950 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-900 dark:text-amber-200 hover:text-amber-950 dark:hover:text-amber-100 transition-colors"
                 >
                   <span>{showTechnicalDetails ? 'Sembunyikan detail teknis' : 'Lihat detail teknis'}</span>
                   {showTechnicalDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                 </button>
 
                 {showTechnicalDetails && (
-                  <div className="mt-2.5 p-3 rounded-xl bg-amber-100/80 border border-amber-300/80 font-mono text-[11px] text-amber-950 space-y-1 select-all">
+                  <div className="mt-2.5 p-3 rounded-xl bg-amber-100/80 dark:bg-amber-500/20 border border-amber-300/80 dark:border-amber-500/40 font-mono text-[11px] text-amber-950 dark:text-amber-100 space-y-1 select-all">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                      <div><span className="text-amber-800 font-semibold">Kode Error:</span> {syncErrorDetails?.errorCode || 'N/A'}</div>
-                      <div><span className="text-amber-800 font-semibold">HTTP Status:</span> {syncErrorDetails?.statusCode || 'N/A'}</div>
-                      <div><span className="text-amber-800 font-semibold">Waktu:</span> {syncErrorDetails?.timestampWib || 'N/A'}</div>
-                      <div><span className="text-amber-800 font-semibold">ID Request:</span> {syncErrorDetails?.requestId || 'N/A'}</div>
+                      <div><span className="text-amber-800 dark:text-amber-300 font-semibold">Kode Error:</span> {syncErrorDetails?.errorCode || 'N/A'}</div>
+                      <div><span className="text-amber-800 dark:text-amber-300 font-semibold">HTTP Status:</span> {syncErrorDetails?.statusCode || 'N/A'}</div>
+                      <div><span className="text-amber-800 dark:text-amber-300 font-semibold">Waktu:</span> {syncErrorDetails?.timestampWib || 'N/A'}</div>
+                      <div><span className="text-amber-800 dark:text-amber-300 font-semibold">ID Request:</span> {syncErrorDetails?.requestId || 'N/A'}</div>
                     </div>
                     {syncErrorDetails?.rawError && (
-                      <div className="pt-1.5 border-t border-amber-200 text-amber-900 break-all">
-                        <span className="text-amber-800 font-semibold">Raw Message:</span> {syncErrorDetails.rawError}
+                      <div className="pt-1.5 border-t border-amber-200 dark:border-amber-500/30 text-amber-900 dark:text-amber-200 break-all">
+                        <span className="text-amber-800 dark:text-amber-300 font-semibold">Raw Message:</span> {syncErrorDetails.rawError}
                       </div>
                     )}
                   </div>
@@ -1054,10 +1054,10 @@ export default function PLTSTab() {
         <div className="space-y-6 animate-in">
           {/* scope2-reconciliation: canonical data alignment without banner */}
           {/* Header Controls: Mode Toggle (YTD vs Bulan Ini) */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Cakupan Periode:</span>
-              <div className="inline-flex rounded-xl bg-slate-100 p-1">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Cakupan Periode:</span>
+              <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
                 <button
                   type="button"
                   onClick={() => {
@@ -1065,8 +1065,8 @@ export default function PLTSTab() {
                     setDashboardFilters(prev => ({ ...prev, period: '2026-01_2026-09', mode: 'YTD', month: 9, throughMonth: 9 }));
                   }}
                   className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.mode === 'YTD'
-                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/60'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs ring-1 ring-slate-200/60 dark:ring-slate-700'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                     }`}
                 >
                   Akumulasi Jan-Sep (YTD)
@@ -1078,8 +1078,8 @@ export default function PLTSTab() {
                     setDashboardFilters(prev => ({ ...prev, period: '2026-09_2026-09', mode: 'MONTH', month: 9, throughMonth: 9 }));
                   }}
                   className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.mode === 'MONTH'
-                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/60'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs ring-1 ring-slate-200/60 dark:ring-slate-700'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                     }`}
                 >
                   Bulan Ini Saja (Sep 2026)
@@ -1087,7 +1087,7 @@ export default function PLTSTab() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-slate-500">
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
               <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>Database Terintegrasi (37 Lokasi DC Canonical)</span>
             </div>
@@ -1097,17 +1097,17 @@ export default function PLTSTab() {
           <div
             className={`rounded-2xl border p-4 shadow-2xs transition-colors ${
               pltsAlarms.faultCount > 0
-                ? 'border-red-300 bg-red-50/40'
+                ? 'border-red-300 bg-red-50/40 dark:bg-red-500/10'
                 : pltsAlarms.alertCount > 0
-                  ? 'border-amber-300 bg-amber-50/30'
-                  : 'border-slate-200 bg-white'
+                  ? 'border-amber-300 bg-amber-50/30 dark:bg-amber-500/10'
+                  : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
             }`}
             data-testid="plant-status-summary"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Status alarm iSolar</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status alarm iSolar</p>
                   <span
                     className={`size-2 rounded-full ${
                       pltsAlarms.faultCount > 0
@@ -1132,14 +1132,14 @@ export default function PLTSTab() {
                     </span>
                   )}
                   {pltsAlarms.faultCount === 0 && pltsAlarms.alertCount === 0 && (
-                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800">
-                      <ShieldCheck size={16} className="text-emerald-600" />
+                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800 dark:text-slate-200">
+                      <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
                       <span>Normal — Tidak ada alarm aktif</span>
                     </span>
                   )}
                 </div>
                 {dashboardData?.summary?.status?.offlineCount > 0 && (
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                     Telemetri offline: <strong>{dashboardData.summary.status.offlineCount} plant</strong>
                     {dashboardData.summary.status.offlinePlants?.length > 0 && (
                       <span> ({dashboardData.summary.status.offlinePlants.map(p => p.name).join(', ')})</span>
@@ -1151,16 +1151,16 @@ export default function PLTSTab() {
               <button
                 type="button"
                 onClick={openAlarmPanel}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 px-3.5 py-2 text-xs font-semibold transition shadow-2xs self-start sm:self-center"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 px-3.5 py-2 text-xs font-semibold transition shadow-2xs self-start sm:self-center"
               >
-                <AlertOctagon size={14} className="text-rose-600" />
+                <AlertOctagon size={14} className="text-rose-600 dark:text-rose-400" />
                 <span>Lihat daftar alarm</span>
               </button>
             </div>
             {dashboardData?.summary?.status?.offlinePlants?.length > 0 && (
-              <div className="mt-3 grid gap-2 sm:grid-cols-2 pt-3 border-t border-slate-100">
+              <div className="mt-3 grid gap-2 sm:grid-cols-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                 {dashboardData.summary.status.offlinePlants.map((plant) => (
-                  <div key={plant.psId} className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
+                  <div key={plant.psId} className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-3 py-2 text-xs text-rose-800 dark:text-rose-300">
                     <strong>{plant.name}</strong>
                     <span className="ml-2">Offline — {plant.reason}</span>
                   </div>
@@ -1173,10 +1173,10 @@ export default function PLTSTab() {
           {dashboardLoading && !dashboardData ? (
             <SummaryCardsSkeleton />
           ) : dashboardError && !dashboardData ? (
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-center text-rose-800">
-              <AlertCircle className="mx-auto size-8 text-rose-600 mb-2" />
+            <div className="rounded-2xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-6 text-center text-rose-800 dark:text-rose-300">
+              <AlertCircle className="mx-auto size-8 text-rose-600 dark:text-rose-400 mb-2" />
               <h4 className="text-sm font-bold">Gagal memuat data</h4>
-              <p className="text-xs text-rose-600 mt-1">{dashboardError}</p>
+              <p className="text-xs text-rose-600 dark:text-rose-400 mt-1">{dashboardError}</p>
               <button
                 type="button"
                 onClick={() => refreshDashboardSummaryAfterSync()}
@@ -1205,12 +1205,12 @@ export default function PLTSTab() {
                     <div className="flex items-center gap-1.5 flex-wrap text-xs">
                       <span>{dashboardData?.summary?.achievementPct != null ? `${dashboardData.summary.achievementPct.toFixed(1)}% dari target` : (dashboardData?.summary?.energyBalance?.target?.achievementPct != null ? `${dashboardData.summary.energyBalance.target.achievementPct.toFixed(1)}% dari target` : '—')}</span>
                       {dashboardData?.summary?.pr?.valuePct != null && (
-                        <span title="Proxy PR dihitung dari iradiasi dan kapasitas efektif (perkiraan)" className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200 cursor-help">
+                        <span title="Proxy PR dihitung dari iradiasi dan kapasitas efektif (perkiraan)" className="inline-flex items-center rounded-md bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 cursor-help">
                           PR: {dashboardData.summary.pr.valuePct.toFixed(1)}% (perkiraan)
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] text-slate-500 font-medium">
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                       Ekspor {formatNum(dashboardData?.summary?.feedInMwh ?? dashboardData?.summary?.energyBalance?.feedInMwh, 2, 2)} MWh &middot; Pakai sendiri {formatNum(dashboardData?.summary?.selfConsumptionMwh ?? dashboardData?.summary?.energyBalance?.selfConsumptionMwh, 2, 2)} MWh
                     </div>
                   </div>
@@ -1225,10 +1225,10 @@ export default function PLTSTab() {
                 unit="kWh"
                 trend={
                   <div className="space-y-0.5" title="Estimasi, asumsi tarif Rp 1.400/kWh belum dikonfirmasi">
-                    <div className="text-xs font-semibold text-emerald-700">
+                    <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                       {dashboardData?.summary?.plantCount ?? 37} dari {dashboardData?.summary?.plantCount ?? 37} DC
                     </div>
-                    <div className="text-[11px] text-slate-500">
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
                       Porsi pakai sendiri {formatNum(dashboardData?.summary?.energyBalance?.coverage?.selfConsumptionSharePct ?? 98.1, 1, 1)}% dari produksi
                     </div>
                   </div>
@@ -1243,14 +1243,14 @@ export default function PLTSTab() {
                 unit="tCO₂e"
                 trend={
                   <div className="space-y-1.5 whitespace-normal">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold" title={`Emisi Terhindar = Produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
-                      <span className="text-emerald-700 font-medium">Faktor Emisi:</span>
+                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold" title={`Emisi Terhindar = Produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
+                      <span className="text-emerald-700 dark:text-emerald-300 font-medium">Faktor Emisi:</span>
                       <span className="font-mono text-emerald-900">1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂</span>
                     </div>
-                    <div className="text-[11px] text-slate-500 font-medium leading-tight" title="Target korporat (referensi): faktor 0,997294 tCO2e/MWh">
-                      Target (referensi RKAP): <span className="font-semibold text-slate-700">{formatNum(dashboardData?.summary?.emission?.targetReferenceTon ?? 4791.34, 2, 2)} tCO₂e</span>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight" title="Target korporat (referensi): faktor 0,997294 tCO2e/MWh">
+                      Target (referensi RKAP): <span className="font-semibold text-slate-700 dark:text-slate-300">{formatNum(dashboardData?.summary?.emission?.targetReferenceTon ?? 4791.34, 2, 2)} tCO₂e</span>
                     </div>
-                    <div className="text-[10px] text-emerald-700 font-semibold pt-0.5" title="Estimasi: 21,77 kgCO2e/pohon/tahun dan 0,400 ton/MWh SFC PLTU">
+                    <div className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold pt-0.5" title="Estimasi: 21,77 kgCO2e/pohon/tahun dan 0,400 ton/MWh SFC PLTU">
                       ~{formatNum(dashboardData?.summary?.emission?.coalAvoidedTon ?? 1809.8, 1, 1)} Ton Batubara &middot; ~{formatNum(dashboardData?.summary?.emission?.treeCount ?? 167931, 0, 0)} Pohon (estimasi)
                     </div>
                   </div>
@@ -1270,17 +1270,17 @@ export default function PLTSTab() {
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                    <div className="size-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                       <BarChart3 size={20} />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-bold text-slate-900">
+                        <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                           Produksi PLTS vs Konsumsi PLN (Bulanan)
                         </h3>
                         <MetricInfoIcon infoKey="plts_monthly_comparison" />
                       </div>
-                      <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         Perbandingan konsumsi listrik PLN, output PLTS (MWh - sumbu kiri), dan Emisi Terhindar (tCO₂e - sumbu kanan)
                       </p>
                     </div>
@@ -1295,8 +1295,8 @@ export default function PLTSTab() {
                         { label: 'Target PLTS', color: CHART_PALETTE.target, type: 'line' },
                       ]}
                     />
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold shrink-0" title={`Perhitungan Emisi Terhindar: Produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
-                      <span className="text-emerald-700 font-medium">Faktor Emisi:</span>
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 text-xs font-semibold shrink-0" title={`Perhitungan Emisi Terhindar: Produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
+                      <span className="text-emerald-700 dark:text-emerald-300 font-medium">Faktor Emisi:</span>
                       <span className="font-bold font-mono">1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂</span>
                     </div>
                   </div>
@@ -1305,7 +1305,7 @@ export default function PLTSTab() {
                 {dashboardLoading && !dashboardData ? (
                   <ChartSkeleton height="h-72 lg:h-[300px]" />
                 ) : (!chartData || chartData.length === 0) ? (
-                  <div className="flex h-72 lg:h-[300px] items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 text-xs font-medium text-slate-500">
+                  <div className="flex h-72 lg:h-[300px] items-center justify-center rounded-xl border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 text-xs font-medium text-slate-500 dark:text-slate-400">
                     Data belum tersedia
                   </div>
                 ) : (
@@ -1338,11 +1338,11 @@ export default function PLTSTab() {
                               const currentPoint = chartData.find(d => d.month === label || d.yearMonth === label);
                               const isPartial = label?.includes('*') || currentPoint?.isPartial;
                               return (
-                                <div className="bg-white text-slate-800 rounded-xl p-3 shadow-xl border border-slate-200 text-xs space-y-1.5 min-w-[240px] select-text">
-                                  <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
-                                    <span className="font-bold text-slate-800">Bulan: {label}</span>
+                                <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs space-y-1.5 min-w-[240px] select-text">
+                                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1 mb-1">
+                                    <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {label}</span>
                                     {isPartial && (
-                                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
                                         Parsial
                                       </span>
                                     )}
@@ -1360,12 +1360,12 @@ export default function PLTSTab() {
                                         target: 'Target PLTS',
                                       };
                                       return (
-                                        <div key={idx} className="font-mono text-xs flex items-center justify-between gap-3 text-slate-600">
+                                        <div key={idx} className="font-mono text-xs flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400">
                                           <div className="flex items-center gap-1.5 font-sans">
                                             <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
                                             <span>{nameMap[entry.dataKey] || entry.name}:</span>
                                           </div>
-                                          <strong className={isEmission ? 'text-emerald-700' : 'text-slate-900'}>
+                                          <strong className={isEmission ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-900 dark:text-slate-100'}>
                                             {entry.value != null ? `${Number(entry.value).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 2 })}${unit}` : '—'}
                                           </strong>
                                         </div>
@@ -1373,12 +1373,12 @@ export default function PLTSTab() {
                                     })}
                                   </div>
                                   {currentPoint && currentPoint.cumAvoidedEmissionTon != null && (
-                                    <div className="pt-1.5 mt-1 border-t border-slate-100 text-[11px] text-slate-600 space-y-0.5">
+                                    <div className="pt-1.5 mt-1 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 space-y-0.5">
                                       <div className="flex justify-between items-center font-mono">
-                                        <span className="text-slate-500 font-sans">Kumulatif YTD:</span>
-                                        <strong className="text-emerald-700 font-semibold">{Number(currentPoint.cumAvoidedEmissionTon).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} tCO₂e</strong>
+                                        <span className="text-slate-500 dark:text-slate-400 font-sans">Kumulatif YTD:</span>
+                                        <strong className="text-emerald-700 dark:text-emerald-300 font-semibold">{Number(currentPoint.cumAvoidedEmissionTon).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} tCO₂e</strong>
                                       </div>
-                                      <div className="text-[10px] text-slate-400">
+                                      <div className="text-[10px] text-slate-400 dark:text-slate-500">
                                         Faktor 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂ &middot; {currentPoint.includedPlantCount ?? 37} plant dihitung
                                       </div>
                                     </div>
@@ -1422,12 +1422,12 @@ export default function PLTSTab() {
               <div>
                 <div className="flex items-center justify-between gap-2 mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                    <div className="size-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                       <BatteryCharging size={20} />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Komposisi Energi DC</h3>
-                      <p className="text-xs text-slate-500 mt-0.5">Porsi bauran energi operasional</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Komposisi Energi DC</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Porsi bauran energi operasional</p>
                     </div>
                   </div>
                   <MetricInfoIcon infoKey="plts_energy_composition" />
@@ -1436,13 +1436,13 @@ export default function PLTSTab() {
                 <div className="space-y-5 my-4">
                   {/* PLN Bar */}
                   <div>
-                    <div className="flex justify-between text-sm font-bold text-slate-700 mb-2">
-                      <span className="flex items-center gap-1.5 text-xs text-slate-600">
-                        <Zap size={14} className="text-slate-400" /> PLN (Grid)
+                    <div className="flex justify-between text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+                      <span className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                        <Zap size={14} className="text-slate-400 dark:text-slate-500" /> PLN (Grid)
                       </span>
-                      <span className="text-sm font-bold text-slate-900 font-mono">{dynamicEnergyBreakdown.plnPercentage}%</span>
+                      <span className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">{dynamicEnergyBreakdown.plnPercentage}%</span>
                     </div>
-                    <div className="h-2.5 rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-2.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                       <div
                         className="h-full rounded-full bg-slate-400 transition-all duration-500"
                         style={{ width: `${dynamicEnergyBreakdown.plnPercentage}%` }}
@@ -1452,13 +1452,13 @@ export default function PLTSTab() {
 
                   {/* PLTS Bar */}
                   <div>
-                    <div className="flex justify-between text-sm font-bold text-amber-600 mb-2">
-                      <span className="flex items-center gap-1.5 text-xs text-amber-700">
+                    <div className="flex justify-between text-sm font-bold text-amber-600 dark:text-amber-400 mb-2">
+                      <span className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-300">
                         <Sun size={14} className="text-amber-500" /> PLTS (Solar)
                       </span>
-                      <span className="text-sm font-bold text-amber-700 font-mono">{dynamicEnergyBreakdown.pltsPercentage}%</span>
+                      <span className="text-sm font-bold text-amber-700 dark:text-amber-300 font-mono">{dynamicEnergyBreakdown.pltsPercentage}%</span>
                     </div>
-                    <div className="h-2.5 rounded-full bg-amber-50 overflow-hidden border border-amber-100/60">
+                    <div className="h-2.5 rounded-full bg-amber-50 dark:bg-amber-500/10 overflow-hidden border border-amber-100/60 dark:border-amber-500/20">
                       <div
                         className="h-full rounded-full bg-amber-500 transition-all duration-500"
                         style={{ width: `${dynamicEnergyBreakdown.pltsPercentage}%` }}
@@ -1469,14 +1469,14 @@ export default function PLTSTab() {
               </div>
 
               {/* Sub-card TARGET 2027 */}
-              <div className="rounded-xl bg-amber-50/80 border border-amber-100 p-4 mt-auto text-xs space-y-1">
-                <div className="font-bold text-amber-800 uppercase tracking-wider text-[11px]">
+              <div className="rounded-xl bg-amber-50/80 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 p-4 mt-auto text-xs space-y-1">
+                <div className="font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider text-[11px]">
                   TARGET 2027
                 </div>
                 <div className="text-amber-900 font-bold text-sm">
                   PLTS ≥ 20% dari Total Konsumsi DC
                 </div>
-                <div className="text-amber-700 text-[11px] pt-0.5">
+                <div className="text-amber-700 dark:text-amber-300 text-[11px] pt-0.5">
                   *Penambahan kapasitas PLTS di 3 DC baru (Medan, Semarang, Banjarmasin)
                 </div>
               </div>
@@ -1512,27 +1512,27 @@ export default function PLTSTab() {
 
           {/* New Monitoring Emisi Listrik DC Section */}
           <CardBox className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-100">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <div className="size-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                   <Activity size={20} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-slate-900">
+                    <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                       Kalkulasi Emisi Aktual per Distribution Center
                     </h3>
                     <MetricInfoIcon infoKey="plts_multi_dc_analytics" />
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     Monitoring operasional dan penghematan PLTS per cabang (Scope 2)
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Periode:</span>
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Periode:</span>
                 <select
-                  className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-500 focus:bg-white transition-colors cursor-pointer"
+                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
                   value={selectedPeriod}
                   onChange={(e) => setSelectedPeriod(e.target.value)}
                 >
@@ -1544,13 +1544,13 @@ export default function PLTSTab() {
             </div>
 
             {/* Filter Toolbar */}
-            <div className="flex flex-col md:flex-row gap-3 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+            <div className="flex flex-col md:flex-row gap-3 bg-slate-50/50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
               <div className="flex-1 space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Wilayah Grid</label>
+                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Wilayah Grid</label>
                 <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={14} />
                   <select
-                    className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-amber-500 appearance-none"
+                    className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-amber-500 appearance-none"
                     value={selectedGridFilter}
                     onChange={(e) => {
                       setSelectedGridFilter(e.target.value);
@@ -1567,15 +1567,15 @@ export default function PLTSTab() {
                     <option value="BATAM">Batam</option>
                     <option value="NTB_LOMBOK">NTB - Lombok</option>
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" size={14} />
                 </div>
               </div>
               <div className="flex-1 space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Cabang / DC</label>
+                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Cabang / DC</label>
                 <div className="relative">
-                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={14} />
                   <select
-                    className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-amber-500 appearance-none"
+                    className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-amber-500 appearance-none"
                     value={selectedDcFilter}
                     onChange={(e) => setSelectedDcFilter(e.target.value)}
                   >
@@ -1584,22 +1584,22 @@ export default function PLTSTab() {
                       <option key={dc.id} value={dc.id}>{dc.name}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" size={14} />
                 </div>
               </div>
               <div className="flex-1 space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1">Pencarian</label>
+                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Pencarian</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={14} />
                   <input
                     type="text"
                     placeholder="Cari nama cabang/DC..."
-                    className="w-full pl-9 pr-8 py-2 text-xs font-medium text-slate-800 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-amber-500"
+                    className="w-full pl-9 pr-8 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-amber-500"
                     value={dcSearch}
                     onChange={(e) => setDcSearch(e.target.value)}
                   />
                   {dcSearch && (
-                    <button onClick={() => setDcSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                    <button onClick={() => setDcSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
                       <X size={14} />
                     </button>
                   )}
@@ -1609,21 +1609,21 @@ export default function PLTSTab() {
 
             {/* Scope Summary */}
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="font-semibold text-slate-700 bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
+              <span className="font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700">
                 {selectedGridFilter === 'ALL' ? 'Semua Grid' : selectedGridFilter}
               </span>
-              <span className="text-slate-400">•</span>
-              <span className="font-semibold text-slate-700 bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
+              <span className="text-slate-400 dark:text-slate-500">•</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700">
                 {dcTableData.length} DC dengan data
               </span>
-              <span className="text-slate-400">•</span>
-              <span className="text-slate-600">
+              <span className="text-slate-400 dark:text-slate-500">•</span>
+              <span className="text-slate-600 dark:text-slate-400">
                 {emissionsPeriods.find(p => p.value === selectedPeriod)?.label || selectedPeriod}
               </span>
             </div>
 
             {/* Data Table */}
-            <div className="relative max-h-[70vh] sm:max-h-[560px] overflow-auto overscroll-contain [scrollbar-width:thin] rounded-2xl border border-slate-100 mt-2 shadow-[inset_0_-10px_10px_-10px_rgba(0,0,0,0.02)]">
+            <div className="relative max-h-[70vh] sm:max-h-[560px] overflow-auto overscroll-contain [scrollbar-width:thin] rounded-2xl border border-slate-100 dark:border-slate-800 mt-2 shadow-[inset_0_-10px_10px_-10px_rgba(0,0,0,0.02)]">
               <table className="min-w-[1100px] w-full text-left text-xs border-separate border-spacing-0">
                 <thead className="text-white text-[11px] uppercase tracking-wide">
                   <tr>
@@ -1636,17 +1636,17 @@ export default function PLTSTab() {
                     <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold text-emerald-400 border-b border-slate-700">Emisi Terhindar<br /><span className="font-normal normal-case text-white/70">(tCO₂e · 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂)</span></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {emissionsError ? (
                     <tr>
-                      <td colSpan={7} className="px-4 py-8 text-center border-b border-slate-100">
-                        <div className="flex flex-col items-center justify-center gap-2 text-rose-600">
+                      <td colSpan={7} className="px-4 py-8 text-center border-b border-slate-100 dark:border-slate-800">
+                        <div className="flex flex-col items-center justify-center gap-2 text-rose-600 dark:text-rose-400">
                           <AlertTriangle size={20} />
                           <span className="font-semibold text-xs">Gagal memuat data emisi: {emissionsError}</span>
                           <button
                             type="button"
                             onClick={() => loadActualEmissions(selectedPeriod)}
-                            className="mt-1 px-3 py-1 text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors"
+                            className="mt-1 px-3 py-1 text-xs font-bold bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors"
                           >
                             Coba lagi
                           </button>
@@ -1655,7 +1655,7 @@ export default function PLTSTab() {
                     </tr>
                   ) : emissionsLoading ? (
                     <tr>
-                      <td colSpan={7} className="px-4 py-8 text-center text-slate-400 border-b border-slate-100">
+                      <td colSpan={7} className="px-4 py-8 text-center text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
                         <div className="flex items-center justify-center gap-2">
                           <RefreshCw size={16} className="animate-spin text-amber-500" />
                           <span>Memuat data emisi...</span>
@@ -1664,48 +1664,48 @@ export default function PLTSTab() {
                     </tr>
                   ) : dcTableData.length > 0 ? (
                     dcTableData.map(dc => (
-                      <tr key={dc.id} className="hover:bg-slate-50 transition-colors group">
-                        <td className="sticky left-0 z-10 bg-white group-hover:bg-slate-50 px-4 py-3 border-b border-slate-100">
-                          <div className="font-bold text-slate-900">{dc.name}</div>
-                          <div className="text-[10px] text-slate-500">{dc.region}</div>
+                      <tr key={dc.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+                        <td className="sticky left-0 z-10 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                          <div className="font-bold text-slate-900 dark:text-slate-100">{dc.name}</div>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400">{dc.region}</div>
                         </td>
-                        <td className="px-4 py-3 border-b border-slate-100">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                        <td className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                             {dc.grid || dc.gridRegion}
                           </span>
                         </td>
-                        <td className="text-right px-4 py-3 font-mono text-slate-700 border-b border-slate-100">{formatNum(dc.plnConsumptionMWh)}</td>
-                        <td className="text-center px-4 py-3 font-mono text-slate-500 border-b border-slate-100">
+                        <td className="text-right px-4 py-3 font-mono text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800">{formatNum(dc.plnConsumptionMWh)}</td>
+                        <td className="text-center px-4 py-3 font-mono text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                           {typeof dc.factor === 'number' ? dc.factor.toFixed(3) : (dc.gridFactor ? Number(dc.gridFactor).toFixed(3) : '—')}
                         </td>
-                        <td className="text-right px-4 py-3 font-mono font-bold text-amber-700 bg-amber-50/30 border-b border-slate-100">
+                        <td className="text-right px-4 py-3 font-mono font-bold text-amber-700 dark:text-amber-300 bg-amber-50/30 dark:bg-amber-500/10 border-b border-slate-100 dark:border-slate-800">
                           {formatNum(dc.scope2EmissionTon)}
                         </td>
-                        <td className="text-right px-4 py-3 font-mono text-slate-700 border-b border-slate-100">
+                        <td className="text-right px-4 py-3 font-mono text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800">
                           {dc.pltsProdMWh > 0 ? formatNum(dc.pltsProdMWh) : <span className="text-slate-300">—</span>}
                         </td>
-                        <td className="text-right px-4 py-3 font-mono font-bold text-emerald-700 bg-emerald-50/30 border-b border-slate-100">
+                        <td className="text-right px-4 py-3 font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50/30 dark:bg-emerald-500/10 border-b border-slate-100 dark:border-slate-800">
                           {dc.avoidedEmissionTon > 0 ? formatNum(dc.avoidedEmissionTon) : <span className="text-slate-300">—</span>}
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={7} className="px-4 py-8 text-center text-slate-500 border-b border-slate-100">
+                      <td colSpan={7} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                         Tidak ada data cabang/DC yang sesuai dengan filter pencarian.
                       </td>
                     </tr>
                   )}
                 </tbody>
                 {dcTableData.length > 0 && (
-                  <tfoot className="bg-slate-50 font-bold">
+                  <tfoot className="bg-slate-50 dark:bg-slate-800/40 font-bold">
                     <tr>
-                      <td colSpan={2} className="sticky bottom-0 left-0 z-30 bg-slate-50 border-t border-slate-300 px-4 py-3 text-slate-900 text-right shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">TOTAL CAKUPAN TERPILIH</td>
-                      <td className="sticky bottom-0 z-10 bg-slate-50 border-t border-slate-300 text-right px-4 py-3 font-mono text-slate-900 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalPlnMWh)}</td>
-                      <td className="sticky bottom-0 z-10 bg-slate-50 border-t border-slate-300 text-center px-4 py-3 text-slate-400 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">—</td>
-                      <td className="sticky bottom-0 z-10 bg-amber-50/80 border-t border-slate-300 text-right px-4 py-3 font-mono text-amber-700 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalScope2Ton)}</td>
-                      <td className="sticky bottom-0 z-10 bg-slate-50 border-t border-slate-300 text-right px-4 py-3 font-mono text-slate-900 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalPltsMWh)}</td>
-                      <td className="sticky bottom-0 z-10 bg-emerald-50/80 border-t border-slate-300 text-right px-4 py-3 font-mono text-emerald-700 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalAvoidedTon)}</td>
+                      <td colSpan={2} className="sticky bottom-0 left-0 z-30 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-300 dark:border-slate-600 px-4 py-3 text-slate-900 dark:text-slate-100 text-right shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">TOTAL CAKUPAN TERPILIH</td>
+                      <td className="sticky bottom-0 z-10 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalPlnMWh)}</td>
+                      <td className="sticky bottom-0 z-10 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-300 dark:border-slate-600 text-center px-4 py-3 text-slate-400 dark:text-slate-500 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">—</td>
+                      <td className="sticky bottom-0 z-10 bg-amber-50/80 dark:bg-amber-500/10 border-t border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-amber-700 dark:text-amber-300 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalScope2Ton)}</td>
+                      <td className="sticky bottom-0 z-10 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalPltsMWh)}</td>
+                      <td className="sticky bottom-0 z-10 bg-emerald-50/80 dark:bg-emerald-500/10 border-t border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-emerald-700 dark:text-emerald-300 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalAvoidedTon)}</td>
                     </tr>
                   </tfoot>
                 )}
@@ -1713,10 +1713,10 @@ export default function PLTSTab() {
             </div>
 
             {/* Methodology Note */}
-            <div className="mt-4 text-[10px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg border border-slate-100">
-              <p><strong className="text-slate-700">Faktor Emisi PLTS:</strong> 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂ (konstanta konfigurasi tunggal: <code>PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH</code>).</p>
-              <p><strong className="text-slate-700">Rumus Scope 2:</strong> <code>Emisi (tCO₂e) = Konsumsi PLN (MWh) × CM Ex-Post</code></p>
-              <p><strong className="text-slate-700">Rumus Emisi Terhindar:</strong> <code>Emisi Terhindar (tCO₂e) = Produksi PLTS yang dipakai sendiri (kWh) × {PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000</code></p>
+            <div className="mt-4 text-[10px] text-slate-500 dark:text-slate-400 space-y-1 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
+              <p><strong className="text-slate-700 dark:text-slate-300">Faktor Emisi PLTS:</strong> 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂ (konstanta konfigurasi tunggal: <code>PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH</code>).</p>
+              <p><strong className="text-slate-700 dark:text-slate-300">Rumus Scope 2:</strong> <code>Emisi (tCO₂e) = Konsumsi PLN (MWh) × CM Ex-Post</code></p>
+              <p><strong className="text-slate-700 dark:text-slate-300">Rumus Emisi Terhindar:</strong> <code>Emisi Terhindar (tCO₂e) = Produksi PLTS yang dipakai sendiri (kWh) × {PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000</code></p>
               <p>Catatan: Penghematan emisi (Avoided Emissions) dari PLTS tidak dikurangi lagi dari Scope 2 karena Scope 2 sudah dihitung murni dari listrik yang dibeli (Purchased Electricity).</p>
             </div>
 
