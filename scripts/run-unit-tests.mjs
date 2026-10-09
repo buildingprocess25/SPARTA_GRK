@@ -20,6 +20,11 @@ const unitTestScripts = [
   ['--test', 'src/lib/scope2/__tests__/export.test.mjs'],
   ['--test', 'src/lib/solar/__tests__/inverterTemperature.test.mjs'],
   ['--test', 'tests/reconciliation-identities.test.mjs'],
+  ['--test', 'src/lib/alarms/__tests__/normalize.test.mjs'],
+  ['--test', 'src/lib/alarms/__tests__/apiContract.test.mjs'],
+  ['--test', 'src/context/__tests__/alarmState.test.mjs'],
+  ['--test', 'src/components/alarms/__tests__/alarmUiContract.test.mjs'],
+  ['--test', 'src/components/__tests__/alarmIntegrationContract.test.mjs'],
 ];
 
 // If inverterTempPipeline.test.mjs exists, run it too

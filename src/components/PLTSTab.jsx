@@ -8,7 +8,7 @@ import {
   Sparkles, CheckCircle2, ChevronRight, Download, Radio,
   RefreshCw, KeyRound, Globe, Server, Check, ArrowUpRight,
   Cpu, Thermometer, Search, Filter, FileSpreadsheet, ShieldCheck,
-  Info, List, MapPin, Activity, X, ChevronDown, ChevronUp, AlertCircle, AlertTriangle
+  Info, List, MapPin, Activity, X, ChevronDown, ChevronUp, AlertCircle, AlertTriangle, AlertOctagon
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -27,6 +27,7 @@ import { buildCacheKey } from '@/lib/solar/cacheKey';
 import { SummaryCardsSkeleton, ChartSkeleton, TabContentSkeleton, TableSkeleton } from '@/components/solar/PLTSDashboardSkeletons';
 import InputDataButton from '@/components/ui/InputDataButton';
 import PLTSInputModal from '@/components/solar/PLTSInputModal';
+import { useAlarms } from '@/context/AlarmContext';
 
 const PLTSSummaryCard = dynamic(() => import('@/components/PLTSSummaryCard'), {
   loading: () => <TableSkeleton rows={4} />,
@@ -62,6 +63,8 @@ const PLTS_EMISSION_FACTOR_LABEL = String(PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KW
 export default function PLTSTab() {
   const isAuditBaselineEnabled = isFeatureEnabled('auditBaseline');
   const { dcLocations } = useSustainability();
+  const { summary: alarmSummary, openPanel: openAlarmPanel } = useAlarms();
+  const pltsAlarms = alarmSummary?.byTab?.plts || { faultCount: 0, alertCount: 0, activeCount: 0 };
 
   const [dashboardFilters, setDashboardFilters] = useState({
     period: '2026-01_2026-09', mode: 'YTD', month: 9, throughMonth: 9,
@@ -855,33 +858,64 @@ export default function PLTSTab() {
             </div>
           </div>
 
-          {dashboardData?.summary?.status && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs" data-testid="plant-status-summary">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Status operasional terakhir</p>
-                  <p className="mt-1 text-lg font-black text-slate-900" title={dashboardData.summary.status.offlinePlants?.map(p => p.name).join(', ') || 'Semua plant aktif'}>
-                    Plant offline: {dashboardData.summary.status.offlineCount}
+          {/* Status alarm iSolar & operasional */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs" data-testid="plant-status-summary">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Status alarm iSolar</p>
+                  <span className="size-1.5 rounded-full bg-emerald-500" />
+                </div>
+                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                  {pltsAlarms.faultCount > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 text-white font-bold text-xs px-2.5 py-0.5 shadow-2xs">
+                      <AlertOctagon size={13} />
+                      <span>{pltsAlarms.faultCount} Fault</span>
+                    </span>
+                  )}
+                  {pltsAlarms.alertCount > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 text-white font-bold text-xs px-2.5 py-0.5 shadow-2xs">
+                      <AlertTriangle size={13} />
+                      <span>{pltsAlarms.alertCount} Alert</span>
+                    </span>
+                  )}
+                  {pltsAlarms.faultCount === 0 && pltsAlarms.alertCount === 0 && (
+                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800">
+                      <ShieldCheck size={16} className="text-emerald-600" />
+                      <span>Normal — Tidak ada alarm aktif</span>
+                    </span>
+                  )}
+                </div>
+                {dashboardData?.summary?.status?.offlineCount > 0 && (
+                  <p className="mt-2 text-xs text-slate-500">
+                    Telemetri offline: <strong>{dashboardData.summary.status.offlineCount} plant</strong>
                     {dashboardData.summary.status.offlinePlants?.length > 0 && (
-                      <span className="ml-2 text-xs font-medium text-slate-500">
-                        ({dashboardData.summary.status.offlinePlants.map(p => p.name).join(', ')})
-                      </span>
+                      <span> ({dashboardData.summary.status.offlinePlants.map(p => p.name).join(', ')})</span>
                     )}
                   </p>
-                </div>
+                )}
               </div>
-              {dashboardData.summary.status.offlinePlants?.length > 0 && (
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  {dashboardData.summary.status.offlinePlants.map((plant) => (
-                    <div key={plant.psId} className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
-                      <strong>{plant.name}</strong>
-                      <span className="ml-2">Offline — {plant.reason}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+
+              <button
+                type="button"
+                onClick={openAlarmPanel}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 px-3.5 py-2 text-xs font-semibold transition shadow-2xs self-start sm:self-center"
+              >
+                <AlertOctagon size={14} className="text-rose-600" />
+                <span>Lihat daftar alarm</span>
+              </button>
             </div>
-          )}
+            {dashboardData?.summary?.status?.offlinePlants?.length > 0 && (
+              <div className="mt-3 grid gap-2 sm:grid-cols-2 pt-3 border-t border-slate-100">
+                {dashboardData.summary.status.offlinePlants.map((plant) => (
+                  <div key={plant.psId} className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
+                    <strong>{plant.name}</strong>
+                    <span className="ml-2">Offline — {plant.reason}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* 3. Baris 4 KPI Dinamis */}
           {dashboardLoading && !dashboardData ? (

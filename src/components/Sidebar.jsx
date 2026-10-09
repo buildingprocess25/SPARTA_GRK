@@ -5,6 +5,7 @@ import {
   LayoutDashboard, TrendingDown, TrendingUp, History,
   X, ShieldCheck, ChevronDown, Sun, Droplets, Fuel, Zap
 } from 'lucide-react';
+import AlarmBadges from '@/components/alarms/AlarmBadges';
 
 const navItems = [
   {
@@ -181,6 +182,7 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setIsMo
                               >
                                 <SubIcon size={16} className={isSubActive ? 'text-blue-700' : sub.colorClass} />
                                 <span className="truncate">{sub.label}</span>
+                                <AlarmBadges sourceTab={sub.id} className="ml-auto shrink-0" />
                               </button>
                             );
                           })}
