@@ -7,6 +7,7 @@ import {
   ALARM_STORAGE_KEY,
   ALARM_STORAGE_VERSION,
   ALARM_MAX_READ_IDS,
+  ALARMS_BROWSER_NOTIFICATIONS_ENABLED,
 } from '@/lib/alarms/config.js';
 import {
   identifyAlarmsToNotify,
@@ -15,6 +16,7 @@ import {
   filterAlarms,
 } from './alarmState.js';
 import { useToast } from '@/components/ui/ToastProvider';
+import { createAlarmPollCoordinator } from './alarmPollCoordinator.js';
 
 const AlarmContext = createContext(null);
 const NOTIFIED_STORAGE_KEY = 'isolar_notified_alarms';
@@ -36,15 +38,21 @@ export function AlarmProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [lastSuccessfulPollAt, setLastSuccessfulPollAt] = useState(null);
   const [pollError, setPollError] = useState(null);
-  const [notificationPermission, setNotificationPermission] = useState('default');
+  const [notificationPermission, setNotificationPermission] = useState(
+    ALARMS_BROWSER_NOTIFICATIONS_ENABLED ? 'default' : 'disabled'
+  );
 
   const notifiedMapRef = useRef({});
+  const initialSnapshotCompleteRef = useRef(false);
   const pollTimerRef = useRef(null);
+  const pollCoordinatorRef = useRef(null);
 
   // Load readIds & notifiedMap from localStorage on mount
   useEffect(() => {
     try {
-      if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (!ALARMS_BROWSER_NOTIFICATIONS_ENABLED) {
+        setNotificationPermission('disabled');
+      } else if (typeof window !== 'undefined' && 'Notification' in window) {
         setNotificationPermission(Notification.permission);
       } else {
         setNotificationPermission('unsupported');
@@ -128,6 +136,10 @@ export function AlarmProvider({ children }) {
 
   // Request browser Web Notification permission on explicit user click
   const requestNotificationPermission = useCallback(async () => {
+    if (!ALARMS_BROWSER_NOTIFICATIONS_ENABLED) {
+      setNotificationPermission('disabled');
+      return 'disabled';
+    }
     if (typeof window === 'undefined' || !('Notification' in window)) {
       setNotificationPermission('unsupported');
       return 'unsupported';
@@ -149,10 +161,15 @@ export function AlarmProvider({ children }) {
 
   // Primary poll function
   const pollAlarms = useCallback(async () => {
+    const coordinator = pollCoordinatorRef.current;
+    if (!coordinator) return;
+    let request;
     try {
+      request = coordinator.begin();
       const res = await fetch('/api/alarms', {
         cache: 'no-store',
         headers: { Accept: 'application/json' },
+        signal: request.signal,
       });
 
       if (!res.ok) {
@@ -160,6 +177,7 @@ export function AlarmProvider({ children }) {
       }
 
       const json = await res.json();
+      if (!coordinator.isCurrent(request.id)) return;
       if (json.success && json.data) {
         const incoming = json.data.alarms || [];
         const incomingSummary = json.data.summary || { alertCount: 0, faultCount: 0, activeCount: 0, byTab: {} };
@@ -169,21 +187,19 @@ export function AlarmProvider({ children }) {
         setLastSuccessfulPollAt(new Date().toISOString());
         setPollError(null);
 
-        setAlarms(incoming);
-        setSummary(incomingSummary);
-        setLastSuccessfulPollAt(new Date().toISOString());
-        setPollError(null);
-
-        // Deduplication & Notification logic (triggers on first load if unnotified, and 60-min reminder for faults)
+        // The first successful response establishes a baseline; only later IDs are new alarms.
         const { toNotify, updatedNotifiedMap } = identifyAlarmsToNotify(
           incoming,
-          notifiedMapRef.current
+          notifiedMapRef.current,
+          Date.now(),
+          { initialSnapshot: !initialSnapshotCompleteRef.current },
         );
+        initialSnapshotCompleteRef.current = true;
 
         notifiedMapRef.current = updatedNotifiedMap;
         try {
           localStorage.setItem(NOTIFIED_STORAGE_KEY, JSON.stringify(updatedNotifiedMap));
-        } catch (_) {}
+        } catch {}
 
         if (toNotify.length > 0) {
           const notif = summarizeNotification(toNotify);
@@ -198,6 +214,7 @@ export function AlarmProvider({ children }) {
             // 2. Browser Web Notification API (hanya jika diizinkan)
             if (
               typeof window !== 'undefined' &&
+              ALARMS_BROWSER_NOTIFICATIONS_ENABLED &&
               'Notification' in window &&
               Notification.permission === 'granted'
             ) {
@@ -220,14 +237,17 @@ export function AlarmProvider({ children }) {
         }
       }
     } catch (err) {
+      if (err?.name === 'AbortError' || (request && !coordinator.isCurrent(request.id))) return;
       setPollError(err.message || 'Gagal menyinkronkan alarm.');
     } finally {
-      setIsLoading(false);
+      if (!request || coordinator.isCurrent(request.id)) setIsLoading(false);
     }
   }, [toast]);
 
   // Polling scheduler with visibility detection
   useEffect(() => {
+    const coordinator = createAlarmPollCoordinator();
+    pollCoordinatorRef.current = coordinator;
     let currentInterval = ALARM_POLL_INTERVAL_MS;
 
     const scheduleNext = (delayMs) => {
@@ -257,6 +277,8 @@ export function AlarmProvider({ children }) {
 
     return () => {
       if (pollTimerRef.current) clearTimeout(pollTimerRef.current);
+      coordinator.dispose();
+      if (pollCoordinatorRef.current === coordinator) pollCoordinatorRef.current = null;
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [pollAlarms]);
@@ -295,6 +317,7 @@ export function AlarmProvider({ children }) {
 
     if (
       typeof window !== 'undefined' &&
+      ALARMS_BROWSER_NOTIFICATIONS_ENABLED &&
       'Notification' in window &&
       Notification.permission === 'granted'
     ) {
@@ -311,6 +334,11 @@ export function AlarmProvider({ children }) {
       } catch (err) {
         console.warn('[AlarmContext] Gagal mengirim Web Notification uji coba:', err);
       }
+    } else if (!ALARMS_BROWSER_NOTIFICATIONS_ENABLED) {
+      toast.warning({
+        title: 'Notifikasi Browser Dinonaktifkan',
+        description: 'Aktifkan NEXT_PUBLIC_NOTIFICATIONS_ENABLED saat build image untuk memakai notifikasi browser.',
+      });
     } else {
       toast.warning({
         title: 'Izin Notifikasi Belum Diberikan',

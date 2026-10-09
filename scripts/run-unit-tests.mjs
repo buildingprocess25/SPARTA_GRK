@@ -23,8 +23,11 @@ const unitTestScripts = [
   ['--test', 'src/lib/alarms/__tests__/normalize.test.mjs'],
   ['--test', 'src/lib/alarms/__tests__/apiContract.test.mjs'],
   ['--test', 'src/context/__tests__/alarmState.test.mjs'],
+  ['--test', 'src/context/__tests__/alarmProviderContract.test.mjs'],
+  ['--test', 'src/context/__tests__/alarmPollCoordinator.test.mjs'],
   ['--test', 'src/components/alarms/__tests__/alarmUiContract.test.mjs'],
   ['--test', 'src/components/__tests__/alarmIntegrationContract.test.mjs'],
+  ['--test', 'src/components/__tests__/dockerAlarmDeploymentContract.test.mjs'],
 ];
 
 // If inverterTempPipeline.test.mjs exists, run it too

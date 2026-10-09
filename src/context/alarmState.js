@@ -1,21 +1,17 @@
-export const FAULT_REMINDER_INTERVAL_MS = 60 * 60 * 1000; // 60 minutes
-
-export function identifyAlarmsToNotify(incomingAlarms = [], notifiedMap = {}, now = Date.now()) {
+export function identifyAlarmsToNotify(
+  incomingAlarms = [],
+  notifiedMap = {},
+  now = Date.now(),
+  { initialSnapshot = false } = {},
+) {
   const toNotify = [];
   const updatedNotifiedMap = { ...notifiedMap };
 
   for (const alarm of incomingAlarms) {
     const lastNotified = notifiedMap[alarm.id];
-    const isFault = alarm.kind === 'FAULT';
-
-    // Notify if never notified before
     if (!lastNotified) {
-      toNotify.push(alarm);
       updatedNotifiedMap[alarm.id] = now;
-    } else if (isFault && (now - lastNotified) >= FAULT_REMINDER_INTERVAL_MS) {
-      // Re-notify active Fault every 60 minutes
-      toNotify.push({ ...alarm, isReminder: true });
-      updatedNotifiedMap[alarm.id] = now;
+      if (!initialSnapshot) toNotify.push(alarm);
     }
   }
 
@@ -49,11 +45,10 @@ export function summarizeNotification(newAlarms = []) {
   if (newAlarms.length === 1) {
     const alarm = newAlarms[0];
     const isFault = alarm.kind === 'FAULT';
-    const reminderPrefix = alarm.isReminder ? '[Pengingat 60 mnt] ' : '';
     return {
       variant: isFault ? 'error' : 'warning',
       title: `${isFault ? '🔴 Fault' : 'Alert'} iSolar: ${alarm.dcName || 'DC'}`,
-      message: `${reminderPrefix}${alarm.dcName ? `${alarm.dcName}: ` : ''}${alarm.title || 'Gangguan operasional inverter'}${alarm.occurredAt ? ` (${new Date(alarm.occurredAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB)` : ''}`,
+      message: `${alarm.dcName ? `${alarm.dcName}: ` : ''}${alarm.title || 'Gangguan operasional inverter'}${alarm.occurredAt ? ` (${new Date(alarm.occurredAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB)` : ''}`,
       requireInteraction: isFault,
       tag: alarm.id,
       alarm,

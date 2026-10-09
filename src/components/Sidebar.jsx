@@ -182,7 +182,7 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setIsMo
                               >
                                 <SubIcon size={16} className={isSubActive ? 'text-blue-700' : sub.colorClass} />
                                 <span className="truncate">{sub.label}</span>
-                                <AlarmBadges sourceTab={sub.id} className="ml-auto shrink-0" />
+                                <AlarmBadges sourceTab={sub.id} interactive={false} className="ml-auto shrink-0" />
                               </button>
                             );
                           })}

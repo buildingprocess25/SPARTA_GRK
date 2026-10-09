@@ -9,6 +9,7 @@ Spec: `docs/superpowers/specs/2026-10-09-global-isolar-alarm-notifications-desig
 - Read state tersimpan per browser, tanpa migrasi Prisma.
 - Snapshot awal tidak mengirim toast atau Browser Notification.
 - Layout PLTS selain blok status operasional tidak diubah.
+- Deployment harus kompatibel dengan image Next.js standalone pada `src/components/Dockerfile`; Browser Notification aktif, Web Push tetap nonaktif, dan browser tidak menjalankan vendor sync.
 - Setiap task memakai RED→GREEN dan diakhiri commit terpisah.
 
 ## Task 1 — Kontrak alarm dan endpoint read-only
@@ -48,10 +49,11 @@ Spec: `docs/superpowers/specs/2026-10-09-global-isolar-alarm-notifications-desig
 
 ## Task 4 — Review akhir dan perbaikan
 
-1. Jalankan seluruh unit test dan lint.
-2. Lakukan review seluruh diff terhadap spec, khususnya duplicate notification, cleanup timer, accessibility, data fallback, dan tidak adanya vendor call dari browser.
-3. Perbaiki temuan Critical/Important dengan test RED→GREEN.
-4. Jalankan kembali suite penuh dan commit perbaikan bila ada.
+1. Selaraskan konfigurasi Next.js standalone dan flag notifikasi Docker tanpa memasukkan daemon/vendor sync ke proses web.
+2. Jalankan seluruh unit test dan lint.
+3. Lakukan review seluruh diff terhadap spec, khususnya duplicate notification, cleanup timer, accessibility, data fallback, dan tidak adanya vendor call dari browser.
+4. Perbaiki temuan Critical/Important dengan test RED→GREEN.
+5. Jalankan kembali suite penuh dan commit perbaikan bila ada.
 
 ## Review Focus
 
