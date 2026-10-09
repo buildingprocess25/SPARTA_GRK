@@ -1,4 +1,5 @@
 import React from 'react';
+import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
 
 export default function StatCard({
   title,
@@ -8,7 +9,8 @@ export default function StatCard({
   icon: Icon,
   theme = 'default',
   sourceBadge = null,
-  tooltip = null
+  tooltip = null,
+  infoKey = null,
 }) {
   const themes = {
     default: 'text-blue-600',
@@ -21,10 +23,10 @@ export default function StatCard({
 
   return (
     <div
-      className="relative w-full bg-white rounded-xl border border-slate-200 p-4 flex flex-col justify-between overflow-hidden"
+      className="relative w-full bg-white rounded-xl border border-slate-200 p-4 flex flex-col justify-between overflow-visible"
       title={tooltip || title}
     >
-      {/* Top Row: Title, Source Badge & Icon */}
+      {/* Top Row: Title, Source Badge, Info Icon & Main Icon */}
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex flex-col min-w-0 pr-1">
           <span
@@ -39,8 +41,11 @@ export default function StatCard({
             </span>
           )}
         </div>
-        <div className={`shrink-0 ${iconColor}`}>
-          {Icon && <Icon size={18} strokeWidth={2} />}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {infoKey && <MetricInfoIcon infoKey={infoKey} />}
+          <div className={`shrink-0 ${iconColor}`}>
+            {Icon && <Icon size={18} strokeWidth={2} />}
+          </div>
         </div>
       </div>
 

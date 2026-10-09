@@ -7,6 +7,7 @@ import {
   ArrowUp, ArrowDown, RotateCcw, Globe, Building2, Filter, X, Download, RefreshCw
 } from 'lucide-react';
 import CardBox from '@/components/ui/CardBox';
+import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
 import { isDcLocation } from '@/lib/solar/plantMap';
 import { isValidPltsHistoryPeriod } from '@/lib/solar/cacheKey';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
@@ -667,9 +668,12 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               <Sun size={20} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">
-                Ringkasan PLTS (37 Lokasi DC)
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-slate-900">
+                  Ringkasan PLTS (37 Lokasi DC)
+                </h3>
+                <MetricInfoIcon infoKey="plts_multi_dc_analytics" />
+              </div>
               <p className="text-xs text-slate-500 mt-0.5">
                 Monitoring energi tersimpan, kapasitas terpasang, dan emisi terhindar
               </p>
@@ -829,8 +833,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           <div className="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-blue-200 transition-colors">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Kapasitas Terpasang</span>
-              <div className="size-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                <Zap size={14} />
+              <div className="flex items-center gap-1.5">
+                <MetricInfoIcon infoKey="plts_summary_capacity" />
+                <div className="size-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <Zap size={14} />
+                </div>
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-1.5">
@@ -846,8 +853,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           <div className="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-amber-200 transition-colors">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Produksi</span>
-              <div className="size-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                <Sun size={14} />
+              <div className="flex items-center gap-1.5">
+                <MetricInfoIcon infoKey="plts_summary_production" />
+                <div className="size-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <Sun size={14} />
+                </div>
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-1.5">
@@ -875,8 +885,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/20 p-3.5 shadow-2xs hover:border-emerald-300 transition-colors">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Penghematan Energi</span>
-              <div className="size-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                <Zap size={14} />
+              <div className="flex items-center gap-1.5">
+                <MetricInfoIcon infoKey="plts_savings" />
+                <div className="size-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                  <Zap size={14} />
+                </div>
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-1.5">
@@ -897,8 +910,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           <div className="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-emerald-200 transition-colors">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Emisi Terhindar</span>
-              <div className="size-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <Trees size={14} />
+              <div className="flex items-center gap-1.5">
+                <MetricInfoIcon infoKey="plts_summary_co2" />
+                <div className="size-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <Trees size={14} />
+                </div>
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-1.5">
@@ -917,8 +933,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           <div className="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-purple-200 transition-colors">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status Operasional</span>
-              <div className="size-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-                <CheckCircle2 size={14} />
+              <div className="flex items-center gap-1.5">
+                <MetricInfoIcon infoKey="plts_summary_status" />
+                <div className="size-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                  <CheckCircle2 size={14} />
+                </div>
               </div>
             </div>
             <div className="mt-2 flex items-center gap-1.5 flex-wrap text-xs">
@@ -962,9 +981,12 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         {compareYears && comparison && (
           <div className="rounded-2xl border border-blue-100 bg-blue-50/40 p-4" data-yoy-comparison="true">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-              <div>
-                <h4 className="text-sm font-black text-slate-900">Perbandingan Produksi {comparison.years[0]} vs {comparison.years[1]}</h4>
-                <p className="text-[11px] text-slate-500">Batas bulan sejajar: {comparison.label}</p>
+              <div className="flex items-center gap-2">
+                <div>
+                  <h4 className="text-sm font-black text-slate-900">Perbandingan Produksi {comparison.years[0]} vs {comparison.years[1]}</h4>
+                  <p className="text-[11px] text-slate-500">Batas bulan sejajar: {comparison.label}</p>
+                </div>
+                <MetricInfoIcon infoKey="plts_summary_yoy" />
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <div className={`text-sm font-black ${comparison.deltaKwh >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>

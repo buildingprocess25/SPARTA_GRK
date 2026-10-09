@@ -18,6 +18,7 @@ import {
   isolarDCBranches, formatNum
 } from '@/data/sustainabilityData';
 import StatCard from '@/components/ui/StatCard';
+import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
 import CardBox from '@/components/ui/CardBox';
 import { useSustainability } from '@/context/SustainabilityContext';
 import { fetchLiveIsolarData } from '@/services/isolarCloudService';
@@ -959,6 +960,7 @@ export default function PLTSTab() {
                 trendText={`${dashboardData?.summary?.plantCount ?? 39} plant · ${dashboardData?.summary?.capacityKwp != null ? formatNum(dashboardData.summary.capacityKwp, 2, 2) + ' kWp terpasang' : '—'} · ${dashboardData?.summary?.operationalCapacityKwp != null ? formatNum(dashboardData.summary.operationalCapacityKwp, 2, 2) + ' kWp operasional' : '—'}`}
                 icon={Sun}
                 theme="warning"
+                infoKey="plts_capacity"
               />
               <StatCard
                 title="PRODUKSI PLTS"
@@ -981,6 +983,7 @@ export default function PLTSTab() {
                 }
                 icon={Zap}
                 theme="warning"
+                infoKey="plts_production"
               />
               <StatCard
                 title="PENGHEMATAN ENERGI"
@@ -998,6 +1001,7 @@ export default function PLTSTab() {
                 }
                 icon={BatteryCharging}
                 theme="success"
+                infoKey="plts_savings"
               />
               <StatCard
                 title="EMISI TERHINDAR"
@@ -1019,6 +1023,7 @@ export default function PLTSTab() {
                 }
                 icon={TrendingUp}
                 theme="success"
+                infoKey="plts_avoided_emission"
                 tooltip={`Konstanta faktor emisi: 1 kWh = ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂. Dihitung dari produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000.`}
               />
             </div>
@@ -1035,9 +1040,12 @@ export default function PLTSTab() {
                       <BarChart3 size={20} />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">
-                        Produksi PLTS vs Konsumsi PLN (Bulanan)
-                      </h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-bold text-slate-900">
+                          Produksi PLTS vs Konsumsi PLN (Bulanan)
+                        </h3>
+                        <MetricInfoIcon infoKey="plts_monthly_comparison" />
+                      </div>
                       <p className="text-xs text-slate-500 mt-0.5">
                         Perbandingan konsumsi listrik PLN, output PLTS (MWh - sumbu kiri), dan Emisi Terhindar (tCO₂e - sumbu kanan)
                       </p>
@@ -1159,14 +1167,17 @@ export default function PLTSTab() {
             {/* Kanan: Komposisi Energi DC (xl:col-span-1) */}
             <CardBox className="flex flex-col justify-between h-full">
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="size-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                    <BatteryCharging size={20} />
+                <div className="flex items-center justify-between gap-2 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                      <BatteryCharging size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Komposisi Energi DC</h3>
+                      <p className="text-xs text-slate-500 mt-0.5">Porsi bauran energi operasional</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-base font-bold text-slate-900">Komposisi Energi DC</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">Porsi bauran energi operasional</p>
-                  </div>
+                  <MetricInfoIcon infoKey="plts_energy_composition" />
                 </div>
 
                 <div className="space-y-5 my-4">
@@ -1254,9 +1265,12 @@ export default function PLTSTab() {
                   <Activity size={20} />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
-                    Kalkulasi Emisi Aktual per Distribution Center
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-slate-900">
+                      Kalkulasi Emisi Aktual per Distribution Center
+                    </h3>
+                    <MetricInfoIcon infoKey="plts_multi_dc_analytics" />
+                  </div>
                   <p className="text-xs text-slate-500 mt-0.5">
                     Monitoring operasional dan penghematan PLTS per cabang (Scope 2)
                   </p>
