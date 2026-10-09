@@ -486,6 +486,19 @@ export default function PLTSTab() {
     };
   }, [dashboardData]);
 
+  const chartYAxisMax = useMemo(() => {
+    if (!chartData || chartData.length === 0) return 1600;
+    const maxVal = Math.max(
+      ...chartData.map(d => Math.max(
+        d.plnConsumption || 0,
+        (d.selfConsumption || 0) + (d.feedIn || 0),
+        d.avoidedEmissionTon || 0,
+        d.target || 0
+      ))
+    );
+    return Math.ceil((maxVal * 1.1) / 200) * 200 || 1600;
+  }, [chartData]);
+
   return (
     <div className="space-y-6 animate-in">
       {/* 1. Header Section */}
@@ -511,8 +524,8 @@ export default function PLTSTab() {
           <button
             type="button"
             className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'overview'
-                ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                : 'text-slate-500 hover:text-slate-900'
+              ? 'bg-white text-slate-900 shadow-sm font-semibold'
+              : 'text-slate-500 hover:text-slate-900'
               }`}
             onClick={() => setActivePltsSubView('overview')}
           >
@@ -522,8 +535,8 @@ export default function PLTSTab() {
             <button
               type="button"
               className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'april-audit'
-                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                  : 'text-slate-500 hover:text-slate-900'
+                ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                : 'text-slate-500 hover:text-slate-900'
                 }`}
               onClick={() => setActivePltsSubView('april-audit')}
             >
@@ -534,8 +547,8 @@ export default function PLTSTab() {
           <button
             type="button"
             className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'isolar-api'
-                ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                : 'text-slate-500 hover:text-slate-900'
+              ? 'bg-white text-slate-900 shadow-sm font-semibold'
+              : 'text-slate-500 hover:text-slate-900'
               }`}
             onClick={() => setActivePltsSubView('isolar-api')}
           >
@@ -808,8 +821,8 @@ export default function PLTSTab() {
                     setDashboardFilters(prev => ({ ...prev, period: '2026-01_2026-09', mode: 'YTD', month: 9, throughMonth: 9 }));
                   }}
                   className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.mode === 'YTD'
-                      ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/60'
-                      : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/60'
+                    : 'text-slate-500 hover:text-slate-900'
                     }`}
                 >
                   Akumulasi Jan-Sep (YTD)
@@ -821,8 +834,8 @@ export default function PLTSTab() {
                     setDashboardFilters(prev => ({ ...prev, period: '2026-09_2026-09', mode: 'MONTH', month: 9, throughMonth: 9 }));
                   }}
                   className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.mode === 'MONTH'
-                      ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/60'
-                      : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/60'
+                    : 'text-slate-500 hover:text-slate-900'
                     }`}
                 >
                   Bulan Ini Saja (Sep 2026)
@@ -988,12 +1001,13 @@ export default function PLTSTab() {
                 ) : (
                   <div className="w-full h-72 lg:h-[300px] pt-2">
                     <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={chartData} margin={{ top: 10, right: 15, bottom: 0, left: 10 }}>
+                      <ComposedChart data={chartData} margin={{ top: 10, right: 15, bottom: 0, left: 10 }} barGap={3}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
                         <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748B' }} stroke="#E2E8F0" />
                         <YAxis
                           yAxisId="left"
                           orientation="left"
+                          domain={[0, chartYAxisMax]}
                           tick={{ fontSize: 10, fill: '#64748B' }}
                           stroke="#E2E8F0"
                           tickFormatter={v => `${v} MWh`}
@@ -1002,6 +1016,7 @@ export default function PLTSTab() {
                         <YAxis
                           yAxisId="right"
                           orientation="right"
+                          domain={[0, chartYAxisMax]}
                           tick={{ fontSize: 10, fill: '#059669' }}
                           stroke="#E2E8F0"
                           tickFormatter={v => `${v} t`}
@@ -1049,10 +1064,10 @@ export default function PLTSTab() {
                             return null;
                           }}
                         />
-                        <Bar yAxisId="left" dataKey="plnConsumption" name="Konsumsi PLN" fill="#94A3B8" radius={[4, 4, 0, 0]} maxBarSize={20} />
-                        <Bar yAxisId="left" dataKey="selfConsumption" stackId="plts" name="Pakai Sendiri" fill="#F59E0B" radius={[0, 0, 0, 0]} maxBarSize={20} />
-                        <Bar yAxisId="left" dataKey="feedIn" stackId="plts" name="Ekspor" fill="#FDE68A" radius={[4, 4, 0, 0]} maxBarSize={20} />
-                        <Bar yAxisId="right" dataKey="avoidedEmissionTon" name="Emisi Terhindar (tCO₂e)" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={20} />
+                        <Bar yAxisId="left" dataKey="plnConsumption" stackId="pln" name="Konsumsi PLN" fill="#94A3B8" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                        <Bar yAxisId="left" dataKey="selfConsumption" stackId="plts" name="Pakai Sendiri" fill="#F59E0B" radius={[0, 0, 0, 0]} maxBarSize={16} />
+                        <Bar yAxisId="left" dataKey="feedIn" stackId="plts" name="Ekspor" fill="#FDE68A" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                        <Bar yAxisId="right" dataKey="avoidedEmissionTon" stackId="emission" name="Emisi Terhindar" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={16} />
                         <Line yAxisId="left" type="monotone" dataKey="target" name="Target PLTS" stroke="#8B5CF6" strokeDasharray="4 4" strokeWidth={2.5} dot={{ r: 3, fill: '#8B5CF6' }} />
                       </ComposedChart>
                     </ResponsiveContainer>
