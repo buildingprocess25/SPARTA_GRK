@@ -222,17 +222,20 @@ export default function Scope2AnnualLoadDashboard() {
     });
   };
 
+  const [retryCount, setRetryCount] = useState(0);
+
   useEffect(() => {
     const controller = new AbortController();
+    setError(null);
     fetch('/api/scope2/annual-load', { cache: 'no-store', signal: controller.signal })
       .then(async response => {
         const payload = await response.json();
-        if (!response.ok || payload.status !== 'success') throw new Error(payload.message || 'Gagal membaca data');
+        if (!response.ok || payload.status !== 'success') throw new Error(payload.error || payload.message || 'Gagal membaca data');
         setData(payload.data);
       })
       .catch(fetchError => { if (fetchError.name !== 'AbortError') setError(fetchError.message); });
     return () => controller.abort();
-  }, []);
+  }, [retryCount]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -321,7 +324,26 @@ export default function Scope2AnnualLoadDashboard() {
   const pageCount = Math.max(1, Math.ceil(ranking.length / PAGE_SIZE));
   const rankingPage = ranking.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-  if (error) return <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-5 text-red-700"><AlertCircle className="mr-2 inline" size={18} />Data belum dapat ditampilkan: {error}</div>;
+  if (error) {
+    return (
+      <div role="alert" className="rounded-2xl border border-rose-200 bg-rose-50/70 p-6 text-rose-950 space-y-3">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="size-5 text-rose-600 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <h4 className="font-bold text-sm text-rose-950">Data Laporan Scope 2 Belum Dapat Ditampilkan</h4>
+            <p className="text-xs text-rose-700 leading-relaxed">{error}</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setRetryCount(c => c + 1)}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-rose-600 rounded-xl hover:bg-rose-700 transition shadow-xs"
+        >
+          Coba Lagi
+        </button>
+      </div>
+    );
+  }
   if (!data) return <div aria-label="Memuat data Scope 2" className="space-y-4"><div className="h-24 animate-pulse rounded-xl bg-slate-200" /><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{[1, 2, 3, 4].map(item => <div key={item} className="h-32 animate-pulse rounded-xl bg-slate-100" />)}</div><div className="h-80 animate-pulse rounded-xl bg-slate-100" /></div>;
 
   const purchasedMwh = (summary.purchasedBasisEnergyKwh + summary.loadUpperBoundEnergyKwh) / 1_000;

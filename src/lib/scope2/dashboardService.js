@@ -49,18 +49,66 @@ function timestampDateFromFilename(filename) {
 }
 
 function loadInputs(rootDir) {
-  const loadReports = fs.readdirSync(rootDir)
-    .filter(name => LOAD_PATTERN.test(name))
-    .map(filename => parseAnnualLoadReport(fs.readFileSync(path.join(rootDir, filename)), { filename }));
-  const productionReports = fs.readdirSync(rootDir)
-    .filter(name => PRODUCTION_PATTERN.test(name))
-    .map(filename => parseIsolarMonthlyReportFile(path.join(rootDir, filename), { filename }));
-  if (loadReports.length !== 2 || productionReports.length !== 2) {
-    throw new Error(`Expected two load and two production annual reports; found ${loadReports.length} and ${productionReports.length}`);
+  const candidateDirs = [
+    rootDir,
+    process.cwd(),
+    path.resolve(rootDir || '.', '..'),
+  ].filter(Boolean);
+
+  let targetDir = null;
+  let loadFiles = [];
+  let prodFiles = [];
+
+  for (const dir of candidateDirs) {
+    try {
+      if (fs.existsSync(dir)) {
+        const files = fs.readdirSync(dir);
+        const loads = files.filter(name => LOAD_PATTERN.test(name));
+        const prods = files.filter(name => PRODUCTION_PATTERN.test(name));
+        if (loads.length > 0 || prods.length > 0) {
+          targetDir = dir;
+          loadFiles = loads;
+          prodFiles = prods;
+          break;
+        }
+      }
+    } catch (_) {}
   }
-  const evidencePath = path.join(rootDir, 'docs/evidence/scope2-vendor-discovery-2026-10-07.json');
-  const discovery = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
-  return { loadReports, productionReports, discovery };
+
+  if (!targetDir || (loadFiles.length === 0 && prodFiles.length === 0)) {
+    return { loadReports: [], productionReports: [], discovery: { plants: [] }, isEmpty: true };
+  }
+
+  const loadReports = loadFiles.map(filename => {
+    try {
+      return parseAnnualLoadReport(fs.readFileSync(path.join(targetDir, filename)), { filename });
+    } catch (_) {
+      return null;
+    }
+  }).filter(Boolean);
+
+  const productionReports = prodFiles.map(filename => {
+    try {
+      return parseIsolarMonthlyReportFile(path.join(targetDir, filename), { filename });
+    } catch (_) {
+      return null;
+    }
+  }).filter(Boolean);
+
+  let discovery = { plants: [] };
+  const evidencePath = path.join(targetDir, 'docs/evidence/scope2-vendor-discovery-2026-10-07.json');
+  try {
+    if (fs.existsSync(evidencePath)) {
+      discovery = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
+    }
+  } catch (_) {}
+
+  return {
+    loadReports,
+    productionReports,
+    discovery,
+    isEmpty: loadReports.length === 0 && productionReports.length === 0,
+  };
 }
 
 function buildRows({ loadReports, productionReports, discovery }) {
@@ -152,6 +200,39 @@ function aggregateByGrid(rows) {
 
 export function buildScope2CanonicalDashboard({ rootDir = process.cwd(), now = new Date() } = {}) {
   const inputs = loadInputs(rootDir);
+  if (inputs.isEmpty || !inputs.loadReports.length) {
+    return {
+      source: 'ISOLAR_ANNUAL_REPORT_EMPTY_STATE',
+      isEmpty: true,
+      summary: {
+        totalLoadMwh: 0,
+        totalSelfConsumedMwh: 0,
+        scope2PurchasedMwh: 0,
+        scope2EmissionTon: 0,
+        loadBasisEmissionTon: 0,
+        pltsAvoidedTon: 0,
+      },
+      rows: [],
+      monthly: [],
+      yoy: [],
+      rankings: { topEmission: [], topPltsShare: [], anomalies: [] },
+      perGrid: [],
+      factorRows: [],
+      scope2Bridge: {
+        loadBasisTon: 0,
+        pltsAvoidedTon: 0,
+        afterPltsTon: 0,
+        scope2InventoryTon: 0,
+        noDoubleCounting: true,
+      },
+      current: { completeThroughMonth: 9, partialMonth: null, completeRows: [], partialRows: [] },
+      coverage: { monitoredPlantCount: 0, companyFacilityCount: null, companyCoveragePct: null, note: 'Laporan tahunan belum dimuat di direktori kerja.' },
+      quality: { partialPlantMonthCount: 0, loadUpperBoundCount: 0, temporaryFactorCount: 0, abnormalLowCount: 0 },
+      automaticSummary: { narrative: 'Data laporan konsumsi tahunan Scope 2 belum tersedia di server.' },
+      reports: [],
+    };
+  }
+
   const { rows } = buildRows(inputs);
   const currentRows = rows.filter(row => row.yearMonth.startsWith('2026-'));
   const completeRows = currentRows.filter(row => row.periodStatus === 'complete');

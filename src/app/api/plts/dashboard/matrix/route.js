@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getPltsMatrixDashboardWithTiming } from '@/lib/solar/dashboardService';
+import { handleApiError } from '@/lib/server/apiError';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +9,7 @@ function queryObject(searchParams) {
 }
 
 export async function GET(request) {
+  const startTime = Date.now();
   try {
     const { data, timing } = await getPltsMatrixDashboardWithTiming(queryObject(new URL(request.url).searchParams));
     const serverTiming = `db;dur=${timing.dbMs};desc="Database", compute;dur=${timing.computeMs};desc="Compute", total;dur=${timing.totalMs};desc="Total"${timing.cached ? ', cache;desc="HIT"' : ', cache;desc="MISS"'}`;
@@ -19,16 +21,12 @@ export async function GET(request) {
       },
     });
   } catch (error) {
-    const validationError = /mode|month|throughMonth|required/i.test(error.message || '');
-    return NextResponse.json({
-      success: false,
-      error: error.message || 'Gagal memuat matriks bulanan PLTS',
-      code: validationError ? 'INVALID_QUERY' : 'PLTS_MATRIX_ERROR',
-    }, {
-      status: validationError ? 400 : 500,
-      headers: {
-        'Cache-Control': 'no-store',
-      },
+    return handleApiError({
+      endpoint: '/api/plts/dashboard/matrix',
+      startTime,
+      error,
+      defaultCode: 'PLTS_MATRIX_ERROR',
+      defaultMessage: 'Gagal memuat matriks bulanan PLTS',
     });
   }
 }

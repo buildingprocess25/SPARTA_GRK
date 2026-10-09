@@ -15,14 +15,43 @@ if (!globalForPrisma.__prismaErrorHandlersBound) {
   }
 }
 
+function getTunedDatabaseUrl() {
+  const rawUrl = process.env.DATABASE_URL;
+  if (!rawUrl) return undefined;
+  try {
+    const parsed = new URL(rawUrl);
+    if (!parsed.searchParams.has('connection_limit')) {
+      parsed.searchParams.set('connection_limit', process.env.DB_CONNECTION_LIMIT || '15');
+    }
+    if (!parsed.searchParams.has('pool_timeout')) {
+      parsed.searchParams.set('pool_timeout', process.env.DB_POOL_TIMEOUT || '30');
+    }
+    if (!parsed.searchParams.has('connect_timeout')) {
+      parsed.searchParams.set('connect_timeout', '10');
+    }
+    return parsed.toString();
+  } catch (_) {
+    return rawUrl;
+  }
+}
+
 function createPrismaClient() {
-  const client = new PrismaClient({
+  const tunedUrl = getTunedDatabaseUrl();
+  const clientOptions = {
     log: [
       { emit: 'event', level: 'query' },
       { emit: 'stdout', level: 'error' },
       { emit: 'stdout', level: 'warn' },
     ],
-  });
+  };
+
+  if (tunedUrl) {
+    clientOptions.datasources = {
+      db: { url: tunedUrl },
+    };
+  }
+
+  const client = new PrismaClient(clientOptions);
 
   // Track query durations if needed
   client.$on('query', (e) => {

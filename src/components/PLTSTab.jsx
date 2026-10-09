@@ -108,6 +108,16 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
     };
   }
 
+  // 3.5 Database Sibuk / Pool Timeout
+  if (codeStr.includes('DATABASE') || codeStr.includes('POOL') || errStr.includes('database') || errStr.includes('antrian')) {
+    return {
+      category: 'DATABASE',
+      badge: 'Database Sibuk',
+      message: `Koneksi database sedang padat. Menampilkan data tersimpan terakhir ${timeLabel}. Mencoba lagi otomatis.`,
+      advice: 'Koneksi database sedang melayani antrian request. Data pemantauan tetap aman dan sistem akan menyinkronkan ulang secara bertahap.',
+    };
+  }
+
   // 4. Server iSolar Down / 503 / 502 / 504 / MUTATIONS_DISABLED
   if (statusNum === 503 || statusNum === 502 || statusNum === 504 || errStr.includes('503') || errStr.includes('502') || codeStr === 'MUTATIONS_DISABLED' || codeStr.includes('GATEWAY') || codeStr.includes('SERVER')) {
     return {
@@ -253,9 +263,9 @@ export default function PLTSTab() {
           setDashboardData(payload.data);
           setDashboardLoading(false);
 
-          // Idle prefetch remaining tabs for instant first click
+          // Idle prefetch remaining tabs sequentially with delays to prevent DB connection spikes
           if (typeof window !== 'undefined') {
-            const prefetchTabs = () => {
+            const prefetchTabs = async () => {
               const tabEndpoints = [
                 '/api/plts/dashboard/performance',
                 '/api/plts/dashboard/pr',
@@ -263,24 +273,28 @@ export default function PLTSTab() {
                 '/api/plts/dashboard/load',
                 '/api/plts/dashboard/matrix',
               ];
-              tabEndpoints.forEach((ep) => {
+              for (const ep of tabEndpoints) {
+                if (!isCurrent) break;
                 const cacheKey = buildCacheKey(ep, dashboardFilters);
-                if (window.__PLTS_CLIENT_CACHE__ && window.__PLTS_CLIENT_CACHE__.has(cacheKey)) return;
-                fetch(cacheKey, { priority: 'low' })
-                  .then((r) => r.json())
-                  .then((res) => {
+                if (window.__PLTS_CLIENT_CACHE__ && window.__PLTS_CLIENT_CACHE__.has(cacheKey)) continue;
+                try {
+                  const r = await fetch(cacheKey, { priority: 'low' });
+                  if (r.ok) {
+                    const res = await r.json();
                     if (res?.success && window.__PLTS_CLIENT_CACHE__) {
                       window.__PLTS_CLIENT_CACHE__.set(cacheKey, res.data);
                     }
-                  })
-                  .catch(() => { });
-              });
+                  }
+                } catch (_) {}
+                // Delay 600ms between requests to avoid connection pool congestion
+                await new Promise((resolve) => setTimeout(resolve, 600));
+              }
             };
 
             if ('requestIdleCallback' in window) {
-              window.requestIdleCallback(prefetchTabs, { timeout: 3000 });
+              window.requestIdleCallback(() => { prefetchTabs(); }, { timeout: 4000 });
             } else {
-              setTimeout(prefetchTabs, 400);
+              setTimeout(prefetchTabs, 1000);
             }
           }
         }

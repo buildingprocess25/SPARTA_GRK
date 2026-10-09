@@ -14,6 +14,7 @@ import { QUOTA_CONFIG } from '@/lib/solar/endpoints.js';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig.js';
 import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
 import { isTokenRefreshing } from '@/lib/solar/tokenManager.js';
+import { isDbConnectionError, sanitizeErrorMessage } from '@/lib/server/apiError.js';
 
 const MANUAL_COOLDOWN_MS = 60_000;
 const CACHE_TTL_MS = 10_000; // 10s micro-cache to protect DB connection pool
@@ -338,17 +339,23 @@ export async function GET(request) {
       }
     });
   } catch (error) {
-    console.error('[isolar/route] Error:', error);
+    const durationMs = Date.now() - now.getTime();
+    const isConnErr = isDbConnectionError(error);
+    const code = isConnErr ? 'DATABASE_UNAVAILABLE' : (error.code || 'ISOLAR_DATA_ERROR');
+    const sanitizedMsg = sanitizeErrorMessage(error.message || '');
+    console.error(`[API_ERROR] endpoint=/api/isolar duration=${durationMs}ms code=${code} status=${isConnErr ? 503 : 500} error=${sanitizedMsg}`);
     return NextResponse.json({
       success: false,
       mode: 'live',
-      error: error.message || 'Data telemetri tidak dapat dibaca.',
-      details: error.stack,
-      code: error.code || 'DATABASE_UNAVAILABLE',
+      endpoint: '/api/isolar',
+      error: isConnErr
+        ? 'Koneksi database sementara sibuk atau mengalami timeout antrian. Data pemantauan tetap aman.'
+        : (sanitizedMsg || 'Data telemetri tidak dapat dibaca.'),
+      code,
       gatewayStatus: 'ERROR',
       lastSyncTime: formatWibTime(now),
       stationList: [],
-    }, { status: 500 });
+    }, { status: isConnErr ? 503 : 500 });
   }
 }
 
@@ -388,7 +395,17 @@ export async function POST(request) {
       cooldownRemainingMs: isCooldown ? Math.max(0, MANUAL_COOLDOWN_MS - (now - lastManualRefresh)) : 0
     });
   } catch (err) {
-    console.error('[isolar/route] Failed to generate dashboard payload after POST:', err);
-    return NextResponse.json({ success: false, error: 'Gagal memuat data setelah sinkronisasi.', code: 'POST_DASHBOARD_ERROR' }, { status: 500 });
+    const isConnErr = isDbConnectionError(err);
+    const sanitizedMsg = sanitizeErrorMessage(err.message || '');
+    console.error(`[API_ERROR] endpoint=/api/isolar (POST) code=${isConnErr ? 'DATABASE_UNAVAILABLE' : 'POST_DASHBOARD_ERROR'} error=${sanitizedMsg}`);
+    return NextResponse.json({
+      success: false,
+      status: 'error',
+      endpoint: '/api/isolar',
+      error: isConnErr
+        ? 'Koneksi database sementara sibuk. Silakan coba beberapa saat lagi.'
+        : 'Gagal memuat data setelah sinkronisasi.',
+      code: isConnErr ? 'DATABASE_UNAVAILABLE' : 'POST_DASHBOARD_ERROR'
+    }, { status: isConnErr ? 503 : 500 });
   }
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getPltsSummaryDashboardWithTiming } from '@/lib/solar/dashboardService';
+import { handleApiError } from '@/lib/server/apiError';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +9,7 @@ function queryObject(searchParams) {
 }
 
 export async function GET(request) {
+  const startTime = Date.now();
   try {
     const { data, timing } = await getPltsSummaryDashboardWithTiming(queryObject(new URL(request.url).searchParams));
     const cacheDesc = timing.stale ? 'STALE_HIT' : (timing.cached ? 'HIT' : 'MISS');
@@ -20,16 +22,12 @@ export async function GET(request) {
       },
     });
   } catch (error) {
-    const validationError = /mode|month|throughMonth|required/i.test(error.message || '');
-    return NextResponse.json({
-      success: false,
-      error: error.message || 'Gagal memuat ringkasan dashboard PLTS',
-      code: validationError ? 'INVALID_QUERY' : 'PLTS_SUMMARY_ERROR',
-    }, {
-      status: validationError ? 400 : 500,
-      headers: {
-        'Cache-Control': 'no-store',
-      },
+    return handleApiError({
+      endpoint: '/api/plts/dashboard/summary',
+      startTime,
+      error,
+      defaultCode: 'PLTS_SUMMARY_ERROR',
+      defaultMessage: 'Gagal memuat ringkasan dashboard PLTS',
     });
   }
 }
