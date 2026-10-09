@@ -14,10 +14,11 @@ export function evaluateCronAuthorization({ configuredSecret, authorization } = 
 }
 
 export function evaluateMutationAccess({ nodeEnv, hostname, allowManualSync = false } = {}) {
+  if (allowManualSync) {
+    return { allowed: true, status: 200, code: null };
+  }
+
   if (nodeEnv === 'production') {
-    if (allowManualSync) {
-      return { allowed: true, status: 200, code: null };
-    }
     return { allowed: false, status: 403, code: 'MUTATIONS_DISABLED' };
   }
 
@@ -30,7 +31,7 @@ export function evaluateMutationAccess({ nodeEnv, hostname, allowManualSync = fa
 }
 
 export function mutationDecisionForRequest(request, { allowManualSync } = {}) {
-  const isAllowed = allowManualSync ?? (process.env.ALLOW_MANUAL_SYNC === 'true');
+  const isAllowed = allowManualSync ?? (process.env.DISABLE_MUTATIONS !== 'true' && process.env.ALLOW_MANUAL_SYNC !== 'false');
   const decision = evaluateMutationAccess({
     nodeEnv: process.env.NODE_ENV,
     hostname: new URL(request.url).hostname,

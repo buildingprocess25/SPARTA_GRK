@@ -38,8 +38,8 @@ export async function GET() {
       errorMessage: latestRun?.status === 'failed' ? latestRun.errorMessage : null,
       plantCount: 37, // Canonical DC locations count
       inProgress,
-      canManualSync: Boolean(process.env.ALLOW_MANUAL_SYNC === 'true' || process.env.NODE_ENV !== 'production'),
-      mutationsAllowed: Boolean(process.env.ALLOW_MANUAL_SYNC === 'true' || process.env.NODE_ENV !== 'production'),
+      canManualSync: Boolean(process.env.DISABLE_MUTATIONS !== 'true' && process.env.ALLOW_MANUAL_SYNC !== 'false'),
+      mutationsAllowed: Boolean(process.env.DISABLE_MUTATIONS !== 'true' && process.env.ALLOW_MANUAL_SYNC !== 'false'),
     }, {
       headers: {
         'Cache-Control': 'no-store, max-age=0',

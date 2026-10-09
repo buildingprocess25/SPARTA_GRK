@@ -163,7 +163,7 @@ export async function GET(request) {
       },
       targets: targetRecords,
       plants: plantMasters,
-      mutationsAllowed: Boolean(process.env.ALLOW_MANUAL_SYNC === 'true' || process.env.NODE_ENV !== 'production'),
+      mutationsAllowed: Boolean(process.env.DISABLE_MUTATIONS !== 'true' && process.env.ALLOW_MANUAL_SYNC !== 'false'),
     };
 
     cachedPayload = payload;

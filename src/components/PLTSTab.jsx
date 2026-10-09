@@ -786,38 +786,28 @@ export default function PLTSTab() {
                 </div>
               </div>
 
-              {isolarLiveState && (isolarLiveState.canManualSync === false || isolarLiveState.mutationsAllowed === false) ? (
-                <div
-                  className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 text-slate-300 font-semibold text-xs border border-slate-700/60 shrink-0 self-start sm:self-center"
-                  title="Mode hanya-baca aktif di domain publik. Sinkronisasi data berjalan otomatis tiap 15 menit via scheduler."
-                >
-                  <Clock size={14} className="text-blue-400" />
-                  <span>Jadwal Otomatis (15m)</span>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-sm transition-all active:scale-95 disabled:opacity-50 shrink-0 self-start sm:self-center"
-                  onClick={handleManualSync}
-                  disabled={isRefreshing || cooldownRemaining > 0 || isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'}
-                  title={
-                    cooldownRemaining > 0
-                      ? `Cooldown aktif: tunggu ${cooldownRemaining}s`
-                      : isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'
-                        ? 'Refresh dinonaktifkan (Hard Quota Guard)'
-                        : 'Refresh Telemetri'
-                  }
-                >
-                  <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
-                  <span>
-                    {isRefreshing
-                      ? 'Menyinkronkan...'
-                      : cooldownRemaining > 0
-                        ? `Tunggu ${cooldownRemaining}s`
-                        : 'Refresh Sekarang'}
-                  </span>
-                </button>
-              )}
+              <button
+                type="button"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-sm transition-all active:scale-95 disabled:opacity-50 shrink-0 self-start sm:self-center"
+                onClick={handleManualSync}
+                disabled={isRefreshing || cooldownRemaining > 0 || isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'}
+                title={
+                  cooldownRemaining > 0
+                    ? `Cooldown aktif: tunggu ${cooldownRemaining}s`
+                    : isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'
+                      ? 'Refresh dinonaktifkan (Hard Quota Guard)'
+                      : 'Refresh Telemetri'
+                }
+              >
+                <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+                <span>
+                  {isRefreshing
+                    ? 'Menyinkronkan...'
+                    : cooldownRemaining > 0
+                      ? `Tunggu ${cooldownRemaining}s`
+                      : 'Refresh Sekarang'}
+                </span>
+              </button>
             </div>
 
             {/* Baris 2: Grid 4 Stat Kecil */}
