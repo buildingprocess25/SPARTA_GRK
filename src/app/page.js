@@ -8,7 +8,6 @@ import PengurangEmisiTab from '@/components/PengurangEmisiTab';
 import PenambahEmisiTab from '@/components/PenambahEmisiTab';
 import InputDataTab from '@/components/InputDataTab';
 import HistoryTab from '@/components/HistoryTab';
-import EmissionCalculatorPage from '@/components/calculator/EmissionCalculatorPage';
 import { SustainabilityProvider } from '@/context/SustainabilityContext';
 
 export default function Home() {
@@ -63,10 +62,11 @@ export default function Home() {
             />
 
             <main className="flex-1 mx-auto min-w-0 w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
-              {activeTab === 'resume' && (
+              {(activeTab === 'resume' || activeTab === 'calculator') && (
                 <EmisiResumeTab
                   setActiveTab={setActiveTab}
                   navigateTo={navigateTo}
+                  initialOpenCalculator={activeTab === 'calculator'}
                 />
               )}
               {activeTab === 'pengurang' && (
@@ -89,9 +89,6 @@ export default function Home() {
               )}
               {activeTab === 'history' && (
                 <HistoryTab setActiveTab={setActiveTab} />
-              )}
-              {activeTab === 'calculator' && (
-                <EmissionCalculatorPage />
               )}
             </main>
           </div>

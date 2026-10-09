@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect, lazy, Suspense } from 'react';
 import {
   Plus, Sun, Droplets, Fuel, Zap, ArrowRight,
   FileCheck2, ShieldCheck, TrendingDown, TrendingUp, CheckCircle2,
   ExternalLink, Sparkles, AlertCircle, ChevronDown, ChevronUp,
-  Award, BarChart3, Activity, Scale, Percent, ArrowDownRight, Layers
+  Award, BarChart3, Activity, Scale, Percent, ArrowDownRight, Layers,
+  Calculator, X
 } from 'lucide-react';
 import {
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis,
@@ -18,10 +19,45 @@ import StatCard from '@/components/ui/StatCard';
 import CardBox from '@/components/ui/CardBox';
 import MainScope2Bridge from '@/components/MainScope2Bridge';
 
-export default function EmisiResumeTab({ setActiveTab, navigateTo }) {
+// Lazy-load EmissionCalculatorPage agar halaman tetap ringan dan cepat saat awal render
+const EmissionCalculatorPage = lazy(() => import('@/components/calculator/EmissionCalculatorPage'));
+
+function CalculatorLoadingSkeleton() {
+  return (
+    <div className="space-y-4 py-4" aria-label="Memuat kalkulator emisi">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+        <div className="space-y-2">
+          <div className="h-4 w-28 animate-pulse rounded bg-blue-100" />
+          <div className="h-8 w-60 animate-pulse rounded bg-slate-200" />
+          <div className="h-3.5 w-80 max-w-full animate-pulse rounded bg-slate-100" />
+        </div>
+        <div className="h-10 w-24 animate-pulse rounded-xl bg-slate-100" />
+      </div>
+      <div className="h-12 animate-pulse rounded-2xl bg-amber-50 border border-amber-100" />
+      <div className="h-12 animate-pulse rounded-2xl bg-slate-100" />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="h-96 animate-pulse rounded-2xl bg-slate-100" />
+        <div className="h-96 animate-pulse rounded-2xl bg-slate-100" />
+      </div>
+    </div>
+  );
+}
+
+export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCalculator = false }) {
   const { resumeKPI, scope1, scope2, pltsData, waterData, inputHistory } = useSustainability();
   const [showDetailedMapping, setShowDetailedMapping] = useState(false);
   const [chartMetricView, setChartMetricView] = useState('net'); // 'net' | 'all' | 'penambahan' | 'pengurangan'
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(initialOpenCalculator);
+  const calculatorRef = useRef(null);
+
+  useEffect(() => {
+    if (initialOpenCalculator) {
+      setIsCalculatorOpen(true);
+      setTimeout(() => {
+        calculatorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [initialOpenCalculator]);
 
   // Helper navigasi
   const handleNav = (tab, subOption) => {
@@ -111,6 +147,27 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo }) {
         </div>
         <div className="flex items-center gap-2">
           <button
+            type="button"
+            className={`font-semibold rounded-lg px-3.5 py-2 inline-flex items-center gap-2 transition text-sm border shadow-sm ${
+              isCalculatorOpen
+                ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
+                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+            }`}
+            onClick={() => {
+              const nextState = !isCalculatorOpen;
+              setIsCalculatorOpen(nextState);
+              if (nextState) {
+                setTimeout(() => {
+                  calculatorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
+              }
+            }}
+            title="Buka kalkulator simulasi emisi"
+          >
+            <Calculator size={16} className={isCalculatorOpen ? 'text-blue-700' : 'text-blue-600'} />
+            <span>{isCalculatorOpen ? 'Tutup Kalkulator' : 'Buka Kalkulator Emisi'}</span>
+          </button>
+          <button
             className="bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg px-4 py-2 inline-flex items-center gap-2 transition text-sm"
             onClick={() => handleNav('input')}
             title="Tambah log pemakaian baru"
@@ -165,6 +222,85 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo }) {
           icon={Sparkles}
           theme="success"
         />
+      </div>
+
+      {/* 2b. Card Ringkas & Panel Accordion: Kalkulator Emisi GRK (Lazy-loaded) */}
+      <div ref={calculatorRef} className="scroll-mt-6">
+        <CardBox className="border-blue-100/90 bg-gradient-to-r from-blue-50/40 via-white to-slate-50/50 shadow-sm transition-all">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="size-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-blue-200">
+                <Calculator size={22} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-slate-900">Kalkulator Emisi GRK</h3>
+                  <span className="rounded-full bg-blue-100 text-blue-700 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                    Simulasi
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Simulasikan kalkulasi penambah, pengurangan, dan emisi bersih DC/operasional tanpa memengaruhi data dashboard resmi.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsCalculatorOpen(prev => !prev)}
+                className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition shadow-sm ${
+                  isCalculatorOpen
+                    ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-100'
+                }`}
+                aria-expanded={isCalculatorOpen}
+              >
+                <Calculator size={16} />
+                <span>{isCalculatorOpen ? 'Tutup Kalkulator' : 'Buka Kalkulator Emisi'}</span>
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform duration-200 ${isCalculatorOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* Panel Accordion Konten Kalkulator (Lazy-loaded) */}
+          {isCalculatorOpen && (
+            <div className="mt-6 pt-6 border-t border-slate-200 animate-in fade-in duration-300">
+              <div className="mb-5 flex items-center justify-between rounded-xl bg-blue-50/70 border border-blue-100 px-4 py-2.5 text-xs text-blue-800">
+                <span className="font-semibold">
+                  Panel Simulasi Aktif — Seluruh entri dan perhitungan tersimpan otomatis secara lokal tanpa mengubah data master.
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsCalculatorOpen(false)}
+                  className="font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition"
+                  title="Tutup panel kalkulator"
+                >
+                  <X size={14} />
+                  <span>Tutup</span>
+                </button>
+              </div>
+              <Suspense fallback={<CalculatorLoadingSkeleton />}>
+                <EmissionCalculatorPage />
+              </Suspense>
+              <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCalculatorOpen(false);
+                    calculatorRef.current?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition"
+                >
+                  <ChevronUp size={14} />
+                  <span>Tutup Panel Kalkulator</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </CardBox>
       </div>
 
       {/* ============================================================

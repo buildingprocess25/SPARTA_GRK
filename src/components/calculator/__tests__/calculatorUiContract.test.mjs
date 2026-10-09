@@ -5,9 +5,14 @@ import test from 'node:test';
 const read = relative => fs.readFileSync(new URL(relative, import.meta.url), 'utf8');
 const sidebar = read('../../Sidebar.jsx'); const page = read('../../../app/page.js'); const calculator = read('../EmissionCalculatorPage.jsx');
 const home = read('../CalculatorHome.jsx'); const entryForm = read('../CalculatorEntryForm.jsx'); const factors = read('../EmissionFactorsReference.jsx'); const recap = read('../CalculatorRecap.jsx');
+const resume = read('../../EmisiResumeTab.jsx');
 
-test('sidebar and root page preserve the isolated calculator route', () => {
-  assert.match(sidebar, /id:\s*'calculator'/); assert.match(sidebar, /Kalkulator Emisi \(GRK\)/); assert.match(page, /activeTab === 'calculator'/); assert.match(page, /EmissionCalculatorPage/);
+test('calculator is relocated from sidebar to resume tab and lazy loaded', () => {
+  assert.doesNotMatch(sidebar, /id:\s*'calculator'/);
+  assert.match(resume, /Buka Kalkulator Emisi/);
+  assert.match(resume, /EmissionCalculatorPage/);
+  assert.match(resume, /Suspense/);
+  assert.match(page, /initialOpenCalculator/);
 });
 
 test('calculator has autosave draft, explicit audit snapshot and export actions', () => {
