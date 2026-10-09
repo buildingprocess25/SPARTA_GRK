@@ -9,7 +9,7 @@ import {
   ALARM_MAX_READ_IDS,
 } from '@/lib/alarms/config.js';
 import {
-  deduplicateIncomingAlarms,
+  identifyAlarmsToNotify,
   summarizeNotification,
   pruneReadIds,
   filterAlarms,
@@ -17,6 +17,7 @@ import {
 import { useToast } from '@/components/ui/ToastProvider';
 
 const AlarmContext = createContext(null);
+const NOTIFIED_STORAGE_KEY = 'isolar_notified_alarms';
 
 export function AlarmProvider({ children }) {
   const toast = useToast();
@@ -37,11 +38,10 @@ export function AlarmProvider({ children }) {
   const [pollError, setPollError] = useState(null);
   const [notificationPermission, setNotificationPermission] = useState('default');
 
-  const seenIdsRef = useRef(new Set());
-  const isSubsequentPollRef = useRef(false);
+  const notifiedMapRef = useRef({});
   const pollTimerRef = useRef(null);
 
-  // Load readIds from localStorage on mount
+  // Load readIds & notifiedMap from localStorage on mount
   useEffect(() => {
     try {
       if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -56,6 +56,11 @@ export function AlarmProvider({ children }) {
         if (parsed?.version === ALARM_STORAGE_VERSION && Array.isArray(parsed?.readIds)) {
           setReadIds(new Set(parsed.readIds));
         }
+      }
+
+      const storedNotified = localStorage.getItem(NOTIFIED_STORAGE_KEY);
+      if (storedNotified) {
+        notifiedMapRef.current = JSON.parse(storedNotified) || {};
       }
     } catch (e) {
       console.warn('[AlarmContext] Gagal memuat status baca lokal:', e?.message || e);
@@ -164,42 +169,55 @@ export function AlarmProvider({ children }) {
         setLastSuccessfulPollAt(new Date().toISOString());
         setPollError(null);
 
-        // Deduplication & Notification logic
-        const { newAlarms } = deduplicateIncomingAlarms(
+        setAlarms(incoming);
+        setSummary(incomingSummary);
+        setLastSuccessfulPollAt(new Date().toISOString());
+        setPollError(null);
+
+        // Deduplication & Notification logic (triggers on first load if unnotified, and 60-min reminder for faults)
+        const { toNotify, updatedNotifiedMap } = identifyAlarmsToNotify(
           incoming,
-          seenIdsRef.current,
-          isSubsequentPollRef.current
+          notifiedMapRef.current
         );
 
-        if (newAlarms.length > 0) {
-          const notif = summarizeNotification(newAlarms);
+        notifiedMapRef.current = updatedNotifiedMap;
+        try {
+          localStorage.setItem(NOTIFIED_STORAGE_KEY, JSON.stringify(updatedNotifiedMap));
+        } catch (_) {}
+
+        if (toNotify.length > 0) {
+          const notif = summarizeNotification(toNotify);
           if (notif) {
-            // 1. Toast in-app
+            // 1. Toast in-app (selalu muncul)
             if (notif.variant === 'error') {
               toast.error({ title: notif.title, description: notif.message });
             } else {
               toast.warning({ title: notif.title, description: notif.message });
             }
 
-            // 2. Browser Web Notification API (only if granted)
+            // 2. Browser Web Notification API (hanya jika diizinkan)
             if (
               typeof window !== 'undefined' &&
               'Notification' in window &&
               Notification.permission === 'granted'
             ) {
               try {
-                new Notification(notif.title, {
+                const webNotif = new Notification(notif.title, {
                   body: notif.message,
                   icon: '/alfamart-logo.png',
+                  tag: notif.tag || 'isolar-alarms',
+                  requireInteraction: Boolean(notif.requireInteraction),
                 });
-              } catch {
-                // Ignore Web Notification instantiation failures
+                webNotif.onclick = () => {
+                  window.focus();
+                  setIsPanelOpen(true);
+                };
+              } catch (e) {
+                console.warn('[AlarmContext] Gagal menampilkan web notification:', e);
               }
             }
           }
         }
-
-        isSubsequentPollRef.current = true;
       }
     } catch (err) {
       setPollError(err.message || 'Gagal menyinkronkan alarm.');
@@ -252,6 +270,55 @@ export function AlarmProvider({ children }) {
     return alarms.filter((a) => !readIds.has(a.id)).length;
   }, [alarms, readIds]);
 
+  // Dynamic Browser Tab Title Prefix: (N)
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const cleanTitle = document.title.replace(/^\(\d+\)\s*/, '');
+    const activeBadgeCount = unreadCount || summary.activeCount || 0;
+    if (activeBadgeCount > 0) {
+      document.title = `(${activeBadgeCount}) ${cleanTitle}`;
+    } else {
+      document.title = cleanTitle;
+    }
+    return () => {
+      document.title = cleanTitle;
+    };
+  }, [unreadCount, summary.activeCount]);
+
+  // Manual Test Notification Button for user verification
+  const sendTestNotification = useCallback(() => {
+    const testTitle = '🔴 [Uji Coba] FAULT iSolar: DC Bogor';
+    const testDesc = 'Hardware Fault / Proteksi Inverter terdeteksi aktif. Uji coba push notifikasi berhasil.';
+    
+    // In-app toast fallback
+    toast.error({ title: testTitle, description: testDesc });
+
+    if (
+      typeof window !== 'undefined' &&
+      'Notification' in window &&
+      Notification.permission === 'granted'
+    ) {
+      try {
+        const n = new Notification(testTitle, {
+          body: testDesc,
+          icon: '/alfamart-logo.png',
+          requireInteraction: true,
+        });
+        n.onclick = () => {
+          window.focus();
+          setIsPanelOpen(true);
+        };
+      } catch (err) {
+        console.warn('[AlarmContext] Gagal mengirim Web Notification uji coba:', err);
+      }
+    } else {
+      toast.warning({
+        title: 'Izin Notifikasi Belum Diberikan',
+        description: 'Klik tombol "Aktifkan notifikasi browser" agar pop-up browser dapat tampil.',
+      });
+    }
+  }, [toast]);
+
   const value = {
     alarms,
     filteredAlarms,
@@ -268,6 +335,7 @@ export function AlarmProvider({ children }) {
     pollError,
     notificationPermission,
     requestNotificationPermission,
+    sendTestNotification,
     markAsRead,
     markAllAsRead,
     refreshAlarms: pollAlarms,

@@ -38,7 +38,7 @@ export default function AlarmBadges({ sourceTab = 'plts', onClick, className = '
       aria-label={`Status alarm ${sourceTab}: ${faultCount} Fault, ${alertCount} Alert`}
     >
       {faultCount > 0 && (
-        <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] px-2 py-0.5 shadow-xs transition">
+        <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] px-2 py-0.5 shadow-xs transition animate-pulse">
           <AlertOctagon size={11} className="shrink-0" />
           <span>{faultCount} Fault</span>
         </span>

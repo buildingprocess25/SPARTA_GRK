@@ -52,6 +52,7 @@ export default function AlarmDialog() {
     markAllAsRead,
     notificationPermission,
     requestNotificationPermission,
+    sendTestNotification,
     lastSuccessfulPollAt,
     refreshAlarms,
     isLoading,
@@ -98,6 +99,15 @@ export default function AlarmDialog() {
                 <span>Aktifkan notifikasi browser</span>
               </button>
             )}
+            <button
+              type="button"
+              onClick={sendTestNotification}
+              className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 font-semibold px-2 py-1 rounded-lg transition"
+              title="Kirim notifikasi uji coba"
+            >
+              <Bell size={12} className="text-slate-400" />
+              <span>Tes Notifikasi</span>
+            </button>
             <span className="text-slate-500 hidden sm:inline">
               {summary.faultCount} Fault • {summary.alertCount} Alert
             </span>

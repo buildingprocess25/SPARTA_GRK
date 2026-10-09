@@ -16,6 +16,7 @@ import CardBox from '@/components/ui/CardBox';
 import { processAllDCAnalytics, SOLAR_CONSTANTS } from '@/lib/solar/processor';
 import { formatNum } from '@/data/sustainabilityData';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
+import { normalizePlantStatus } from '@/lib/solar/status';
 
 const ALL_METRIC_OPTIONS = [
   {
@@ -339,17 +340,24 @@ export function formatWibTime(dateStr) {
 export function getDCBadges(dc, selectedMetric) {
   const isAuditBaselineEnabled = isFeatureEnabled('auditBaseline');
   const badges = [];
-  const isUnderConstruction = dc.isUnderConstruction || (dc.canonicalName || dc.name || '').toLowerCase().includes('gorontalo');
-  const isOffline = !isUnderConstruction && (dc.isOffline || dc.status === 'Offline');
-  const hasAlarm = !isUnderConstruction && (dc.hasAlarm || (dc.alarmCount && dc.alarmCount > 0) || dc.status === 'Alarm' || (dc.status || '').startsWith('Alarm'));
-  const isWaiting = !isUnderConstruction && (dc.isWaiting || dc.status === 'Menunggu Data' || (dc.currentPowerKw === 0 && dc.todayYieldKwh === 0)) && !isOffline && !hasAlarm;
+  const statusKey = normalizePlantStatus(dc);
   const isStale = dc.isDataStale;
   const isUnreliable = isAuditBaselineEnabled && dc.requiresManualVerification;
-  const isPrInvalid = isAuditBaselineEnabled && selectedMetric === 'pr' && !dc.isValidPr && !isOffline && !isWaiting && !hasAlarm;
-  const isHighYield = !isUnderConstruction && (dc.todaySpecificYield || 0) > 6.0;
+  const isPrInvalid = isAuditBaselineEnabled && selectedMetric === 'pr' && !dc.isValidPr && statusKey === 'normal';
+  const isHighYield = statusKey !== 'construction' && (dc.todaySpecificYield || 0) > 6.0;
 
-  // 0. Project Status: Under Construction
-  if (isUnderConstruction) {
+  // 0. Fault (Highest Operational Priority)
+  if (statusKey === 'fault') {
+    badges.push({
+      id: 'fault',
+      label: 'Fault',
+      className: 'bg-red-600 text-white border-red-700 font-bold shadow-xs animate-pulse',
+      tooltip: `Status vendor: Terdeteksi gangguan kritis hardware inverter (${dc.faultCount || 1} fault aktif)`
+    });
+  }
+
+  // 1. Project Status: Under Construction
+  if (statusKey === 'construction') {
     badges.push({
       id: 'under_construction',
       label: 'Dalam Pembangunan',
@@ -358,28 +366,28 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-  // 1. Dimension 1: Vendor Status (Offline)
-  if (isOffline) {
+  // 2. Dimension 1: Vendor Status (Offline)
+  if (statusKey === 'offline') {
     badges.push({
       id: 'offline',
       label: 'Offline',
-      className: 'bg-rose-100 text-rose-700 border-rose-200',
+      className: 'bg-rose-100 text-rose-700 border-rose-200 font-bold',
       tooltip: 'Status vendor: Inverter offline / transmisi terputus'
     });
   }
 
-  // 2. Dimension 1: Vendor Status (Alarm)
-  if (hasAlarm && !isOffline) {
+  // 3. Dimension 1: Vendor Status (Alarm)
+  if (statusKey === 'alarm') {
     badges.push({
       id: 'alarm',
       label: 'Alarm',
       className: 'bg-amber-100 text-amber-800 border-amber-300 font-bold',
-      tooltip: `Status vendor: Terdeteksi alarm operasional (${dc.alarmCount || 1} alarm / fault aktif)`
+      tooltip: `Status vendor: Terdeteksi alarm operasional (${dc.alarmCount || 1} alarm aktif)`
     });
   }
 
-  // 3. Dimension 1: Vendor Status (Menunggu Data)
-  if (isWaiting && !isOffline && !hasAlarm) {
+  // 4. Dimension 1: Vendor Status (Menunggu Data)
+  if (statusKey === 'pending') {
     badges.push({
       id: 'waiting',
       label: 'Menunggu Data',

@@ -1,3 +1,27 @@
+export const FAULT_REMINDER_INTERVAL_MS = 60 * 60 * 1000; // 60 minutes
+
+export function identifyAlarmsToNotify(incomingAlarms = [], notifiedMap = {}, now = Date.now()) {
+  const toNotify = [];
+  const updatedNotifiedMap = { ...notifiedMap };
+
+  for (const alarm of incomingAlarms) {
+    const lastNotified = notifiedMap[alarm.id];
+    const isFault = alarm.kind === 'FAULT';
+
+    // Notify if never notified before
+    if (!lastNotified) {
+      toNotify.push(alarm);
+      updatedNotifiedMap[alarm.id] = now;
+    } else if (isFault && (now - lastNotified) >= FAULT_REMINDER_INTERVAL_MS) {
+      // Re-notify active Fault every 60 minutes
+      toNotify.push({ ...alarm, isReminder: true });
+      updatedNotifiedMap[alarm.id] = now;
+    }
+  }
+
+  return { toNotify, updatedNotifiedMap };
+}
+
 export function deduplicateIncomingAlarms(incomingAlarms = [], seenIds = new Set(), isSubsequentPoll = false) {
   const newAlarms = [];
 
@@ -25,10 +49,14 @@ export function summarizeNotification(newAlarms = []) {
   if (newAlarms.length === 1) {
     const alarm = newAlarms[0];
     const isFault = alarm.kind === 'FAULT';
+    const reminderPrefix = alarm.isReminder ? '[Pengingat 60 mnt] ' : '';
     return {
       variant: isFault ? 'error' : 'warning',
-      title: `${isFault ? 'Fault' : 'Alert'} iSolar: ${alarm.dcName || 'DC'}`,
-      message: `${alarm.dcName ? `${alarm.dcName}: ` : ''}${alarm.title}${alarm.occurredAt ? ` (${new Date(alarm.occurredAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB)` : ''}`,
+      title: `${isFault ? '🔴 Fault' : 'Alert'} iSolar: ${alarm.dcName || 'DC'}`,
+      message: `${reminderPrefix}${alarm.dcName ? `${alarm.dcName}: ` : ''}${alarm.title || 'Gangguan operasional inverter'}${alarm.occurredAt ? ` (${new Date(alarm.occurredAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB)` : ''}`,
+      requireInteraction: isFault,
+      tag: alarm.id,
+      alarm,
     };
   }
 
@@ -38,8 +66,10 @@ export function summarizeNotification(newAlarms = []) {
 
   return {
     variant: hasFault ? 'error' : 'warning',
-    title: `${newAlarms.length} Alarm Baru iSolar Terdeteksi`,
+    title: `${hasFault ? '🔴' : '🟠'} ${newAlarms.length} Alarm Baru iSolar Terdeteksi`,
     message: `${parts.join(', ')} pada monitoring PLTS. Buka panel alarm untuk detail.`,
+    requireInteraction: hasFault,
+    tag: 'isolar-multiple-alarms',
   };
 }
 

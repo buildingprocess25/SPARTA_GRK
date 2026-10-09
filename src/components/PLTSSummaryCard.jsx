@@ -10,6 +10,7 @@ import CardBox from '@/components/ui/CardBox';
 import { isDcLocation } from '@/lib/solar/plantMap';
 import { isValidPltsHistoryPeriod } from '@/lib/solar/cacheKey';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
+import { normalizePlantStatus, getPlantStatusMeta } from '@/lib/solar/status';
 import {
   BarChart, Bar, ComposedChart, Line, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis
 } from 'recharts';
@@ -339,11 +340,36 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       const telemetry = telemetryByDc.get(item.dcId) || {};
       const performance = performanceByDc.get(item.dcId) || {};
       const installedKwp = item.installedKwp || telemetry.installedKwp || performance.capacityKwp || item.apiInstalledKwp || 0;
-      return {
+      const combined = {
         ...telemetry,
-        ...item,
         ...performance,
+        ...item,
+      };
+      const statusKey = normalizePlantStatus(combined);
+      const meta = getPlantStatusMeta(statusKey);
+      const operationalStatus = {
+        key: meta.key,
+        label: meta.label,
+        badgeColor: meta.badgeColor,
+        isNormal: statusKey === 'normal',
+        isOnline: meta.isOnline,
+        hasFault: meta.hasFault,
+        hasAlarm: meta.hasAlarm,
+        note: combined.operationalStatus?.note || meta.note,
+        faultCount: meta.hasFault ? (combined.faultCount || 1) : 0,
+        alarmCount: meta.hasAlarm ? (combined.alarmCount || 1) : 0,
+        faultNames: combined.operationalStatus?.faultNames || combined.faultNames || (meta.hasFault ? ['Hardware Fault / Proteksi Inverter'] : []),
+      };
+
+      return {
+        ...combined,
         installedKwp,
+        operationalStatus,
+        operationalKey: meta.key,
+        status: meta.label,
+        hasFault: meta.hasFault,
+        hasAlarm: meta.hasAlarm,
+        isOffline: meta.key === 'OFFLINE',
         productionMwh: item.productionMwh ?? performance.productionMwh ?? 0,
         avoidedEmissionTon: performance.emissionTon ?? item.avoidedEmissionTon ?? item.co2Ton ?? 0,
         co2Ton: performance.emissionTon ?? item.co2Ton ?? item.avoidedEmissionTon ?? 0,
@@ -391,11 +417,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       rows.sort((a, b) => (a.productionMwh || 0) - (b.productionMwh || 0));
       rows = rows.slice(0, 5);
     } else if (activeChip === 'attention') {
-      rows = rows.filter(loc => loc.operationalStatus?.key === 'FAULT' || loc.operationalStatus?.key === 'ALARM' || loc.operationalStatus?.key === 'OFFLINE' || loc.isAttention || loc.hasDataAnomaly || !(loc.operationalStatus?.isNormal ?? true));
+      rows = rows.filter(loc => normalizePlantStatus(loc) === 'fault' || normalizePlantStatus(loc) === 'alarm' || normalizePlantStatus(loc) === 'offline' || loc.isAttention || loc.hasDataAnomaly);
     } else if (activeChip === 'fault') {
-      rows = rows.filter(loc => loc.operationalStatus?.key === 'FAULT' || loc.hasFault);
+      rows = rows.filter(loc => normalizePlantStatus(loc) === 'fault');
     } else if (activeChip === 'alarm') {
-      rows = rows.filter(loc => loc.operationalStatus?.key === 'ALARM' || loc.hasAlarm);
+      rows = rows.filter(loc => normalizePlantStatus(loc) === 'alarm');
     }
 
     // 3. User Column Sorting
@@ -502,13 +528,15 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
     let alarm = [];
     let offline = [];
     let waiting = [];
-    filteredRows.forEach(item => {
-      const key = item.operationalStatus?.key;
+    let construction = [];
+    historyDashboardRows.forEach(item => {
+      const statusKey = normalizePlantStatus(item);
       const name = item.canonicalName || item.name;
-      if (key === 'FAULT' || item.hasFault) fault.push(name);
-      else if (key === 'ALARM' || item.hasAlarm) alarm.push(name);
-      else if (key === 'OFFLINE' || item.isOffline) offline.push(name);
-      else if (key === 'WAITING_DATA') waiting.push(name);
+      if (statusKey === 'fault') fault.push(name);
+      else if (statusKey === 'offline') offline.push(name);
+      else if (statusKey === 'alarm') alarm.push(name);
+      else if (statusKey === 'pending') waiting.push(name);
+      else if (statusKey === 'construction') construction.push(name);
       else normal.push(name);
     });
     return {
@@ -517,14 +545,16 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       alarmCount: alarm.length,
       offlineCount: offline.length,
       waitingCount: waiting.length,
+      constructionCount: construction.length,
       normalNames: normal,
       faultNames: fault,
       alarmNames: alarm,
       offlineNames: offline,
       waitingNames: waiting,
+      constructionNames: construction,
       attentionCount: fault.length + alarm.length + offline.length,
     };
-  }, [filteredRows]);
+  }, [historyDashboardRows]);
 
   const exportHistoricalCsv = () => {
     const quote = value => `"${String(value ?? '').replaceAll('"', '""')}"`;
@@ -1025,7 +1055,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               }`}
           >
             <AlertTriangle size={12} className={activeChip === 'fault' ? 'text-white' : 'text-red-600'} />
-            Fault ({historyDashboardRows.filter(r => r.operationalStatus?.key === 'FAULT' || r.hasFault).length})
+            Fault ({statusBreakdown.faultCount})
           </button>
           <button
             type="button"
@@ -1036,7 +1066,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               }`}
           >
             <AlertCircle size={12} className={activeChip === 'alarm' ? 'text-white' : 'text-amber-600'} />
-            Alarm ({historyDashboardRows.filter(r => r.operationalStatus?.key === 'ALARM' || r.hasAlarm).length})
+            Alarm ({statusBreakdown.alarmCount})
           </button>
         </div>
 

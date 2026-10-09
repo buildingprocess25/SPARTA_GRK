@@ -250,11 +250,21 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
         cap += Number(latest.capacityKwp || 0);
         if (latest.psStatus === 0 || latest.psStatus === 4) isOffline = true;
         if (latest.alarmCount && latest.alarmCount > 0) alarmCount += latest.alarmCount;
+        if (Number(latest.psFaultStatus) === 1 || latest.statusCategory === 'FAULT') {
+          hasFault = true;
+          faultNames.push('Hardware Fault / Proteksi Inverter');
+        } else if (Number(latest.psFaultStatus) === 2 || latest.statusCategory === 'ALARM') {
+          alarmCount = Math.max(alarmCount, 1);
+        }
         subPlants.push({
           psId: numId,
           name: latest.name,
           capacityKwp: latest.capacityKwp,
           psStatus: latest.psStatus,
+          psFaultStatus: latest.psFaultStatus,
+          statusCategory: latest.statusCategory,
+          alarmCount: latest.alarmCount,
+          faultCount: latest.faultCount,
           todayEnergyKwh: latest.todayEnergyKwh
         });
       }

@@ -859,24 +859,41 @@ export default function PLTSTab() {
           </div>
 
           {/* Status alarm iSolar & operasional */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs" data-testid="plant-status-summary">
+          <div
+            className={`rounded-2xl border p-4 shadow-2xs transition-colors ${
+              pltsAlarms.faultCount > 0
+                ? 'border-red-300 bg-red-50/40'
+                : pltsAlarms.alertCount > 0
+                  ? 'border-amber-300 bg-amber-50/30'
+                  : 'border-slate-200 bg-white'
+            }`}
+            data-testid="plant-status-summary"
+          >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Status alarm iSolar</p>
-                  <span className="size-1.5 rounded-full bg-emerald-500" />
+                  <span
+                    className={`size-2 rounded-full ${
+                      pltsAlarms.faultCount > 0
+                        ? 'bg-red-500 animate-ping'
+                        : pltsAlarms.alertCount > 0
+                          ? 'bg-amber-500'
+                          : 'bg-emerald-500'
+                    }`}
+                  />
                 </div>
                 <div className="mt-1.5 flex flex-wrap items-center gap-2">
                   {pltsAlarms.faultCount > 0 && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 text-white font-bold text-xs px-2.5 py-0.5 shadow-2xs">
-                      <AlertOctagon size={13} />
-                      <span>{pltsAlarms.faultCount} Fault</span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 text-white font-bold text-xs px-3 py-1 shadow-xs animate-pulse">
+                      <AlertOctagon size={14} />
+                      <span>🔴 {pltsAlarms.faultCount} Fault</span>
                     </span>
                   )}
                   {pltsAlarms.alertCount > 0 && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 text-white font-bold text-xs px-2.5 py-0.5 shadow-2xs">
-                      <AlertTriangle size={13} />
-                      <span>{pltsAlarms.alertCount} Alert</span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500 text-white font-bold text-xs px-3 py-1 shadow-xs">
+                      <AlertTriangle size={14} />
+                      <span>🟠 {pltsAlarms.alertCount} Alert</span>
                     </span>
                   )}
                   {pltsAlarms.faultCount === 0 && pltsAlarms.alertCount === 0 && (

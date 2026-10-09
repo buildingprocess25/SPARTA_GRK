@@ -460,6 +460,8 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
     let onlineSubCount = 0;
     let totalAlarms = 0;
     let anyAlarm = false;
+    let totalFaults = 0;
+    let anyFault = false;
 
     let totalEqHoursWeighted = 0;
 
@@ -474,12 +476,12 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
       const alarmCount = Number(p.alarm_count || 0);
       const faultCount = Number(p.fault_count || 0);
       const faultStatus = Number(p.ps_fault_status || 0);
-      const hasFault = faultCount > 0;
-      const hasAlarm = alarmCount > 0;
+      const hasFault = faultCount > 0 || faultStatus === 1;
+      const hasAlarm = (alarmCount > 0 || faultStatus === 2) && !hasFault;
       
       const isVendorOffline = Number(p.ps_status) === 0;
       const isVendorOnline = !isVendorOffline;
-      const isWaiting = isVendorOnline && (pwrKw === 0 || pwrKw === null) && (todayKwh === 0);
+      const isWaiting = isVendorOnline && (pwrKw === 0 || pwrKw === null) && (todayKwh === 0) && !hasFault && !hasAlarm;
 
       const updateTime = p.curr_power_update_time || p.today_energy_update_time || p.total_energy_update_time;
       const plantApiCap = p.total_capcity?.value !== undefined ? Number(p.total_capcity.value) : null;
@@ -493,7 +495,11 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
       const subNeedsVerif = Math.abs(subDiffPct) > 25.0;
 
       if (isVendorOnline) onlineSubCount++;
-      if (hasFault || hasAlarm) {
+      if (hasFault) {
+        anyFault = true;
+        totalFaults += (faultCount || 1);
+      }
+      if (hasAlarm) {
         anyAlarm = true;
         totalAlarms += (alarmCount || 1);
       }
@@ -514,8 +520,8 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
 
       let subStatus = 'Normal';
       if (isVendorOffline) subStatus = 'Offline';
-      else if (hasFault) subStatus = `Fault (${faultCount})`;
-      else if (hasAlarm) subStatus = `Alarm (${alarmCount})`;
+      else if (hasFault) subStatus = 'Fault';
+      else if (hasAlarm) subStatus = 'Alarm';
       else if (isWaiting) subStatus = 'Menunggu Data';
 
       return {
@@ -531,6 +537,7 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
         faultCount,
         faultStatus,
         hasFault,
+        hasAlarm,
         isWaiting,
         isOnline: isVendorOnline,
         isOffline: isVendorOffline,
@@ -542,7 +549,7 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
     // Determine aggregate vendor status (Dimension 1)
     const isAllOffline = onlineSubCount === 0 && matchingPlants.length > 0;
     const isOnline = onlineSubCount > 0;
-    const isWaiting = !isAllOffline && subPlantTelemetry.every(sp => !sp.isOnline || sp.isWaiting);
+    const isWaiting = !isAllOffline && !anyFault && !anyAlarm && subPlantTelemetry.every(sp => !sp.isOnline || sp.isWaiting);
 
     const isUnderConstruction = dc.dcId === 'DC-GORONTALO' || dc.canonicalName?.toLowerCase().includes('gorontalo') || Boolean(dc.isUnderConstruction);
 
@@ -552,6 +559,9 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
     if (isUnderConstruction) {
       status = 'Dalam Pembangunan';
       statusColor = '#94A3B8';
+    } else if (anyFault) {
+      status = 'Fault';
+      statusColor = '#DC2626';
     } else if (isAllOffline) {
       status = 'Offline';
       statusColor = '#E11D48';
@@ -619,6 +629,8 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
       statusColor,
       isOnline,
       isOffline: isAllOffline,
+      hasFault: anyFault,
+      faultCount: totalFaults,
       hasAlarm: anyAlarm,
       alarmCount: totalAlarms,
       isWaiting,
