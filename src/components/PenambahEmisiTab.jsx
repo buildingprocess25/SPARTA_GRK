@@ -15,6 +15,7 @@ import StatCard from '@/components/ui/StatCard';
 import CardBox from '@/components/ui/CardBox';
 import Scope2AnnualLoadDashboard from '@/components/Scope2AnnualLoadDashboard';
 import Scope1InputModal from '@/components/scope1/Scope1InputModal';
+import InputDataButton from '@/components/ui/InputDataButton';
 import {
   branchHierarchyList,
   getHierarchyElectricityStats,
@@ -72,16 +73,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
         </div>
 
         {activeSubScope === 'scope1' && (
-          <div className="flex items-center gap-2 shrink-0 sm:self-start">
-            <button
-              type="button"
-              onClick={() => setIsInputModalOpen(true)}
-              className="inline-flex items-center justify-center gap-2 h-10 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 text-white shadow-sm hover:bg-slate-800 hover:shadow-md hover:ring-2 hover:ring-slate-700/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 active:scale-[0.98] transition-all duration-150 shrink-0 cursor-pointer"
-            >
-              <Fuel size={16} className="text-rose-400 shrink-0" />
-              <span className="tracking-wide">Input Data Scope 1</span>
-            </button>
-          </div>
+          <InputDataButton label="Input Data Scope 1" icon={Fuel} onClick={() => setIsInputModalOpen(true)} />
         )}
       </header>
 

@@ -17,7 +17,7 @@ test('calculator is relocated from sidebar to resume tab and lazy loaded', () =>
 
 test('calculator has autosave draft, explicit audit snapshot and export actions', () => {
   assert.match(calculator, /localStorage\.getItem\(DRAFT_KEY\)/); assert.match(calculator, /Simpan ke Riwayat Audit/); assert.match(calculator, /Unduh PDF/); assert.match(calculator, /Unduh Excel/);
-  assert.match(calculator, /Mode simulasi/); assert.match(calculator, /window\.confirm/); assert.match(calculator, /Draft tidak dapat disimpan/);
+  assert.match(calculator, /Mode simulasi/); assert.match(calculator, /useConfirm/); assert.doesNotMatch(calculator, /window\.confirm/); assert.match(calculator, /Draft tidak dapat disimpan/);
   assert.match(calculator, /entry\.category !== 'offset'/); assert.match(calculator, /snapshotRegistry/); assert.match(calculator, /disabled=\{!days\}/);
 });
 

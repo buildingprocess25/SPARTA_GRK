@@ -1,4 +1,5 @@
 import './globals.css';
+import OverlayProviders from '@/components/ui/OverlayProviders';
 
 export const metadata = {
   title: 'Alfamart - Dashboard Sustainability Energy & Water',
@@ -14,7 +15,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="id" suppressHydrationWarning>
       <body suppressHydrationWarning className="bg-slate-50 text-slate-800">
-        {children}
+        <OverlayProviders>{children}</OverlayProviders>
       </body>
     </html>
   );

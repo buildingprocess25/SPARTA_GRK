@@ -197,6 +197,31 @@ test('PLTS avoided emissions use self-consumption times the single 0.997 factor 
   assert.equal(data.summary.emission.includedPlantCount, 2);
 });
 
+test('manual PLTS input replaces the same plant-month source without double-counting energy flow', () => {
+  const data = buildPltsDashboardFromRows({
+    query: { period: '2026-01_2026-01', mode: 'YTD', throughMonth: 1, grid: 'ALL', plant: 'ALL', compareYears: [2025, 2026] },
+    currentYearMonth: '202610',
+    plants: [{ dcId: 'A', canonicalName: 'Plant A', grid: 'JAMALI', sungrowPsIds: [1], apiInstalledKwp: 100 }],
+    observations: [
+      { yearMonth: '202601', psId: 1, energyKwh: 100, source: 'ISOLAR_REPORT_IMPORT' },
+      { yearMonth: '202601', psId: 1, energyKwh: 120, source: 'MANUAL_INPUT' },
+    ],
+    energyFlows: [
+      { yearMonth: '202601', psId: 1, yieldKwh: 100, feedInKwh: 10, source: 'ISOLAR_REPORT_IMPORT' },
+      { yearMonth: '202601', psId: 1, yieldKwh: 120, feedInKwh: 20, source: 'MANUAL_INPUT' },
+    ],
+    targets: [], climate: [], loads: [], factors: {},
+  });
+
+  assert.equal(data.plants[0].monthly[0].source, 'MANUAL_INPUT');
+  assert.equal(data.monthly[0].actualKwh, 120);
+  assert.equal(data.monthly[0].feedInKwh, 20);
+  assert.equal(data.monthly[0].selfConsumptionKwh, 100);
+  assert.equal(data.monthly[0].avoidedEmissionTon, 0.0997);
+  assert.equal(data.fullYearMonthly[0].feedInKwh, 20);
+  assert.equal(data.fullYearMonthly[0].avoidedEmissionTon, 0.0997);
+});
+
 test('owner grid table marks factor eligibility explicitly', () => {
   assert.ok(GRID_EMISSION_FACTORS.every((factor) => ['resmi', 'sementara'].includes(factor.status)));
   const sulselrabar = GRID_EMISSION_FACTORS.find((factor) => factor.grid === 'SULSELRABAR');

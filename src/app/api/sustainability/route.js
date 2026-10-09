@@ -414,7 +414,8 @@ export async function POST(request) {
           source: source || 'MANUAL',
           category: 'PLN',
           proofRef: proofRef || '',
-          qualityStatus: status === 'DRAFT' ? 'DRAFT' : 'COMPLETE'
+          qualityStatus: status === 'DRAFT' ? 'DRAFT' : 'COMPLETE',
+          metadata: { activityDate: date }
         }
       });
     } else {

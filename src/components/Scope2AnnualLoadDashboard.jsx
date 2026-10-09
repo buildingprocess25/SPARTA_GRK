@@ -13,6 +13,7 @@ import Scope2DcDrawer from '@/components/scope2/Scope2DcDrawer';
 import Scope2Filters from '@/components/scope2/Scope2Filters';
 import Scope2Waterfall from '@/components/scope2/Scope2Waterfall';
 import Scope2InputModal from '@/components/scope2/Scope2InputModal';
+import InputDataButton from '@/components/ui/InputDataButton';
 import { buildProjection, filterCanonicalRows, parseScope2Query } from '@/lib/scope2/analytics.js';
 import { aggregateCanonicalRows } from '@/lib/scope2/energyReconciliation.js';
 import { getGridFactor } from '@/lib/emission-factors.js';
@@ -331,16 +332,7 @@ export default function Scope2AnnualLoadDashboard() {
           Emisi karbon dari listrik yang dibeli pada setiap distribution center.
         </p>
       </div>
-      <div className="flex items-center gap-2 shrink-0 sm:self-start">
-        <button
-          type="button"
-          onClick={() => setIsInputModalOpen(true)}
-          className="inline-flex items-center justify-center gap-2 h-10 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 text-white shadow-sm hover:bg-slate-800 hover:shadow-md hover:ring-2 hover:ring-slate-700/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 active:scale-[0.98] transition-all duration-150 shrink-0 cursor-pointer"
-        >
-          <Zap size={16} className="text-amber-400 shrink-0" />
-          <span className="tracking-wide">Input Data Scope 2</span>
-        </button>
-      </div>
+      <InputDataButton label="Input Data Scope 2" icon={Zap} onClick={() => setIsInputModalOpen(true)} />
     </header>
 
     <CardBox className="space-y-3"><h2 className="text-sm font-bold text-slate-900">Filter data</h2><Scope2Filters filters={filters} grids={grids} plants={plants} onChange={setFilters} />{SHOW_TARIFF && <div className="flex flex-wrap items-end gap-3 border-t pt-3"><label className="text-xs font-semibold text-slate-600">Tarif asumsi (Rp/kWh)<input type="number" min="1" value={filters.tariff} onChange={event => setFilters({ ...filters, tariff: Math.max(1, Number(event.target.value) || 1) })} className="ml-2 w-32 rounded-lg border px-3 py-2" /></label><span className="rounded-full bg-amber-50 px-3 py-1 text-xs text-amber-800">Asumsi, perlu konfirmasi</span><span className="text-xs text-slate-500">Implisit portal: Rp {number.format(data.assumptions.portalImplicitTariffRupiahPerKwh)}/kWh</span></div>}</CardBox>

@@ -13,6 +13,9 @@ import CalculatorRecap from './CalculatorRecap';
 import CalculatorStepper from './CalculatorStepper';
 import EmissionFactorsReference from './EmissionFactorsReference';
 import { CALCULATOR_CATEGORIES, CATEGORY_MAP } from './calculatorConfig';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
+import { notify } from '@/components/ui/ToastProvider';
+import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 
 const DRAFT_KEY = 'alfamart-esg-calculator-draft-v2';
 const AUDIT_KEY = 'alfamart-esg-calculator-audit-history-v1';
@@ -26,6 +29,7 @@ function downloadBlob(blob, filename) {
 }
 
 export default function EmissionCalculatorPage() {
+  const confirm = useConfirm();
   const [view, setView] = useState('home');
   const [activeCategory, setActiveCategory] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
@@ -83,23 +87,31 @@ export default function EmissionCalculatorPage() {
     setEntries(current => editingEntry ? current.map(item => item.id === editingEntry.id ? entry : item) : [...current, entry]);
     setEditingEntry(null); setNotice('Entri ditambahkan; draft akan disimpan otomatis.');
   };
-  const handleDeleteEntry = id => { if (window.confirm('Hapus entri ini?')) setEntries(current => current.filter(entry => entry.id !== id)); };
-  const reset = () => {
-    if (entries.length === 0 || window.confirm('Reset seluruh simulasi? Draft lokal dan semua entri akan dihapus.')) {
+  const handleDeleteEntry = async id => {
+    const ok = await confirm(dialogPresets.hapusEntri);
+    if (!ok) return;
+    setEntries(current => current.filter(entry => entry.id !== id));
+    notify.success(toastPresets.deleteSuccess);
+  };
+  const reset = async () => {
+    const ok = entries.length === 0 || await confirm(dialogPresets.resetSimulasiDenganJumlah(entries.length));
+    if (ok) {
       setEntries([]); setProfile(INITIAL_PROFILE); setEditingEntry(null); setActiveCategory(null); setView('home'); localStorage.removeItem(DRAFT_KEY); setNotice('Simulasi telah direset.');
+      notify.success(toastPresets.resetSuccess);
     }
   };
 
-  const saveAudit = () => {
+  const saveAudit = async () => {
     try { inclusiveDays(profile.periodStart, profile.periodEnd); } catch { setNotice('Periode belum valid. Perbaiki tanggal sebelum menyimpan audit.'); return; }
     if (!entries.length) { setNotice('Tambahkan minimal satu entri sebelum menyimpan audit.'); return; }
-    if (!window.confirm('Simpan snapshot simulasi ini ke Riwayat Audit lokal? Setelah disimpan, snapshot tidak ikut berubah saat draft diedit.')) return;
+    if (!await confirm(dialogPresets.simpanSnapshot)) return;
     const record = { id: crypto.randomUUID(), savedAt: new Date().toISOString(), profile, entries, summary, schemaVersion: 2 };
     try {
       const history = JSON.parse(localStorage.getItem(AUDIT_KEY) || '[]');
       localStorage.setItem(AUDIT_KEY, JSON.stringify([record, ...history]));
       setNotice('Snapshot berhasil disimpan ke Riwayat Audit lokal kalkulator.');
-    } catch { setNotice('Penyimpanan audit gagal karena penyimpanan browser tidak tersedia.'); }
+      notify.success(toastPresets.saveSuccess);
+    } catch { setNotice('Penyimpanan audit gagal karena penyimpanan browser tidak tersedia.'); notify.error(toastPresets.saveError); }
   };
 
   const exportExcel = async () => {

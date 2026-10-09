@@ -1,18 +1,22 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
-  X, Zap, FileSpreadsheet, Download, RefreshCw,
+  Zap, FileSpreadsheet, Download, RefreshCw,
   CheckCircle2, AlertCircle, AlertTriangle, Calculator,
   Database, UploadCloud, Check, Building2, Calendar, FileText, ChevronDown
 } from 'lucide-react';
 import { useSustainability } from '@/context/SustainabilityContext';
 import { getGridFactor } from '@/lib/emission-factors.js';
 import { CANONICAL_DC_ENTITIES } from '@/lib/solar/plantMap.js';
+import BaseModal from '@/components/ui/BaseModal';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
+import { notify } from '@/components/ui/ToastProvider';
+import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 
 export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = [] }) {
   const { addDataEntry, refreshData } = useSustainability();
+  const confirm = useConfirm();
 
   // Mode: 'manual' | 'excel'
   const [activeTab, setActiveTab] = useState('manual');
@@ -49,6 +53,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
   const [energyValue, setEnergyValue] = useState('');
   const [periodMonth, setPeriodMonth] = useState('09');
   const [periodYear, setPeriodYear] = useState('2026');
+  const [activityDate, setActivityDate] = useState('2026-09-15');
   const [tariffPerKwh, setTariffPerKwh] = useState('1400');
   const [plnCustomerNumber, setPlnCustomerNumber] = useState('');
   const [invoiceRef, setInvoiceRef] = useState('');
@@ -72,47 +77,6 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
       setSelectedPsId(String(dcList[0].psId || dcList[0].dcId));
     }
   }, [dcList, selectedPsId]);
-
-  const [mounted, setMounted] = useState(false);
-  const modalRef = useRef(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    if (!isOpen) return;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [isOpen]);
-
-  // Handle ESC key and focus modal on open
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-
-    // Focus management for accessibility
-    const timer = setTimeout(() => {
-      if (modalRef.current) {
-        modalRef.current.focus();
-      }
-    }, 50);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      clearTimeout(timer);
-    };
-  }, [isOpen, onClose]);
 
   // Current selected DC
   const selectedDC = useMemo(() => {
@@ -138,6 +102,12 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
     const factorObj = getGridFactor(selectedDC.grid);
     return selectedDC.factor || factorObj?.cmExPost || 0.87;
   }, [selectedDC]);
+
+  const handlePeriodChange = (nextMonth, nextYear) => {
+    setPeriodMonth(nextMonth);
+    setPeriodYear(nextYear);
+    setActivityDate(`${nextYear}-${nextMonth.padStart(2, '0')}-15`);
+  };
 
   // Live calculation of Scope 2 emissions
   const liveCalculation = useMemo(() => {
@@ -167,6 +137,9 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
     if (!selectedDC) {
       errors.dc = 'Pilih Distribution Center';
     }
+    if (!activityDate || !activityDate.startsWith(`${periodYear}-${periodMonth.padStart(2, '0')}`)) {
+      errors.date = 'Tanggal pengisian harus berada dalam periode yang dipilih.';
+    }
     const val = parseFloat(energyValue);
     if (!energyValue || isNaN(val) || val <= 0) {
       errors.energy = `Masukkan jumlah konsumsi listrik ${energyUnit.toUpperCase()} yang dibeli (> 0)`;
@@ -182,12 +155,13 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
       setStatusMessage({ type: 'error', text: 'Periksa kembali kolom yang belum terisi dengan benar.' });
       return;
     }
+    if (!await confirm(dialogPresets.simpanScope2)) return;
 
     setIsSubmitting(true);
     setStatusMessage(null);
 
     const yearMonth = `${periodYear}-${periodMonth.padStart(2, '0')}`;
-    const dateStr = `${yearMonth}-15`;
+    const dateStr = activityDate || `${yearMonth}-15`;
     const idempotencyKey = `tx-pln-${selectedDC.dcId || selectedDC.psId}-${yearMonth}-${Date.now()}`;
     const invoiceCode = invoiceRef.trim() || `INV-PLN-${selectedDC.name.replace(/\s+/g, '')}-${periodMonth}${periodYear.slice(2)}`;
 
@@ -210,15 +184,13 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
 
     try {
       // 1. Post to API backend
-      try {
-        await fetch('/api/sustainability', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-      } catch (apiErr) {
-        console.warn('API sync notice:', apiErr.message);
-      }
+      const response = await fetch('/api/sustainability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(result?.message || result?.error || 'Server menolak data Scope 2.');
 
       // 2. Add to Local Sustainability Context
       addDataEntry({
@@ -250,6 +222,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
         type: 'success',
         text: `Data konsumsi listrik PLN ${selectedDC.name} (${liveCalculation.mwh.toFixed(2)} MWh / +${liveCalculation.emissionTon.toFixed(2)} tCO₂e) berhasil disimpan!`
       });
+      notify.success(toastPresets.saveSuccess);
 
       setTimeout(() => {
         onClose();
@@ -261,6 +234,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
         type: 'error',
         text: `Gagal menyimpan: ${err.message || 'Periksa koneksi jaringan'}`
       });
+      notify.error({ ...toastPresets.saveError, description: err.message || toastPresets.saveError.description });
     } finally {
       setIsSubmitting(false);
     }
@@ -313,12 +287,14 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
           error: data.error,
           records: []
         });
+        notify.error({ ...toastPresets.uploadError, description: data.error || toastPresets.uploadError.description });
       } else {
         setPreviewResult(data);
         setStatusMessage({
           type: 'success',
           text: `File ${file.name} tervalidasi: ${data.validCount} baris valid, ${data.errorCount} baris error.`
         });
+        notify.success(toastPresets.uploadSuccess);
       }
     } catch (err) {
       console.error('Error parsing excel:', err);
@@ -326,6 +302,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
         type: 'error',
         text: 'Terjadi kesalahan saat memvalidasi file Excel.'
       });
+      notify.error(toastPresets.uploadError);
     } finally {
       setIsProcessingExcel(false);
     }
@@ -342,6 +319,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
       });
       return;
     }
+    if (!await confirm(dialogPresets.simpanBatchScope2)) return;
 
     setIsSubmitting(true);
     setStatusMessage(null);
@@ -390,6 +368,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
         type: 'success',
         text: `Sukses! ${data.committedCount} transaksi Scope 2 PLN berhasil diimpor ke database!`
       });
+      notify.success(toastPresets.uploadSuccess);
 
       setTimeout(() => {
         onClose();
@@ -401,59 +380,44 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
         type: 'error',
         text: `Gagal simpan batch: ${err.message}`
       });
+      notify.error({ ...toastPresets.uploadError, description: err.message || toastPresets.uploadError.description });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (!isOpen || !mounted) return null;
+  const defaultDcKey = String(dcList[0]?.psId || dcList[0]?.dcId || '');
+  const hasUnsavedChanges = Boolean(
+    activeTab !== 'manual'
+    || selectedPsId !== defaultDcKey
+    || energyUnit !== 'mwh'
+    || energyValue
+    || periodMonth !== '09'
+    || periodYear !== '2026'
+    || activityDate !== '2026-09-15'
+    || tariffPerKwh !== '1400'
+    || plnCustomerNumber
+    || invoiceRef
+    || excelFile
+    || allowPartialImport
+  );
+  const handleCloseRequest = async () => {
+    if (isSubmitting || isProcessingExcel) return;
+    if (hasUnsavedChanges && !await confirm(dialogPresets.keluarTanpaSimpan)) return;
+    onClose();
+  };
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="scope2-modal-title"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-5 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+  return (
+    <BaseModal
+      open={isOpen}
+      onClose={handleCloseRequest}
+      title="Input Data Scope 2 — Listrik PLN"
+      subtitle="Catat konsumsi energi listrik yang dibeli dari PLN per Distribution Center."
+      icon={<Zap size={20} className="text-amber-600" />}
+      badge="Listrik Purchased"
+      size="md"
+      loading={isSubmitting || isProcessingExcel}
     >
-      <div
-        ref={modalRef}
-        tabIndex={-1}
-        className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-[680px] max-h-[90vh] flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-150 outline-none"
-      >
-        {/* Header Modal */}
-        <div className="px-6 py-4.5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0 border border-amber-500/20 shadow-xs">
-              <Zap size={20} className="fill-amber-500/20 text-amber-600" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 id="scope2-modal-title" className="text-lg font-bold text-slate-900 leading-tight">
-                  Input Data Scope 2 — Listrik PLN
-                </h2>
-                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60 tracking-wider">
-                  Listrik Purchased
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Catat konsumsi energi listrik yang dibeli dari PLN per Distribution Center.
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="size-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors"
-            aria-label="Tutup pop-up"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
         {/* Segmented Control Switcher */}
         <div className="px-6 pt-3 pb-2.5 border-b border-slate-100 bg-slate-50/60 shrink-0">
           <div className="inline-flex bg-slate-200/60 p-1 rounded-xl gap-1 w-full sm:w-auto">
@@ -547,14 +511,14 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
               {/* Bagian 2: Periode Pelaporan (Bulan & Tahun Rapat) */}
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
                 <div className="grid grid-cols-12 gap-2">
-                  <div className="col-span-8 sm:col-span-8">
+                  <div className="col-span-12 sm:col-span-5">
                     <label htmlFor="modal-scope2-month" className="text-[11px] font-bold text-slate-600 block mb-1">
                       Bulan Pelaporan <span className="text-rose-500">*</span>
                     </label>
                     <select
                       id="modal-scope2-month"
                       value={periodMonth}
-                      onChange={(e) => setPeriodMonth(e.target.value)}
+                      onChange={(e) => handlePeriodChange(e.target.value, periodYear)}
                       className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-amber-500"
                     >
                       <option value="01">01 - Januari</option>
@@ -572,20 +536,33 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                     </select>
                   </div>
 
-                  <div className="col-span-4 sm:col-span-4">
+                  <div className="col-span-6 sm:col-span-3">
                     <label htmlFor="modal-scope2-year" className="text-[11px] font-bold text-slate-600 block mb-1">
                       Tahun <span className="text-rose-500">*</span>
                     </label>
                     <select
                       id="modal-scope2-year"
                       value={periodYear}
-                      onChange={(e) => setPeriodYear(e.target.value)}
+                      onChange={(e) => handlePeriodChange(periodMonth, e.target.value)}
                       className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-amber-500"
                     >
                       <option value="2026">2026</option>
                       <option value="2025">2025</option>
                       <option value="2024">2024</option>
                     </select>
+                  </div>
+                  <div className="col-span-6 sm:col-span-4">
+                    <label htmlFor="modal-scope2-date" className="text-[11px] font-bold text-slate-600 block mb-1">
+                      Tanggal Pengisian
+                    </label>
+                    <input
+                      id="modal-scope2-date"
+                      type="date"
+                      value={activityDate}
+                      onChange={(e) => setActivityDate(e.target.value)}
+                      className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:border-amber-500"
+                    />
+                    {formErrors.date && <p className="mt-1 text-[10px] font-semibold text-rose-600">{formErrors.date}</p>}
                   </div>
                 </div>
               </div>
@@ -896,10 +873,10 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between shrink-0">
+        <div className="sticky bottom-0 z-10 flex shrink-0 flex-col-reverse gap-2 border-t border-slate-100 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleCloseRequest}
             disabled={isSubmitting}
             className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-900 transition-colors disabled:opacity-50"
           >
@@ -948,8 +925,6 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
             </button>
           )}
         </div>
-      </div>
-    </div>,
-    document.body
+    </BaseModal>
   );
 }

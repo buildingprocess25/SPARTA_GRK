@@ -1,18 +1,22 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
-  X, Fuel, FileSpreadsheet, Download, RefreshCw,
+  Fuel, FileSpreadsheet, Download, RefreshCw,
   CheckCircle2, AlertCircle, AlertTriangle, Calculator,
   Database, UploadCloud, Check, ChevronDown, Settings2
 } from 'lucide-react';
 import { useSustainability } from '@/context/SustainabilityContext';
 import { calculateScope1FuelEmission } from '@/lib/carbon/carbonEngine';
 import { MASTER_FACILITIES, findFacilityById } from '@/lib/master/facilityMaster';
+import BaseModal from '@/components/ui/BaseModal';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
+import { notify } from '@/components/ui/ToastProvider';
+import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 
 export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
   const { dcLocations, addDataEntry, importBatchData, refreshData } = useSustainability();
+  const confirm = useConfirm();
 
   // Mode: 'manual' | 'excel'
   const [activeTab, setActiveTab] = useState('manual');
@@ -56,47 +60,6 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
       setGensetAssetCode(`GEN-${facilities[0].code || 'DC'}-01`);
     }
   }, [facilities, selectedFacilityId]);
-
-  const [mounted, setMounted] = useState(false);
-  const modalRef = useRef(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    if (!isOpen) return;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [isOpen]);
-
-  // Handle ESC key and focus modal on open
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-
-    // Focus management for accessibility
-    const timer = setTimeout(() => {
-      if (modalRef.current) {
-        modalRef.current.focus();
-      }
-    }, 50);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      clearTimeout(timer);
-    };
-  }, [isOpen, onClose]);
 
   // Selected facility object
   const selectedDC = useMemo(() => {
@@ -156,6 +119,9 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
     if (!selectedFacilityId) {
       errors.facility = 'Pilih lokasi fasilitas / DC';
     }
+    if (!activityDate || !activityDate.startsWith(`${periodYear}-${periodMonth.padStart(2, '0')}`)) {
+      errors.date = 'Tanggal pengisian harus berada dalam periode yang dipilih.';
+    }
     if (fuelInputMode === 'liter') {
       const l = parseFloat(fuelLiters);
       if (!fuelLiters || isNaN(l) || l <= 0) {
@@ -181,6 +147,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
       setStatusMessage({ type: 'error', text: 'Periksa kembali kolom yang belum terisi dengan benar.' });
       return;
     }
+    if (!await confirm(dialogPresets.simpanScope1)) return;
 
     setIsSubmitting(true);
     setStatusMessage(null);
@@ -211,15 +178,13 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
     };
 
     try {
-      try {
-        await fetch('/api/sustainability', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-      } catch (apiErr) {
-        console.warn('API submission notice:', apiErr.message);
-      }
+      const response = await fetch('/api/sustainability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(result?.message || result?.error || 'Server menolak data Scope 1.');
 
       addDataEntry(payload);
 
@@ -231,6 +196,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
         type: 'success',
         text: `Data konsumsi solar ${selectedDC.name} (${payload.fuelLiters.toLocaleString('id-ID')} L / +${liveCalc.emissionTon.toFixed(2)} tCO₂e) berhasil disimpan!`
       });
+      notify.success(toastPresets.saveSuccess);
 
       if (onSuccess) {
         onSuccess(payload);
@@ -246,6 +212,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
         type: 'error',
         text: `Gagal menyimpan: ${err.message || 'Periksa koneksi jaringan'}`
       });
+      notify.error({ ...toastPresets.saveError, description: err.message || toastPresets.saveError.description });
     } finally {
       setIsSubmitting(false);
     }
@@ -296,12 +263,14 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
           error: data.error,
           records: []
         });
+        notify.error({ ...toastPresets.uploadError, description: data.error || toastPresets.uploadError.description });
       } else {
         setPreviewResult(data);
         setStatusMessage({
           type: 'success',
           text: `File ${file.name} tervalidasi: ${data.validCount} baris valid, ${data.errorCount} baris error.`
         });
+        notify.success(toastPresets.uploadSuccess);
       }
     } catch (err) {
       console.error('Error parsing excel:', err);
@@ -309,6 +278,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
         type: 'error',
         text: 'Terjadi kesalahan saat memvalidasi file Excel.'
       });
+      notify.error(toastPresets.uploadError);
     } finally {
       setIsProcessingExcel(false);
     }
@@ -324,6 +294,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
       });
       return;
     }
+    if (!await confirm(dialogPresets.simpanBatchScope1)) return;
 
     setIsSubmitting(true);
     setStatusMessage(null);
@@ -374,6 +345,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
         type: 'success',
         text: `Sukses! ${data.committedCount} transaksi Scope 1 Genset berhasil diimpor ke database!`
       });
+      notify.success(toastPresets.uploadSuccess);
 
       if (onSuccess) {
         onSuccess(data);
@@ -389,59 +361,49 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
         type: 'error',
         text: `Gagal simpan batch: ${err.message}`
       });
+      notify.error({ ...toastPresets.uploadError, description: err.message || toastPresets.uploadError.description });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (!isOpen || !mounted) return null;
+  const defaultFacilityId = facilities[0]?.id || '';
+  const defaultAssetCode = `GEN-${selectedDC?.code || 'DC'}-01`;
+  const hasUnsavedChanges = Boolean(
+    activeTab !== 'manual'
+    || selectedFacilityId !== defaultFacilityId
+    || fuelType !== 'SOLAR'
+    || fuelInputMode !== 'liter'
+    || fuelLiters
+    || costRupiah
+    || pricePerLiter !== '15000'
+    || periodMonth !== '08'
+    || periodYear !== '2026'
+    || activityDate !== '2026-08-15'
+    || (gensetAssetCode && gensetAssetCode !== defaultAssetCode)
+    || gensetKva !== '500'
+    || runHours !== '40'
+    || proofRef
+    || excelFile
+    || allowPartialImport
+  );
+  const handleCloseRequest = async () => {
+    if (isSubmitting || isProcessingExcel) return;
+    if (hasUnsavedChanges && !await confirm(dialogPresets.keluarTanpaSimpan)) return;
+    onClose();
+  };
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="scope1-modal-title"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-5 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+  return (
+    <BaseModal
+      open={isOpen}
+      onClose={handleCloseRequest}
+      title="Input Data Scope 1 — Solar Genset"
+      subtitle="Pencatatan konsumsi BBM solar genset cadangan operasional DC & fasilitas."
+      icon={<Fuel size={20} className="text-rose-600" />}
+      badge="BBM Stasioner"
+      size="md"
+      loading={isSubmitting || isProcessingExcel}
     >
-      <div
-        ref={modalRef}
-        tabIndex={-1}
-        className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-[680px] max-h-[90vh] flex flex-col overflow-hidden text-slate-800 animate-in zoom-in-95 duration-150 outline-none"
-      >
-        {/* Header Modal */}
-        <div className="px-6 py-4.5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center shrink-0 border border-rose-500/20 shadow-xs">
-              <Fuel size={20} className="fill-rose-500/20 text-rose-600" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 id="scope1-modal-title" className="text-lg font-bold text-slate-900 leading-tight">
-                  Input Data Scope 1 — Solar Genset
-                </h2>
-                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200/60 tracking-wider">
-                  BBM Stasioner
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Pencatatan konsumsi BBM solar genset cadangan operasional DC & fasilitas.
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="size-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition-colors"
-            aria-label="Tutup pop-up"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
         {/* Segmented Control Switcher */}
         <div className="px-6 pt-3 pb-2.5 border-b border-slate-100 bg-slate-50/60 shrink-0">
           <div className="inline-flex bg-slate-200/60 p-1 rounded-xl gap-1 w-full sm:w-auto">
@@ -594,6 +556,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                       onChange={(e) => setActivityDate(e.target.value)}
                       className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:border-rose-500"
                     />
+                    {formErrors.date && <p className="mt-1 text-[10px] font-semibold text-rose-600">{formErrors.date}</p>}
                   </div>
                 </div>
               </div>
@@ -1014,10 +977,10 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between shrink-0">
+        <div className="sticky bottom-0 z-10 flex shrink-0 flex-col-reverse gap-2 border-t border-slate-100 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleCloseRequest}
             disabled={isSubmitting}
             className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-900 transition-colors disabled:opacity-50"
           >
@@ -1066,8 +1029,6 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
             </button>
           )}
         </div>
-      </div>
-    </div>,
-    document.body
+    </BaseModal>
   );
 }

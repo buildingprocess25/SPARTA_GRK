@@ -25,6 +25,8 @@ import { getGridFactor } from '@/lib/emission-factors';
 import { isFeatureEnabled, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
 import { buildCacheKey } from '@/lib/solar/cacheKey';
 import { SummaryCardsSkeleton, ChartSkeleton, TabContentSkeleton, TableSkeleton } from '@/components/solar/PLTSDashboardSkeletons';
+import InputDataButton from '@/components/ui/InputDataButton';
+import PLTSInputModal from '@/components/solar/PLTSInputModal';
 
 const PLTSSummaryCard = dynamic(() => import('@/components/PLTSSummaryCard'), {
   loading: () => <TableSkeleton rows={4} />,
@@ -65,6 +67,7 @@ export default function PLTSTab() {
     period: '2026-01_2026-09', mode: 'YTD', month: 9, throughMonth: 9,
     grid: 'ALL', plant: 'ALL', compareYears: true,
   });
+  const [isInputModalOpen, setIsInputModalOpen] = useState(false);
   const setDashboardFilter = (key, next) => setDashboardFilters(current => ({
     ...current,
     [key]: typeof next === 'function' ? next(current[key]) : next,
@@ -520,7 +523,9 @@ export default function PLTSTab() {
         </div>
 
         {/* Sub-tab Switcher: Segmented Control */}
-        <div className="inline-flex flex-wrap gap-1 rounded-full bg-slate-100 p-1 shrink-0 self-start sm:self-center">
+        <div className="flex shrink-0 flex-col items-end gap-2 self-start">
+          <InputDataButton label="Input Data PLTS" icon={Sun} onClick={() => setIsInputModalOpen(true)} />
+          <div className="inline-flex flex-wrap gap-1 rounded-full bg-slate-100 p-1">
           <button
             type="button"
             className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'overview'
@@ -555,6 +560,7 @@ export default function PLTSTab() {
             <Radio size={14} className="text-emerald-500 animate-pulse" />
             <span>Live iSolarCloud API</span>
           </button>
+          </div>
         </div>
       </div>
 
@@ -1401,6 +1407,7 @@ export default function PLTSTab() {
       )}
 
       {isAuditBaselineEnabled && activePltsSubView === 'april-audit' && <PLTSAuditBaselineTab />}
+      <PLTSInputModal plants={dashboardData?.plants || []} open={isInputModalOpen} onClose={() => setIsInputModalOpen(false)} onSuccess={refreshDashboardSummaryAfterSync} />
     </div>
   );
 }

@@ -3,9 +3,25 @@
 import React from 'react';
 import { History, Trash2, RotateCcw } from 'lucide-react';
 import { useSustainability } from '@/context/SustainabilityContext';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
+import { notify } from '@/components/ui/ToastProvider';
+import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 
 export default function HistoryTab({ setActiveTab }) {
   const { inputHistory, deleteHistoryItem, resetToDefault } = useSustainability();
+  const confirm = useConfirm();
+
+  const handleReset = async () => {
+    if (!await confirm(dialogPresets.resetDataDenganJumlah(inputHistory.length))) return;
+    resetToDefault();
+    notify.success(toastPresets.resetDataSuccess);
+  };
+
+  const handleDelete = async (item) => {
+    if (!await confirm(dialogPresets.hapusEntriBernama(item.dcName))) return;
+    deleteHistoryItem(item.id);
+    notify.success(toastPresets.deleteSuccess);
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -26,11 +42,7 @@ export default function HistoryTab({ setActiveTab }) {
         <button
           type="button"
           className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-white text-rose-600 px-4 py-2.5 text-sm font-medium hover:bg-rose-50 hover:border-rose-300 transition-colors shadow-sm self-start sm:self-auto focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
-          onClick={() => {
-            if (confirm('Yakin ingin mereset seluruh data kembali ke data contoh bawaan?')) {
-              resetToDefault();
-            }
-          }}
+          onClick={handleReset}
         >
           <RotateCcw size={15} />
           <span>Reset Data Default</span>
@@ -88,7 +100,7 @@ export default function HistoryTab({ setActiveTab }) {
                         <button
                           type="button"
                           className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
-                          onClick={() => deleteHistoryItem(item.id)}
+                          onClick={() => handleDelete(item)}
                           title="Hapus log ini"
                         >
                           <Trash2 size={16} />
@@ -116,7 +128,7 @@ export default function HistoryTab({ setActiveTab }) {
                     <button
                       type="button"
                       className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
-                      onClick={() => deleteHistoryItem(item.id)}
+                      onClick={() => handleDelete(item)}
                       title="Hapus"
                     >
                       <Trash2 size={16} />
