@@ -24,11 +24,24 @@ export async function fetchLiveIsolarData(forceRefresh = false, { timeoutMs = 75
 
     clearTimeout(timeoutId);
 
+    const requestId = `req-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+
     if (!res || !res.ok) {
+      let serverJson = null;
+      try {
+        if (res) serverJson = await res.json().catch(() => null);
+      } catch (_) {}
+
+      const statusCode = res?.status || 0;
+      const errorCode = serverJson?.code || (statusCode ? `HTTP_${statusCode}` : 'OFFLINE_OR_UNAVAILABLE');
+      const rawError = serverJson?.error || (res ? `Server error (HTTP ${res.status})` : 'Data telemetri live tidak tersedia secara offline.');
+
       return {
         success: false,
-        error: res ? `Server error (HTTP ${res.status})` : 'Data telemetri live tidak tersedia secara offline.',
-        code: 'OFFLINE_OR_UNAVAILABLE',
+        status: statusCode,
+        code: errorCode,
+        error: rawError,
+        requestId,
         stationList: [],
       };
     }
@@ -37,19 +50,24 @@ export async function fetchLiveIsolarData(forceRefresh = false, { timeoutMs = 75
     if (!data) {
       return {
         success: false,
+        status: res.status,
         error: 'Respons server tidak valid.',
         code: 'INVALID_JSON',
+        requestId,
         stationList: [],
       };
     }
 
-    return data;
+    return { ...data, requestId };
   } catch (err) {
     clearTimeout(timeoutId);
+    const isTimeout = err.name === 'AbortError' || String(err.message || '').includes('timeout');
     return {
       success: false,
+      status: 0,
       error: err.message || 'Koneksi ke endpoint iSolar internal terputus.',
-      code: err.name === 'AbortError' ? 'TIMEOUT_ERROR' : 'NETWORK_ERROR',
+      code: isTimeout ? 'TIMEOUT_ERROR' : 'NETWORK_ERROR',
+      requestId: `req-err-${Date.now().toString(36)}`,
       stationList: [],
     };
   }

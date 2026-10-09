@@ -32,6 +32,7 @@ import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
 import CardBox from '@/components/ui/CardBox';
 import { useSustainability } from '@/context/SustainabilityContext';
 import { fetchLiveIsolarData } from '@/services/isolarCloudService';
+import { notify } from '@/components/ui/ToastProvider';
 import { getGridFactor } from '@/lib/emission-factors';
 import { isFeatureEnabled, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
 import { buildCacheKey } from '@/lib/solar/cacheKey';
@@ -70,6 +71,61 @@ const summaryClientCache = typeof window !== 'undefined'
   ? (window.__PLTS_SUMMARY_CACHE__ = window.__PLTS_SUMMARY_CACHE__ || new Map())
   : new Map();
 const PLTS_EMISSION_FACTOR_LABEL = String(PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH).replace('.', ',');
+
+function classifySyncError({ error, status, code, lastSyncTime }) {
+  const errStr = String(error || '').toLowerCase();
+  const codeStr = String(code || '').toUpperCase();
+  const statusNum = Number(status) || 0;
+  const timeLabel = lastSyncTime ? `(${lastSyncTime})` : '';
+
+  // 1. Token / Otentikasi
+  if (statusNum === 401 || errStr.includes('token') || errStr.includes('unauthorized') || codeStr.includes('AUTH') || codeStr.includes('TOKEN')) {
+    return {
+      category: 'AUTH',
+      badge: 'Otentikasi / Token',
+      message: `Gagal otentikasi ke iSolarCloud. Menampilkan data terakhir ${timeLabel}. Mencoba lagi otomatis.`,
+      advice: 'Token akses iSolarCloud kedaluwarsa atau ditolak vendor. Sistem melakukan refresh token otomatis di background.',
+    };
+  }
+
+  // 2. Kuota Habis
+  if (statusNum === 429 || errStr.includes('kuota') || errStr.includes('quota') || errStr.includes('hard limit') || codeStr.includes('QUOTA')) {
+    return {
+      category: 'QUOTA',
+      badge: 'Batas Kuota',
+      message: `Batas kuota panggilan API iSolarCloud tercapai. Menampilkan data terakhir ${timeLabel}. Mencoba lagi otomatis.`,
+      advice: 'Batas kuota panggilan jam ini (2.000 call) atau bulan ini (100.000 call) telah tercapai. Sinkron otomatis akan dilanjutkan pada periode jam berikutnya.',
+    };
+  }
+
+  // 3. Jaringan / Timeout
+  if (statusNum === 408 || errStr.includes('timeout') || errStr.includes('network') || errStr.includes('terputus') || codeStr.includes('TIMEOUT') || codeStr.includes('NETWORK')) {
+    return {
+      category: 'NETWORK',
+      badge: 'Jaringan / Timeout',
+      message: `Koneksi ke gateway iSolarCloud terputus atau batas waktu habis. Menampilkan data terakhir ${timeLabel}. Mencoba lagi otomatis.`,
+      advice: 'Koneksi jaringan internasional ke gateway iSolarCloud sedang lambat. Sistem akan mencoba kembali pada jadwal 15 menit berikutnya.',
+    };
+  }
+
+  // 4. Server iSolar Down / 503 / 502 / 504 / MUTATIONS_DISABLED
+  if (statusNum === 503 || statusNum === 502 || statusNum === 504 || errStr.includes('503') || errStr.includes('502') || codeStr === 'MUTATIONS_DISABLED' || codeStr.includes('GATEWAY') || codeStr.includes('SERVER')) {
+    return {
+      category: 'SERVER',
+      badge: 'Server iSolar / Gateway',
+      message: `Gagal terhubung ke iSolarCloud. Menampilkan data terakhir ${timeLabel}. Mencoba lagi otomatis.`,
+      advice: 'Server iSolarCloud sedang sibuk, dalam pemeliharaan, atau akses mutasi manual dibatasi. Snapshot lokal tetap aman ditampilkan.',
+    };
+  }
+
+  // 5. Default / Lainnya
+  return {
+    category: 'GENERAL',
+    badge: 'Koneksi Gateway',
+    message: `Gagal menyinkronkan data dengan iSolarCloud. Menampilkan data terakhir ${timeLabel}. Mencoba lagi otomatis.`,
+    advice: 'Layanan iSolarCloud sementara tidak merespons dengan normal. Data pemantauan terakhir tetap tersimpan di database.',
+  };
+}
 
 export default function PLTSTab() {
   const isAuditBaselineEnabled = isFeatureEnabled('auditBaseline');
@@ -120,6 +176,17 @@ export default function PLTSTab() {
   const [emissionsError, setEmissionsError] = useState(null);
   const [emissionsLoading, setEmissionsLoading] = useState(false);
   const [refreshError, setRefreshError] = useState(null);
+  const [syncErrorDetails, setSyncErrorDetails] = useState(null);
+  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+    const timer = setInterval(() => {
+      setCooldownRemaining(prev => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldownRemaining]);
   const [dashboardData, setDashboardData] = useState(null);
   const [dashboardError, setDashboardError] = useState(null);
   const [dashboardLoading, setDashboardLoading] = useState(true);
@@ -323,23 +390,82 @@ export default function PLTSTab() {
     if (force) {
       setIsRefreshing(true);
       setRefreshError(null);
+      setSyncErrorDetails(null);
     }
     try {
       const res = await fetchLiveIsolarData(force);
       if (res && res.success && Array.isArray(res.stationList) && res.stationList.length > 0) {
         setIsolarLiveState(res);
         setRefreshError(null);
-        if (force) await refreshDashboardSummaryAfterSync();
+        setSyncErrorDetails(null);
+        if (force) {
+          notify.success('Sinkronisasi Berhasil', 'Data telemetri PLTS iSolarCloud berhasil diperbarui.');
+          await refreshDashboardSummaryAfterSync();
+        }
       } else if (res && res.success && res.mode === 'mock') {
         setIsolarLiveState(res);
         setRefreshError(null);
-        if (force) await refreshDashboardSummaryAfterSync();
+        setSyncErrorDetails(null);
+        if (force) {
+          notify.success('Mode Simulasi', 'Data telemetri simulasi berhasil diperbarui.');
+          await refreshDashboardSummaryAfterSync();
+        }
       } else if (force) {
-        setRefreshError(res?.error || 'Data telemetri langsung tidak tersedia. Menampilkan data tersimpan terakhir.');
+        const classified = classifySyncError({
+          error: res?.error,
+          status: res?.status,
+          code: res?.code,
+          lastSyncTime: isolarLiveState?.lastSyncTime,
+        });
+
+        const nowWib = new Intl.DateTimeFormat('id-ID', {
+          timeZone: 'Asia/Jakarta',
+          day: '2-digit', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit', second: '2-digit'
+        }).format(new Date()) + ' WIB';
+
+        const errorObj = {
+          ...classified,
+          rawError: res?.error || 'Server error',
+          statusCode: res?.status || 500,
+          errorCode: res?.code || 'UNKNOWN_ERROR',
+          requestId: res?.requestId || `req-${Date.now().toString(36)}`,
+          timestampWib: nowWib,
+        };
+
+        setSyncErrorDetails(errorObj);
+        setRefreshError(errorObj.message);
+        setCooldownRemaining(30);
+        notify.error('Gagal Menyinkronkan', errorObj.message);
       }
     } catch (e) {
       if (force) {
-        setRefreshError(e.message || 'Koneksi ke server terputus.');
+        const classified = classifySyncError({
+          error: e.message,
+          status: 0,
+          code: 'NETWORK_ERROR',
+          lastSyncTime: isolarLiveState?.lastSyncTime,
+        });
+
+        const nowWib = new Intl.DateTimeFormat('id-ID', {
+          timeZone: 'Asia/Jakarta',
+          day: '2-digit', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit', second: '2-digit'
+        }).format(new Date()) + ' WIB';
+
+        const errorObj = {
+          ...classified,
+          rawError: e.message || 'Koneksi ke server terputus.',
+          statusCode: 0,
+          errorCode: 'NETWORK_EXCEPTION',
+          requestId: `req-${Date.now().toString(36)}`,
+          timestampWib: nowWib,
+        };
+
+        setSyncErrorDetails(errorObj);
+        setRefreshError(errorObj.message);
+        setCooldownRemaining(30);
+        notify.error('Gagal Menyinkronkan', errorObj.message);
       }
     } finally {
       if (force) {
@@ -356,7 +482,7 @@ export default function PLTSTab() {
   }, [activePltsSubView, isolarLiveState]);
 
   const handleManualSync = () => {
-    if (!isRefreshing) {
+    if (!isRefreshing && cooldownRemaining <= 0) {
       loadIsolarData(true);
     }
   };
@@ -635,11 +761,23 @@ export default function PLTSTab() {
                 type="button"
                 className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-sm transition-all active:scale-95 disabled:opacity-50 shrink-0 self-start sm:self-center"
                 onClick={handleManualSync}
-                disabled={isRefreshing || isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'}
-                title={isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED' ? 'Refresh dinonaktifkan (Hard Quota Guard)' : 'Refresh Telemetri (Cooldown 60s)'}
+                disabled={isRefreshing || cooldownRemaining > 0 || isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'}
+                title={
+                  cooldownRemaining > 0
+                    ? `Cooldown aktif: tunggu ${cooldownRemaining}s`
+                    : isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'
+                      ? 'Refresh dinonaktifkan (Hard Quota Guard)'
+                      : 'Refresh Telemetri'
+                }
               >
                 <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
-                <span>{isRefreshing ? 'Menyinkronkan...' : 'Refresh Sekarang'}</span>
+                <span>
+                  {isRefreshing
+                    ? 'Menyinkronkan...'
+                    : cooldownRemaining > 0
+                      ? `Tunggu ${cooldownRemaining}s`
+                      : 'Refresh Sekarang'}
+                </span>
               </button>
             </div>
 
@@ -712,19 +850,74 @@ export default function PLTSTab() {
             </p>
           </div>
 
-          {refreshError && (
-            <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-200 flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="size-4 text-amber-400 shrink-0" />
-                <span>{refreshError}</span>
+          {(syncErrorDetails || refreshError) && (
+            <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 shadow-sm text-amber-950 animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-amber-200/80 text-amber-900 shrink-0 mt-0.5">
+                    <AlertTriangle className="size-5 text-amber-800" />
+                  </div>
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-bold uppercase tracking-wider text-amber-850 bg-amber-200/70 px-2.5 py-0.5 rounded-full border border-amber-300">
+                        {syncErrorDetails?.badge || 'Koneksi Gateway'}
+                      </span>
+                      {syncErrorDetails?.timestampWib && (
+                        <span className="text-xs font-medium text-amber-800/80">
+                          {syncErrorDetails.timestampWib}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm font-semibold text-amber-950 leading-snug">
+                      {syncErrorDetails?.message || refreshError}
+                    </p>
+                    {syncErrorDetails?.advice && (
+                      <p className="text-xs text-amber-900/90 leading-relaxed">
+                        💡 <strong>Saran:</strong> {syncErrorDetails.advice}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSyncErrorDetails(null);
+                    setRefreshError(null);
+                  }}
+                  className="p-1 rounded-lg text-amber-700 hover:text-amber-950 hover:bg-amber-200/60 shrink-0 transition-colors"
+                  title="Tutup banner"
+                >
+                  <X size={16} />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setRefreshError(null)}
-                className="text-amber-400 hover:text-amber-200 text-xs px-2 py-0.5 rounded bg-amber-500/20"
-              >
-                Tutup
-              </button>
+
+              {/* Collapsible: Lihat detail teknis */}
+              <div className="mt-3 pt-3 border-t border-amber-200/80">
+                <button
+                  type="button"
+                  onClick={() => setShowTechnicalDetails(prev => !prev)}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-900 hover:text-amber-950 transition-colors"
+                >
+                  <span>{showTechnicalDetails ? 'Sembunyikan detail teknis' : 'Lihat detail teknis'}</span>
+                  {showTechnicalDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </button>
+
+                {showTechnicalDetails && (
+                  <div className="mt-2.5 p-3 rounded-xl bg-amber-100/80 border border-amber-300/80 font-mono text-[11px] text-amber-950 space-y-1 select-all">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      <div><span className="text-amber-800 font-semibold">Kode Error:</span> {syncErrorDetails?.errorCode || 'N/A'}</div>
+                      <div><span className="text-amber-800 font-semibold">HTTP Status:</span> {syncErrorDetails?.statusCode || 'N/A'}</div>
+                      <div><span className="text-amber-800 font-semibold">Waktu:</span> {syncErrorDetails?.timestampWib || 'N/A'}</div>
+                      <div><span className="text-amber-800 font-semibold">ID Request:</span> {syncErrorDetails?.requestId || 'N/A'}</div>
+                    </div>
+                    {syncErrorDetails?.rawError && (
+                      <div className="pt-1.5 border-t border-amber-200 text-amber-900 break-all">
+                        <span className="text-amber-800 font-semibold">Raw Message:</span> {syncErrorDetails.rawError}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

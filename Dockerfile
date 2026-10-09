@@ -1,38 +1,51 @@
-# Use Docker BuildKit for better layer caching during rebuild
-# Enable with: DOCKER_BUILDKIT=1 docker build .
+# syntax=docker/dockerfile:1
+# Multi-stage Dockerfile for SPARTA Next.js Standalone deployment on Dokploy
 
+# ─── 1. Base Image ────────────────────────────────────────────────────────────
 FROM node:22-bookworm-slim AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
+# ─── 2. Dependencies Stage ────────────────────────────────────────────────────
 FROM base AS deps
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma
 RUN npm ci
 
+# ─── 3. Builder Stage ─────────────────────────────────────────────────────────
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Generate Prisma Client for the build step
 RUN npx prisma generate
 
-# Provide non-secret placeholders so Next.js/Prisma imports that validate
-# env variables do not fail during image build.
+# Ensure Next.js outputs the standalone directory containing minimal runtime bundle
+ENV NEXT_OUTPUT_MODE=standalone
+ARG NEXT_PUBLIC_NOTIFICATIONS_ENABLED=true
+ENV NEXT_PUBLIC_NOTIFICATIONS_ENABLED=${NEXT_PUBLIC_NOTIFICATIONS_ENABLED}
+
+# Non-secret placeholders for build-time validation
 ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 ENV ISOLAR_MODE=mock
 
 RUN npm run build
 
+# ─── 4. Production Runner Stage ───────────────────────────────────────────────
 FROM base AS runner
 WORKDIR /app
+
+ARG APP_PORT=3001
+ENV PORT=${APP_PORT}
+ENV HOSTNAME=0.0.0.0
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV TZ=Asia/Jakarta
-ENV PORT=3001
-ENV HOSTNAME=0.0.0.0
 
 RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 --gid 1001 nextjs
 
+# Copy static assets and standalone bundle
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
@@ -40,6 +53,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/src/generated/prisma ./src/genera
 
 USER nextjs
 
-EXPOSE 3001
+EXPOSE ${APP_PORT}
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD node -e "fetch('http://localhost:' + (process.env.PORT || 3001) + '/api/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
 
 CMD ["node", "server.js"]
