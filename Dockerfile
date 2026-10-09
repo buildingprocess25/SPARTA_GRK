@@ -28,7 +28,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV TZ=Asia/Jakarta
-ENV PORT=3000
+ENV PORT=3001
 ENV HOSTNAME=0.0.0.0
 
 RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 --gid 1001 nextjs
@@ -40,6 +40,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/src/generated/prisma ./src/genera
 
 USER nextjs
 
-EXPOSE 3000
+EXPOSE 3001
 
 CMD ["node", "server.js"]
