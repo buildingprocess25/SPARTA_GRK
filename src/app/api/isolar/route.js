@@ -309,8 +309,10 @@ export async function buildFullDashboardPayload(now = new Date()) {
         hoursElapsed: Number(hoursElapsedThisMonth.toFixed(1))
       }
     },
-    canManualSync: Boolean(process.env.ALLOW_MANUAL_SYNC === 'true' || process.env.NODE_ENV !== 'production'),
-    mutationsAllowed: Boolean(process.env.ALLOW_MANUAL_SYNC === 'true' || process.env.NODE_ENV !== 'production'),
+    // This whole route is behind the login wall in middleware.js, so any
+    // request that reaches this point has already passed authentication.
+    canManualSync: true,
+    mutationsAllowed: true,
     summaryNationwide,
     stationList: canonicalStations,
   };

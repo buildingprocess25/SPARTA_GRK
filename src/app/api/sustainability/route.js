@@ -163,7 +163,9 @@ export async function GET(request) {
       },
       targets: targetRecords,
       plants: plantMasters,
-      mutationsAllowed: Boolean(process.env.DISABLE_MUTATIONS !== 'true' && process.env.ALLOW_MANUAL_SYNC !== 'false'),
+      // This route is behind the login wall in middleware.js, so any request
+      // that reaches this point has already passed authentication.
+      mutationsAllowed: true,
     };
 
     cachedPayload = payload;

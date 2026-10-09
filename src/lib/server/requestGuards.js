@@ -31,11 +31,15 @@ export function evaluateMutationAccess({ nodeEnv, hostname, allowManualSync = fa
 }
 
 export function mutationDecisionForRequest(request, { allowManualSync } = {}) {
-  // Fail-closed by default: without an explicit opt-in, production stays
-  // read-only (per the stabilization design doc) since there is no real user
-  // auth layer yet. Set ALLOW_MANUAL_SYNC=true (e.g. temporarily, for testing)
-  // to open the manual "Sync Now" / mutation endpoints back up.
-  const isAllowed = allowManualSync ?? (process.env.DISABLE_MUTATIONS !== 'true' && process.env.ALLOW_MANUAL_SYNC === 'true');
+  // A verified login session (see middleware.js + src/lib/auth.js) is now the
+  // primary way to open this up: middleware already rejected the request
+  // before it got here if there was no valid session cookie, so the
+  // x-sparta-user header it forwards can be trusted as "this user logged in".
+  // ALLOW_MANUAL_SYNC stays as a manual escape hatch (e.g. for a route that
+  // predates/bypasses middleware), but fails closed by default in production.
+  const hasAuthenticatedSession = Boolean(request.headers.get('x-sparta-user'));
+  const envEscapeHatch = process.env.DISABLE_MUTATIONS !== 'true' && process.env.ALLOW_MANUAL_SYNC === 'true';
+  const isAllowed = allowManualSync ?? (hasAuthenticatedSession || envEscapeHatch);
   const decision = evaluateMutationAccess({
     nodeEnv: process.env.NODE_ENV,
     hostname: new URL(request.url).hostname,

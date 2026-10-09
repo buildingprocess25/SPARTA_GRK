@@ -1,19 +1,43 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ShieldCheck, User, Mail, KeyRound, CheckCircle2,
   X, ChevronDown, Lock, Shield, Sparkles, Building2,
-  Phone, BadgeCheck, Eye, EyeOff, Send, Menu
+  Phone, BadgeCheck, Eye, EyeOff, Send, Menu, LogOut
 } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function Header({ isProfileOpen: externalProfileOpen, setIsProfileOpen: setExternalProfileOpen, onToggleMobileSidebar }) {
+  const router = useRouter();
   const [internalProfileOpen, setInternalProfileOpen] = useState(false);
   const isProfileOpen = externalProfileOpen !== undefined ? externalProfileOpen : internalProfileOpen;
   const setIsProfileOpen = setExternalProfileOpen || setInternalProfileOpen;
   const [showCurrentPass, setShowCurrentPass] = useState(false);
   const [showNewPass, setShowNewPass] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/auth/me', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && data?.success) setCurrentUser(data.user);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (_) { /* best effort - cookie clear still redirects below */ }
+    router.replace('/login');
+    router.refresh();
+  };
 
   const [profileData] = useState({
     name: 'Valens Aditya T.',
@@ -27,6 +51,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
     phone: '+62 812-9876-5432',
     joinYear: '2022',
   });
+  const displayName = currentUser?.displayName || profileData.name;
 
   const [passwordState, setPasswordState] = useState({
     currentPass: '',
@@ -82,8 +107,8 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
           </button>
 
           <div className="flex items-center gap-2.5">
-            <h1 className="max-w-[9rem] truncate text-sm sm:max-w-none sm:text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
-              VALENS ADITYA T.
+            <h1 className="max-w-[9rem] truncate text-sm sm:max-w-none sm:text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight uppercase">
+              {displayName}
             </h1>
             <span className="hidden lg:inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-500/10 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20">
               Sustainability ESG
@@ -101,6 +126,16 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
             <span className="hidden sm:inline">System Live</span>
           </div>
           <ThemeToggle />
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={loggingOut}
+            aria-label="Keluar"
+            title="Keluar"
+            className="size-9 inline-flex items-center justify-center rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:text-slate-400 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-colors disabled:opacity-50"
+          >
+            <LogOut size={17} />
+          </button>
         </div>
       </header>
 
@@ -138,7 +173,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
 
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-white truncate">{profileData.name}</h3>
+                    <h3 className="text-lg font-bold text-white truncate">{displayName}</h3>
                     <span className="inline-flex rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-semibold">
                       Active PIC
                     </span>
@@ -174,7 +209,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
                     <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Username</span>
-                    <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">@{profileData.username}</span>
+                    <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">@{currentUser?.username || profileData.username}</span>
                   </div>
                   <div>
                     <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Departemen</span>
@@ -306,18 +341,29 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
             </div>
 
             {/* Footer Profil */}
-            <div className="border-t border-slate-100 dark:border-slate-800 px-6 py-3.5 bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-xs shrink-0">
-              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                <Shield size={13} className="text-emerald-600 dark:text-emerald-400" />
-                Terlindungi SPARTA Protocol
+            <div className="border-t border-slate-100 dark:border-slate-800 px-6 py-3.5 bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-xs shrink-0 gap-2">
+              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1 min-w-0">
+                <Shield size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="truncate">Terlindungi SPARTA Protocol</span>
               </span>
-              <button
-                type="button"
-                className="px-4 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold transition-colors"
-                onClick={() => setIsProfileOpen(false)}
-              >
-                Tutup
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 font-semibold transition-colors disabled:opacity-50"
+                >
+                  <LogOut size={13} />
+                  Keluar
+                </button>
+                <button
+                  type="button"
+                  className="px-4 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold transition-colors"
+                  onClick={() => setIsProfileOpen(false)}
+                >
+                  Tutup
+                </button>
+              </div>
             </div>
           </div>
         </div>
