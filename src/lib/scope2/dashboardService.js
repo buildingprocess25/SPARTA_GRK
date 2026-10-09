@@ -2,9 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { CARBON_FACTORS, FACTOR_REGISTRY_PROVENANCE } from '../carbon/carbonEngine.js';
-import { parseIsolarMonthlyReportFile } from '../importers/isolarMonthlyReport.js';
-import { CANONICAL_DC_ENTITIES, isDcLocation, normalizeName } from '../solar/plantMap.js';
-import { parseAnnualLoadReport } from './annualLoadReport.js';
+import { fetchRawEnergyFlows } from '../energy-data.js';
+import { CANONICAL_DC_ENTITIES, isDcLocation } from '../solar/plantMap.js';
 import {
   buildAutomaticSummary,
   buildProjection,
@@ -14,21 +13,8 @@ import {
 } from './analytics.js';
 import { aggregateCanonicalRows, reconcilePlantMonth } from './energyReconciliation.js';
 
-const LOAD_PATTERN = /^monthly load consump_Annual report_.*\.csv$/i;
-const PRODUCTION_PATTERN = /^Monthly Report_Annual report_.*\.csv$/;
-
 function rounded(value, digits = 3) {
   return Number(Number(value).toFixed(digits));
-}
-
-function resolveEntity(name) {
-  const normalized = normalizeName(name);
-  const entity = CANONICAL_DC_ENTITIES.find(item =>
-    normalizeName(item.canonicalName) === normalized
-    || (item.aliases || []).some(alias => normalizeName(alias) === normalized),
-  );
-  if (!entity) throw new Error(`Unmapped Scope 2 plant: ${name}`);
-  return entity;
 }
 
 function factorForGrid(grid) {
@@ -43,125 +29,73 @@ function factorForGrid(grid) {
   };
 }
 
-function timestampDateFromFilename(filename) {
-  const match = /_(\d{4})(\d{2})(\d{2})\d{6}\.csv$/i.exec(filename);
-  return match ? `${match[1]}-${match[2]}-${match[3]}` : null;
-}
-
-function loadInputs(rootDir) {
-  const candidateDirs = [
-    rootDir,
-    process.cwd(),
-    path.resolve(rootDir || '.', '..'),
-  ].filter(Boolean);
-
-  let targetDir = null;
-  let loadFiles = [];
-  let prodFiles = [];
-
+function loadDiscovery(rootDir) {
+  const candidateDirs = [rootDir, process.cwd(), path.resolve(rootDir || '.', '..')].filter(Boolean);
   for (const dir of candidateDirs) {
     try {
-      if (fs.existsSync(dir)) {
-        const files = fs.readdirSync(dir);
-        const loads = files.filter(name => LOAD_PATTERN.test(name));
-        const prods = files.filter(name => PRODUCTION_PATTERN.test(name));
-        if (loads.length > 0 || prods.length > 0) {
-          targetDir = dir;
-          loadFiles = loads;
-          prodFiles = prods;
-          break;
-        }
+      const evidencePath = path.join(dir, 'docs/evidence/scope2-vendor-discovery-2026-10-07.json');
+      if (fs.existsSync(evidencePath)) {
+        return JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
       }
     } catch (_) {}
   }
-
-  if (!targetDir || (loadFiles.length === 0 && prodFiles.length === 0)) {
-    return { loadReports: [], productionReports: [], discovery: { plants: [] }, isEmpty: true };
-  }
-
-  const loadReports = loadFiles.map(filename => {
-    try {
-      return parseAnnualLoadReport(fs.readFileSync(path.join(targetDir, filename)), { filename });
-    } catch (_) {
-      return null;
-    }
-  }).filter(Boolean);
-
-  const productionReports = prodFiles.map(filename => {
-    try {
-      return parseIsolarMonthlyReportFile(path.join(targetDir, filename), { filename });
-    } catch (_) {
-      return null;
-    }
-  }).filter(Boolean);
-
-  let discovery = { plants: [] };
-  const evidencePath = path.join(targetDir, 'docs/evidence/scope2-vendor-discovery-2026-10-07.json');
-  try {
-    if (fs.existsSync(evidencePath)) {
-      discovery = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
-    }
-  } catch (_) {}
-
-  return {
-    loadReports,
-    productionReports,
-    discovery,
-    isEmpty: loadReports.length === 0 && productionReports.length === 0,
-  };
+  return { plants: [] };
 }
 
-function buildRows({ loadReports, productionReports, discovery }) {
-  const productionByKey = new Map();
-  const feedInByKey = new Map();
-  for (const report of productionReports) {
-    for (const record of report.records) {
-      if (record.status === 'VALID') {
-        productionByKey.set(`${record.psId}|${record.yearMonth}`, record.energyKwh);
-        feedInByKey.set(`${record.psId}|${record.yearMonth}`, record.feedInKwh ?? 0);
-      }
-    }
-  }
+/**
+ * Builds canonical Scope 2 rows straight from the database (energy_flow_monthly,
+ * via energy-data.js's fetchRawEnergyFlows - the same table the PLTS page and
+ * the cross-page reconciliation tests already trust). Replaces the old
+ * CSV-file-reading pipeline: those CSVs only ever existed on a dev machine
+ * (gitignored via `*.csv`) and were never shipped to the deployed container,
+ * so this dashboard was permanently empty in production.
+ */
+async function buildRowsFromDb({ year, rootDir }) {
+  const rawRows = await fetchRawEnergyFlows({ year, rootDir });
+  const discovery = loadDiscovery(rootDir);
   const connectTypeByPsId = new Map(discovery.plants.map(plant => [Number(plant.ps_id), Number(plant.connect_type)]));
-  const reportByYear = new Map(loadReports.map(report => [report.reportYear, report]));
+  const entityByDcId = new Map(CANONICAL_DC_ENTITIES.map(entity => [entity.dcId, entity]));
+
   const output = [];
-  for (const report of loadReports) {
-    const dataThroughDate = timestampDateFromFilename(report.filename);
-    for (const record of report.records) {
-      if (record.status !== 'VALID') continue;
-      const entity = resolveEntity(record.plantName);
-      if (!isDcLocation(entity)) continue; // Filter: 37 Distribution Centers only (sembunyikan 2 pilot Drive Thru)
+  for (const raw of rawRows) {
+    const entity = entityByDcId.get(raw.dcId);
+    if (!entity || !isDcLocation(entity)) continue; // Filter: 37 Distribution Centers only (sembunyikan 2 pilot Drive Thru)
 
-      const psId = Number(entity.sungrowPsIds[0]);
-      const factor = factorForGrid(entity.grid);
-      const isPartial = record.yearMonth === '2026-10';
-      const prodKwh = productionByKey.get(`${psId}|${record.yearMonth}`) ?? null;
-      const feedInKwh = feedInByKey.get(`${psId}|${record.yearMonth}`) ?? 0;
+    // Months that have not been reported yet come back as all-zero placeholder
+    // rows (energy_flow_monthly is pre-seeded for the full year); skip them so
+    // they don't show up as fabricated zero-consumption months.
+    const hasData = raw.loadKwh !== 0 || raw.yieldKwh !== 0 || raw.feedInKwh !== 0 || raw.purchasedKwh !== 0;
+    if (!hasData) continue;
 
-      output.push(reconcilePlantMonth({
-        yearMonth: record.yearMonth,
-        psId,
-        dcId: entity.dcId,
-        dcName: entity.canonicalName,
-        grid: entity.grid,
-        installedKwp: entity.apiInstalledKwp,
-        connectType: connectTypeByPsId.get(psId) ?? 3,
-        loadKwh: record.loadKwh,
-        productionKwh: prodKwh,
-        exportKwh: feedInKwh,
-        gridFactorKgPerKwh: factor.value,
-        factorStatus: factor.status,
-        periodStatus: isPartial ? 'partial' : 'complete',
-        dataThroughDate: isPartial ? dataThroughDate : null,
-        sourceRefs: [
-          `${report.filename}:Monthly load consumption(kWh)`,
-          ...(productionByKey.has(`${psId}|${record.yearMonth}`) ? ['Monthly Report:Monthly yield(kWh)'] : []),
-        ],
-        qualityFlags: factor.status === 'temporary' ? [`FACTOR_SOURCE:${factor.source}`] : [],
-      }));
-    }
+    const psId = Number(raw.psId);
+    const factor = factorForGrid(entity.grid);
+    // Derive load from the measured purchased + self-consumed energy (same
+    // identity energy-data.js enforces) so reconcilePlantMonth's own
+    // purchasedKwh re-derivation lands back on the DB's purchasedKwh exactly,
+    // instead of drifting from independent rounding in the raw load_kwh column.
+    const selfConsumedKwh = Math.max(0, raw.yieldKwh - raw.feedInKwh);
+    const loadKwh = raw.purchasedKwh + selfConsumedKwh;
+
+    output.push(reconcilePlantMonth({
+      yearMonth: raw.yearMonth,
+      psId,
+      dcId: entity.dcId,
+      dcName: entity.canonicalName,
+      grid: entity.grid,
+      installedKwp: entity.apiInstalledKwp,
+      connectType: connectTypeByPsId.get(psId) ?? 3,
+      loadKwh,
+      productionKwh: raw.yieldKwh,
+      exportKwh: raw.feedInKwh,
+      gridFactorKgPerKwh: factor.value,
+      factorStatus: factor.status,
+      periodStatus: 'complete', // energy_flow_monthly only carries finalized monthly-report imports
+      dataThroughDate: null,
+      sourceRefs: [`energy_flow_monthly:${raw.source}`],
+      qualityFlags: factor.status === 'temporary' ? [`FACTOR_SOURCE:${factor.source}`] : [],
+    }));
   }
-  return { rows: output, reportByYear };
+  return output;
 }
 
 function aggregateMonthly(rows) {
@@ -198,11 +132,12 @@ function aggregateByGrid(rows) {
   });
 }
 
-export function buildScope2CanonicalDashboard({ rootDir = process.cwd(), now = new Date() } = {}) {
-  const inputs = loadInputs(rootDir);
-  if (inputs.isEmpty || !inputs.loadReports.length) {
+export async function buildScope2CanonicalDashboard({ rootDir = process.cwd(), now = new Date(), year } = {}) {
+  const targetYear = year || now.getFullYear();
+  const rows = await buildRowsFromDb({ year: targetYear, rootDir });
+  if (!rows.length) {
     return {
-      source: 'ISOLAR_ANNUAL_REPORT_EMPTY_STATE',
+      source: 'ENERGY_FLOW_MONTHLY_EMPTY_STATE',
       isEmpty: true,
       summary: {
         totalLoadMwh: 0,
@@ -226,15 +161,14 @@ export function buildScope2CanonicalDashboard({ rootDir = process.cwd(), now = n
         noDoubleCounting: true,
       },
       current: { completeThroughMonth: 9, partialMonth: null, completeRows: [], partialRows: [] },
-      coverage: { monitoredPlantCount: 0, companyFacilityCount: null, companyCoveragePct: null, note: 'Laporan tahunan belum dimuat di direktori kerja.' },
+      coverage: { monitoredPlantCount: 0, companyFacilityCount: null, companyCoveragePct: null, note: 'Belum ada data energy_flow_monthly untuk tahun ini di database.' },
       quality: { partialPlantMonthCount: 0, loadUpperBoundCount: 0, temporaryFactorCount: 0, abnormalLowCount: 0 },
       automaticSummary: { narrative: 'Data laporan konsumsi tahunan Scope 2 belum tersedia di server.' },
       reports: [],
     };
   }
 
-  const { rows } = buildRows(inputs);
-  const currentRows = rows.filter(row => row.yearMonth.startsWith('2026-'));
+  const currentRows = rows.filter(row => row.yearMonth.startsWith(String(targetYear)));
   const completeRows = currentRows.filter(row => row.periodStatus === 'complete');
   const partialRows = currentRows.filter(row => row.periodStatus === 'partial');
   const summary = aggregateCanonicalRows(currentRows);
@@ -256,8 +190,9 @@ export function buildScope2CanonicalDashboard({ rootDir = process.cwd(), now = n
       factor: factor.value, factorStatus: factor.status, source: factor.source,
     };
   });
-  const projection = buildProjection(currentRows, { year: 2026, field: 'scope2EmissionTon' });
+  const projection = buildProjection(currentRows, { year: targetYear, field: 'scope2EmissionTon' });
   const allQualityFlags = currentRows.flatMap(row => row.qualityFlags);
+  const completeThroughMonth = currentRows.reduce((max, row) => Math.max(max, Number(row.yearMonth.slice(5, 7)) || 0), 0);
 
   return {
     source: 'ISOLAR_ANNUAL_REPORT_MONTHLY_LOAD_WITH_CANONICAL_RECONCILIATION',
@@ -281,8 +216,8 @@ export function buildScope2CanonicalDashboard({ rootDir = process.cwd(), now = n
       noDoubleCounting: afterPltsTon === summary.scope2EmissionTon,
     },
     current: {
-      completeThroughMonth: 9,
-      partialMonth: partialRows.length ? 10 : null,
+      completeThroughMonth,
+      partialMonth: partialRows.length ? Number(partialRows[0].yearMonth.slice(5, 7)) : null,
       partialDataThroughDate: partialRows[0]?.dataThroughDate || null,
       completeRows,
       partialRows,
@@ -306,6 +241,12 @@ export function buildScope2CanonicalDashboard({ rootDir = process.cwd(), now = n
       portalImplicitTariffRupiahPerKwh: rounded(Math.abs(-1_702_356) / (2.67 * 1_000), 2),
       scope2Basis: 'purchased when self-consumption is proven; otherwise load upper bound',
     },
-    reports: inputs.loadReports.map(report => ({ filename: report.filename, year: report.reportYear, hash: report.hash, ...report.summary })),
+    reports: [{
+      filename: 'energy_flow_monthly (database)',
+      year: targetYear,
+      hash: null,
+      rowCount: currentRows.length,
+      source: 'DB_ENERGY_FLOW_MONTHLY',
+    }],
   };
 }

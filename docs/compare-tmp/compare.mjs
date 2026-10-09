@@ -80,7 +80,7 @@ function fileProfile(filename) {
   };
 }
 
-const dashboard = buildScope2CanonicalDashboard({ rootDir: root, now: new Date('2026-10-08T00:00:00+07:00') });
+const dashboard = await buildScope2CanonicalDashboard({ rootDir: root, now: new Date('2026-10-08T00:00:00+07:00') });
 const dashboardRows = dashboard.canonicalRows.filter(row => row.yearMonth <= '2026-09');
 const byKey = new Map(dashboardRows.map(row => [`${row.yearMonth}|${row.dcName}`, row]));
 const mentorRows = [];

@@ -109,7 +109,7 @@ test('Cross-Page Test: PLTS Pakai Sendiri di Halaman PLTS == di Halaman Scope 2'
   const pltsMonthly = await getCanonicalMonthlySummary({ year: 2026, throughMonth: 9 });
   const pltsYtd = await getCanonicalYtdSummary({ year: 2026, throughMonth: 9 });
 
-  const scope2Dashboard = buildScope2CanonicalDashboard({ rootDir: process.cwd() });
+  const scope2Dashboard = await buildScope2CanonicalDashboard({ rootDir: process.cwd() });
   const scope2CompleteRows = scope2Dashboard.canonicalRows.filter(r => r.yearMonth >= '2026-01' && r.yearMonth <= '2026-09');
   
   // 1. April comparison
@@ -130,7 +130,7 @@ test('Cross-Page Test: PLTS Pakai Sendiri di Halaman PLTS == di Halaman Scope 2'
 
 test('Canonical Entity Scope: Strictly 37 Distribution Centers', async () => {
   const pltsYtd = await getCanonicalYtdSummary({ year: 2026, throughMonth: 9 });
-  const scope2Dashboard = buildScope2CanonicalDashboard({ rootDir: process.cwd() });
+  const scope2Dashboard = await buildScope2CanonicalDashboard({ rootDir: process.cwd() });
 
   assert.equal(pltsYtd.plantCount, 37, 'PLTS YTD plant count must be 37');
   assert.equal(scope2Dashboard.coverage.monitoredPlantCount, 37, 'Scope 2 dashboard plant count must be 37');

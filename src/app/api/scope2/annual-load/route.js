@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const startTime = Date.now();
   try {
-    const data = buildScope2CanonicalDashboard();
+    const data = await buildScope2CanonicalDashboard();
     return NextResponse.json({
       success: true,
       status: 'success',

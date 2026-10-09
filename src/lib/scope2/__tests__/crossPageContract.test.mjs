@@ -11,8 +11,8 @@ test('PLTS tab and main dashboard consume the canonical Scope 2 bridge', () => {
   assert.match(resume, /scope2Bridge/);
 });
 
-test('canonical bridge equals inventory and does not double subtract PLTS', () => {
-  const data = buildScope2CanonicalDashboard({ rootDir: process.cwd() });
+test('canonical bridge equals inventory and does not double subtract PLTS', async () => {
+  const data = await buildScope2CanonicalDashboard({ rootDir: process.cwd() });
   assert.equal(data.scope2Bridge.afterPltsTon, data.scope2Bridge.scope2InventoryTon);
   assert.equal(data.scope2Bridge.noDoubleCounting, true);
 });

@@ -63,7 +63,7 @@ async function diagnose() {
   console.log(` Flat factor 0.77644 * Self = ${(ytdTableSelf * 0.77644 / 1000).toFixed(2)} tCO2e`);
 
   // 2. Fetch Scope 2 Dashboard data
-  const scope2Data = buildScope2CanonicalDashboard();
+  const scope2Data = await buildScope2CanonicalDashboard();
   console.log('\n--- Scope 2 Dashboard Canonical Rows ---');
   const scope2YtdRows = scope2Data.canonicalRows.filter(r => r.yearMonth >= '2026-01' && r.yearMonth <= '2026-09');
   const scope2YtdPurchased = scope2YtdRows.filter(r => r.scope2Basis === 'purchased');

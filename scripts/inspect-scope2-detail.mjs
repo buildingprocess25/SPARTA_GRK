@@ -2,8 +2,8 @@ import fs from 'fs';
 import { buildScope2CanonicalDashboard } from '../src/lib/scope2/dashboardService.js';
 import { aggregateCanonicalRows } from '../src/lib/scope2/energyReconciliation.js';
 
-function inspectScope2() {
-  const d = buildScope2CanonicalDashboard();
+async function inspectScope2() {
+  const d = await buildScope2CanonicalDashboard();
   const aprRows = d.canonicalRows.filter(r => r.yearMonth === '2026-04');
   console.log('=== SCOPE 2 APRIL ROWS ANALYSIS ===');
   console.log('Total April rows:', aprRows.length);
@@ -27,4 +27,5 @@ function inspectScope2() {
   });
 }
 
-inspectScope2();
+await inspectScope2();
+

@@ -10,7 +10,7 @@ export async function GET(request) {
   try {
     const url = new URL(request.url);
     const format = url.searchParams.get('format') === 'csv' ? 'csv' : 'xlsx';
-    const dashboard = buildScope2CanonicalDashboard();
+    const dashboard = await buildScope2CanonicalDashboard();
     const exported = buildScope2ExportData(dashboard, url.searchParams);
     if (format === 'csv') {
       return new NextResponse(buildScope2Csv(exported), {
