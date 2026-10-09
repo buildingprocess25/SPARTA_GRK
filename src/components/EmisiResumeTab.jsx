@@ -147,30 +147,9 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         </div>
         <div className="flex items-center gap-2">
           <button
-            type="button"
-            className={`font-semibold rounded-lg px-3.5 py-2 inline-flex items-center gap-2 transition text-sm border shadow-sm ${
-              isCalculatorOpen
-                ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
-                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-            }`}
-            onClick={() => {
-              const nextState = !isCalculatorOpen;
-              setIsCalculatorOpen(nextState);
-              if (nextState) {
-                setTimeout(() => {
-                  calculatorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 50);
-              }
-            }}
-            title="Buka kalkulator simulasi emisi"
-          >
-            <Calculator size={16} className={isCalculatorOpen ? 'text-blue-700' : 'text-blue-600'} />
-            <span>{isCalculatorOpen ? 'Tutup Kalkulator' : 'Buka Kalkulator Emisi'}</span>
-          </button>
-          <button
             className="bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg px-4 py-2 inline-flex items-center gap-2 transition text-sm"
-            onClick={() => handleNav('input')}
-            title="Tambah log pemakaian baru"
+            onClick={() => handleNav('penambah', 'scope1')}
+            title="Input data emisi operasional (Scope 1 / Scope 2)"
           >
             <Plus size={16} />
             <span>Input Emisi</span>

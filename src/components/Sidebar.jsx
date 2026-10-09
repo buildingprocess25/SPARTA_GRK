@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import {
-  LayoutDashboard, TrendingDown, TrendingUp, PlusCircle, History,
-  FileSpreadsheet, X, ShieldCheck, ChevronDown, Sun, Droplets, Fuel, Zap
+  LayoutDashboard, TrendingDown, TrendingUp, History,
+  X, ShieldCheck, ChevronDown, Sun, Droplets, Fuel, Zap
 } from 'lucide-react';
 
 const navItems = [
@@ -39,9 +39,8 @@ const navItems = [
     ],
   },
   {
-    group: 'INPUT & AUDIT',
+    group: 'AUDIT & RIWAYAT',
     items: [
-      { id: 'input', label: 'Mulai Audit / Input', icon: PlusCircle, badge: 'Form / Excel' },
       { id: 'history', label: 'Riwayat Audit', icon: History },
     ],
   },

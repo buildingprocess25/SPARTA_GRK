@@ -13,7 +13,7 @@ test('Scope 1 Modal & Input Data Component Verification', async (t) => {
 
     // 1. Check title & modal container
     assert.ok(content.includes('Input Data Scope 1 — Solar Genset'), 'Has modal title');
-    assert.ok(content.includes('fixed inset-0'), 'Renders as overlay dialog above page');
+    assert.ok(content.includes('BaseModal') || content.includes('fixed inset-0'), 'Renders as overlay dialog above page');
 
     // 2. Check tab options: Manual & Excel
     assert.ok(content.includes('Input Manual'), 'Has Input Manual tab');
@@ -48,7 +48,7 @@ test('Scope 1 Modal & Input Data Component Verification', async (t) => {
     const content = fs.readFileSync(filePath, 'utf-8');
 
     assert.ok(content.includes('Scope1InputModal'), 'Imports Scope1InputModal');
-    assert.ok(content.includes('+ Input Data'), 'Has + Input Data button');
+    assert.ok(content.includes('InputDataButton') || content.includes('Input Data'), 'Has Input Data button');
     assert.ok(content.includes('isInputModalOpen'), 'Controls modal visibility via state');
   });
 

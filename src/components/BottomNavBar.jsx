@@ -1,8 +1,7 @@
 'use client';
 
 import {
-  LayoutDashboard, TrendingDown, TrendingUp, PlusCircle, History,
-  FileSpreadsheet
+  LayoutDashboard, TrendingDown, TrendingUp, History
 } from 'lucide-react';
 
 export default function BottomNavBar({ activeTab, setActiveTab }) {
@@ -10,7 +9,6 @@ export default function BottomNavBar({ activeTab, setActiveTab }) {
     { id: 'resume', label: 'DASHBOARD', shortLabel: 'BERANDA', icon: LayoutDashboard },
     { id: 'pengurang', label: 'PENGURANG EMISI', shortLabel: 'OFFSET', icon: TrendingDown },
     { id: 'penambah', label: 'PENAMBAH EMISI', shortLabel: 'EMISI', icon: TrendingUp },
-    { id: 'input', label: 'INPUT / AUDIT', shortLabel: 'INPUT', icon: PlusCircle },
     { id: 'history', label: 'RIWAYAT', shortLabel: 'LOG', icon: History },
   ];
 
