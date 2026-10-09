@@ -95,14 +95,23 @@ export default function Scope2Waterfall({ summary }) {
     <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-3 xl:gap-2">
       {steps.map((step) => {
         const IconComponent = step.icon;
+        const topAccent = step.isResult
+          ? 'border-t-2 border-t-rose-500'
+          : step.id === 'load'
+          ? 'border-t-2 border-t-slate-400'
+          : step.id === 'plts'
+          ? 'border-t-2 border-t-amber-400'
+          : step.id === 'purchased'
+          ? 'border-t-2 border-t-blue-400'
+          : 'border-t-2 border-t-indigo-400';
 
         return (
           <React.Fragment key={step.id}>
             {/* Step Card */}
             <div
-              className={`flex-1 min-w-0 rounded-xl p-4 transition-all duration-200 flex flex-col justify-between ${
+              className={`flex-1 min-w-0 rounded-xl p-4 transition-all duration-200 flex flex-col justify-between h-full ${topAccent} ${
                 step.isResult
-                  ? 'bg-gradient-to-br from-rose-50/90 to-rose-100/70 border-2 border-rose-300 ring-2 ring-rose-200/60 shadow-sm'
+                  ? 'bg-gradient-to-br from-rose-50/80 via-white to-rose-100/60 border border-rose-200 ring-2 ring-rose-200/50 shadow-sm'
                   : 'bg-white border border-slate-200/90 shadow-2xs hover:border-slate-300'
               }`}
               title={step.note}
@@ -111,8 +120,10 @@ export default function Scope2Waterfall({ summary }) {
               <div className="flex items-center justify-between gap-2 mb-2.5">
                 <div className="flex items-center gap-1.5 min-w-0">
                   <span
-                    className={`size-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
-                      step.isResult ? 'bg-rose-600 text-white' : 'bg-slate-900 text-white'
+                    className={`size-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                      step.isResult
+                        ? 'bg-rose-100 text-rose-700 border border-rose-200'
+                        : 'bg-slate-100 text-slate-600 border border-slate-200/80'
                     }`}
                   >
                     {step.stepBadge}
@@ -120,7 +131,7 @@ export default function Scope2Waterfall({ summary }) {
                   <span
                     className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded truncate ${
                       step.isResult
-                        ? 'bg-rose-200/80 text-rose-900'
+                        ? 'bg-rose-100/80 text-rose-800'
                         : 'bg-slate-100 text-slate-600'
                     }`}
                   >
@@ -145,7 +156,7 @@ export default function Scope2Waterfall({ summary }) {
               {/* Value & Unit */}
               <div className="mt-1.5 flex items-baseline flex-wrap">
                 <span
-                  className={`text-2xl xl:text-[26px] font-black tracking-tight ${
+                  className={`text-2xl xl:text-[26px] font-bold tracking-tight tabular-nums transition-all duration-300 ${
                     step.isResult ? 'text-rose-700' : 'text-slate-900'
                   }`}
                 >
@@ -170,14 +181,14 @@ export default function Scope2Waterfall({ summary }) {
               </p>
             </div>
 
-            {/* Operator Connector */}
+            {/* Operator Connector (Soft Neutral Circle) */}
             {step.operator && (
               <div className="flex items-center justify-center shrink-0 self-center py-0.5 xl:py-0">
                 <span
-                  className={`size-7 rounded-full flex items-center justify-center font-black text-xs shadow-xs transition-transform ${
+                  className={`size-7 rounded-full flex items-center justify-center font-bold text-xs shadow-2xs transition-colors ${
                     step.operator === '→'
-                      ? 'bg-rose-600 text-white ring-2 ring-rose-200'
-                      : 'bg-slate-900 text-white'
+                      ? 'bg-rose-50/80 border border-rose-200 text-rose-600'
+                      : 'bg-slate-100 border border-slate-200/80 text-slate-600'
                   }`}
                   title={step.operatorLabel}
                   aria-label={step.operatorLabel}

@@ -70,15 +70,15 @@ export default function KpiCard({
 
   return (
     <div
-      className={`relative rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 flex flex-col justify-between shadow-2xs hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200 min-w-0 ${themeConfig.accentBorder} ${className}`}
+      className={`relative rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-5 flex flex-col justify-between h-full shadow-2xs hover:-translate-y-0.5 hover:shadow-xs transition-all duration-200 min-w-0 has-[[data-popover-open="true"]]:z-50 has-[[data-popover-open="true"]]:relative ${themeConfig.accentBorder} ${className}`}
       title={tooltip || label}
       {...props}
     >
       {/* Top Row: Label & Icons */}
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="flex flex-col min-w-0 pr-1">
+      <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-2">
+        <div className="flex flex-col min-w-0 pr-1 flex-1">
           <span
-            className="text-xs font-bold uppercase tracking-wider text-slate-500 truncate"
+            className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 line-clamp-2 leading-tight break-words"
             title={label}
           >
             {label}
@@ -90,31 +90,35 @@ export default function KpiCard({
           )}
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           {infoKey && <MetricInfoIcon infoKey={infoKey} />}
           {Icon && (
             <div
-              className={`size-9 rounded-xl flex items-center justify-center shrink-0 ${themeConfig.iconBg}`}
+              className={`size-8 sm:size-9 rounded-xl flex items-center justify-center shrink-0 ${themeConfig.iconBg}`}
             >
-              <Icon size={17} strokeWidth={2.2} />
+              <Icon size={16} strokeWidth={2.2} />
             </div>
           )}
         </div>
       </div>
 
       {/* Middle Row: Big Number & Unit */}
-      <div className="mt-1 flex items-baseline flex-wrap">
-        <span
-          className={`text-2xl sm:text-[26px] font-bold tracking-tight tabular-nums ${themeConfig.numberColor}`}
-        >
-          {value != null ? value : '—'}
-        </span>
-        {unit && (
-          <span className="text-xs font-semibold text-slate-500 ml-1.5 shrink-0">
-            {unit}
+      {React.isValidElement(value) ? (
+        <div className="mt-1 w-full">{value}</div>
+      ) : (
+        <div className="mt-1 flex items-baseline flex-wrap">
+          <span
+            className={`text-2xl sm:text-[26px] font-bold tracking-tight tabular-nums transition-all duration-300 ${themeConfig.numberColor}`}
+          >
+            {value != null ? value : '—'}
           </span>
-        )}
-      </div>
+          {unit && (
+            <span className="text-xs font-semibold text-slate-500 ml-1.5 shrink-0">
+              {unit}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Bottom Row: Description / Footnote */}
       {descriptionContent && (

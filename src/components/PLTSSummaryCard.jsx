@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import CardBox from '@/components/ui/CardBox';
 import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
+import KpiCard from '@/components/ui/KpiCard';
 import { isDcLocation } from '@/lib/solar/plantMap';
 import { isValidPltsHistoryPeriod } from '@/lib/solar/cacheKey';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
@@ -828,158 +829,131 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         )}
 
         {/* 2. METRIC CARDS (DYNAMIC TO SHARED FILTER) */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 pt-1 relative z-20 has-[[data-popover-open='true']]:z-40">
           {/* Card 1: Kapasitas */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-blue-200 transition-colors">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Kapasitas Terpasang</span>
-              <div className="flex items-center gap-1.5">
-                <MetricInfoIcon infoKey="plts_summary_capacity" />
-                <div className="size-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <Zap size={14} />
-                </div>
-              </div>
-            </div>
-            <div className="mt-2 flex items-baseline gap-1.5">
-              <span className="text-xl font-black text-slate-900 font-mono">{formatNum(kpi.totalKwp, 1, 2)}</span>
-              <span className="text-xs font-medium text-slate-500">kWp</span>
-            </div>
-            <span className="text-[11px] text-slate-500 block mt-1">
-              {filteredRows.length} plant fisik aktif
-            </span>
-          </div>
+          <KpiCard
+            label="Kapasitas Terpasang"
+            value={formatNum(kpi.totalKwp, 1, 2)}
+            unit="kWp"
+            subtitle={`${filteredRows.length} plant fisik aktif`}
+            icon={Zap}
+            theme="plts"
+            infoKey="plts_summary_capacity"
+          />
 
           {/* Card 2: Total Produksi */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-amber-200 transition-colors">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Produksi</span>
-              <div className="flex items-center gap-1.5">
-                <MetricInfoIcon infoKey="plts_summary_production" />
-                <div className="size-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                  <Sun size={14} />
+          <KpiCard
+            label="Total Produksi"
+            value={(dashboardData?.summary?.productionKwh ?? Math.round(totalFooter.totalMwh * 1000))?.toLocaleString('id-ID')}
+            unit="kWh"
+            subtitle={
+              <div className="space-y-1">
+                <span>Periode {data?.history?.activePeriod?.label || data?.period}</span>
+                <div className="border-t border-slate-100 pt-1 text-[10px] text-slate-500">
+                  {isNational && dashboardData?.summary?.targetMwh != null
+                    ? <>Target {Math.round(dashboardData.summary.targetMwh * 1000).toLocaleString('id-ID')} kWh · Capai <strong className="text-emerald-700">{formatNum(dashboardData.summary.achievementPct, 1, 1)}%</strong></>
+                    : 'Target nasional'}
+                  {isNational && dashboardData?.summary?.achievementPct != null && (
+                    <div className="mt-1 h-1 overflow-hidden rounded-full bg-amber-100">
+                      <div className="h-full rounded-full bg-amber-500" style={{ width: `${Math.min(100, dashboardData.summary.achievementPct)}%` }} />
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-            <div className="mt-2 flex items-baseline gap-1.5">
-              <span className="text-xl font-black text-amber-700 font-mono">
-                {(dashboardData?.summary?.productionKwh ?? Math.round(totalFooter.totalMwh * 1000))?.toLocaleString('id-ID')}
-              </span>
-              <span className="text-xs font-medium text-amber-600">kWh</span>
-            </div>
-            <span className="text-[11px] text-slate-500 block mt-1">
-              Periode {data?.history?.activePeriod?.label || data?.period}
-            </span>
-            <div className="mt-2 border-t border-amber-100 pt-2 text-[10px] text-slate-600">
-              {isNational && dashboardData?.summary?.targetMwh != null
-                ? <>Target {Math.round(dashboardData.summary.targetMwh * 1000).toLocaleString('id-ID')} kWh · Capai <strong className="text-emerald-700">{formatNum(dashboardData.summary.achievementPct, 1, 1)}%</strong></>
-                : 'Target nasional'}
-              {isNational && dashboardData?.summary?.achievementPct != null && (
-                <div className="mt-1 h-1 overflow-hidden rounded-full bg-amber-100">
-                  <div className="h-full rounded-full bg-amber-500" style={{ width: `${Math.min(100, dashboardData.summary.achievementPct)}%` }} />
-                </div>
-              )}
-            </div>
-          </div>
+            }
+            icon={Sun}
+            theme="plts"
+            infoKey="plts_summary_production"
+          />
 
           {/* Card 3: Penghematan Energi Bersih (Non-Nominal) */}
-          <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/20 p-3.5 shadow-2xs hover:border-emerald-300 transition-colors">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Penghematan Energi</span>
-              <div className="flex items-center gap-1.5">
-                <MetricInfoIcon infoKey="plts_savings" />
-                <div className="size-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                  <Zap size={14} />
+          <KpiCard
+            label="Penghematan Energi"
+            value={(dashboardData?.summary?.savingsKwh ?? dashboardData?.summary?.productionKwh ?? Math.round(totalFooter.totalMwh * 1000))?.toLocaleString('id-ID')}
+            unit="kWh"
+            subtitle={
+              <div className="space-y-1">
+                <span className="text-[10px] text-emerald-700 font-semibold block">
+                  {dashboardData?.summary?.emission?.coalAvoidedTon ? `~${formatNum(dashboardData.summary.emission.coalAvoidedTon, 1, 1)} Ton Batubara (estimasi)` : 'Batubara Terhindar'}
+                </span>
+                <div className="border-t border-slate-100 pt-1 text-[10px] text-slate-500" title="Estimasi SFC PLTU 0,40 kg batubara/kWh untuk energi pakai sendiri 37 plant resmi ESDM">
+                  Ekuivalen 0,40 kg batubara / kWh (37 plant resmi)
                 </div>
               </div>
-            </div>
-            <div className="mt-2 flex items-baseline gap-1.5">
-              <span className="text-xl font-black text-emerald-700 font-mono">
-                {(dashboardData?.summary?.savingsKwh ?? dashboardData?.summary?.productionKwh ?? Math.round(totalFooter.totalMwh * 1000))?.toLocaleString('id-ID')}
-              </span>
-              <span className="text-xs font-medium text-emerald-600">kWh</span>
-            </div>
-            <span className="text-[10px] text-emerald-700 font-semibold block mt-1">
-              {dashboardData?.summary?.emission?.coalAvoidedTon ? `~${formatNum(dashboardData.summary.emission.coalAvoidedTon, 1, 1)} Ton Batubara (estimasi)` : 'Batubara Terhindar'}
-            </span>
-            <div className="mt-2 border-t border-emerald-100 pt-2 text-[10px] text-slate-600" title="Estimasi SFC PLTU 0,40 kg batubara/kWh untuk energi pakai sendiri 37 plant resmi ESDM">
-              Ekuivalen 0,40 kg batubara / kWh (37 plant resmi)
-            </div>
-          </div>
+            }
+            icon={Zap}
+            theme="savings"
+            infoKey="plts_savings"
+          />
 
           {/* Card 4: Reduksi Emisi */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-emerald-200 transition-colors">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Emisi Terhindar</span>
-              <div className="flex items-center gap-1.5">
-                <MetricInfoIcon infoKey="plts_summary_co2" />
-                <div className="size-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                  <Trees size={14} />
+          <KpiCard
+            label="Emisi Terhindar"
+            value={formatNum(kpi.totalCo2ReducedTon, 2, 2)}
+            unit="tCO₂e"
+            subtitle={
+              <div className="space-y-1">
+                <span>Setara {formatNum(kpi.treeEquivalent, 0, 0)} pohon</span>
+                <div className="border-t border-slate-100 pt-1 text-[10px] text-slate-500" title="Energi PLTS yang dipakai sendiri dikali faktor emisi tunggal dashboard">
+                  Faktor emisi: {PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh
                 </div>
               </div>
-            </div>
-            <div className="mt-2 flex items-baseline gap-1.5">
-              <span className="text-xl font-black text-emerald-700 font-mono">{formatNum(kpi.totalCo2ReducedTon, 2, 2)}</span>
-              <span className="text-xs font-medium text-emerald-600">tCO₂e</span>
-            </div>
-            <span className="text-[11px] text-slate-500 block mt-1">
-              Setara {formatNum(kpi.treeEquivalent, 0, 0)} pohon
-            </span>
-            <div className="mt-2 border-t border-emerald-100 pt-2 text-[10px] text-slate-600" title="Energi PLTS yang dipakai sendiri dikali faktor emisi tunggal dashboard">
-              Faktor emisi: {PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh
-            </div>
-          </div>
+            }
+            icon={Trees}
+            theme="savings"
+            infoKey="plts_summary_co2"
+          />
 
           {/* Card 5: Status Operasional Stasiun */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-2xs hover:border-purple-200 transition-colors">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status Operasional</span>
-              <div className="flex items-center gap-1.5">
-                <MetricInfoIcon infoKey="plts_summary_status" />
-                <div className="size-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-                  <CheckCircle2 size={14} />
+          <KpiCard
+            label="Status Operasional"
+            value={
+              <div className="flex items-center gap-1.5 flex-wrap text-sm sm:text-base font-bold">
+                <span
+                  className="font-mono text-emerald-700 cursor-help"
+                  title={`Normal (${statusBreakdown.normalNames.length} lokasi):\n${statusBreakdown.normalNames.join(', ')}`}
+                >
+                  {statusBreakdown.normalCount} Normal
+                </span>
+                <span className="text-slate-300">·</span>
+                <span
+                  className={`font-mono ${statusBreakdown.faultCount > 0 ? 'text-red-600' : 'text-slate-400'} cursor-help`}
+                  title={`Fault (${statusBreakdown.faultNames.length} lokasi):\n${statusBreakdown.faultNames.join(', ') || 'Tidak ada'}`}
+                >
+                  {statusBreakdown.faultCount} Fault
+                </span>
+                <span className="text-slate-300">·</span>
+                <span
+                  className={`font-mono ${statusBreakdown.alarmCount > 0 ? 'text-amber-600' : 'text-slate-400'} cursor-help`}
+                  title={`Alarm (${statusBreakdown.alarmNames.length} lokasi):\n${statusBreakdown.alarmNames.join(', ') || 'Tidak ada'}`}
+                >
+                  {statusBreakdown.alarmCount} Alarm
+                </span>
+                <span className="text-slate-300">·</span>
+                <span
+                  className={`font-mono ${statusBreakdown.offlineCount > 0 ? 'text-slate-700' : 'text-slate-400'} cursor-help`}
+                  title={`Offline (${statusBreakdown.offlineNames.length} lokasi):\n${statusBreakdown.offlineNames.join(', ') || 'Tidak ada'}`}
+                >
+                  {statusBreakdown.offlineCount} Offline
+                </span>
+              </div>
+            }
+            subtitle={
+              <div className="space-y-1">
+                <span>{statusBreakdown.attentionCount === 0 ? 'Semua lokasi beroperasi normal' : `${statusBreakdown.attentionCount} lokasi perlu perhatian`}</span>
+                <div className="border-t border-slate-100 pt-1 text-[10px] text-slate-500">
+                  PR: {dashboardData?.summary?.pr?.valuePct ? <strong className="text-cyan-800">{formatNum(dashboardData.summary.pr.valuePct, 1, 1)}%</strong> : 'Belum tersedia'}
                 </div>
               </div>
-            </div>
-            <div className="mt-2 flex items-center gap-1.5 flex-wrap text-xs">
-              <span
-                className="font-mono font-black text-emerald-700 cursor-help"
-                title={`Normal (${statusBreakdown.normalNames.length} lokasi):\n${statusBreakdown.normalNames.join(', ')}`}
-              >
-                {statusBreakdown.normalCount} Normal
-              </span>
-              <span className="text-slate-300">·</span>
-              <span
-                className={`font-mono font-black ${statusBreakdown.faultCount > 0 ? 'text-red-600' : 'text-slate-400'} cursor-help`}
-                title={`Fault (${statusBreakdown.faultNames.length} lokasi):\n${statusBreakdown.faultNames.join(', ') || 'Tidak ada'}`}
-              >
-                {statusBreakdown.faultCount} Fault
-              </span>
-              <span className="text-slate-300">·</span>
-              <span
-                className={`font-mono font-black ${statusBreakdown.alarmCount > 0 ? 'text-amber-600' : 'text-slate-400'} cursor-help`}
-                title={`Alarm (${statusBreakdown.alarmNames.length} lokasi):\n${statusBreakdown.alarmNames.join(', ') || 'Tidak ada'}`}
-              >
-                {statusBreakdown.alarmCount} Alarm
-              </span>
-              <span className="text-slate-300">·</span>
-              <span
-                className={`font-mono font-black ${statusBreakdown.offlineCount > 0 ? 'text-slate-700' : 'text-slate-400'} cursor-help`}
-                title={`Offline (${statusBreakdown.offlineNames.length} lokasi):\n${statusBreakdown.offlineNames.join(', ') || 'Tidak ada'}`}
-              >
-                {statusBreakdown.offlineCount} Offline
-              </span>
-            </div>
-            <span className="text-[11px] text-slate-500 block mt-1">
-              {statusBreakdown.attentionCount === 0 ? 'Semua lokasi beroperasi normal' : `${statusBreakdown.attentionCount} lokasi perlu perhatian`}
-            </span>
-            <div className="mt-2 border-t border-purple-100 pt-2 text-[10px] text-slate-600">
-              PR: {dashboardData?.summary?.pr?.valuePct ? <strong className="text-cyan-800">{formatNum(dashboardData.summary.pr.valuePct, 1, 1)}%</strong> : 'Belum tersedia'}
-            </div>
-          </div>
+            }
+            icon={CheckCircle2}
+            theme={statusBreakdown.attentionCount > 0 ? 'genset' : 'savings'}
+            infoKey="plts_summary_status"
+          />
         </div>
 
         {compareYears && comparison && (
-          <div className="rounded-2xl border border-blue-100 bg-blue-50/40 p-4" data-yoy-comparison="true">
+          <div className="rounded-2xl border border-blue-100 bg-blue-50/40 p-4 relative z-0" data-yoy-comparison="true">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
               <div className="flex items-center gap-2">
                 <div>

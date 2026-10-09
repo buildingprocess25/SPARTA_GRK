@@ -10,7 +10,8 @@ import {
   Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell, Line
 } from 'recharts';
 import { useSustainability } from '@/context/SustainabilityContext';
-import StatCard from '@/components/ui/StatCard';
+import PageHeader from '@/components/ui/PageHeader';
+import KpiCard from '@/components/ui/KpiCard';
 import CardBox from '@/components/ui/CardBox';
 
 const WATER_COLORS = ['#0EA5E9', '#38BDF8', '#7DD3FC', '#BAE6FD'];
@@ -28,57 +29,53 @@ export default function WaterRecycleTab() {
   return (
     <div className="space-y-6 animate-in">
       {/* 1. Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-100">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 mb-1">
-            Water Recycle
-          </h1>
-          <p className="text-sm text-slate-500 leading-relaxed mb-2">
-            Volume air daur ulang dan manfaat yang dihitung.
-          </p>
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+      <PageHeader
+        title="Water Recycle"
+        subtitle="Volume air daur ulang dan manfaat yang dihitung."
+        badge={
+          <>
             <span>{summary.activeSites} DC Aktif</span>
             <span>&middot;</span>
             <span>{summary.plannedSites} Planned</span>
             <span>&middot;</span>
             <span>Diperbarui {new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* 2. Baris 4 KPI */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <StatCard
-          title="KAPASITAS TOTAL"
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
+        <KpiCard
+          label="KAPASITAS TOTAL"
           value={summary.totalCapacity}
           unit="m³/hari"
-          trendText="Kapasitas desain semua DC"
+          trend="Kapasitas desain semua DC"
           icon={Gauge}
-          theme="default"
+          theme="water"
         />
-        <StatCard
-          title="AIR TEROLAH AKTUAL"
+        <KpiCard
+          label="AIR TEROLAH AKTUAL"
           value={summary.totalRecycled}
           unit="m³/hari"
-          trendText={`${((summary.totalRecycled / summary.totalCapacity) * 100).toFixed(1)}% utilisasi`}
+          trend={`${((summary.totalRecycled / summary.totalCapacity) * 100).toFixed(1)}% utilisasi`}
           icon={Recycle}
-          theme="default"
+          theme="water"
         />
-        <StatCard
-          title="AIR HEMAT YTD"
+        <KpiCard
+          label="AIR HEMAT YTD"
           value={(summary.waterSavedYTD / 1000).toFixed(1)}
           unit="ribu m³"
-          trendText="+12.3% vs tahun lalu"
+          trend="+12.3% vs tahun lalu"
           icon={ArrowDownRight}
-          theme="success"
+          theme="savings"
         />
-        <StatCard
-          title="PENGHEMATAN YTD"
+        <KpiCard
+          label="PENGHEMATAN YTD"
           value={summary.costSavedYTD.toLocaleString()}
           unit="Juta Rp"
-          trendText="@ Rp 8.000/m³"
+          trend="@ Rp 8.000/m³"
           icon={Calculator}
-          theme="success"
+          theme="savings"
         />
       </div>
 

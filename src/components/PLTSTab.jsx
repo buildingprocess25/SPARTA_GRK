@@ -17,6 +17,8 @@ import {
 import {
   isolarDCBranches, formatNum
 } from '@/data/sustainabilityData';
+import PageHeader from '@/components/ui/PageHeader';
+import KpiCard from '@/components/ui/KpiCard';
 import StatCard from '@/components/ui/StatCard';
 import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
 import CardBox from '@/components/ui/CardBox';
@@ -509,64 +511,60 @@ export default function PLTSTab() {
   return (
     <div className="space-y-6 animate-in">
       {/* 1. Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-100">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 mb-1">
-            PLTS Atap
-          </h1>
-          <p className="text-sm text-slate-500 leading-relaxed mb-2">
-            Produksi energi dan kinerja plant PLTS.
-          </p>
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+      <PageHeader
+        title="PLTS Atap"
+        subtitle="Produksi energi dan kinerja plant PLTS."
+        badge={
+          <>
             <span>{totalPlants} plant DC</span>
             <span>&middot;</span>
             <span>Sungrow</span>
             <span>&middot;</span>
             <span>Diperbarui {dashboardData?.summary?.sync?.lastSyncTime || `${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`}</span>
+          </>
+        }
+        actions={
+          <div className="flex shrink-0 flex-col items-end gap-2 self-start">
+            <InputDataButton label="Input Data PLTS" icon={Sun} onClick={() => setIsInputModalOpen(true)} />
+            <div className="inline-flex flex-wrap gap-1 rounded-full bg-slate-100 p-1">
+              <button
+                type="button"
+                className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'overview'
+                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                  : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                onClick={() => setActivePltsSubView('overview')}
+              >
+                Target
+              </button>
+              {isAuditBaselineEnabled && (
+                <button
+                  type="button"
+                  className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'april-audit'
+                    ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                    : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  onClick={() => setActivePltsSubView('april-audit')}
+                >
+                  <FileSpreadsheet size={14} className="text-emerald-600" />
+                  <span>Audit Baseline (April 2026)</span>
+                </button>
+              )}
+              <button
+                type="button"
+                className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'isolar-api'
+                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                  : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                onClick={() => setActivePltsSubView('isolar-api')}
+              >
+                <Radio size={14} className="text-emerald-500 animate-pulse" />
+                <span>Live iSolarCloud API</span>
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* Sub-tab Switcher: Segmented Control */}
-        <div className="flex shrink-0 flex-col items-end gap-2 self-start">
-          <InputDataButton label="Input Data PLTS" icon={Sun} onClick={() => setIsInputModalOpen(true)} />
-          <div className="inline-flex flex-wrap gap-1 rounded-full bg-slate-100 p-1">
-          <button
-            type="button"
-            className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'overview'
-              ? 'bg-white text-slate-900 shadow-sm font-semibold'
-              : 'text-slate-500 hover:text-slate-900'
-              }`}
-            onClick={() => setActivePltsSubView('overview')}
-          >
-            Target
-          </button>
-          {isAuditBaselineEnabled && (
-            <button
-              type="button"
-              className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'april-audit'
-                ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                : 'text-slate-500 hover:text-slate-900'
-                }`}
-              onClick={() => setActivePltsSubView('april-audit')}
-            >
-              <FileSpreadsheet size={14} className="text-emerald-600" />
-              <span>Audit Baseline (April 2026)</span>
-            </button>
-          )}
-          <button
-            type="button"
-            className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'isolar-api'
-              ? 'bg-white text-slate-900 shadow-sm font-semibold'
-              : 'text-slate-500 hover:text-slate-900'
-              }`}
-            onClick={() => setActivePltsSubView('isolar-api')}
-          >
-            <Radio size={14} className="text-emerald-500 animate-pulse" />
-            <span>Live iSolarCloud API</span>
-          </button>
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* JIKA MODE: LIVE ISOLARCLOUD API VIEW */}
       {activePltsSubView === 'isolar-api' && (
@@ -952,21 +950,21 @@ export default function PLTSTab() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-              <StatCard
-                title="KAPASITAS PLTS"
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
+              <KpiCard
+                label="KAPASITAS PLTS"
                 value={dashboardData?.summary?.capacityKwp != null ? formatNum(dashboardData.summary.capacityKwp, 2, 2) : '—'}
                 unit="kWp"
-                trendText={`${dashboardData?.summary?.plantCount ?? 39} plant · ${dashboardData?.summary?.capacityKwp != null ? formatNum(dashboardData.summary.capacityKwp, 2, 2) + ' kWp terpasang' : '—'} · ${dashboardData?.summary?.operationalCapacityKwp != null ? formatNum(dashboardData.summary.operationalCapacityKwp, 2, 2) + ' kWp operasional' : '—'}`}
+                trend={`${dashboardData?.summary?.plantCount ?? 39} plant · ${dashboardData?.summary?.capacityKwp != null ? formatNum(dashboardData.summary.capacityKwp, 2, 2) + ' kWp terpasang' : '—'} · ${dashboardData?.summary?.operationalCapacityKwp != null ? formatNum(dashboardData.summary.operationalCapacityKwp, 2, 2) + ' kWp operasional' : '—'}`}
                 icon={Sun}
-                theme="warning"
+                theme="plts"
                 infoKey="plts_capacity"
               />
-              <StatCard
-                title="PRODUKSI PLTS"
+              <KpiCard
+                label="PRODUKSI PLTS"
                 value={dashboardData?.summary?.productionKwh != null ? formatNum(dashboardData.summary.productionKwh, 1, 1) : '—'}
                 unit="kWh"
-                trendText={
+                trend={
                   <div className="space-y-1">
                     <div className="flex items-center gap-1.5 flex-wrap text-xs">
                       <span>{dashboardData?.summary?.achievementPct != null ? `${dashboardData.summary.achievementPct.toFixed(1)}% dari target` : (dashboardData?.summary?.energyBalance?.target?.achievementPct != null ? `${dashboardData.summary.energyBalance.target.achievementPct.toFixed(1)}% dari target` : '—')}</span>
@@ -982,14 +980,14 @@ export default function PLTSTab() {
                   </div>
                 }
                 icon={Zap}
-                theme="warning"
+                theme="plts"
                 infoKey="plts_production"
               />
-              <StatCard
-                title="PENGHEMATAN ENERGI"
+              <KpiCard
+                label="PENGHEMATAN ENERGI"
                 value={dashboardData?.summary?.savingsKwh != null ? formatNum(dashboardData.summary.savingsKwh, 1, 1) : '—'}
                 unit="kWh"
-                trendText={
+                trend={
                   <div className="space-y-0.5" title="Estimasi, asumsi tarif Rp 1.400/kWh belum dikonfirmasi">
                     <div className="text-xs font-semibold text-emerald-700">
                       {dashboardData?.summary?.plantCount ?? 37} dari {dashboardData?.summary?.plantCount ?? 37} DC
@@ -1000,14 +998,14 @@ export default function PLTSTab() {
                   </div>
                 }
                 icon={BatteryCharging}
-                theme="success"
+                theme="savings"
                 infoKey="plts_savings"
               />
-              <StatCard
-                title="EMISI TERHINDAR"
+              <KpiCard
+                label="EMISI TERHINDAR"
                 value={dashboardData?.summary?.emission?.emissionTon != null ? formatNum(dashboardData.summary.emission.emissionTon, 2, 2) : '—'}
                 unit="tCO₂e"
-                trendText={
+                trend={
                   <div className="space-y-1.5 whitespace-normal">
                     <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold" title={`Emisi Terhindar = Produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
                       <span className="text-emerald-700 font-medium">Faktor Emisi:</span>
@@ -1022,7 +1020,7 @@ export default function PLTSTab() {
                   </div>
                 }
                 icon={TrendingUp}
-                theme="success"
+                theme="savings"
                 infoKey="plts_avoided_emission"
                 tooltip={`Konstanta faktor emisi: 1 kWh = ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂. Dihitung dari produksi PLTS yang dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000.`}
               />

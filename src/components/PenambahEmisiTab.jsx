@@ -11,7 +11,8 @@ import {
   CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart
 } from 'recharts';
 import { useSustainability } from '@/context/SustainabilityContext';
-import StatCard from '@/components/ui/StatCard';
+import PageHeader from '@/components/ui/PageHeader';
+import KpiCard from '@/components/ui/KpiCard';
 import CardBox from '@/components/ui/CardBox';
 import Scope2AnnualLoadDashboard from '@/components/Scope2AnnualLoadDashboard';
 import Scope1InputModal from '@/components/scope1/Scope1InputModal';
@@ -60,22 +61,19 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
   return (
     <div className="space-y-6 animate-in">
       {/* 1. Header Halaman */}
-      <header className="pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
-            {activeSubScope === 'scope1' ? 'Scope 1 — BBM' : 'Scope 2 — Listrik'}
-          </h1>
-          <p className="mt-1 text-sm text-slate-500 leading-relaxed">
-            {activeSubScope === 'scope1'
-              ? 'Konsumsi BBM genset dan kendaraan operasional.'
-              : 'Konsumsi listrik yang dibeli dan emisi per fasilitas.'}
-          </p>
-        </div>
-
-        {activeSubScope === 'scope1' && (
-          <InputDataButton label="Input Data Scope 1" icon={Fuel} onClick={() => setIsInputModalOpen(true)} />
-        )}
-      </header>
+      <PageHeader
+        title={activeSubScope === 'scope1' ? 'Scope 1 — BBM' : 'Scope 2 — Listrik'}
+        subtitle={
+          activeSubScope === 'scope1'
+            ? 'Konsumsi BBM genset dan kendaraan operasional.'
+            : 'Konsumsi listrik yang dibeli dan emisi per fasilitas.'
+        }
+        actions={
+          activeSubScope === 'scope1' ? (
+            <InputDataButton label="Input Data Scope 1" icon={Fuel} onClick={() => setIsInputModalOpen(true)} />
+          ) : null
+        }
+      />
 
       {/* 2. Metode & Sumber Info */}
       <details className="group border border-slate-200 rounded-xl bg-white shadow-sm [&_summary::-webkit-details-marker]:hidden">
@@ -281,73 +279,73 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
 
       {/* 3. Baris 4 KPI */}
       {activeSubScope === 'scope1' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-          <StatCard
-            title="TOTAL KONSUMSI SOLAR YTD"
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
+          <KpiCard
+            label="TOTAL KONSUMSI SOLAR YTD"
             value={formatNum(scope1.summary.totalFuelLitersYTD)}
             unit="Liter"
-            trendText="Pemakaian darurat genset saat outage PLN"
+            trend="Pemakaian darurat genset saat outage PLN"
             icon={Fuel}
-            theme="default"
+            theme="genset"
           />
-          <StatCard
-            title="TOTAL EMISI SCOPE 1"
+          <KpiCard
+            label="TOTAL EMISI SCOPE 1"
             value={formatNum(scope1.summary.totalEmissionCO2e, 1)}
             unit="tCO₂e"
-            trendText="+ Liter × 2.6685 kgCO₂e/L"
+            trend="+ Liter × 2.6685 kgCO₂e/L"
             icon={Flame}
-            theme="danger"
+            theme="emission"
           />
-          <StatCard
-            title="BIAYA SOLAR INDUSTRI"
+          <KpiCard
+            label="BIAYA SOLAR INDUSTRI"
             value={`Rp ${formatNum(scope1.summary.fuelCostTotalJuta, 1)}`}
             unit="Juta"
-            trendText="Est. Rp 15.000 / Liter industri"
+            trend="Est. Rp 15.000 / Liter industri"
             icon={Calculator}
-            theme="warning"
+            theme="calc"
           />
-          <StatCard
-            title="UNIT GENSET AKTIF"
+          <KpiCard
+            label="UNIT GENSET AKTIF"
             value={scope1.summary.activeGensetUnits}
             unit="Unit DC"
-            trendText={`Rata-rata ${scope1.summary.avgRunHoursPerMonth} jam operasi/bulan`}
+            trend={`Rata-rata ${scope1.summary.avgRunHoursPerMonth} jam operasi/bulan`}
             icon={Factory}
-            theme="success"
+            theme="pln"
           />
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-          <StatCard
-            title={`LISTRIK PLN (${selectedPeriod === 'ytd' ? 'YTD' : MONTH_NAMES_SHORT[Number(selectedPeriod)]})`}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
+          <KpiCard
+            label={`LISTRIK PLN (${selectedPeriod === 'ytd' ? 'YTD' : MONTH_NAMES_SHORT[Number(selectedPeriod)]})`}
             value={formatNum(hierarchyStats.summary.totalKwh > 1000000 ? hierarchyStats.summary.totalKwh / 1000000 : hierarchyStats.summary.totalKwh / 1000, 2)}
             unit={hierarchyStats.summary.totalKwh > 1000000 ? "GWh" : "MWh"}
-            trendText={`${hierarchyStats.summary.branchCount} Cabang • ${selectedFacility === 'all' ? 'Semua Fasilitas' : selectedFacility.toUpperCase()}`}
+            trend={`${hierarchyStats.summary.branchCount} Cabang • ${selectedFacility === 'all' ? 'Semua Fasilitas' : selectedFacility.toUpperCase()}`}
             icon={Zap}
-            theme="warning"
+            theme="pln"
           />
-          <StatCard
-            title="TOTAL EMISI SCOPE 2"
+          <KpiCard
+            label="TOTAL EMISI SCOPE 2"
             value={formatNum(hierarchyStats.summary.totalEmissionTon, 1)}
             unit="tCO₂e"
-            trendText={`Grid Factor: ${hierarchyStats.summary.avgEmissionFactor} tCO₂/MWh`}
+            trend={`Grid Factor: ${hierarchyStats.summary.avgEmissionFactor} tCO₂/MWh`}
             icon={Flame}
-            theme="danger"
+            theme="emission"
           />
-          <StatCard
-            title="ESTIMASI BIAYA LISTRIK"
+          <KpiCard
+            label="ESTIMASI BIAYA LISTRIK"
             value={`Rp ${formatNum(hierarchyStats.summary.totalCostJuta > 1000 ? hierarchyStats.summary.totalCostJuta / 1000 : hierarchyStats.summary.totalCostJuta, 2)}`}
             unit={hierarchyStats.summary.totalCostJuta > 1000 ? "Miliar" : "Juta"}
-            trendText="Tarif Gol. I-3/TM Rp 1.400/kWh"
+            trend="Tarif Gol. I-3/TM Rp 1.400/kWh"
             icon={Calculator}
-            theme="default"
+            theme="calc"
           />
-          <StatCard
-            title="JARINGAN TRANSMISI"
+          <KpiCard
+            label="JARINGAN TRANSMISI"
             value={hierarchyStats.summary.activeGrid.split(' ')[0]}
             unit={hierarchyStats.summary.activeGrid.includes('(') ? hierarchyStats.summary.activeGrid.split('(')[1].replace(')', '') : 'Nasional'}
-            trendText="Faktor Emisi Regional ESDM"
+            trend="Faktor Emisi Regional ESDM"
             icon={Building2}
-            theme="success"
+            theme="default"
           />
         </div>
       )}

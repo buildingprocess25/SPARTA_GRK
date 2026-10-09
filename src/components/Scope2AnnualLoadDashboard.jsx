@@ -8,7 +8,8 @@ import {
 } from 'recharts';
 
 import CardBox from '@/components/ui/CardBox';
-import StatCard from '@/components/ui/StatCard';
+import PageHeader from '@/components/ui/PageHeader';
+import KpiCard from '@/components/ui/KpiCard';
 import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
 import Scope2DcDrawer from '@/components/scope2/Scope2DcDrawer';
 import Scope2Filters from '@/components/scope2/Scope2Filters';
@@ -324,17 +325,13 @@ export default function Scope2AnnualLoadDashboard() {
   const updateSort = key => setSortConfig(current => ({ key, direction: current.key === key && current.direction === 'desc' ? 'asc' : 'desc' }));
 
   return <div className="min-w-0 space-y-6 animate-in">
-    <header className="pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
-          Scope 2: Listrik PLN
-        </h1>
-        <p className="mt-1 text-sm text-slate-500 leading-relaxed">
-          Emisi karbon dari listrik yang dibeli pada setiap distribution center.
-        </p>
-      </div>
-      <InputDataButton label="Input Data Scope 2" icon={Zap} onClick={() => setIsInputModalOpen(true)} />
-    </header>
+    <PageHeader
+      title="Scope 2: Listrik PLN"
+      subtitle="Emisi karbon dari listrik yang dibeli pada setiap distribution center."
+      actions={
+        <InputDataButton label="Input Data Scope 2" icon={Zap} onClick={() => setIsInputModalOpen(true)} />
+      }
+    />
 
     <CardBox className="space-y-3"><h2 className="text-sm font-bold text-slate-900">Filter data</h2><Scope2Filters filters={filters} grids={grids} plants={plants} onChange={setFilters} />{SHOW_TARIFF && <div className="flex flex-wrap items-end gap-3 border-t pt-3"><label className="text-xs font-semibold text-slate-600">Tarif asumsi (Rp/kWh)<input type="number" min="1" value={filters.tariff} onChange={event => setFilters({ ...filters, tariff: Math.max(1, Number(event.target.value) || 1) })} className="ml-2 w-32 rounded-lg border px-3 py-2" /></label><span className="rounded-full bg-amber-50 px-3 py-1 text-xs text-amber-800">Asumsi, perlu konfirmasi</span><span className="text-xs text-slate-500">Implisit portal: Rp {number.format(data.assumptions.portalImplicitTariffRupiahPerKwh)}/kWh</span></div>}</CardBox>
 
@@ -346,11 +343,43 @@ export default function Scope2AnnualLoadDashboard() {
         </h2>
         <span className="text-[11px] text-slate-400 font-medium">Ringkasan Eksekutif YTD</span>
       </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard title="EMISI SCOPE 2 YTD" value={show(summary.scope2EmissionTon)} unit="tCO₂e" trendText="Akumulasi periode terpilih" icon={Flame} theme="danger" infoKey="scope2_emission_ytd" />
-        <StatCard title="LISTRIK DIBELI PLN YTD" value={show(purchasedMwh)} unit="MWh" trendText={`${summary.plantCount}/${monitoredCount} DC tercakup`} icon={Zap} theme="default" infoKey="scope2_purchased_mwh" />
-        <StatCard title="INTENSITAS EMISI" value={show(intensity)} unit="tCO₂e/MWh" trendText="Berdasarkan faktor emisi resmi" icon={Flame} theme="warning" infoKey="scope2_emission_intensity" />
-        <StatCard title="PROYEKSI AKHIR TAHUN" value={show(projection.baseAnnual)} unit="tCO₂e" trendText={projection.baseAnnual === null ? 'Data belum cukup' : `${show(projection.minAnnual)}–${show(projection.maxAnnual)} estimasi`} icon={Flame} theme="danger" infoKey="scope2_annual_projection" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 relative z-20 has-[[data-popover-open='true']]:z-40">
+        <KpiCard
+          label="EMISI SCOPE 2 YTD"
+          value={show(summary.scope2EmissionTon)}
+          unit="tCO₂e"
+          trend="Akumulasi periode terpilih"
+          icon={Flame}
+          theme="emission"
+          infoKey="scope2_emission_ytd"
+        />
+        <KpiCard
+          label="LISTRIK DIBELI PLN YTD"
+          value={show(purchasedMwh)}
+          unit="MWh"
+          trend={`${summary.plantCount}/${monitoredCount} DC tercakup`}
+          icon={Zap}
+          theme="pln"
+          infoKey="scope2_purchased_mwh"
+        />
+        <KpiCard
+          label="INTENSITAS EMISI"
+          value={show(intensity)}
+          unit="tCO₂e/MWh"
+          trend="Berdasarkan faktor emisi resmi"
+          icon={Flame}
+          theme="calc"
+          infoKey="scope2_emission_intensity"
+        />
+        <KpiCard
+          label="PROYEKSI AKHIR TAHUN"
+          value={show(projection.baseAnnual)}
+          unit="tCO₂e"
+          trend={projection.baseAnnual === null ? 'Data belum cukup' : `${show(projection.minAnnual)}–${show(projection.maxAnnual)} estimasi`}
+          icon={Flame}
+          theme="emission"
+          infoKey="scope2_annual_projection"
+        />
       </div>
     </div>
 

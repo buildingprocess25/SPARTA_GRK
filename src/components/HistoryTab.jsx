@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { History, Trash2, RotateCcw } from 'lucide-react';
+import PageHeader from '@/components/ui/PageHeader';
 import { useSustainability } from '@/context/SustainabilityContext';
 import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { notify } from '@/components/ui/ToastProvider';
@@ -26,28 +27,25 @@ export default function HistoryTab({ setActiveTab }) {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* 1. Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-1">
+      <PageHeader
+        title="Riwayat Input & Audit Emisi"
+        subtitle="Daftar seluruh aktivitas pencatatan emisi Scope 1, Scope 2, PLTS, dan Water Recycle di Distribution Center Alfamart."
+        badge={
           <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide bg-slate-100 text-slate-700 border border-slate-200/60">
             LOG AUDIT & INPUT
           </span>
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
-            Riwayat Input & Audit Emisi
-          </h1>
-          <p className="text-sm text-slate-500 max-w-3xl">
-            Daftar seluruh aktivitas pencatatan emisi Scope 1, Scope 2, PLTS, dan Water Recycle di Distribution Center Alfamart.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-white text-rose-600 px-4 py-2.5 text-sm font-medium hover:bg-rose-50 hover:border-rose-300 transition-colors shadow-sm self-start sm:self-auto focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
-          onClick={handleReset}
-        >
-          <RotateCcw size={15} />
-          <span>Reset Data Default</span>
-        </button>
-      </div>
+        }
+        actions={
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-white text-rose-600 px-4 py-2.5 text-sm font-medium hover:bg-rose-50 hover:border-rose-300 transition-colors shadow-2xs self-start sm:self-auto focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+            onClick={handleReset}
+          >
+            <RotateCcw size={15} />
+            <span>Reset Data Default</span>
+          </button>
+        }
+      />
 
       {/* 2. Main Content Card */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 lg:p-6 space-y-4">

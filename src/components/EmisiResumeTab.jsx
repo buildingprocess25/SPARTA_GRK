@@ -15,7 +15,9 @@ import {
 import { useSustainability } from '@/context/SustainabilityContext';
 import { formatNum } from '@/data/sustainabilityData';
 import { CARBON_FACTORS } from '@/lib/carbon/carbonEngine';
-import StatCard from '@/components/ui/StatCard';
+import PageHeader from '@/components/ui/PageHeader';
+import KpiCard from '@/components/ui/KpiCard';
+import InputDataButton from '@/components/ui/InputDataButton';
 import CardBox from '@/components/ui/CardBox';
 import MainScope2Bridge from '@/components/MainScope2Bridge';
 
@@ -136,70 +138,61 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
   return (
     <div className="space-y-6 animate-in">
       {/* 1. Header & Actions */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-slate-100">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 mb-1">
-            Dashboard Emisi Karbon
-          </h1>
-          <p className="text-sm text-slate-500">
-            Pemantauan konsolidasi emisi operasional DC Alfamart.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            className="bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg px-4 py-2 inline-flex items-center gap-2 transition text-sm"
+      <PageHeader
+        title="Dashboard Emisi Karbon"
+        subtitle="Pemantauan konsolidasi emisi operasional DC Alfamart."
+        actions={
+          <InputDataButton
+            label="Input Emisi"
+            icon={Plus}
             onClick={() => handleNav('penambah', 'scope1')}
-            title="Input data emisi operasional (Scope 1 / Scope 2)"
-          >
-            <Plus size={16} />
-            <span>Input Emisi</span>
-          </button>
-        </div>
-      </div>
+          />
+        }
+      />
 
       {/* scope2Bridge: canonical connection to Scope 2 and PLTS without double counting */}
       <MainScope2Bridge scope1Ton={scope1.summary.totalEmissionCO2e} onNavigate={handleNav} />
 
       {/* 2. Ringkasan Metrik (High Priority First Sight) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
         {/* Metric 1: Net Emission */}
-        <StatCard
-          title="NET EMISSIONS (BERSIH)"
+        <KpiCard
+          label="NET EMISSIONS (BERSIH)"
           value={formatNum(resumeKPI.netEmissionTon, 1)}
           unit="tCO₂e"
-          trendText={`Terkoreksi ${resumeKPI.netReductionPct} oleh offset PLTS & Air`}
+          trend={`Terkoreksi ${resumeKPI.netReductionPct} oleh offset PLTS & Air`}
           icon={Award}
-          theme="default"
+          theme="emission"
         />
 
         {/* Metric 2: Gross Emission (Scope 1 + 2) */}
-        <StatCard
-          title="EMISI KOTOR (SCOPE 1 & 2)"
+        <KpiCard
+          label="EMISI KOTOR (SCOPE 1 & 2)"
           value={formatNum(resumeKPI.grossEmissionTon, 1)}
           unit="tCO₂e"
-          trendText="Listrik PLN (97.9%) & Solar Genset (2.1%)"
+          trend="Listrik PLN (97.9%) & Solar Genset (2.1%)"
           icon={TrendingUp}
-          theme="danger"
+          theme="emission"
         />
 
         {/* Metric 3: Avoided Carbon (Offset) */}
-        <StatCard
-          title="TOTAL OFFSET (PENGURANG)"
+        <KpiCard
+          label="TOTAL OFFSET (PENGURANG)"
           value={formatNum(resumeKPI.avoidedEmissionTon, 1)}
           unit="tCO₂e"
-          trendText={`${formatNum(pltsData.summary.energyGeneratedYTD / 1000)} MWh PLTS + ${formatNum(waterData.summary.waterSavedYTD)} m³ Air`}
+          trend={`${formatNum(pltsData.summary.energyGeneratedYTD / 1000)} MWh PLTS + ${formatNum(waterData.summary.waterSavedYTD)} m³ Air`}
           icon={Sun}
-          theme="warning"
+          theme="savings"
         />
 
         {/* Metric 4: Cost Saving */}
-        <StatCard
-          title="TOTAL PENGHEMATAN BIAYA"
+        <KpiCard
+          label="TOTAL PENGHEMATAN BIAYA"
           value={`Rp ${formatNum(resumeKPI.totalCostSavingJuta, 1)}`}
           unit="Juta"
-          trendText="Efisiensi tagihan listrik & pengolahan air"
+          trend="Efisiensi tagihan listrik & pengolahan air"
           icon={Sparkles}
-          theme="success"
+          theme="savings"
         />
       </div>
 

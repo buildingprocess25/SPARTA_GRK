@@ -147,7 +147,8 @@ export default function MetricInfoIcon({
   return (
     <div
       ref={containerRef}
-      className={`relative inline-flex items-center justify-center ${className}`}
+      data-popover-open={isOpen ? 'true' : 'false'}
+      className={`relative inline-flex items-center justify-center ${isOpen ? 'z-[100]' : ''} ${className}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -172,7 +173,7 @@ export default function MetricInfoIcon({
           role="dialog"
           aria-label={info.title}
           onClick={(e) => e.stopPropagation()}
-          className={`absolute ${placementClass} mt-2 w-80 sm:w-88 max-w-[92vw] bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-xl p-4 z-50 text-left animate-in fade-in zoom-in-95 duration-150 select-text`}
+          className={`absolute ${placementClass} mt-2 w-72 sm:w-80 max-w-[92vw] max-h-[min(480px,80vh)] overflow-y-auto bg-white rounded-2xl border border-slate-200 shadow-2xl p-3.5 sm:p-4 z-[100] text-left animate-in fade-in zoom-in-95 duration-150 select-text`}
           style={{ transformOrigin, ...adjustedStyle }}
         >
           {/* Header */}
