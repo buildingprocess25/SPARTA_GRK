@@ -9,30 +9,7 @@ import {
   AlertCircle, LoaderCircle
 } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
-
-// Flavor/display info per account - not tied to a real HR/SSO record, this
-// is a 2-fixed-account login (see src/lib/auth.js), not a user-management
-// system. Keyed by username so the modal stops showing "Valens Aditya T."
-// for every account regardless of who's actually logged in.
-const PROFILE_BY_USERNAME = {
-  valens: {
-    nip: 'ALFA-78921-EN',
-    role: 'Energy & Sustainability Specialist',
-    dept: 'Dept. Energy Management & ESG',
-    division: 'Operation & Property Division',
-    headOffice: 'Alfa Tower lt. 19, Tangerang',
-    joinYear: '2022',
-  },
-  admin: {
-    nip: 'ALFA-ADMIN',
-    role: 'System Administrator',
-    dept: 'Dept. Energy Management & ESG',
-    division: 'Operation & Property Division',
-    headOffice: 'Alfa Tower lt. 19, Tangerang',
-    joinYear: '2026',
-  },
-};
-const DEFAULT_PROFILE = { nip: '—', role: 'Pengguna SPARTA', dept: '—', division: '—', headOffice: 'Alfa Tower, Tangerang', joinYear: '—' };
+import { getProfileFor, getInitials } from '@/lib/profileMeta';
 
 export default function Header({ isProfileOpen: externalProfileOpen, setIsProfileOpen: setExternalProfileOpen, onToggleMobileSidebar }) {
   const router = useRouter();
@@ -65,7 +42,8 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
   };
 
   const displayName = currentUser?.displayName || 'Pengguna SPARTA';
-  const profileData = PROFILE_BY_USERNAME[currentUser?.username] || DEFAULT_PROFILE;
+  const profileData = getProfileFor(currentUser?.username);
+  const initials = getInitials(displayName);
 
   const [passwordState, setPasswordState] = useState({
     currentPass: '',
@@ -209,7 +187,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
 
               <div className="flex items-center gap-4">
                 <div className="relative size-14 rounded-2xl bg-blue-600 border-2 border-white/20 flex items-center justify-center font-bold text-xl text-white shadow-md shrink-0">
-                  <span>VA</span>
+                  <span>{initials}</span>
                   <div className="absolute -bottom-1 -right-1 size-5 bg-emerald-500 rounded-full border-2 border-slate-900 flex items-center justify-center text-white" title="Akun Terverifikasi">
                     <BadgeCheck size={12} />
                   </div>

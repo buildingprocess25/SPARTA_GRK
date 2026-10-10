@@ -6,6 +6,7 @@ import {
   X, ShieldCheck, ChevronDown, Sun, Droplets, Fuel, Zap
 } from 'lucide-react';
 import AlarmBadges from '@/components/alarms/AlarmBadges';
+import { getProfileFor, getInitials } from '@/lib/profileMeta';
 
 const navItems = [
   {
@@ -50,6 +51,22 @@ const navItems = [
 export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setIsMobileOpen, onOpenProfile, navigateTo, pengurangSubTab, penambahSubScope }) {
   const [expandedGroups, setExpandedGroups] = useState({ pengurang: true, penambah: true });
   const closeButtonRef = useRef(null);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/auth/me', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && data?.success) setCurrentUser(data.user);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  const displayName = currentUser?.displayName || 'Pengguna SPARTA';
+  const profileData = getProfileFor(currentUser?.username);
+  const initials = getInitials(displayName);
 
   useEffect(() => {
     if (!isMobileOpen) return undefined;
@@ -207,16 +224,16 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setIsMo
         >
           <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors flex items-center gap-3 cursor-pointer group">
             <div className="size-10 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-sm shrink-0 group-hover:scale-105 transition-transform">
-              VA
+              {initials}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-1">
                 <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                  Valens Aditya T.
+                  {displayName}
                 </span>
               </div>
               <div className="flex items-center justify-between mt-0.5">
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate">Energy Management</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{profileData.role}</span>
                 <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded px-1.5 py-0.2 shrink-0">
                   Profile
                 </span>
