@@ -32,9 +32,14 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
   const [fuelLiters, setFuelLiters] = useState('');
   const [costRupiah, setCostRupiah] = useState('');
   const [pricePerLiter, setPricePerLiter] = useState('15000');
-  const [periodMonth, setPeriodMonth] = useState('08');
-  const [periodYear, setPeriodYear] = useState('2026');
-  const [activityDate, setActivityDate] = useState('2026-08-15');
+  // Defaults to the current month/date instead of a hardcoded past month -
+  // this used to always default to August 2026 regardless of when the form
+  // was actually opened, an easy way to silently log an entry under the
+  // wrong month if nobody noticed to change it.
+  const today = useMemo(() => new Date(), []);
+  const [periodMonth, setPeriodMonth] = useState(String(today.getMonth() + 1).padStart(2, '0'));
+  const [periodYear, setPeriodYear] = useState(String(today.getFullYear()));
+  const [activityDate, setActivityDate] = useState(today.toISOString().slice(0, 10));
   const [gensetAssetCode, setGensetAssetCode] = useState('');
   const [gensetKva, setGensetKva] = useState('500');
   const [runHours, setRunHours] = useState('40');

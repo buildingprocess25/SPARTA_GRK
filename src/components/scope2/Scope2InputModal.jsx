@@ -51,9 +51,13 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
   // Form inputs
   const [energyUnit, setEnergyUnit] = useState('mwh'); // 'mwh' | 'kwh'
   const [energyValue, setEnergyValue] = useState('');
-  const [periodMonth, setPeriodMonth] = useState('09');
-  const [periodYear, setPeriodYear] = useState('2026');
-  const [activityDate, setActivityDate] = useState('2026-09-15');
+  // Defaults to the current month/date rather than a hardcoded past month -
+  // same fix as Scope1InputModal, same reason: silently logging an entry
+  // under the wrong month if nobody remembered to change the default.
+  const today = useMemo(() => new Date(), []);
+  const [periodMonth, setPeriodMonth] = useState(String(today.getMonth() + 1).padStart(2, '0'));
+  const [periodYear, setPeriodYear] = useState(String(today.getFullYear()));
+  const [activityDate, setActivityDate] = useState(today.toISOString().slice(0, 10));
   const [tariffPerKwh, setTariffPerKwh] = useState('1400');
   const [plnCustomerNumber, setPlnCustomerNumber] = useState('');
   const [invoiceRef, setInvoiceRef] = useState('');

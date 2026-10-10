@@ -99,6 +99,33 @@ export function SustainabilityProvider({ children }) {
             monthlyTrend: data.water.monthlyTrend
           }));
         }
+
+        // Fuel/genset records are saved for real via POST /api/sustainability
+        // (fuel_activity table) and this GET already returns every record as
+        // data.fuel.detailActivities - but until now nothing mapped that back
+        // onto dcLocations[].genset, so the "Rincian Operasional Genset DC"
+        // table (PenambahEmisiTab) only ever showed the hardcoded zero
+        // defaults from initialDCLocations regardless of what had actually
+        // been saved. Aggregate the latest month's liters per DC here so the
+        // table reflects what's really in the database.
+        if (Array.isArray(data.fuel?.detailActivities) && data.fuel.detailActivities.length > 0) {
+          const latestYearMonth = [...new Set(data.fuel.detailActivities.map(r => r.yearMonth))].sort().at(-1);
+          const litersByDc = new Map();
+          const runHoursByDc = new Map();
+          for (const r of data.fuel.detailActivities) {
+            if (r.yearMonth !== latestYearMonth) continue;
+            litersByDc.set(r.dcId, (litersByDc.get(r.dcId) || 0) + (r.liters || 0));
+            const existingHours = r.metadata?.runHours;
+            if (existingHours) runHoursByDc.set(r.dcId, existingHours);
+          }
+          if (litersByDc.size > 0) {
+            setDcLocations(prev => prev.map(dc => (
+              litersByDc.has(dc.id)
+                ? { ...dc, genset: { ...dc.genset, monthlyFuelLiters: litersByDc.get(dc.id), runHours: runHoursByDc.get(dc.id) ?? dc.genset?.runHours } }
+                : dc
+            )));
+          }
+        }
       }
     } catch (err) {
       console.warn('Note: Using local verified state while backend syncs', err);
