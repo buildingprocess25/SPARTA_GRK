@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, AlertCircle, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Database, Flame, Search, Zap } from 'lucide-react';
+import { Activity, AlertCircle, ArrowRight, ChevronDown, Database, Flame, Search, Zap } from 'lucide-react';
 import {
   Area, AreaChart, Bar, CartesianGrid, Cell, ComposedChart, Line,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
@@ -30,7 +30,6 @@ import { aggregateCanonicalRows } from '@/lib/scope2/energyReconciliation.js';
 import { getGridFactor } from '@/lib/emission-factors.js';
 
 const SHOW_TARIFF = false;
-const PAGE_SIZE = 10;
 const number = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 });
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
 const show = value => value === null || value === undefined || !Number.isFinite(value) ? '—' : number.format(value);
@@ -162,7 +161,6 @@ export default function Scope2AnnualLoadDashboard() {
   const [filters, setFilters] = useState(initialFilters);
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'scope2EmissionTon', direction: 'desc' });
-  const [currentPage, setCurrentPage] = useState(1);
   const [isInputModalOpen, setIsInputModalOpen] = useState(false);
 
   const handleScope2SubmitSuccess = (entry) => {
@@ -249,7 +247,6 @@ export default function Scope2AnnualLoadDashboard() {
     const qs = params.toString();
     const newUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
     window.history.replaceState(null, '', newUrl);
-    setCurrentPage(1);
   }, [filters]);
 
   const canonicalRows = useMemo(() => data?.canonicalRows || [], [data]);
@@ -320,9 +317,6 @@ export default function Scope2AnnualLoadDashboard() {
       return sortConfig.direction === 'asc' ? result : -result;
     });
   }, [filteredRows, sortConfig, canonicalRows]);
-
-  const pageCount = Math.max(1, Math.ceil(ranking.length / PAGE_SIZE));
-  const rankingPage = ranking.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   if (error) {
     return (
@@ -583,39 +577,30 @@ export default function Scope2AnnualLoadDashboard() {
         </div>
       </div>
       {ranking.length ? (
-        <>
-          <div className="max-h-[560px] overflow-auto rounded-xl border">
-            <table className="min-w-[840px] w-full text-xs">
-              <thead className="sticky top-0 z-10 bg-slate-900 dark:bg-slate-950 text-white">
-                <tr>
-                  <th className="p-3 text-left"><button onClick={() => updateSort('dcName')} className="font-semibold">Cabang / DC ↕</button></th>
-                  <th className="p-3 text-left"><button onClick={() => updateSort('grid')} className="font-semibold">Grid ↕</button></th>
-                  <th className="p-3 text-right"><button onClick={() => updateSort('emissionFactor')} className="font-semibold" title="Faktor Emisi Grid (tCO₂e/MWh) / Faktor Perkalian">Faktor Emisi ↕</button></th>
-                  <th className="p-3 text-right"><button onClick={() => updateSort('electricityEnergyKwh')} className="font-semibold">Dibeli PLN (MWh) ↕</button></th>
-                  <th className="p-3 text-right"><button onClick={() => updateSort('scope2EmissionTon')} className="font-semibold">Emisi YTD (tCO₂e) ↕</button></th>
+        <div className="max-h-[560px] overflow-auto rounded-xl border">
+          <table className="min-w-[840px] w-full text-xs">
+            <thead className="sticky top-0 z-10 bg-slate-900 dark:bg-slate-950 text-white">
+              <tr>
+                <th className="p-3 text-left"><button onClick={() => updateSort('dcName')} className="font-semibold">Cabang / DC ↕</button></th>
+                <th className="p-3 text-left"><button onClick={() => updateSort('grid')} className="font-semibold">Grid ↕</button></th>
+                <th className="p-3 text-right"><button onClick={() => updateSort('emissionFactor')} className="font-semibold" title="Faktor Emisi Grid (tCO₂e/MWh) / Faktor Perkalian">Faktor Emisi ↕</button></th>
+                <th className="p-3 text-right"><button onClick={() => updateSort('electricityEnergyKwh')} className="font-semibold">Dibeli PLN (MWh) ↕</button></th>
+                <th className="p-3 text-right"><button onClick={() => updateSort('scope2EmissionTon')} className="font-semibold">Emisi YTD (tCO₂e) ↕</button></th>
+              </tr>
+            </thead>
+            <tbody>
+              {ranking.map((row, index) => (
+                <tr key={row.psId} onClick={() => setSelectedPlant(row)} tabIndex="0" onKeyDown={event => { if (event.key === 'Enter') setSelectedPlant(row); }} className={`cursor-pointer border-b dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 focus:bg-blue-50 dark:focus:bg-blue-500/10 focus:outline-none ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : ''}`}>
+                  <td className="p-3 font-semibold text-slate-900 dark:text-slate-100">{row.dcName}</td>
+                  <td className="p-3 font-mono text-slate-600 dark:text-slate-400">{row.grid}</td>
+                  <td className="p-3 text-right font-mono font-medium text-slate-700 dark:text-slate-300">{formatFactor(row.emissionFactor)}</td>
+                  <td className="p-3 text-right font-mono text-slate-700 dark:text-slate-300">{show(row.electricityEnergyKwh / 1_000)}</td>
+                  <td className="p-3 text-right font-mono font-bold text-rose-700 dark:text-rose-400">{show(row.scope2EmissionTon)}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {rankingPage.map(row => (
-                  <tr key={row.psId} onClick={() => setSelectedPlant(row)} tabIndex="0" onKeyDown={event => { if (event.key === 'Enter') setSelectedPlant(row); }} className="cursor-pointer border-b hover:bg-blue-50 dark:hover:bg-blue-500/10 focus:bg-blue-50 dark:focus:bg-blue-500/10 focus:outline-none">
-                    <td className="p-3 font-semibold text-slate-900 dark:text-slate-100">{row.dcName}</td>
-                    <td className="p-3 font-mono text-slate-600 dark:text-slate-400">{row.grid}</td>
-                    <td className="p-3 text-right font-mono font-medium text-slate-700 dark:text-slate-300">{formatFactor(row.emissionFactor)}</td>
-                    <td className="p-3 text-right font-mono text-slate-700 dark:text-slate-300">{show(row.electricityEnergyKwh / 1_000)}</td>
-                    <td className="p-3 text-right font-mono font-bold text-rose-700 dark:text-rose-400">{show(row.scope2EmissionTon)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-            <span>Halaman {currentPage} dari {pageCount}</span>
-            <div className="flex gap-2">
-              <button aria-label="Halaman sebelumnya" disabled={currentPage === 1} onClick={() => setCurrentPage(page => Math.max(1, page - 1))} className="rounded-lg border p-2 disabled:opacity-40"><ChevronLeft size={16} /></button>
-              <button aria-label="Halaman berikutnya" disabled={currentPage === pageCount} onClick={() => setCurrentPage(page => Math.min(pageCount, page + 1))} className="rounded-lg border p-2 disabled:opacity-40"><ChevronRight size={16} /></button>
-            </div>
-          </div>
-        </>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <div className="rounded-xl border border-dashed p-10 text-center text-sm text-slate-500 dark:text-slate-400">Tidak ada DC yang cocok dengan filter.</div>
       )}
