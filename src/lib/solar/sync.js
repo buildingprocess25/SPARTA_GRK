@@ -598,9 +598,21 @@ export async function runSync({ trigger = 'cron' } = {}) {
             }),
           });
 
-          if (!faultRes.ok) break;
+          if (!faultRes.ok) {
+            // FaultActive has historically stayed at 0 rows forever with no
+            // error ever surfacing - this silent break on a non-OK vendor
+            // response was why: it looks identical to "no faults" in every
+            // downstream log/metric. Log it so a real vendor failure (auth,
+            // quota, wrong scope) is finally visible instead of indistinguishable
+            // from "nothing to report".
+            console.warn(`[SYNC] getFaultAlarmInfo HTTP ${faultRes.status} pada halaman ${curPage} - vendor API gagal, berhenti sync fault/alarm untuk siklus ini.`);
+            break;
+          }
           const faultJson = await faultRes.json();
-          if (faultJson.result_code !== '1') break;
+          if (faultJson.result_code !== '1') {
+            console.warn(`[SYNC] getFaultAlarmInfo result_code=${faultJson.result_code} msg=${faultJson.result_msg || faultJson.result_message || '(tidak ada pesan)'} pada halaman ${curPage}`);
+            break;
+          }
 
           const pageData = faultJson.result_data || {};
           const faults = pageData.pageList || pageData.data || [];
