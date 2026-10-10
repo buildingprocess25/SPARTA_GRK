@@ -371,7 +371,7 @@ export function getDCBadges(dc, selectedMetric) {
     badges.push({
       id: 'offline',
       label: 'Offline',
-      className: 'bg-rose-100 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30 font-bold',
+      className: 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30 font-bold',
       tooltip: 'Status vendor: Inverter offline / transmisi terputus'
     });
   }
@@ -381,7 +381,7 @@ export function getDCBadges(dc, selectedMetric) {
     badges.push({
       id: 'alarm',
       label: 'Alarm',
-      className: 'bg-amber-100 text-amber-800 dark:text-amber-300 border-amber-300 font-bold',
+      className: 'bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-300 font-bold',
       tooltip: `Status vendor: Terdeteksi alarm operasional (${dc.alarmCount || 1} alarm aktif)`
     });
   }
@@ -2008,7 +2008,7 @@ export default function PLTSAnalyticsSection({
                               <div className="flex flex-col items-end">
                                 <span className="font-bold text-slate-900 dark:text-slate-100 inline-flex items-center gap-1">
                                   {d.portalPrManual.prPercent}%
-                                  <span className="text-[9px] px-1.5 py-0.2 bg-amber-100 text-amber-800 dark:text-amber-300 rounded font-bold border border-amber-300">
+                                  <span className="text-[9px] px-1.5 py-0.2 bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 rounded font-bold border border-amber-300">
                                     Manual
                                   </span>
                                 </span>
@@ -2229,12 +2229,12 @@ export default function PLTSAnalyticsSection({
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 block">{psId}</span>
                               {st.isDataStale && (
-                                <span className="text-[9px] px-1 py-0.2 rounded bg-rose-100 text-rose-700 dark:text-rose-300 font-bold">
+                                <span className="text-[9px] px-1 py-0.2 rounded bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 font-bold">
                                   Usang
                                 </span>
                               )}
                               {st.requiresManualVerification && (
-                                <span className="text-[9px] px-1 py-0.2 rounded bg-amber-100 text-amber-800 dark:text-amber-300 font-bold" title="Kapasitas beda dari baseline">
+                                <span className="text-[9px] px-1 py-0.2 rounded bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 font-bold" title="Kapasitas beda dari baseline">
                                   Kapasitas beda
                                 </span>
                               )}
@@ -2359,12 +2359,12 @@ export default function PLTSAnalyticsSection({
                                 <span>{psName}</span>
                                 <span className="font-mono text-slate-400 dark:text-slate-500 text-[10px] font-normal">({psId})</span>
                                 {st.isDataStale && (
-                                  <span className="text-[9px] px-1 py-0.2 rounded bg-rose-100 text-rose-700 dark:text-rose-300 font-bold">
+                                  <span className="text-[9px] px-1 py-0.2 rounded bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 font-bold">
                                     Usang
                                   </span>
                                 )}
                                 {st.requiresManualVerification && (
-                                  <span className="text-[9px] px-1 py-0.2 rounded bg-amber-100 text-amber-800 dark:text-amber-300 font-bold">
+                                  <span className="text-[9px] px-1 py-0.2 rounded bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 font-bold">
                                     Kapasitas beda
                                   </span>
                                 )}
