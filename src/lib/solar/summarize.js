@@ -7,11 +7,6 @@ import { createPrismaHistoryRepository, getPltsHistory } from './history.js';
 const MONTH_NAMES_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
-// Verified device offline list from vendor portal telemetry
-const VENDOR_OFFLINE_DEVICES = {
-  1247367: 1, // Alfamart DC Kotabumi (1 device offline)
-  1162742: 1, // Alfamart DC Bogor (1 device offline)
-};
 
 // Server-side in-memory cache for summarizePlts
 if (!globalThis.__PLTS_SUMMARIZE_CACHE__) {
@@ -188,6 +183,20 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
 
   const plantLatest = await prisma.plantLatest.findMany();
   const faultActive = await prisma.faultActive.findMany();
+  // Live, same source /api/isolar uses for its faultStats.problemDeviceCount
+  // (inverter_latest.dev_fault_status) - this used to be a hand-maintained
+  // hardcoded map of two psIds checked once against the vendor portal, which
+  // silently went stale the moment those devices recovered or a different
+  // device elsewhere failed, and was the reason this page's "1 Perangkat
+  // Offline" flag could never agree with any other page in the app.
+  const inverterLatest = await prisma.inverterLatest.findMany({ select: { psId: true, devFaultStatus: true } }).catch(() => []);
+  const offlineDeviceCountByPsId = new Map();
+  inverterLatest.forEach(inv => {
+    if (inv.devFaultStatus !== 4 && inv.devFaultStatus !== null) {
+      const psId = Number(inv.psId);
+      offlineDeviceCountByPsId.set(psId, (offlineDeviceCountByPsId.get(psId) || 0) + 1);
+    }
+  });
   let faultHistory24h = [];
   try {
     faultHistory24h = await prisma.$queryRaw`
@@ -269,8 +278,8 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
         });
       }
 
-      if (VENDOR_OFFLINE_DEVICES[numId]) {
-        offlineDeviceCount += VENDOR_OFFLINE_DEVICES[numId];
+      if (offlineDeviceCountByPsId.has(numId)) {
+        offlineDeviceCount += offlineDeviceCountByPsId.get(numId);
       }
 
       const activeF = faultMap.get(numId);

@@ -396,6 +396,22 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
+  // 4b. Device-level issue (same category as classifyLocationStatus's
+  // DEVICE_OFFLINE, used by the Resume Emisi GRK page) - plant itself is
+  // online/producing but one or more inverters are reporting a fault. Only
+  // shown when the station isn't already flagged Fault/Offline/Alarm above,
+  // matching that function's priority order, so both pages agree exactly on
+  // which locations carry this flag instead of only one of them showing it.
+  const problemDeviceCount = dc.faultStats?.problemDeviceCount || 0;
+  if (statusKey === 'normal' && problemDeviceCount > 0) {
+    badges.push({
+      id: 'device_offline',
+      label: `${problemDeviceCount} Perangkat Offline`,
+      className: 'bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-500/30 font-semibold',
+      tooltip: `${problemDeviceCount} inverter melaporkan gangguan, plant tetap berproduksi normal secara keseluruhan`
+    });
+  }
+
   // 4. Dimension 2: Freshness (Usang >30 min)
   if (isStale) {
     badges.push({
