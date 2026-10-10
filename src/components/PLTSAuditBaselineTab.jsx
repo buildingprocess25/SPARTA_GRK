@@ -22,27 +22,27 @@ export default function PLTSAuditBaselineTab() {
     <CardBox className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <FileSpreadsheet className="text-emerald-600" size={22} />
+          <FileSpreadsheet className="text-emerald-600 dark:text-emerald-400" size={22} />
           <div>
-            <h3 className="font-bold text-slate-900">Audit Baseline April 2026</h3>
-            <p className="text-xs text-slate-500">Komponen terpisah; hanya dimuat saat feature flag audit aktif.</p>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100">Audit Baseline April 2026</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Komponen terpisah; hanya dimuat saat feature flag audit aktif.</p>
           </div>
         </div>
         <label className="relative">
-          <Search className="absolute left-3 top-2.5 text-slate-400" size={15} />
-          <input value={search} onChange={(event) => setSearch(event.target.value)} className="rounded-xl border border-slate-200 py-2 pl-9 pr-3 text-xs" placeholder="Cari plant" />
+          <Search className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500" size={15} />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-2 pl-9 pr-3 text-xs" placeholder="Cari plant" />
         </label>
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 text-xs">
-        <div className="rounded-xl bg-slate-50 p-3"><span className="text-slate-500">Produksi</span><strong className="block text-base">{formatNum(totals.production, 2)} MWh</strong></div>
-        <div className="rounded-xl bg-slate-50 p-3"><span className="text-slate-500">Pembelian PLN</span><strong className="block text-base">{formatNum(totals.purchased, 2)} MWh</strong></div>
-        <div className="rounded-xl bg-slate-50 p-3"><span className="text-slate-500">Beban</span><strong className="block text-base">{formatNum(totals.load, 2)} MWh</strong></div>
-        <div className="rounded-xl bg-slate-50 p-3"><span className="text-slate-500">Emisi terhindar</span><strong className="block text-base">{formatNum(totals.co2, 2)} tCO₂e</strong></div>
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-800 p-3"><span className="text-slate-500 dark:text-slate-400">Produksi</span><strong className="block text-base text-slate-900 dark:text-slate-100">{formatNum(totals.production, 2)} MWh</strong></div>
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-800 p-3"><span className="text-slate-500 dark:text-slate-400">Pembelian PLN</span><strong className="block text-base text-slate-900 dark:text-slate-100">{formatNum(totals.purchased, 2)} MWh</strong></div>
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-800 p-3"><span className="text-slate-500 dark:text-slate-400">Beban</span><strong className="block text-base text-slate-900 dark:text-slate-100">{formatNum(totals.load, 2)} MWh</strong></div>
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-800 p-3"><span className="text-slate-500 dark:text-slate-400">Emisi terhindar</span><strong className="block text-base text-slate-900 dark:text-slate-100">{formatNum(totals.co2, 2)} tCO₂e</strong></div>
       </div>
-      <div className="max-h-[520px] overflow-auto rounded-xl border border-slate-200">
+      <div className="max-h-[520px] overflow-auto rounded-xl border border-slate-200 dark:border-slate-700">
         <table className="w-full min-w-[760px] text-xs">
-          <thead className="sticky top-0 bg-slate-50 text-slate-600"><tr><th className="p-3 text-left">Plant</th><th className="p-3 text-right">Produksi MWh</th><th className="p-3 text-right">PLN MWh</th><th className="p-3 text-right">Beban MWh</th><th className="p-3 text-right">CO₂ t</th></tr></thead>
-          <tbody>{rows.map((row) => <tr key={row.plantName} className="border-t border-slate-100"><td className="p-3 font-semibold">{row.plantName}</td><td className="p-3 text-right">{formatNum(row.totalProductionMwh, 2)}</td><td className="p-3 text-right">{formatNum(row.energyPurchasedMwh, 2)}</td><td className="p-3 text-right">{formatNum(row.monthlyLoadMwh, 2)}</td><td className="p-3 text-right">{formatNum(row.co2AvoidedTon, 2)}</td></tr>)}</tbody>
+          <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300"><tr><th className="p-3 text-left">Plant</th><th className="p-3 text-right">Produksi MWh</th><th className="p-3 text-right">PLN MWh</th><th className="p-3 text-right">Beban MWh</th><th className="p-3 text-right">CO₂ t</th></tr></thead>
+          <tbody>{rows.map((row) => <tr key={row.plantName} className="border-t border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-200"><td className="p-3 font-semibold text-slate-900 dark:text-slate-100">{row.plantName}</td><td className="p-3 text-right">{formatNum(row.totalProductionMwh, 2)}</td><td className="p-3 text-right">{formatNum(row.energyPurchasedMwh, 2)}</td><td className="p-3 text-right">{formatNum(row.monthlyLoadMwh, 2)}</td><td className="p-3 text-right">{formatNum(row.co2AvoidedTon, 2)}</td></tr>)}</tbody>
         </table>
       </div>
     </CardBox>

@@ -540,11 +540,11 @@ export default function Scope2AnnualLoadDashboard() {
               </thead>
               <tbody>
                 {monthly.map(row => (
-                  <tr key={row.yearMonth} className={row.periodStatus === 'partial' ? 'border-b bg-amber-50/70' : 'border-b'}>
+                  <tr key={row.yearMonth} className={row.periodStatus === 'partial' ? 'border-b dark:border-slate-800 bg-amber-50/70 dark:bg-amber-500/10' : 'border-b dark:border-slate-800'}>
                     <td className="p-3 font-semibold">
                       {row.label} {row.yearMonth.slice(0, 4)}
                       {row.periodStatus === 'partial' && (
-                        <span className="ml-2 rounded-full border border-amber-300 bg-amber-100 px-2 py-0.5 text-[10px] text-amber-900">
+                        <span className="ml-2 rounded-full border border-amber-300 dark:border-amber-500/40 bg-amber-100 dark:bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-900 dark:text-amber-300">
                           Parsial
                         </span>
                       )}

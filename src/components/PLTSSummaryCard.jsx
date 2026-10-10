@@ -863,7 +863,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                     ? <>Target {Math.round(dashboardData.summary.targetMwh * 1000).toLocaleString('id-ID')} kWh · Capai <strong className="text-emerald-700 dark:text-emerald-300">{formatNum(dashboardData.summary.achievementPct, 1, 1)}%</strong></>
                     : 'Target nasional'}
                   {isNational && dashboardData?.summary?.achievementPct != null && (
-                    <div className="mt-1 h-1 overflow-hidden rounded-full bg-amber-100">
+                    <div className="mt-1 h-1 overflow-hidden rounded-full bg-amber-100 dark:bg-amber-500/20">
                       <div className="h-full rounded-full bg-amber-500" style={{ width: `${Math.min(100, dashboardData.summary.achievementPct)}%` }} />
                     </div>
                   )}
