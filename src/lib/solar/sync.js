@@ -410,9 +410,16 @@ export async function runSync({ trigger = 'cron' } = {}) {
           const totalEnergyKwh = normalizeTotalEnergyKwh(plant.total_energy);
           const classifiedStatus = classifyVendorPlantStatus(plant, { checkedAt: now, localHour });
           const previousCategory = previousStatusByPsId.get(psId);
+          // OFFLINE (ps_status=0, komunikasi plant terputus) sempat tidak
+          // ikut memicu push sama sekali - hanya transisi ke FAULT/ALARM yang
+          // dicek, padahal OFFLINE justru prioritas tertinggi di
+          // classifyVendorPlantStatus() dan sering lebih mendesak daripada
+          // Fault/Alarm biasa (plant Pontianak jadi Offline tanpa notifikasi
+          // apa pun ke pengguna).
+          const degradedCategories = ['OFFLINE', 'FAULT', 'ALARM'];
           if (
-            (classifiedStatus.category === 'FAULT' || classifiedStatus.category === 'ALARM')
-            && previousCategory !== 'FAULT' && previousCategory !== 'ALARM'
+            degradedCategories.includes(classifiedStatus.category)
+            && !degradedCategories.includes(previousCategory)
           ) {
             newlyDegradedPlants.push({ psId, psName: plant.ps_name || null, category: classifiedStatus.category, reason: classifiedStatus.reason });
           }
@@ -544,15 +551,17 @@ export async function runSync({ trigger = 'cron' } = {}) {
             return entity?.canonicalName || fallback || `Plant ${psId}`;
           };
           const first = newlyDegradedPlants[0];
-          const isFault = newlyDegradedPlants.some((p) => p.category === 'FAULT');
+          const categoryIcon = { OFFLINE: '⚫', FAULT: '🔴', ALARM: '🟠' };
+          const categoryLabel = { OFFLINE: 'Offline', FAULT: 'Fault', ALARM: 'Alarm' };
+          const isUrgent = newlyDegradedPlants.some((p) => p.category === 'FAULT' || p.category === 'OFFLINE');
           const title = newlyDegradedPlants.length === 1
-            ? `${first.category === 'FAULT' ? '🔴 Fault' : '🟠 Alarm'} Baru: ${dcName(first.psId, first.psName)}`
-            : `${isFault ? '🔴' : '🟠'} ${newlyDegradedPlants.length} Plant Berubah Status`;
+            ? `${categoryIcon[first.category]} ${categoryLabel[first.category]} Baru: ${dcName(first.psId, first.psName)}`
+            : `${isUrgent ? '🔴' : '🟠'} ${newlyDegradedPlants.length} Plant Berubah Status`;
           const body = newlyDegradedPlants.length === 1
             ? first.reason
-            : newlyDegradedPlants.slice(0, 3).map((p) => `${dcName(p.psId, p.psName)}: ${p.category}`).join(' | ');
+            : newlyDegradedPlants.slice(0, 3).map((p) => `${dcName(p.psId, p.psName)}: ${categoryLabel[p.category]}`).join(' | ');
 
-          await sendPushToAll({ title, body, tag: 'sparta-status-change', requireInteraction: isFault, url: '/' });
+          await sendPushToAll({ title, body, tag: 'sparta-status-change', requireInteraction: isUrgent, url: '/' });
         } catch (pushErr) {
           console.warn('[SYNC] Gagal mengirim push notification perubahan status plant:', pushErr.message);
         }
