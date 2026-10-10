@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 
-const dashboard = fs.readFileSync(new URL('../Scope2AnnualLoadDashboard.jsx', import.meta.url), 'utf8');
+const dashboard = fs.readFileSync(new URL('../scope2/Scope2AnnualLoadDashboard.jsx', import.meta.url), 'utf8');
 const drawer = fs.readFileSync(new URL('../scope2/Scope2DcDrawer.jsx', import.meta.url), 'utf8');
 
 test('Scope 2 page removes median and upper-bound presentation language', () => {

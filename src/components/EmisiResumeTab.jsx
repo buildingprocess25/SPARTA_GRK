@@ -27,7 +27,7 @@ import PageHeader from '@/components/ui/PageHeader';
 import KpiCard from '@/components/ui/KpiCard';
 import InputDataButton from '@/components/ui/InputDataButton';
 import CardBox from '@/components/ui/CardBox';
-import MainScope2Bridge from '@/components/MainScope2Bridge';
+import MainScope2Bridge from '@/components/scope2/MainScope2Bridge';
 
 // Lazy-load EmissionCalculatorPage agar halaman tetap ringan dan cepat saat awal render
 const EmissionCalculatorPage = lazy(() => import('@/components/calculator/EmissionCalculatorPage'));

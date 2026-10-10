@@ -2,10 +2,10 @@ import fs from 'node:fs';
 
 const mode = process.argv.includes('--final') ? 'final' : 'baseline';
 const files = {
-  scope2: fs.readFileSync('src/components/Scope2AnnualLoadDashboard.jsx', 'utf8'),
+  scope2: fs.readFileSync('src/components/scope2/Scope2AnnualLoadDashboard.jsx', 'utf8'),
   api: fs.readFileSync('src/app/api/scope2/annual-load/route.js', 'utf8'),
   main: fs.readFileSync('src/components/EmisiResumeTab.jsx', 'utf8'),
-  plts: fs.readFileSync('src/components/PLTSTab.jsx', 'utf8'),
+  plts: fs.readFileSync('src/components/plts/PLTSTab.jsx', 'utf8'),
 };
 
 const checks = [

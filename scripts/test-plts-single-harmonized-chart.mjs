@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const filePath = new URL('../src/components/PLTSTab.jsx', import.meta.url);
+const filePath = new URL('../src/components/plts/PLTSTab.jsx', import.meta.url);
 const content = fs.readFileSync(filePath, 'utf8');
 
 // 1. Check chartYAxisMax ensures both left (MWh) and right (tCO2e) axes share identical domain

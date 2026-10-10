@@ -4,25 +4,25 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Activity, BarChart3, CloudSun, Gauge, PlugZap } from 'lucide-react';
 import CardBox from '@/components/ui/CardBox';
-import { TabContentSkeleton } from '@/components/solar/PLTSDashboardSkeletons';
+import { TabContentSkeleton } from '@/components/plts/PLTSDashboardSkeletons';
 import { prefetchPltsEndpoint } from '@/hooks/usePltsData';
 
-const TabProductionTarget = dynamic(() => import('@/components/solar/TabProductionTarget'), {
+const TabProductionTarget = dynamic(() => import('@/components/plts/TabProductionTarget'), {
   loading: () => <TabContentSkeleton />,
   ssr: false,
 });
 
-const TabSystemPerformancePr = dynamic(() => import('@/components/solar/TabSystemPerformancePr'), {
+const TabSystemPerformancePr = dynamic(() => import('@/components/plts/TabSystemPerformancePr'), {
   loading: () => <TabContentSkeleton />,
   ssr: false,
 });
 
-const TabSupportingParameters = dynamic(() => import('@/components/solar/TabSupportingParameters'), {
+const TabSupportingParameters = dynamic(() => import('@/components/plts/TabSupportingParameters'), {
   loading: () => <TabContentSkeleton />,
   ssr: false,
 });
 
-const TabLoadVsPlts = dynamic(() => import('@/components/solar/TabLoadVsPlts'), {
+const TabLoadVsPlts = dynamic(() => import('@/components/plts/TabLoadVsPlts'), {
   loading: () => <TabContentSkeleton />,
   ssr: false,
 });

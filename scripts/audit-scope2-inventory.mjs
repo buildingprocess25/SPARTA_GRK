@@ -20,7 +20,7 @@ function sourceSummary(filename) {
 
 const filesToTrace = [
   'src/components/PenambahEmisiTab.jsx',
-  'src/components/Scope2AnnualLoadDashboard.jsx',
+  'src/components/scope2/Scope2AnnualLoadDashboard.jsx',
   'src/app/api/scope2/annual-load/route.js',
   'src/lib/scope2/annualLoadReportServer.js',
   'src/lib/scope2/annualLoadReport.js',

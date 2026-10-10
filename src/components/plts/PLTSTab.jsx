@@ -36,32 +36,32 @@ import { notify } from '@/components/ui/ToastProvider';
 import { getGridFactor } from '@/lib/emission-factors';
 import { isFeatureEnabled, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
 import { buildCacheKey } from '@/lib/solar/cacheKey';
-import { SummaryCardsSkeleton, ChartSkeleton, TabContentSkeleton, TableSkeleton } from '@/components/solar/PLTSDashboardSkeletons';
+import { SummaryCardsSkeleton, ChartSkeleton, TabContentSkeleton, TableSkeleton } from '@/components/plts/PLTSDashboardSkeletons';
 import InputDataButton from '@/components/ui/InputDataButton';
-import PLTSInputModal from '@/components/solar/PLTSInputModal';
+import PLTSInputModal from '@/components/plts/PLTSInputModal';
 import { useAlarms } from '@/context/AlarmContext';
 
-const PLTSSummaryCard = dynamic(() => import('@/components/PLTSSummaryCard'), {
+const PLTSSummaryCard = dynamic(() => import('@/components/plts/PLTSSummaryCard'), {
   loading: () => <TableSkeleton rows={4} />,
   ssr: false,
 });
 
-const PLTSAnalyticsSection = dynamic(() => import('@/components/PLTSAnalyticsSection'), {
+const PLTSAnalyticsSection = dynamic(() => import('@/components/plts/PLTSAnalyticsSection'), {
   loading: () => <TabContentSkeleton />,
   ssr: false,
 });
 
-const PLTSAuditBaselineTab = dynamic(() => import('@/components/PLTSAuditBaselineTab'), {
+const PLTSAuditBaselineTab = dynamic(() => import('@/components/plts/PLTSAuditBaselineTab'), {
   loading: () => <TableSkeleton rows={6} />,
   ssr: false,
 });
 
-const PLTSPerformanceAnalysis = dynamic(() => import('@/components/PLTSPerformanceAnalysis'), {
+const PLTSPerformanceAnalysis = dynamic(() => import('@/components/plts/PLTSPerformanceAnalysis'), {
   loading: () => <TabContentSkeleton />,
   ssr: false,
 });
 
-const PLTSMonthlyMatrixTable = dynamic(() => import('@/components/PLTSMonthlyMatrixTable'), {
+const PLTSMonthlyMatrixTable = dynamic(() => import('@/components/plts/PLTSMonthlyMatrixTable'), {
   loading: () => <TableSkeleton rows={6} />,
   ssr: false,
 });

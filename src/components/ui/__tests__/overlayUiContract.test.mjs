@@ -46,7 +46,7 @@ test('targeted dashboard components contain no native browser confirm or alert c
     read('../../HistoryTab.jsx'),
     read('../../scope1/Scope1InputModal.jsx'),
     read('../../scope2/Scope2InputModal.jsx'),
-    read('../../solar/PLTSInputModal.jsx'),
+    read('../../plts/PLTSInputModal.jsx'),
   ].join('\n');
   assert.doesNotMatch(sources, /window\.(?:confirm|alert)\s*\(/);
   assert.doesNotMatch(sources, /\balert\s*\(/);
@@ -54,8 +54,8 @@ test('targeted dashboard components contain no native browser confirm or alert c
 });
 
 test('PLTS input persists production and energy flow to the dashboard data sources', () => {
-  const modal = read('../../solar/PLTSInputModal.jsx');
-  const pltsTab = read('../../PLTSTab.jsx');
+  const modal = read('../../plts/PLTSInputModal.jsx');
+  const pltsTab = read('../../plts/PLTSTab.jsx');
   const route = read('../../../app/api/plts/manual/route.js');
   const dashboard = read('../../../lib/solar/dashboard.js');
   assert.match(pltsTab, /plants=\{dashboardData\?\.plants \|\| \[\]\}/);

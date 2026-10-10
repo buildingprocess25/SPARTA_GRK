@@ -124,7 +124,7 @@ test('dashboard PR detail, monthly row and card use one canonical calculation', 
 
 test('audit baseline is not statically imported by flag-off runtime entry points', () => {
   const route = fs.readFileSync(new URL('../src/app/api/isolar/route.js', import.meta.url), 'utf8');
-  const tab = fs.readFileSync(new URL('../src/components/PLTSTab.jsx', import.meta.url), 'utf8');
+  const tab = fs.readFileSync(new URL('../src/components/plts/PLTSTab.jsx', import.meta.url), 'utf8');
   const sustainability = fs.readFileSync(new URL('../src/data/sustainabilityData.js', import.meta.url), 'utf8');
   assert.doesNotMatch(route, /^import .*monitorPltsApril2026/m);
   assert.doesNotMatch(tab, /^import PLTSAnalyticsSection/m);

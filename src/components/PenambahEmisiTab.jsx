@@ -22,7 +22,7 @@ import { useSustainability } from '@/context/SustainabilityContext';
 import PageHeader from '@/components/ui/PageHeader';
 import KpiCard from '@/components/ui/KpiCard';
 import CardBox from '@/components/ui/CardBox';
-import Scope2AnnualLoadDashboard from '@/components/Scope2AnnualLoadDashboard';
+import Scope2AnnualLoadDashboard from '@/components/scope2/Scope2AnnualLoadDashboard';
 import Scope1InputModal from '@/components/scope1/Scope1InputModal';
 import InputDataButton from '@/components/ui/InputDataButton';
 import {

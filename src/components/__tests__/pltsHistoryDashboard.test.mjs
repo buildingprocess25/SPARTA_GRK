@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const source = fs.readFileSync(new URL('../PLTSSummaryCard.jsx', import.meta.url), 'utf8');
+const source = fs.readFileSync(new URL('../plts/PLTSSummaryCard.jsx', import.meta.url), 'utf8');
 
 test('dashboard exposes database-backed YoY controls and aligned comparison chart', () => {
   assert.match(source, /compareYears/);

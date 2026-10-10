@@ -29,7 +29,7 @@ assert.ok(modalContent.includes('/api/templates?category=PLN'), 'Must support of
 console.log('✓ Scope2InputModal component contains all required elements and verification hooks');
 
 // 3. Check Scope2AnnualLoadDashboard integration
-const dashboardPath = path.resolve('src/components/Scope2AnnualLoadDashboard.jsx');
+const dashboardPath = path.resolve('src/components/scope2/Scope2AnnualLoadDashboard.jsx');
 const dashboardContent = fs.readFileSync(dashboardPath, 'utf8');
 
 assert.ok(dashboardContent.includes('Scope2InputModal'), 'Must import Scope2InputModal');

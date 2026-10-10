@@ -1,7 +1,7 @@
 'use client';
 
 import { Sun, Droplets } from 'lucide-react';
-import PLTSTab from '@/components/PLTSTab';
+import PLTSTab from '@/components/plts/PLTSTab';
 import WaterRecycleTab from '@/components/WaterRecycleTab';
 
 export default function PengurangEmisiTab({ activeSubTab = 'plts', setActiveSubTab }) {

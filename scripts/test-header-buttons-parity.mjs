@@ -5,7 +5,7 @@ import path from 'node:path';
 console.log('Testing Scope 1 & Scope 2 Header Button Parity...');
 
 const scope1Path = path.resolve('src/components/PenambahEmisiTab.jsx');
-const scope2Path = path.resolve('src/components/Scope2AnnualLoadDashboard.jsx');
+const scope2Path = path.resolve('src/components/scope2/Scope2AnnualLoadDashboard.jsx');
 
 const scope1Content = fs.readFileSync(scope1Path, 'utf8');
 const scope2Content = fs.readFileSync(scope2Path, 'utf8');
