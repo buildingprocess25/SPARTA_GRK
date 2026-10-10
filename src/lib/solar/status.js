@@ -154,7 +154,21 @@ export function normalizePlantStatus(input = {}) {
   if (input.statusCategory === 'WAITING_DATA' || input.isWaiting) {
     return 'pending';
   }
-  if ((psStatus === null || psStatus === undefined) && !input.statusCategory) {
+  // processor.js's canonical DC objects (used by PLTSAnalyticsSection's
+  // ranking list via /api/isolar) never carry psStatus or statusCategory at
+  // all - they use isOnline/isOffline/hasFault/hasAlarm/isWaiting instead.
+  // For that shape the blind "psStatus missing" fallback below used to fire
+  // unconditionally and mark every genuinely NORMAL plant as "Menunggu Data"
+  // even though isWaiting was already correctly false just above. Only apply
+  // the blind fallback when the caller gave NO explicit boolean signal at
+  // all (truly unclassified raw data), not merely because it uses a
+  // different field name than psStatus.
+  const hasExplicitBooleanSignal = input.isOnline !== undefined
+    || input.isWaiting !== undefined
+    || input.hasFault !== undefined
+    || input.hasAlarm !== undefined
+    || input.isOffline !== undefined;
+  if ((psStatus === null || psStatus === undefined) && !input.statusCategory && !hasExplicitBooleanSignal) {
     return 'pending';
   }
 
