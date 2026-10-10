@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import {
   TrendingUp, Fuel, Zap, AlertCircle,
   Calculator, Gauge, Factory, Building2, Flame,
-  Layers, MapPin, Store, Calendar, ArrowRight, PlusCircle
+  Layers, MapPin, Store, Calendar, ArrowRight, PlusCircle, Search
 } from 'lucide-react';
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis,
@@ -42,6 +42,17 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
   const [selectedFacility, setSelectedFacility] = useState('all'); // 'all' | 'office' | 'warehouse' | 'toko'
   const [selectedWarehouseSub, setSelectedWarehouseSub] = useState('all'); // 'all' | 'wh' | 'bulky' | 'depo' | 'storeHub'
   const [selectedPeriod, setSelectedPeriod] = useState('ytd'); // 'ytd' or '0'..'11'
+  const [gensetSearch, setGensetSearch] = useState('');
+
+  const filteredDcLocations = useMemo(() => {
+    const query = gensetSearch.trim().toLowerCase();
+    if (!query) return dcLocations;
+    return dcLocations.filter((dc) => (
+      (dc.name || '').toLowerCase().includes(query)
+      || (dc.code || '').toLowerCase().includes(query)
+      || (dc.region || '').toLowerCase().includes(query)
+    ));
+  }, [dcLocations, gensetSearch]);
 
   const handleScopeChange = (scope) => {
     if (setActiveSubScope) {
@@ -519,23 +530,36 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
 
       {/* 5. Card Tabel: Rincian Operasional */}
       <CardBox className="space-y-4">
-        <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
-          <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
-            {activeSubScope === 'scope1'
-              ? 'Rincian Operasional Genset DC'
-              : 'Breakdown Konsumsi Listrik & Emisi per Cabang / Fasilitas'}
-          </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {activeSubScope === 'scope1'
-              ? 'Status mesin genset dan konsumsi solar per cabang'
-              : 'Rincian data per fasilitas (Office, WH Utama, Bulky, Depo, Store Hub, Toko) dan kalkulasi emisi'}
-          </p>
+        <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
+              {activeSubScope === 'scope1'
+                ? 'Rincian Operasional Genset DC'
+                : 'Breakdown Konsumsi Listrik & Emisi per Cabang / Fasilitas'}
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              {activeSubScope === 'scope1'
+                ? `Status mesin genset dan konsumsi solar per cabang • ${filteredDcLocations.length} dari ${dcLocations.length} DC`
+                : 'Rincian data per fasilitas (Office, WH Utama, Bulky, Depo, Store Hub, Toko) dan kalkulasi emisi'}
+            </p>
+          </div>
+          {activeSubScope === 'scope1' && (
+            <label className="relative shrink-0">
+              <Search className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500" size={14} />
+              <input
+                value={gensetSearch}
+                onChange={(event) => setGensetSearch(event.target.value)}
+                className="w-full sm:w-56 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-2 pl-9 pr-3 text-xs placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Cari DC, kode, atau wilayah..."
+              />
+            </label>
+          )}
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
+        <div className={`overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800 ${activeSubScope === 'scope1' ? 'max-h-[560px] overflow-y-auto' : ''}`}>
           {activeSubScope === 'scope1' ? (
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-900 dark:bg-slate-950 text-white text-xs uppercase">
+              <thead className="sticky top-0 z-20 bg-slate-900 dark:bg-slate-950 text-white text-xs uppercase">
                 <tr>
                   <th className="sticky left-0 bg-slate-900 dark:bg-slate-950 px-4 py-3 font-semibold z-10">Kode</th>
                   <th className="px-4 py-3 font-semibold">Distribution Center</th>
@@ -547,12 +571,15 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 </tr>
               </thead>
               <tbody>
-                {dcLocations.map((dc) => {
+                {filteredDcLocations.length === 0 && (
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-400 dark:text-slate-500">Tidak ada DC yang cocok dengan pencarian "{gensetSearch}"</td></tr>
+                )}
+                {filteredDcLocations.map((dc, index) => {
                   const gensetLiters = dc.genset?.monthlyFuelLiters || 0;
                   const scope1Ton = ((gensetLiters * 2.68) / 1000).toFixed(2);
                   return (
-                    <tr key={dc.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                      <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 font-mono text-slate-500 dark:text-slate-400 font-bold px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800">
+                    <tr key={dc.id} className={`border-b border-slate-100 dark:border-slate-800 hover:bg-blue-50/60 dark:hover:bg-slate-800 transition-colors ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900'}`}>
+                      <td className={`sticky left-0 font-mono text-slate-500 dark:text-slate-400 font-bold px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900'}`}>
                         {dc.code || 'DC'}
                       </td>
                       <td className="px-4 py-3 font-semibold text-slate-900 dark:text-slate-100">{dc.name}</td>
