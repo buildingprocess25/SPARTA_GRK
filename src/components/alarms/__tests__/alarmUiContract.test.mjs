@@ -31,7 +31,7 @@ test('AlarmDialog uses BaseModal and exposes filtering, read actions, and notifi
   assert.match(dialog, /BaseModal/);
   assert.match(dialog, /Tandai semua sudah dibaca/);
   assert.match(dialog, /Tandai dibaca/);
-  assert.match(dialog, /Aktifkan notifikasi browser/);
+  assert.match(dialog, /Aktifkan push notification/);
   assert.match(dialog, /useAlarms/);
   assert.match(dialog, /filter/i);
   assert.match(dialog, /pollError/);

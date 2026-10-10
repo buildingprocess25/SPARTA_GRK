@@ -160,6 +160,16 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
           select: {
             psId: true,
             name: true,
+            // psStatus/psFaultStatus/alarmCount/faultCount are required by
+            // status.js's normalizePlantStatus() (used for every location's
+            // operational badge in PLTSAnalyticsSection/PLTSSummaryCard) -
+            // without them it always fell back to "Menunggu Data" regardless
+            // of the already-correct statusCategory stored below, because it
+            // treats a missing psStatus as "never synced yet".
+            psStatus: true,
+            psFaultStatus: true,
+            alarmCount: true,
+            faultCount: true,
             statusCategory: true,
             statusReason: true,
             statusCheckedAt: true,

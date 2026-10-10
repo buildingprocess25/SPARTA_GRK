@@ -26,6 +26,14 @@ ENV NEXT_OUTPUT_MODE=standalone
 ARG NEXT_PUBLIC_NOTIFICATIONS_ENABLED=true
 ENV NEXT_PUBLIC_NOTIFICATIONS_ENABLED=${NEXT_PUBLIC_NOTIFICATIONS_ENABLED}
 
+# Web Push public key must be baked in at build time (NEXT_PUBLIC_* vars are
+# inlined into the client bundle, unlike normal runtime env vars) - set this
+# as a Dokploy "Build Arg", not just a runtime env var, or push subscriptions
+# will silently fail client-side. VAPID_PRIVATE_KEY stays a runtime-only env
+# var (used server-side only) and needs no build arg.
+ARG NEXT_PUBLIC_VAPID_PUBLIC_KEY=
+ENV NEXT_PUBLIC_VAPID_PUBLIC_KEY=${NEXT_PUBLIC_VAPID_PUBLIC_KEY}
+
 # Non-secret placeholders for build-time validation
 ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 ENV ISOLAR_MODE=mock

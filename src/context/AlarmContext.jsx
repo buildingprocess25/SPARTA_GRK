@@ -17,6 +17,7 @@ import {
 } from './alarmState.js';
 import { useToast } from '@/components/ui/ToastProvider';
 import { createAlarmPollCoordinator } from './alarmPollCoordinator.js';
+import { enablePushNotifications, disablePushNotifications, getExistingPushSubscription, isPushSupported } from '@/lib/pushClient.js';
 
 const AlarmContext = createContext(null);
 const NOTIFIED_STORAGE_KEY = 'isolar_notified_alarms';
@@ -134,7 +135,21 @@ export function AlarmProvider({ children }) {
     });
   }, [alarms, persistReadIds]);
 
-  // Request browser Web Notification permission on explicit user click
+  const [isSubscribedToPush, setIsSubscribedToPush] = useState(false);
+
+  // Reflect any push subscription that already exists (e.g. granted in a
+  // previous session) so the UI doesn't ask again unnecessarily.
+  useEffect(() => {
+    if (!isPushSupported()) return;
+    getExistingPushSubscription().then((sub) => {
+      if (sub) setIsSubscribedToPush(true);
+    });
+  }, []);
+
+  // Request browser Web Notification permission + register a real Web Push
+  // subscription (service worker + server-stored subscription) on explicit
+  // user click - this is what actually lets a notification reach the phone
+  // when the browser tab isn't open, unlike the plain Notification API alone.
   const requestNotificationPermission = useCallback(async () => {
     if (!ALARMS_BROWSER_NOTIFICATIONS_ENABLED) {
       setNotificationPermission('disabled');
@@ -145,17 +160,46 @@ export function AlarmProvider({ children }) {
       return 'unsupported';
     }
     try {
-      const result = await Notification.requestPermission();
-      setNotificationPermission(result);
+      const result = await enablePushNotifications();
+      setNotificationPermission(result === 'granted' ? 'granted' : result);
       if (result === 'granted') {
-        toast.success({ title: 'Notifikasi Aktif', description: 'Notifikasi browser untuk alarm iSolar aktif.' });
+        setIsSubscribedToPush(true);
+        toast.success({ title: 'Notifikasi Aktif', description: 'Push notification alarm iSolar aktif di perangkat ini, termasuk saat browser tidak sedang dibuka.' });
       } else if (result === 'denied') {
         toast.warning({ title: 'Notifikasi Ditolak', description: 'Notifikasi diblokir oleh setelan browser.' });
+      } else if (result === 'not_configured') {
+        toast.warning({ title: 'Push Belum Dikonfigurasi', description: 'Server belum mengatur kunci VAPID untuk push notification.' });
+      } else if (result === 'unsupported') {
+        toast.warning({ title: 'Tidak Didukung', description: 'Browser ini tidak mendukung push notification.' });
       }
       return result;
     } catch (e) {
       console.error('[AlarmContext] Permintaan izin notifikasi gagal:', e);
       return 'denied';
+    }
+  }, [toast]);
+
+  const disableNotificationPermission = useCallback(async () => {
+    await disablePushNotifications();
+    setIsSubscribedToPush(false);
+    toast.info({ title: 'Notifikasi Dimatikan', description: 'Push notification alarm untuk perangkat ini dinonaktifkan.' });
+  }, [toast]);
+
+  const sendRealTestPush = useCallback(async () => {
+    try {
+      const res = await fetch('/api/push/test', { method: 'POST' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        toast.warning({ title: 'Gagal Mengirim Push Uji Coba', description: data.error || 'Server menolak permintaan.' });
+        return;
+      }
+      if (data.sent > 0) {
+        toast.success({ title: 'Push Uji Coba Terkirim', description: `Terkirim ke ${data.sent} perangkat. Cek notifikasi di HP/browser kamu.` });
+      } else {
+        toast.warning({ title: 'Belum Ada Perangkat Terdaftar', description: 'Aktifkan notifikasi dulu di perangkat ini sebelum menguji.' });
+      }
+    } catch (e) {
+      toast.warning({ title: 'Gagal Mengirim Push Uji Coba', description: e.message });
     }
   }, [toast]);
 
@@ -362,8 +406,11 @@ export function AlarmProvider({ children }) {
     lastSuccessfulPollAt,
     pollError,
     notificationPermission,
+    isSubscribedToPush,
     requestNotificationPermission,
+    disableNotificationPermission,
     sendTestNotification,
+    sendRealTestPush,
     markAsRead,
     markAllAsRead,
     refreshAlarms: pollAlarms,

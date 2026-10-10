@@ -739,3 +739,20 @@ model InverterTempExportAudit {
   @@index([status])
   @@map("inverter_temp_export_audit")
 }
+
+/// Web Push subscription per device/browser, tied to the logged-in user (see
+/// src/lib/auth.js). One row per device that granted notification permission;
+/// re-subscribing with the same endpoint updates in place.
+model PushSubscription {
+  id         String   @id @default(cuid())
+  username   String   @map("username")
+  endpoint   String   @unique
+  p256dh     String
+  auth       String
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  lastSeenAt DateTime @updatedAt @map("last_seen_at") @db.Timestamptz(6)
+
+  @@index([username])
+  @@map("push_subscription")
+}

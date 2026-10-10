@@ -23,7 +23,7 @@ import { getWibHour } from './apiClient.js';
 import { parseEnergyKwh, parsePowerKw, parseTotalEnergyMwh } from './processor.js';
 import { parseFreshnessThreshold, resolveTelemetryFreshness } from './freshness.js';
 import { classifyVendorPlantStatus } from './status.js';
-import { isDcLocation } from './plantMap.js';
+import { isDcLocation, CANONICAL_DC_ENTITIES } from './plantMap.js';
 import { getValidToken } from './tokenManager.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -519,6 +519,14 @@ export async function runSync({ trigger = 'cron' } = {}) {
         let totalFaultsSynced = 0;
         let activeFaultsCount = 0;
         let historyFaultsCount = 0;
+        const newlyAppearedFaults = [];
+
+        // Snapshot which faults were already active before this cycle, so we
+        // can tell genuinely NEW faults apart from ones still ongoing from a
+        // previous sync - only new ones should trigger a push notification.
+        const previousActiveFaultCodes = new Set(
+          (await prisma.faultActive.findMany({ select: { faultCode: true } })).map((f) => f.faultCode),
+        );
 
         // Clear active faults table for fresh snapshot
         await prisma.faultActive.deleteMany();
@@ -573,6 +581,9 @@ export async function runSync({ trigger = 'cron' } = {}) {
                 update: { psId, psKey, faultName, faultType, faultLevel, createTime, processStatus },
                 create: { faultCode, psId, psKey, faultName, faultType, faultLevel, createTime, processStatus },
               });
+              if (!previousActiveFaultCodes.has(faultCode)) {
+                newlyAppearedFaults.push({ psId, faultName, faultType, faultLevel, psName: f.ps_name || null });
+              }
             } else if (processStatus === '9') {
               // 2. Write to FaultHistory table (idempotent per fault_code)
               historyFaultsCount++;
@@ -599,7 +610,28 @@ export async function runSync({ trigger = 'cron' } = {}) {
           curPage++;
         }
 
-        console.log(`[SYNC] getFaultAlarmInfo synced rowCount=${totalFaultsSynced} (Active=${activeFaultsCount}, History=${historyFaultsCount})`);
+        console.log(`[SYNC] getFaultAlarmInfo synced rowCount=${totalFaultsSynced} (Active=${activeFaultsCount}, History=${historyFaultsCount}, New=${newlyAppearedFaults.length})`);
+
+        if (newlyAppearedFaults.length > 0) {
+          try {
+            const { sendPushToAll } = await import('../push.js');
+            const dcName = (psId, fallback) => {
+              const entity = CANONICAL_DC_ENTITIES.find((e) => (e.sungrowPsIds || []).includes(psId));
+              return entity?.canonicalName || fallback || `Plant ${psId}`;
+            };
+            const first = newlyAppearedFaults[0];
+            const title = newlyAppearedFaults.length === 1
+              ? `🔴 Fault Baru: ${dcName(first.psId, first.psName)}`
+              : `🔴 ${newlyAppearedFaults.length} Fault Baru Terdeteksi`;
+            const body = newlyAppearedFaults.length === 1
+              ? (first.faultName || 'Gangguan operasional inverter terdeteksi.')
+              : newlyAppearedFaults.slice(0, 3).map((f) => `${dcName(f.psId, f.psName)}: ${f.faultName}`).join(' | ');
+
+            await sendPushToAll({ title, body, tag: 'sparta-fault-alarm', requireInteraction: true, url: '/' });
+          } catch (pushErr) {
+            console.warn('[SYNC] Gagal mengirim push notification fault baru:', pushErr.message);
+          }
+        }
       } catch (faultErr) {
         console.warn('[SYNC] Sub-component getFaultAlarmInfo gagal:', faultErr.message);
       }

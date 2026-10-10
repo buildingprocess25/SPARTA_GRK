@@ -16,6 +16,18 @@ const finiteOrNull = (value) => {
   return Number.isFinite(number) ? number : null;
 };
 
+// Matches the priority order documented in status.js: OFFLINE > FAULT > ALARM > WAITING_DATA > NORMAL.
+const STATUS_CATEGORY_PRIORITY = { OFFLINE: 0, FAULT: 1, ALARM: 2, WAITING_DATA: 3, UNDER_CONSTRUCTION: 4, NORMAL: 5 };
+
+function worstStatusCategory(statusEntries) {
+  if (!Array.isArray(statusEntries) || statusEntries.length === 0) return 'WAITING_DATA';
+  return statusEntries.reduce((worst, entry) => {
+    const rank = STATUS_CATEGORY_PRIORITY[entry.category] ?? STATUS_CATEGORY_PRIORITY.NORMAL;
+    const worstRank = STATUS_CATEGORY_PRIORITY[worst] ?? STATUS_CATEGORY_PRIORITY.NORMAL;
+    return rank < worstRank ? entry.category : worst;
+  }, 'NORMAL');
+}
+
 export function parseDashboardQuery(input = {}) {
   const mode = String(input.mode || 'YTD').toUpperCase();
   if (!['YTD', 'MONTH'].includes(mode)) throw new Error('mode must be YTD or MONTH');
@@ -523,6 +535,15 @@ export function buildPltsDashboardFromRows({
       monthly,
       hasConflict: monthly.some((item) => item.conflict),
       statuses: statusSummary.plants.filter((status) => (plant.sungrowPsIds || []).includes(status.psId)),
+      // Flattened worst-case status so src/lib/solar/status.js's
+      // normalizePlantStatus() (used by the location badges in
+      // PLTSAnalyticsSection/PLTSSummaryCard) can read it directly - it looks
+      // for `statusCategory` on the row itself, not the nested `statuses`
+      // array above, so without this every location badge fell through to
+      // "Menunggu Data" regardless of real vendor status.
+      statusCategory: worstStatusCategory(
+        statusSummary.plants.filter((status) => (plant.sungrowPsIds || []).includes(status.psId)),
+      ),
     };
   });
 

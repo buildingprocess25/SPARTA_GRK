@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
+import PushPermissionBanner from '@/components/ui/PushPermissionBanner';
 import EmisiResumeTab from '@/components/EmisiResumeTab';
 import PengurangEmisiTab from '@/components/PengurangEmisiTab';
 import PenambahEmisiTab from '@/components/PenambahEmisiTab';
@@ -62,6 +63,7 @@ export default function Home() {
             />
 
             <main className="flex-1 mx-auto min-w-0 w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+              <PushPermissionBanner />
               {(activeTab === 'resume' || activeTab === 'calculator') && (
                 <EmisiResumeTab
                   setActiveTab={setActiveTab}

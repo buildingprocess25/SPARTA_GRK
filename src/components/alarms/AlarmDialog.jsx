@@ -52,7 +52,9 @@ export default function AlarmDialog() {
     markAllAsRead,
     notificationPermission,
     requestNotificationPermission,
+    disableNotificationPermission,
     sendTestNotification,
+    sendRealTestPush,
     lastSuccessfulPollAt,
     refreshAlarms,
     isLoading,
@@ -81,10 +83,29 @@ export default function AlarmDialog() {
         <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs">
           <div className="flex items-center gap-2">
             {notificationPermission === 'granted' ? (
-              <span className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-semibold bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-1 rounded-lg">
-                <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>Notifikasi browser aktif</span>
-              </span>
+              <>
+                <span className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-semibold bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-1 rounded-lg">
+                  <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span>Push notification aktif di perangkat ini</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={sendRealTestPush}
+                  className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 bg-white dark:bg-slate-900 hover:bg-blue-50 dark:hover:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 font-semibold px-2 py-1 rounded-lg transition"
+                  title="Kirim push notification sungguhan ke semua perangkat terdaftar - muncul walau browser tidak dibuka"
+                >
+                  <BellRing size={12} className="shrink-0" />
+                  <span>Tes Push Sungguhan</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={disableNotificationPermission}
+                  className="text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 underline decoration-dotted"
+                  title="Matikan push notification di perangkat ini"
+                >
+                  Matikan
+                </button>
+              </>
             ) : notificationPermission === 'disabled' ? (
               <span className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
                 <Bell size={13} className="text-slate-400 dark:text-slate-500 shrink-0" />
@@ -102,7 +123,7 @@ export default function AlarmDialog() {
                 className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 rounded-lg transition shadow-xs"
               >
                 <BellRing size={13} className="shrink-0" />
-                <span>Aktifkan notifikasi browser</span>
+                <span>Aktifkan push notification</span>
               </button>
             )}
             <button
