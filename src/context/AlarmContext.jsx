@@ -171,6 +171,8 @@ export function AlarmProvider({ children }) {
         toast.warning({ title: 'Push Belum Dikonfigurasi', description: 'Server belum mengatur kunci VAPID untuk push notification.' });
       } else if (result === 'unsupported') {
         toast.warning({ title: 'Tidak Didukung', description: 'Browser ini tidak mendukung push notification.' });
+      } else if (result === 'error') {
+        toast.warning({ title: 'Gagal Mengaktifkan Push', description: 'Izin browser sudah diberikan, tapi server menolak menyimpan langganan. Cek tab Network di DevTools untuk request /api/push/subscribe, atau coba lagi.' });
       }
       return result;
     } catch (e) {

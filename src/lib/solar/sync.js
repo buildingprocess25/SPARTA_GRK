@@ -381,7 +381,20 @@ export async function runSync({ trigger = 'cron' } = {}) {
       const dcPlants = rawPlants.filter(p => isDcLocation(p));
       const dcPsIds = dcPlants.map(p => Number(p.ps_id));
       const { dateWib, hour: localHour } = getWibTimeInfo(now);
-      
+
+      // Snapshot each plant's PREVIOUS station-level status so we can detect
+      // a fresh FAULT/ALARM transition below. This is a second, independent
+      // push trigger alongside the getFaultAlarmInfo-based one further down -
+      // that sub-component lives in its own try/catch and can silently fail
+      // (e.g. if the vendor endpoint errors), while ps_status/ps_fault_status
+      // here come from the same getPowerStationList call that already
+      // reliably succeeds every sync cycle.
+      const previousStatusByPsId = new Map(
+        (await prisma.plantLatest.findMany({ select: { psId: true, statusCategory: true } }))
+          .map((p) => [p.psId, p.statusCategory]),
+      );
+      const newlyDegradedPlants = [];
+
       await prisma.$transaction(async (tx) => {
         // Delete old plants not in response or non-DC
         await tx.plantLatest.deleteMany({
@@ -396,6 +409,13 @@ export async function runSync({ trigger = 'cron' } = {}) {
           const todayEnergyKwh = parseEnergyKwh(plant.today_energy);
           const totalEnergyKwh = normalizeTotalEnergyKwh(plant.total_energy);
           const classifiedStatus = classifyVendorPlantStatus(plant, { checkedAt: now, localHour });
+          const previousCategory = previousStatusByPsId.get(psId);
+          if (
+            (classifiedStatus.category === 'FAULT' || classifiedStatus.category === 'ALARM')
+            && previousCategory !== 'FAULT' && previousCategory !== 'ALARM'
+          ) {
+            newlyDegradedPlants.push({ psId, psName: plant.ps_name || null, category: classifiedStatus.category, reason: classifiedStatus.reason });
+          }
           const eqHour = plant.equivalent_hour?.value !== undefined 
             && plant.equivalent_hour.value !== '' 
             && plant.equivalent_hour.value !== '--'
@@ -511,6 +531,32 @@ export async function runSync({ trigger = 'cron' } = {}) {
         maxWait: 20000,
         timeout: 60000,
       });
+
+      // Push for plants that just flipped into FAULT/ALARM on the primary,
+      // always-succeeding getPowerStationList signal (see newlyDegradedPlants
+      // above) - independent of whether the getFaultAlarmInfo sub-component
+      // below succeeds.
+      if (newlyDegradedPlants.length > 0) {
+        try {
+          const { sendPushToAll } = await import('../push.js');
+          const dcName = (psId, fallback) => {
+            const entity = CANONICAL_DC_ENTITIES.find((e) => (e.sungrowPsIds || []).includes(psId));
+            return entity?.canonicalName || fallback || `Plant ${psId}`;
+          };
+          const first = newlyDegradedPlants[0];
+          const isFault = newlyDegradedPlants.some((p) => p.category === 'FAULT');
+          const title = newlyDegradedPlants.length === 1
+            ? `${first.category === 'FAULT' ? '🔴 Fault' : '🟠 Alarm'} Baru: ${dcName(first.psId, first.psName)}`
+            : `${isFault ? '🔴' : '🟠'} ${newlyDegradedPlants.length} Plant Berubah Status`;
+          const body = newlyDegradedPlants.length === 1
+            ? first.reason
+            : newlyDegradedPlants.slice(0, 3).map((p) => `${dcName(p.psId, p.psName)}: ${p.category}`).join(' | ');
+
+          await sendPushToAll({ title, body, tag: 'sparta-status-change', requireInteraction: isFault, url: '/' });
+        } catch (pushErr) {
+          console.warn('[SYNC] Gagal mengirim push notification perubahan status plant:', pushErr.message);
+        }
+      }
 
       // ─── Sub-component 2: Faults & Alarms (getFaultAlarmInfo 24h) ───────────
       try {

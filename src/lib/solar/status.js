@@ -144,8 +144,17 @@ export function normalizePlantStatus(input = {}) {
     return 'construction';
   }
 
-  // 5. PENDING (Hanya jika telemetri awal belum pernah diterima / ps_status is null)
-  if (psStatus === null || psStatus === undefined || input.statusCategory === 'WAITING_DATA' || input.isWaiting) {
+  // 5. PENDING (hanya jika benar-benar belum ada sinyal apa pun: psStatus
+  // kosong DAN tidak ada statusCategory yang sudah diklasifikasikan di
+  // tempat lain. Kalau caller sudah menyertakan statusCategory (mis.
+  // dashboard.js meratakan hasil summarizePlantStatuses ke tiap baris lokasi
+  // tanpa menyalin psStatus mentah), psStatus kosong saja TIDAK BOLEH
+  // menimpa klasifikasi NORMAL yang sudah benar - sebelumnya di sinilah
+  // setiap lokasi NORMAL salah tampil sebagai "Menunggu Data".
+  if (input.statusCategory === 'WAITING_DATA' || input.isWaiting) {
+    return 'pending';
+  }
+  if ((psStatus === null || psStatus === undefined) && !input.statusCategory) {
     return 'pending';
   }
 

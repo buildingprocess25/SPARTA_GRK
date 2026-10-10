@@ -31,22 +31,33 @@ export function isPushSupported() {
 export async function enablePushNotifications() {
   if (!isPushSupported()) return 'unsupported';
 
-  const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-  if (!vapidPublicKey) return 'not_configured';
-
   try {
+    // Ask for Notification permission first, regardless of whether VAPID is
+    // configured - this is also what the plain in-tab Notification() fallback
+    // in AlarmContext relies on. Returning early for a missing VAPID key
+    // before this point used to also block that fallback, leaving the user
+    // with literally no alarm notifications while the server-side push keys
+    // were still being set up.
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') return permission;
+
+    const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    if (!vapidPublicKey) return 'not_configured';
 
     const registration = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
 
     let subscription = await registration.pushManager.getSubscription();
     if (!subscription) {
-      subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-      });
+      try {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+        });
+      } catch (subErr) {
+        console.warn('[pushClient] pushManager.subscribe() gagal - cek apakah NEXT_PUBLIC_VAPID_PUBLIC_KEY valid:', subErr);
+        return 'error';
+      }
     }
 
     const res = await fetch('/api/push/subscribe', {
@@ -54,7 +65,11 @@ export async function enablePushNotifications() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subscription: subscription.toJSON() }),
     });
-    if (!res.ok) return 'error';
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      console.warn(`[pushClient] POST /api/push/subscribe gagal (HTTP ${res.status}):`, body);
+      return 'error';
+    }
 
     return 'granted';
   } catch (err) {

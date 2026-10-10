@@ -34,6 +34,16 @@ jobs:
           tags: |
             ghcr.io/${{ env.REPO }}:latest
             ghcr.io/${{ env.REPO }}:${{ github.sha }}
+          # NEXT_PUBLIC_* variables are inlined into the client bundle at
+          # build time - Dokploy's "Environment" tab only sets runtime env
+          # vars for the already-built image it pulls from ghcr.io, so it has
+          # no effect on these. They must be passed here instead, sourced
+          # from GitHub Actions secrets/variables (Repo Settings > Secrets and
+          # variables > Actions). VAPID_PRIVATE_KEY/AUTH_*/CRON_SECRET etc.
+          # are runtime-only and stay in Dokploy's Environment tab as before.
+          build-args: |
+            NEXT_PUBLIC_NOTIFICATIONS_ENABLED=${{ vars.NEXT_PUBLIC_NOTIFICATIONS_ENABLED || 'true' }}
+            NEXT_PUBLIC_VAPID_PUBLIC_KEY=${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY }}
 
       - name: Trigger Deployment Webhook (Dokploy)
         env:
