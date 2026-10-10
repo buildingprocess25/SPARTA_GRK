@@ -1,11 +1,15 @@
 /**
  * Minimal fixed-user authentication (2 accounts: admin, valens).
- * No database, no user management UI - credentials live in env vars as
- * salted scrypt hashes, sessions are a signed cookie (HMAC-SHA256), not a
- * server-side session store. This is deliberately small: it exists to put a
- * login wall in front of the dashboard, not to be a general auth system.
+ * Credentials live in the app_user DB table (seeded once from
+ * AUTH_*_PASSWORD_HASH env vars on server boot - see
+ * instrumentation.js/seedAppUsersFromEnv), so the in-app "Reset Password"
+ * feature can update a password without an env var edit + redeploy.
+ * Sessions are still a signed cookie (HMAC-SHA256), not a server-side
+ * session store. This is deliberately small: it exists to put a login wall
+ * in front of the dashboard, not to be a general user-management system.
  */
 import crypto from 'crypto';
+import prisma from './prisma.js';
 
 export const SESSION_COOKIE = 'sparta_session';
 export const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60; // 7 days
@@ -19,7 +23,7 @@ function getSessionSecret() {
 }
 
 /** @returns {{username: string, passwordHash: string, displayName: string}[]} */
-function getConfiguredUsers() {
+function getEnvConfiguredUsers() {
   const users = [];
   if (process.env.AUTH_ADMIN_USERNAME && process.env.AUTH_ADMIN_PASSWORD_HASH) {
     users.push({
@@ -38,10 +42,41 @@ function getConfiguredUsers() {
   return users;
 }
 
-export function findUser(username) {
+/**
+ * Upserts the env-configured accounts into app_user, but only when that
+ * username doesn't already exist - a password changed in-app via
+ * changePassword() must never be silently reverted by the env var hash on
+ * the next server restart.
+ */
+export async function seedAppUsersFromEnv() {
+  const envUsers = getEnvConfiguredUsers();
+  for (const user of envUsers) {
+    const existing = await prisma.appUser.findUnique({ where: { username: user.username } });
+    if (existing) continue;
+    await prisma.appUser.create({
+      data: { username: user.username, passwordHash: user.passwordHash, displayName: user.displayName },
+    });
+  }
+}
+
+export async function findUser(username) {
   const normalized = String(username || '').trim().toLowerCase();
   if (!normalized) return null;
-  return getConfiguredUsers().find((u) => u.username.toLowerCase() === normalized) || null;
+  const user = await prisma.appUser.findFirst({ where: { username: { equals: normalized, mode: 'insensitive' } } });
+  return user || null;
+}
+
+export async function changePassword(username, newPassword) {
+  // username is the exact-cased @id primary key, so look the row up first
+  // (case-insensitive, same as login) rather than lowercasing it ourselves -
+  // a stored username with different casing than the lowercased lookup would
+  // otherwise silently match zero rows.
+  const user = await findUser(username);
+  if (!user) throw new Error('Akun tidak ditemukan.');
+  await prisma.appUser.update({
+    where: { username: user.username },
+    data: { passwordHash: hashPassword(newPassword) },
+  });
 }
 
 /** scrypt with a random salt, stored as "salt:hash" (both hex) */

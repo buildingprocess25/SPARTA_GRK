@@ -7,7 +7,7 @@ export async function GET(request) {
   if (!username) {
     return NextResponse.json({ success: false, error: 'UNAUTHENTICATED' }, { status: 401 });
   }
-  const user = findUser(username);
+  const user = await findUser(username);
   if (!user) {
     return NextResponse.json({ success: false, error: 'UNAUTHENTICATED' }, { status: 401 });
   }

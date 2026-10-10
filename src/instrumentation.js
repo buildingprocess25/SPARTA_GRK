@@ -4,9 +4,12 @@ export async function register() {
       const prisma = (await import('./lib/prisma.js')).default;
       const { preWarmPltsCache, initDbKeepAliveAndPoolWarmup } = await import('./lib/solar/dashboardService.js');
       const { startServerDaemon } = await import('./lib/solar/scheduler.js');
+      const { seedAppUsersFromEnv } = await import('./lib/auth.js');
 
       console.log('[Instrumentation] Initializing database connection pool...');
       await prisma.$connect();
+      console.log('[Instrumentation] Seeding login accounts from env (skips any that already exist in DB)...');
+      await seedAppUsersFromEnv();
       console.log('[Instrumentation] Initializing connection keep-alive & pool warmup...');
       await initDbKeepAliveAndPoolWarmup();
       console.log('[Instrumentation] Pre-warming PLTS default dashboard cache...');

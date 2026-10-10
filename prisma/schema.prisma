@@ -9,6 +9,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// Login credentials for the fixed 2-account app login (admin, valens).
+/// Seeded once from AUTH_*_PASSWORD_HASH env vars on server boot (see
+/// instrumentation.js) so existing passwords carry over; the in-app
+/// "Reset Password" feature then updates passwordHash here directly instead
+/// of requiring an env var edit + redeploy for every password change.
+model AppUser {
+  username     String   @id
+  passwordHash String   @map("password_hash")
+  displayName  String   @map("display_name")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("app_user")
+}
+
 /// Latest telemetry for each physical plant (39 rows)
 model PlantLatest {
   psId             Int       @id @map("ps_id")

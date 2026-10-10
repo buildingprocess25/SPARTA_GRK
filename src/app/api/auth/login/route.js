@@ -45,7 +45,7 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Username dan password wajib diisi.' }, { status: 400 });
     }
 
-    const user = findUser(username);
+    const user = await findUser(username);
     // Always run verifyPassword (even with a dummy hash) so a wrong username
     // takes the same time as a wrong password - avoids trivially leaking
     // which accounts exist via response timing.

@@ -3,11 +3,36 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  ShieldCheck, User, Mail, KeyRound, CheckCircle2,
+  ShieldCheck, User, KeyRound, CheckCircle2,
   X, ChevronDown, Lock, Shield, Sparkles, Building2,
-  Phone, BadgeCheck, Eye, EyeOff, Send, Menu, LogOut
+  Phone, BadgeCheck, Eye, EyeOff, Menu, LogOut,
+  AlertCircle, LoaderCircle
 } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+
+// Flavor/display info per account - not tied to a real HR/SSO record, this
+// is a 2-fixed-account login (see src/lib/auth.js), not a user-management
+// system. Keyed by username so the modal stops showing "Valens Aditya T."
+// for every account regardless of who's actually logged in.
+const PROFILE_BY_USERNAME = {
+  valens: {
+    nip: 'ALFA-78921-EN',
+    role: 'Energy & Sustainability Specialist',
+    dept: 'Dept. Energy Management & ESG',
+    division: 'Operation & Property Division',
+    headOffice: 'Alfa Tower lt. 19, Tangerang',
+    joinYear: '2022',
+  },
+  admin: {
+    nip: 'ALFA-ADMIN',
+    role: 'System Administrator',
+    dept: 'Dept. Energy Management & ESG',
+    division: 'Operation & Property Division',
+    headOffice: 'Alfa Tower lt. 19, Tangerang',
+    joinYear: '2026',
+  },
+};
+const DEFAULT_PROFILE = { nip: '—', role: 'Pengguna SPARTA', dept: '—', division: '—', headOffice: 'Alfa Tower, Tangerang', joinYear: '—' };
 
 export default function Header({ isProfileOpen: externalProfileOpen, setIsProfileOpen: setExternalProfileOpen, onToggleMobileSidebar }) {
   const router = useRouter();
@@ -39,27 +64,18 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
     router.refresh();
   };
 
-  const [profileData] = useState({
-    name: 'Valens Aditya T.',
-    username: 'valens.aditya',
-    email: 'valens.aditya@alfamart.co.id',
-    nip: 'ALFA-78921-EN',
-    role: 'Energy & Sustainability Specialist',
-    dept: 'Dept. Energy Management & ESG',
-    division: 'Operation & Property Division',
-    headOffice: 'Alfa Tower lt. 19, Tangerang',
-    phone: '+62 812-9876-5432',
-    joinYear: '2022',
-  });
-  const displayName = currentUser?.displayName || profileData.name;
+  const displayName = currentUser?.displayName || 'Pengguna SPARTA';
+  const profileData = PROFILE_BY_USERNAME[currentUser?.username] || DEFAULT_PROFILE;
 
   const [passwordState, setPasswordState] = useState({
     currentPass: '',
     newPass: '',
     confirmPass: '',
   });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const [notification, setNotification] = useState(null);
+  const [notificationType, setNotificationType] = useState('success');
   const modalCloseRef = useRef(null);
 
   useEffect(() => {
@@ -77,18 +93,46 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
     };
   }, [isProfileOpen, setIsProfileOpen]);
 
-  const showNotification = (msg) => {
+  const showNotification = (msg, type = 'success') => {
     setNotification(msg);
+    setNotificationType(type);
     setTimeout(() => setNotification(null), 4000);
   };
 
-  const handleResetPassword = (e) => {
+  const handleResetPassword = async (e) => {
     e.preventDefault();
-    showNotification('Perubahan password belum tersedia karena autentikasi belum terhubung.');
-  };
-
-  const handleCheckEmail = () => {
-    showNotification('Verifikasi email belum tersedia karena autentikasi belum terhubung.');
+    if (isChangingPassword) return;
+    if (passwordState.newPass !== passwordState.confirmPass) {
+      showNotification('Konfirmasi password baru tidak cocok.', 'error');
+      return;
+    }
+    if (passwordState.newPass.length < 8) {
+      showNotification('Password baru minimal 8 karakter.', 'error');
+      return;
+    }
+    setIsChangingPassword(true);
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: passwordState.currentPass,
+          newPassword: passwordState.newPass,
+          confirmPassword: passwordState.confirmPass,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.success) {
+        showNotification(data?.error || 'Gagal mengubah password.', 'error');
+        return;
+      }
+      setPasswordState({ currentPass: '', newPass: '', confirmPass: '' });
+      showNotification('Password berhasil diubah.', 'success');
+    } catch (_) {
+      showNotification('Koneksi gagal, coba lagi.', 'error');
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   return (
@@ -189,8 +233,13 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
 
             {/* Notification Toast */}
             {notification && (
-              <div className="bg-emerald-50 dark:bg-emerald-500/10 border-b border-emerald-100 dark:border-emerald-500/20 px-4 py-2.5 flex items-center gap-2 text-xs font-medium text-emerald-800 dark:text-emerald-300 animate-in">
-                <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <div className={`border-b px-4 py-2.5 flex items-center gap-2 text-xs font-medium animate-in ${notificationType === 'error'
+                ? 'bg-rose-50 dark:bg-rose-500/10 border-rose-100 dark:border-rose-500/20 text-rose-800 dark:text-rose-300'
+                : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300'
+                }`}>
+                {notificationType === 'error'
+                  ? <AlertCircle size={16} className="text-rose-600 dark:text-rose-400 shrink-0" />
+                  : <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />}
                 <span>{notification}</span>
               </div>
             )}
@@ -209,7 +258,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
                     <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Username</span>
-                    <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">@{currentUser?.username || profileData.username}</span>
+                    <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">@{currentUser?.username || '—'}</span>
                   </div>
                   <div>
                     <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Departemen</span>
@@ -226,37 +275,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                 </div>
               </div>
 
-              {/* 2. CHECK EMAIL TERDAFTAR */}
-              <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase">
-                    <Mail size={15} className="text-blue-600 dark:text-blue-400" />
-                    <span>Check Email Terdaftar</span>
-                  </div>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20">
-                    <BadgeCheck size={11} />
-                    Corporate SSO
-                  </span>
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                  <div className="min-w-0">
-                    <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100 block truncate">{profileData.email}</span>
-                    <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Terhubung dengan sistem SSO & laporan emisi</span>
-                  </div>
-                  <button
-                    type="button"
-                    className="inline-flex min-h-11 w-full sm:w-auto items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold shrink-0 disabled:opacity-70"
-                    onClick={handleCheckEmail}
-                    disabled
-                  >
-                    <Send size={12} />
-                    <span>Belum tersedia</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* 3. RESET PASSWORD */}
+              {/* 2. RESET PASSWORD */}
               <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase">
@@ -267,9 +286,6 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                 </div>
 
                 <form onSubmit={handleResetPassword} className="space-y-3">
-                  <p className="rounded-lg border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 text-[11px] leading-relaxed text-amber-800 dark:text-amber-300">
-                    Fitur ini menunggu integrasi autentikasi. Jangan masukkan password akun asli.
-                  </p>
                   <div>
                     <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Password Saat Ini</label>
                     <div className="relative">
@@ -278,7 +294,8 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                         placeholder="Masukkan password lama"
                         value={passwordState.currentPass}
                         onChange={(e) => setPasswordState({ ...passwordState, currentPass: e.target.value })}
-                        disabled
+                        autoComplete="current-password"
+                        required
                         className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-9 text-xs focus:outline-none focus:border-blue-500 disabled:opacity-60"
                       />
                       <button
@@ -300,7 +317,9 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                           placeholder="Min. 8 karakter"
                           value={passwordState.newPass}
                           onChange={(e) => setPasswordState({ ...passwordState, newPass: e.target.value })}
-                          disabled
+                          autoComplete="new-password"
+                          minLength={8}
+                          required
                           className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-8 text-xs focus:outline-none focus:border-blue-500 disabled:opacity-60"
                         />
                         <button
@@ -320,7 +339,9 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                         placeholder="Ulangi password"
                         value={passwordState.confirmPass}
                         onChange={(e) => setPasswordState({ ...passwordState, confirmPass: e.target.value })}
-                        disabled
+                        autoComplete="new-password"
+                        minLength={8}
+                        required
                         className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500 disabled:opacity-60"
                       />
                     </div>
@@ -329,11 +350,11 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                   <div className="pt-1">
                     <button
                       type="submit"
-                      disabled
-                      className="w-full inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold py-2 cursor-not-allowed"
+                      disabled={isChangingPassword}
+                      className="w-full inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <Lock size={13} />
-                      <span>Update Password</span>
+                      {isChangingPassword ? <LoaderCircle size={13} className="animate-spin" /> : <Lock size={13} />}
+                      <span>{isChangingPassword ? 'Menyimpan...' : 'Update Password'}</span>
                     </button>
                   </div>
                 </form>
