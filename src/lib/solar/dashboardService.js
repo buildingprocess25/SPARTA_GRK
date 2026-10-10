@@ -72,6 +72,39 @@ function wibYearMonth(now = new Date()) {
   return `${parts.find((part) => part.type === 'year')?.value}${parts.find((part) => part.type === 'month')?.value}`;
 }
 
+const PLANT_LATEST_SELECT = {
+  psId: true,
+  name: true,
+  // psStatus/psFaultStatus/alarmCount/faultCount are required by
+  // status.js's normalizePlantStatus() (used for every location's
+  // operational badge in PLTSAnalyticsSection/PLTSSummaryCard) -
+  // without them it always fell back to "Menunggu Data" regardless
+  // of the already-correct statusCategory stored below, because it
+  // treats a missing psStatus as "never synced yet".
+  psStatus: true,
+  psFaultStatus: true,
+  alarmCount: true,
+  faultCount: true,
+  statusCategory: true,
+  statusReason: true,
+  statusCheckedAt: true,
+  raw: true,
+};
+
+async function fetchPlantLatestWithRetry(db) {
+  try {
+    return await db.plantLatest.findMany({ select: PLANT_LATEST_SELECT, orderBy: { psId: 'asc' } });
+  } catch (err) {
+    console.warn('[dashboardService] plantLatest.findMany gagal, retry sekali:', err?.message || err);
+    try {
+      return await db.plantLatest.findMany({ select: PLANT_LATEST_SELECT, orderBy: { psId: 'asc' } });
+    } catch (retryErr) {
+      console.error('[dashboardService] plantLatest.findMany gagal setelah retry - semua status badge akan fallback ke "Menunggu Data":', retryErr?.message || retryErr);
+      return [];
+    }
+  }
+}
+
 async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
   const flightKey = `raw:${years.join(',')}:${simulateLatencyMs}`;
   if (inFlightPromises.has(flightKey)) {
@@ -156,27 +189,14 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
         db.syncRun.findFirst({
           orderBy: { startedAt: 'desc' },
         }).catch(() => null),
-        db.plantLatest?.findMany ? db.plantLatest.findMany({
-          select: {
-            psId: true,
-            name: true,
-            // psStatus/psFaultStatus/alarmCount/faultCount are required by
-            // status.js's normalizePlantStatus() (used for every location's
-            // operational badge in PLTSAnalyticsSection/PLTSSummaryCard) -
-            // without them it always fell back to "Menunggu Data" regardless
-            // of the already-correct statusCategory stored below, because it
-            // treats a missing psStatus as "never synced yet".
-            psStatus: true,
-            psFaultStatus: true,
-            alarmCount: true,
-            faultCount: true,
-            statusCategory: true,
-            statusReason: true,
-            statusCheckedAt: true,
-            raw: true,
-          },
-          orderBy: { psId: 'asc' },
-        }).catch(() => []) : Promise.resolve([]),
+        // Retried once before falling back: this query used to swallow any
+        // failure (eg. connection pool exhaustion under concurrent requests)
+        // silently into `[]`, which made every location badge fall back to
+        // "Menunggu Data" with zero trace in the logs even though every other
+        // dashboard section kept rendering fine. The retry absorbs a single
+        // transient pool-contention timeout, and the final catch now logs so
+        // a real outage is visible instead of masquerading as "no status".
+        (db.plantLatest?.findMany ? fetchPlantLatestWithRetry(db) : Promise.resolve([])),
         db.$queryRaw`
           SELECT year_month as "yearMonth", ps_id as "psId", yield_kwh as "yieldKwh", feed_in_kwh as "feedInKwh", purchased_kwh as "purchasedKwh", load_kwh as "loadKwh", source
           FROM energy_flow_monthly
