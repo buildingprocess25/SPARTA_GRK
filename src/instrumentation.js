@@ -51,9 +51,19 @@ export async function register() {
       // Running the sync loop in-process here means auto-sync no longer
       // depends on any external scheduler config at all - it starts the
       // moment this server process boots.
-      console.log('[Instrumentation] Starting in-process iSolar sync daemon (5-minute interval)...');
+      //
+      // Interval widened from 5 to 10 minutes: each cycle writes dozens to
+      // hundreds of individual DB operations (39 plants upserted, faults,
+      // inverter telemetry, snapshots), and running every 5 minutes was the
+      // single largest contributor to the managed Postgres plan's monthly
+      // operations quota being exhausted (confirmed: workspace got blocked
+      // mid-month). Doubling the interval roughly halves that cost with no
+      // effect on page load speed - it only trades a few extra minutes of
+      // telemetry staleness, which is an acceptable tradeoff for a solar
+      // production dashboard (not a safety-critical real-time system).
+      console.log('[Instrumentation] Starting in-process iSolar sync daemon (10-minute interval)...');
       const { startServerDaemon } = await import('./lib/solar/scheduler.js');
-      startServerDaemon({ intervalMs: 300_000 });
+      startServerDaemon({ intervalMs: 600_000 });
     } catch (error) {
       console.warn('[Instrumentation] Sync daemon start notice:', error?.message || error);
     }
