@@ -14,7 +14,7 @@ export const CHART_PALETTE = Object.freeze({
   savings: '#10B981',        // Emerald-500
   calc: '#6366F1',           // Indigo-500
   target: '#8B5CF6',         // Purple-500
-  net: '#0F172A',            // Slate-900
+  net: 'var(--chart-net)',   // Slate-900 (light) / Slate-200 (dark) - see globals.css
 });
 
 // Values reference CSS custom properties (see globals.css :root / .dark) so

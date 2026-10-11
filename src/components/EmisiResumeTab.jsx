@@ -304,13 +304,16 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {/* Pill Legend terpadu */}
+            {/* Legend hanya menampilkan seri yang benar-benar tampil di chart
+                saat ini - sebelumnya selalu menampilkan semua 4 warna sekaligus
+                terlepas dari toggle di bawah ini, jadi legend-nya menjanjikan
+                3 warna yang sebenarnya sedang disembunyikan di chart. */}
             <ChartPillLegend
               items={[
-                { label: 'Penambahan (S1+S2)', color: CHART_PALETTE.emission },
-                { label: 'Pengurangan (PLTS+Air)', color: CHART_PALETTE.savings },
-                { label: 'Emisi Bersih', color: CHART_PALETTE.net, type: 'line' },
-                { label: 'Rasio Offset', color: CHART_PALETTE.target, type: 'line' },
+                ...(chartMetricView === 'all' || chartMetricView === 'penambahan' ? [{ label: 'Penambahan (S1+S2)', color: CHART_PALETTE.emission }] : []),
+                ...(chartMetricView === 'all' || chartMetricView === 'pengurangan' ? [{ label: 'Pengurangan (PLTS+Air)', color: CHART_PALETTE.savings }] : []),
+                ...(chartMetricView === 'all' || chartMetricView === 'net' ? [{ label: 'Emisi Bersih', color: CHART_PALETTE.net, type: 'line' }] : []),
+                ...(chartMetricView === 'all' || chartMetricView === 'net' ? [{ label: 'Rasio Offset', color: CHART_PALETTE.target, type: 'line' }] : []),
               ]}
             />
 
@@ -447,13 +450,13 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
 
                           <div className="flex items-center justify-between gap-3 font-mono pt-1.5 border-t border-slate-100 dark:border-slate-800">
                             <span className="flex items-center gap-1.5 font-sans font-semibold text-slate-700 dark:text-slate-300">
-                              <span className="size-2 rounded-full bg-slate-900 dark:bg-slate-950 shrink-0" />
+                              <span className="size-2 rounded-full bg-slate-900 dark:bg-slate-200 shrink-0" />
                               Emisi Bersih:
                             </span>
                             <strong className="text-slate-900 dark:text-slate-100">{formatYAxisNumber(data.netTon)} tCO₂e</strong>
                           </div>
 
-                          <div className="flex items-center justify-between gap-3 font-mono pt-0.5">
+                          <div className="flex items-center justify-between gap-3 font-mono pt-1">
                             <span className="flex items-center gap-1.5 font-sans text-purple-700 dark:text-purple-300 font-semibold">
                               <span className="size-2 rounded-full bg-purple-500 shrink-0" />
                               Rasio Offset:

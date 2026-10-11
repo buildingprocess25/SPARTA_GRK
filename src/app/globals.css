@@ -37,6 +37,12 @@
   --chart-grid: #F1F5F9;
   --chart-axis: #64748B;
   --chart-axis-line: #E2E8F0;
+  /* "Net" series (eg. Emisi Bersih line) - was hardcoded #0F172A (near-black)
+     in CHART_PALETTE.net, which in dark mode sat almost invisible against
+     the card's own near-black background. Light mode keeps the same
+     near-black for a confident "this is the headline number" look; dark
+     mode uses a light slate so the line still reads against a dark card. */
+  --chart-net: #0F172A;
 
   /* Elevation Tokens */
   --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
@@ -68,6 +74,7 @@
   --chart-grid: #1E293B;
   --chart-axis: #94A3B8;
   --chart-axis-line: #334155;
+  --chart-net: #E2E8F0; /* Slate-200 - was the same near-black as light mode and disappeared against dark cards */
 
   /* Elevation Tokens (dark - subtler, screens emit their own light) */
   --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
