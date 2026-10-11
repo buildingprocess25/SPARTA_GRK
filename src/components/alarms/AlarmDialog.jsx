@@ -275,17 +275,19 @@ export default function AlarmDialog() {
                         )}
                       </div>
 
-                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-snug">
+                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-snug" title={alarm.id}>
                         {alarm.title}
                       </h4>
+
+                      {alarm.detail && (
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-snug">{alarm.detail}</p>
+                      )}
 
                       <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 pt-0.5">
                         <span className="inline-flex items-center gap-1">
                           <Clock size={12} className="text-slate-400 dark:text-slate-500 shrink-0" />
                           <span>{formatWibDate(alarm.occurredAt)}</span>
                         </span>
-                        <span className="text-slate-300 dark:text-slate-600">•</span>
-                        <span>Kode: <code className="font-mono">{alarm.id}</code></span>
                         <span className="text-slate-300 dark:text-slate-600">•</span>
                         <span className="text-emerald-700 dark:text-emerald-400 font-medium">Status: Aktif</span>
                       </div>

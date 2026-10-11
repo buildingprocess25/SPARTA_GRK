@@ -61,9 +61,20 @@ export function normalizeAlarmRecords(records = [], entities = [], plantNames = 
  * reliable station-level signal instead of waiting on a vendor endpoint
  * that doesn't reliably agree with its own station overview.
  */
+const DEGRADED = { OFFLINE: 'FAULT', FAULT: 'FAULT', ALARM: 'ALERT' };
+
+// Plain-language headline per category - the raw statusReason ("vendor
+// melaporkan alarm_count=1, ps_fault_status=2") is accurate but reads like a
+// debug log, not something meant for a person scanning a notification card.
+// The raw reason is kept on `detail` instead, for anyone who wants it.
+const STATION_ALARM_TITLES = {
+  OFFLINE: () => 'Plant kehilangan komunikasi dengan vendor (offline)',
+  FAULT: () => 'Gangguan hardware terdeteksi pada inverter/perangkat',
+  ALARM: () => 'Peringatan operasional terdeteksi pada inverter/perangkat',
+};
+
 export function normalizeStationLevelAlarms(plants = [], entities = []) {
   const entityByPsId = buildEntityLookup(entities);
-  const DEGRADED = { OFFLINE: 'FAULT', FAULT: 'FAULT', ALARM: 'ALERT' };
 
   return plants
     .filter((plant) => DEGRADED[plant.statusCategory])
@@ -77,7 +88,8 @@ export function normalizeStationLevelAlarms(plants = [], entities = []) {
         dcId: entity?.dcId || `PS-${psId || 'UNKNOWN'}`,
         dcName: entity?.canonicalName || plant.name || `Plant ${psId || 'tidak terpetakan'}`,
         kind: DEGRADED[plant.statusCategory],
-        title: plant.statusReason || `Status vendor: ${plant.statusCategory}`,
+        title: STATION_ALARM_TITLES[plant.statusCategory]?.() || `Status vendor: ${plant.statusCategory}`,
+        detail: plant.statusReason || null,
         occurredAt: toIsoOrNull(plant.statusCheckedAt),
         status: 'ACTIVE',
         vendorType: plant.statusCategory === 'FAULT' || plant.statusCategory === 'OFFLINE' ? 1 : 2,
