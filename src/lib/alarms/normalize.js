@@ -48,6 +48,45 @@ export function normalizeAlarmRecords(records = [], entities = [], plantNames = 
   });
 }
 
+/**
+ * Station-level OFFLINE/FAULT/ALARM from PlantLatest.statusCategory - the
+ * same signal sync.js already uses to trigger push notifications and the
+ * ranking list badges, computed every cycle from the vendor's always-
+ * succeeding getPowerStationList call. The "Status Alarm iSolar" panel used
+ * to read ONLY from FaultActive (detailed per-device faults from the
+ * separate getFaultAlarmInfo endpoint), which has stayed empty in practice
+ * even when a plant is genuinely showing Alarm/Offline everywhere else in
+ * the app - confirmed live: Lombok B showed "Alarm" in the ranking list
+ * with zero corresponding entry here. This fills that gap with the more
+ * reliable station-level signal instead of waiting on a vendor endpoint
+ * that doesn't reliably agree with its own station overview.
+ */
+export function normalizeStationLevelAlarms(plants = [], entities = []) {
+  const entityByPsId = buildEntityLookup(entities);
+  const DEGRADED = { OFFLINE: 'FAULT', FAULT: 'FAULT', ALARM: 'ALERT' };
+
+  return plants
+    .filter((plant) => DEGRADED[plant.statusCategory])
+    .map((plant) => {
+      const psId = Number(plant.psId);
+      const entity = entityByPsId.get(psId);
+      return {
+        id: `station-${psId}-${plant.statusCategory}`,
+        source: 'ISOLAR_STATION_OVERVIEW',
+        sourceTab: 'plts',
+        dcId: entity?.dcId || `PS-${psId || 'UNKNOWN'}`,
+        dcName: entity?.canonicalName || plant.name || `Plant ${psId || 'tidak terpetakan'}`,
+        kind: DEGRADED[plant.statusCategory],
+        title: plant.statusReason || `Status vendor: ${plant.statusCategory}`,
+        occurredAt: toIsoOrNull(plant.statusCheckedAt),
+        status: 'ACTIVE',
+        vendorType: plant.statusCategory === 'FAULT' || plant.statusCategory === 'OFFLINE' ? 1 : 2,
+        vendorLevel: 0,
+        updatedAt: toIsoOrNull(plant.updatedAt),
+      };
+    });
+}
+
 export function summarizeAlarms(alarms = []) {
   const active = alarms.filter((alarm) => alarm.status === 'ACTIVE');
   const summary = {

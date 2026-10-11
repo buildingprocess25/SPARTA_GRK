@@ -561,7 +561,20 @@ export async function runSync({ trigger = 'cron' } = {}) {
             ? first.reason
             : newlyDegradedPlants.slice(0, 3).map((p) => `${dcName(p.psId, p.psName)}: ${categoryLabel[p.category]}`).join(' | ');
 
-          await sendPushToAll({ title, body, tag: 'sparta-status-change', requireInteraction: isUrgent, url: '/' });
+          const pushResult = await sendPushToAll({ title, body, tag: 'sparta-status-change', requireInteraction: isUrgent, url: '/' });
+          // sendPushToAll() can "succeed" (no exception) while actually
+          // delivering to nobody - eg. VAPID not configured server-side
+          // returns {sent:0, skipped:'VAPID_NOT_CONFIGURED'} silently, and a
+          // subscription rejected by the push service (expired, wrong keys)
+          // just increments `failed` without throwing. Neither case was ever
+          // logged, so a real incident (alarm fired, zero notifications
+          // received) left no trace to diagnose from. Log the outcome every
+          // time so this is visible in Dokploy logs going forward.
+          if (pushResult.skipped || pushResult.sent === 0) {
+            console.warn(`[SYNC] Push status-change TIDAK terkirim ke siapa pun: ${JSON.stringify(pushResult)}`);
+          } else {
+            console.log(`[SYNC] Push status-change terkirim: ${JSON.stringify(pushResult)}`);
+          }
         } catch (pushErr) {
           console.warn('[SYNC] Gagal mengirim push notification perubahan status plant:', pushErr.message);
         }
@@ -694,7 +707,12 @@ export async function runSync({ trigger = 'cron' } = {}) {
               ? (first.faultName || 'Gangguan operasional inverter terdeteksi.')
               : newlyAppearedFaults.slice(0, 3).map((f) => `${dcName(f.psId, f.psName)}: ${f.faultName}`).join(' | ');
 
-            await sendPushToAll({ title, body, tag: 'sparta-fault-alarm', requireInteraction: true, url: '/' });
+            const pushResult = await sendPushToAll({ title, body, tag: 'sparta-fault-alarm', requireInteraction: true, url: '/' });
+            if (pushResult.skipped || pushResult.sent === 0) {
+              console.warn(`[SYNC] Push fault-baru TIDAK terkirim ke siapa pun: ${JSON.stringify(pushResult)}`);
+            } else {
+              console.log(`[SYNC] Push fault-baru terkirim: ${JSON.stringify(pushResult)}`);
+            }
           } catch (pushErr) {
             console.warn('[SYNC] Gagal mengirim push notification fault baru:', pushErr.message);
           }
