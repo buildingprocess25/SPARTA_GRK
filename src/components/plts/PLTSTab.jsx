@@ -688,12 +688,12 @@ export default function PLTSTab() {
           </>
         }
         actions={
-          <div className="flex shrink-0 flex-col items-end gap-2 self-start">
-            <InputDataButton label="Input Data PLTS" icon={Sun} onClick={() => setIsInputModalOpen(true)} />
+          <div className="flex shrink-0 flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+            <InputDataButton label="Input Data PLTS" icon={Sun} onClick={() => setIsInputModalOpen(true)} className="w-full sm:w-auto" />
             <SegmentedTabs
               value={activePltsSubView}
               onChange={setActivePltsSubView}
-              fullWidthOnMobile={false}
+              fullWidthOnMobile={true}
               options={[
                 { value: 'overview', label: 'Target' },
                 {

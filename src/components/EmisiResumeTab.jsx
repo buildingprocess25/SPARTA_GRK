@@ -358,7 +358,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
               <Suspense fallback={<CalculatorLoadingSkeleton />}>
                 <EmissionCalculatorPage />
               </Suspense>
-              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end pb-8 lg:pb-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -457,7 +457,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         </div>
 
         {/* Compact Average & Comparison Summary */}
-        <div className="flex flex-wrap items-center gap-6 py-3 px-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 rounded-xl text-sm">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-4 sm:gap-6 py-3 px-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 rounded-xl text-sm">
           <div className="flex flex-col">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Rata-Rata Penambahan</span>
             <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{formatYAxisNumber(avgPenambahan)} <span className="text-xs text-slate-500 dark:text-slate-400 font-sans font-medium">tCO₂e/bln</span></span>
@@ -482,26 +482,24 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         {/* Grafik Utama Recharts */}
         <div className="w-full h-72 lg:h-[300px] pt-2 print:break-inside-avoid">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={monthlyComparisonData} margin={{ top: 12, right: 16, bottom: 0, left: 16 }}>
+            <ComposedChart data={monthlyComparisonData} margin={{ top: 12, right: 12, bottom: 0, left: 8 }}>
               <CartesianGrid {...CHART_GRID_PROPS} />
               <XAxis dataKey="month" {...CHART_AXIS_PROPS} />
               <YAxis
                 yAxisId="left"
                 stroke="#E2E8F0"
                 tick={{ fontSize: 10, fill: '#64748B' }}
-                width={72}
+                width={55}
                 tickFormatter={formatYAxisNumber}
-                label={{ value: 'Emisi (tCO₂e)', angle: -90, position: 'insideLeft', offset: 0, style: { fill: '#94A3B8', fontSize: 10, textAnchor: 'middle' } }}
               />
               <YAxis
                 yAxisId="right"
                 orientation="right"
-                domain={[0, 20]}
+                domain={[0, 'auto']}
                 stroke="#E2E8F0"
                 tick={{ fontSize: 10, fill: CHART_PALETTE.target }}
                 tickFormatter={v => `${v}%`}
-                width={55}
-                label={{ value: 'Rasio Offset (%)', angle: 90, position: 'insideRight', offset: 0, style: { fill: CHART_PALETTE.target, fontSize: 10, textAnchor: 'middle' } }}
+                width={45}
               />
               <Tooltip
                 content={({ active, payload, label }) => {
@@ -601,29 +599,29 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
           <table className="w-full text-left text-xs border-collapse">
             <thead className="bg-slate-900 dark:bg-slate-950 text-white text-xs uppercase">
               <tr>
-                <th className="sticky left-0 bg-slate-900 dark:bg-slate-950 px-4 py-3 font-semibold z-10">Bulan 2026</th>
-                <th className="text-right px-4 py-3 font-semibold">Scope 1 (Genset)</th>
-                <th className="text-right px-4 py-3 font-semibold">Scope 2 (Grid PLN)</th>
-                <th className="text-right px-4 py-3 font-semibold bg-red-950 text-red-100">Total Penambahan (tCO₂e)</th>
-                <th className="text-right px-4 py-3 font-semibold">PLTS Avoided</th>
-                <th className="text-right px-4 py-3 font-semibold">Water Avoided</th>
-                <th className="text-right px-4 py-3 font-semibold bg-emerald-950 text-emerald-100">Total Pengurangan (tCO₂e)</th>
-                <th className="text-right px-4 py-3 font-semibold">Net Emisi (tCO₂e)</th>
-                <th className="text-center px-4 py-3 font-semibold">Perbandingan Rasio Offset</th>
+                <th className="sticky left-0 bg-slate-900 dark:bg-slate-950 px-4 py-3 font-semibold z-10 whitespace-nowrap min-w-[140px] border-r border-slate-800">Bulan 2026</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Scope 1 (Genset)</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Scope 2 (Grid PLN)</th>
+                <th className="text-right px-4 py-3 font-semibold bg-red-950 text-red-100 whitespace-nowrap">Total Penambahan (tCO₂e)</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">PLTS Avoided</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Water Avoided</th>
+                <th className="text-right px-4 py-3 font-semibold bg-emerald-950 text-emerald-100 whitespace-nowrap">Total Pengurangan (tCO₂e)</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Net Emisi (tCO₂e)</th>
+                <th className="text-center px-4 py-3 font-semibold whitespace-nowrap">Perbandingan Rasio Offset</th>
               </tr>
             </thead>
             <tbody>
               {monthlyComparisonData.map((d, i) => (
                 <tr key={i} className="print:break-inside-avoid border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                  <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800">{d.month} 2026</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-500 dark:text-slate-400 font-mono">{d.scope1Ton.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 font-mono">{d.scope2Ton.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-red-600 dark:text-red-400 bg-red-50/30 dark:bg-red-500/10 font-mono">+{d.penambahanTon.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right text-emerald-600 dark:text-emerald-400 font-mono">{d.pltsAvoided.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right text-cyan-600 dark:text-cyan-400 font-mono">{d.waterAvoided.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50/30 dark:bg-emerald-500/10 font-mono">-{d.penguranganTon.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-slate-900 dark:text-slate-100 font-mono">{d.netTon.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap min-w-[140px]">{d.month} 2026</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap">{d.scope1Ton.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 font-mono whitespace-nowrap">{d.scope2Ton.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-red-600 dark:text-red-400 bg-red-50/30 dark:bg-red-500/10 font-mono whitespace-nowrap">+{d.penambahanTon.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right text-emerald-600 dark:text-emerald-400 font-mono whitespace-nowrap">{d.pltsAvoided.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right text-cyan-600 dark:text-cyan-400 font-mono whitespace-nowrap">{d.waterAvoided.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50/30 dark:bg-emerald-500/10 font-mono whitespace-nowrap">-{d.penguranganTon.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-slate-900 dark:text-slate-100 font-mono whitespace-nowrap">{d.netTon.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-center whitespace-nowrap">
                     <span className="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-500/20 font-mono">
                       {d.offsetRatioPct}%
                     </span>
@@ -632,16 +630,16 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
               ))}
             </tbody>
             <tfoot>
-              <tr className="bg-slate-50 dark:bg-slate-800/40 font-semibold border-t-2 border-slate-200 dark:border-slate-700">
-                <td className="sticky left-0 bg-slate-50 dark:bg-slate-800/40 font-bold text-slate-900 dark:text-slate-100 px-4 py-3.5 z-10 border-r border-slate-100 dark:border-slate-800">RATA-RATA BULANAN</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-500 dark:text-slate-400 font-mono">{(scope1.summary.totalEmissionCO2e / totalMonths).toFixed(1)}</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 font-mono">{(scope2.summary.totalEmissionCO2e / totalMonths).toFixed(1)}</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-red-700 dark:text-red-300 bg-red-50/50 dark:bg-red-500/10 font-mono">+{avgPenambahan} tCO₂e</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-emerald-600 dark:text-emerald-400 font-mono">{(pltsData.summary.co2Avoided / totalMonths).toFixed(1)}</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-cyan-600 dark:text-cyan-400 font-mono">{(waterData.summary.co2Avoided / totalMonths).toFixed(1)}</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50/50 dark:bg-emerald-500/10 font-mono">-{avgPengurangan} tCO₂e</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-slate-900 dark:text-slate-100 font-mono">{avgNet} tCO₂e</td>
-                <td className="px-4 py-3.5 text-center font-bold text-purple-900 dark:text-purple-200 font-mono">{avgOffsetRatio}%</td>
+              <tr className="bg-slate-50 dark:bg-slate-900 font-semibold border-t-2 border-slate-200 dark:border-slate-700">
+                <td className="sticky left-0 bg-slate-50 dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-4 py-3.5 z-10 border-r border-slate-200 dark:border-slate-800 whitespace-nowrap min-w-[140px]">RATA-RATA BULANAN</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap">{(scope1.summary.totalEmissionCO2e / totalMonths).toFixed(1)}</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 font-mono whitespace-nowrap">{(scope2.summary.totalEmissionCO2e / totalMonths).toFixed(1)}</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-red-700 dark:text-red-300 bg-red-50/50 dark:bg-red-500/10 font-mono whitespace-nowrap">+{avgPenambahan} tCO₂e</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-emerald-600 dark:text-emerald-400 font-mono whitespace-nowrap">{(pltsData.summary.co2Avoided / totalMonths).toFixed(1)}</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-cyan-600 dark:text-cyan-400 font-mono whitespace-nowrap">{(waterData.summary.co2Avoided / totalMonths).toFixed(1)}</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50/50 dark:bg-emerald-500/10 font-mono whitespace-nowrap">-{avgPengurangan} tCO₂e</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-slate-900 dark:text-slate-100 font-mono whitespace-nowrap">{avgNet} tCO₂e</td>
+                <td className="px-4 py-3.5 text-center font-bold text-purple-900 dark:text-purple-200 font-mono whitespace-nowrap">{avgOffsetRatio}%</td>
               </tr>
             </tfoot>
           </table>
