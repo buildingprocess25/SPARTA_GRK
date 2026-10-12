@@ -8,7 +8,7 @@ import {
 import {
   BarChart3, TrendingUp, TrendingDown, Award, AlertTriangle,
   Download, ArrowUpDown, HelpCircle, CheckCircle2,
-  Clock, ShieldAlert, Sparkles, Layers, Activity, Calendar,
+  Clock, ShieldAlert, Layers, Activity, Calendar,
   Radio, CheckSquare, Square, Search, RefreshCw, Eye, Grid, List,
   Info, ChevronDown, ChevronUp, AlertCircle
 } from 'lucide-react';
@@ -150,6 +150,8 @@ function SafePrBarTooltip({ active, payload }) {
   return null;
 }
 
+// backdrop-blur-md on this tooltip's near-opaque background keeps its text
+// legible when it floats directly over busy chart gridlines/bars.
 function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, chartViewMode, hoveredDCId }) {
   if (active && payload && payload.length) {
     const rawData = payload[0]?.payload || {};
@@ -979,17 +981,17 @@ export default function PLTSAnalyticsSection({
 
     if (selectedMetric === 'pr') {
       if (activeChosenCount === 1) {
-        return `Komparasi Proxy PR — ${chosenDCs[0]?.canonicalName || chosenDCs[0]?.name || '1 Lokasi'} (April 2026)`;
+        return `Komparasi Proxy PR: ${chosenDCs[0]?.canonicalName || chosenDCs[0]?.name || '1 Lokasi'} (April 2026)`;
       }
-      return `Komparasi Proxy PR Baseline — ${activeChosenCount} Lokasi Terpilih (April 2026)`;
+      return `Komparasi Proxy PR Baseline: ${activeChosenCount} Lokasi Terpilih (April 2026)`;
     }
     if (activeChosenCount === 1) {
-      return `Tren ${label} — ${chosenDCs[0]?.canonicalName || chosenDCs[0]?.name || '1 Lokasi'} (${unit})`;
+      return `Tren ${label}: ${chosenDCs[0]?.canonicalName || chosenDCs[0]?.name || '1 Lokasi'} (${unit})`;
     }
     if (activeChosenCount >= 38) {
-      return `Tren ${label} — Seluruh ${activeChosenCount} Plant Operasional (${unit})`;
+      return `Tren ${label}: Seluruh ${activeChosenCount} Plant Operasional (${unit})`;
     }
-    return `Tren ${label} — ${activeChosenCount} Plant Terpilih (${unit})`;
+    return `Tren ${label}: ${activeChosenCount} Plant Terpilih (${unit})`;
   }, [activeChosenCount, activeMetricMeta, chosenDCs, selectedMetric, unitMode]);
 
   // Table Data (filtered by selection + search)
@@ -1068,7 +1070,7 @@ export default function PLTSAnalyticsSection({
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-              <Sparkles size={20} />
+              <Award size={20} />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">

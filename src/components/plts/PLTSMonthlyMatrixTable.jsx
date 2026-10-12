@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import {
   Award, Download, FileSpreadsheet, Info, ChevronDown,
-  Sparkles, CheckCircle2, TrendingUp, Sun, Zap, Building2, Trees, BatteryCharging
+  CheckCircle2, TrendingUp, Sun, Zap, Building2, Trees, BatteryCharging
 } from 'lucide-react';
 import CardBox from '@/components/ui/CardBox';
 import { CONVERSION_CONFIG } from '@/lib/solar/conversionConfig';

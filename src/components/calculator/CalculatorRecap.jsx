@@ -25,7 +25,7 @@ export default function CalculatorRecap({ profile, entries, summary, days }) {
         <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400"><Lightbulb size={18} /></div>
         <div>
           <h3 className="font-bold text-slate-900 dark:text-slate-100">Saran Penghematan</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Dihitung otomatis dari hasil simulasi di atas, bukan dari AI — angkanya selalu persis sama dengan rekap.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Dihitung otomatis dari hasil simulasi di atas, bukan dari AI: angkanya selalu persis sama dengan rekap.</p>
         </div>
       </div>
       <p className={`mt-4 rounded-xl border p-3.5 text-sm font-semibold ${HEADLINE_TONE_CLASSES[suggestions.headlineTone]}`}>{suggestions.headline}</p>

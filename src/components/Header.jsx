@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ShieldCheck, User, KeyRound, CheckCircle2,
-  X, ChevronDown, Lock, Shield, Sparkles, Building2,
+  X, ChevronDown, Lock, Shield, Building2,
   Phone, BadgeCheck, Eye, EyeOff, Menu, LogOut,
   AlertCircle, LoaderCircle
 } from 'lucide-react';

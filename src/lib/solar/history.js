@@ -271,7 +271,7 @@ export function aggregateMonthlyHistory({
       isPartial,
       label: bounds.start === bounds.end
         ? `${MONTH_SHORT[Number(bounds.start.slice(4)) - 1]} ${bounds.start.slice(0, 4)}${isPartial ? ' (sebagian)' : ''}`
-        : `Jan-${MONTH_SHORT[Number(bounds.end.slice(4)) - 1]} ${bounds.end.slice(0, 4)} (YTD)${isPartial ? ' — sebagian' : ''}`,
+        : `Jan-${MONTH_SHORT[Number(bounds.end.slice(4)) - 1]} ${bounds.end.slice(0, 4)} (YTD)${isPartial ? ' (sebagian)' : ''}`,
     },
     months,
     locations,

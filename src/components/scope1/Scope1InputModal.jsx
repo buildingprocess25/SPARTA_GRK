@@ -419,7 +419,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
     <BaseModal
       open={isOpen}
       onClose={handleCloseRequest}
-      title={category === 'VEHICLE' ? 'Input Data Scope 1 — Kendaraan' : 'Input Data Scope 1 — Genset'}
+      title={category === 'VEHICLE' ? 'Input Data Scope 1: Kendaraan' : 'Input Data Scope 1: Genset'}
       subtitle={category === 'VEHICLE'
         ? 'Pencatatan konsumsi BBM kendaraan operasional (mobile combustion).'
         : 'Pencatatan konsumsi BBM genset cadangan operasional DC & fasilitas.'}
@@ -554,7 +554,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                   >
                     {filteredFacilities.map((fac) => (
                       <option key={fac.id} value={fac.id}>
-                        [{fac.code || 'DC'}] {fac.name} — {fac.region}
+                        [{fac.code || 'DC'}] {fac.name} ({fac.region})
                       </option>
                     ))}
                   </select>

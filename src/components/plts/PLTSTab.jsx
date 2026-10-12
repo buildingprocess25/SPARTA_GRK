@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import {
   Sun, Zap, BatteryCharging, Calculator, Factory,
   TrendingUp, Gauge, BarChart3, Building2, Trees, Award,
-  Sparkles, CheckCircle2, ChevronRight, Download, Radio,
+  CheckCircle2, ChevronRight, Download, Radio,
   RefreshCw, KeyRound, Globe, Server, Check, ArrowUpRight,
   Cpu, Thermometer, Search, Filter, FileSpreadsheet, ShieldCheck,
   Info, List, MapPin, Activity, X, ChevronDown, ChevronUp, AlertCircle, AlertTriangle, AlertOctagon, Clock
@@ -1122,7 +1122,7 @@ export default function PLTSTab() {
                   {pltsAlarms.faultCount === 0 && pltsAlarms.alertCount === 0 && (
                     <span className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800 dark:text-slate-200">
                       <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
-                      <span>Normal — Tidak ada alarm aktif</span>
+                      <span>Normal, tidak ada alarm aktif</span>
                     </span>
                   )}
                 </div>
@@ -1150,7 +1150,7 @@ export default function PLTSTab() {
                 {dashboardData.summary.status.offlinePlants.map((plant) => (
                   <div key={plant.psId} className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-3 py-2 text-xs text-rose-800 dark:text-rose-300">
                     <strong>{plant.name}</strong>
-                    <span className="ml-2">Offline — {plant.reason}</span>
+                    <span className="ml-2">Offline: {plant.reason}</span>
                   </div>
                 ))}
               </div>

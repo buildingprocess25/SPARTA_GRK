@@ -5,7 +5,7 @@ import {
   CartesianGrid, Line, ComposedChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
 } from 'recharts';
 import {
-  Gauge, Thermometer, Sun, Zap, Activity, Info, RefreshCw, Layers, MapPin, Sparkles, TrendingDown,
+  Gauge, Thermometer, Sun, Zap, Activity, Info, RefreshCw, Layers, MapPin, TrendingDown,
 } from 'lucide-react';
 import { TabContentSkeleton } from './PLTSDashboardSkeletons';
 
@@ -315,6 +315,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
                   if (!active || !payload || !payload.length) return null;
                   const item = payload[0]?.payload;
                   return (
+                    // backdrop-blur-md keeps this tooltip legible over chart gridlines behind it
                     <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg text-xs space-y-1.5">
                       <div className="flex items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-1 font-bold text-slate-800 dark:text-slate-200">
                         <span>Bulan: {label} {selectedYear}</span>

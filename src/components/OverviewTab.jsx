@@ -91,7 +91,7 @@ export default function OverviewTab({ setActiveTab }) {
               <Sun size={28} />
             </div>
             <div>
-              <h3 className="section-title">Kelistrikan DC — PLTS</h3>
+              <h3 className="section-title">Kelistrikan DC: PLTS</h3>
               <p className="section-subtitle">
                 Monitoring pembangkitan energi surya (PLTS Atap) pada Distribution Center. Data dari IsolarCloud & IoT Energy Meter.
               </p>

@@ -818,7 +818,7 @@ export default function InputDataTab({ setActiveTab }) {
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-300">
                     <Fuel size={14} />
-                    <span>Scope 1 — Genset</span>
+                    <span>Scope 1: Genset</span>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                     Solar/Bio, mode LITER / RUPIAH, kode aset & jam operasi.
@@ -839,7 +839,7 @@ export default function InputDataTab({ setActiveTab }) {
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-rose-700 dark:text-rose-300">
                     <Fuel size={14} />
-                    <span>Scope 1 — Kendaraan</span>
+                    <span>Scope 1: Kendaraan</span>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                     Pertalite, Solar, Pertamax (Draft), nopol & unit kerja.
@@ -860,7 +860,7 @@ export default function InputDataTab({ setActiveTab }) {
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-blue-700 dark:text-blue-300">
                     <Zap size={14} />
-                    <span>Scope 2 — Listrik PLN</span>
+                    <span>Scope 2: Listrik PLN</span>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                     ID Pelanggan/Meter, kWh konsumsi, biaya tagihan PLN.
@@ -881,7 +881,7 @@ export default function InputDataTab({ setActiveTab }) {
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
                     <Sun size={14} />
-                    <span>Pengurang — PLTS</span>
+                    <span>Pengurang: PLTS</span>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                     39 Plant iSolar, kWh produksi actual, yield & avoided ton.
@@ -902,7 +902,7 @@ export default function InputDataTab({ setActiveTab }) {
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-cyan-700 dark:text-cyan-300">
                     <Droplets size={14} />
-                    <span>Pengurang — Air</span>
+                    <span>Pengurang: Air</span>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                     Mode VOLUME / METER, m³ air terolah, hemat biaya PDAM.
@@ -959,11 +959,11 @@ export default function InputDataTab({ setActiveTab }) {
                   className="text-xs font-medium bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="AUTO">Deteksi Otomatis (Auto-Detect)</option>
-                  <option value="GENSET">Scope 1 — Genset</option>
-                  <option value="VEHICLE">Scope 1 — Kendaraan Operasional</option>
-                  <option value="PLN">Scope 2 — Listrik PLN</option>
-                  <option value="PLTS">Pengurang — PLTS</option>
-                  <option value="WATER">Pengurang — Water Recycle</option>
+                  <option value="GENSET">Scope 1: Genset</option>
+                  <option value="VEHICLE">Scope 1: Kendaraan Operasional</option>
+                  <option value="PLN">Scope 2: Listrik PLN</option>
+                  <option value="PLTS">Pengurang: PLTS</option>
+                  <option value="WATER">Pengurang: Water Recycle</option>
                 </select>
               </div>
             </div>
@@ -1334,9 +1334,9 @@ export default function InputDataTab({ setActiveTab }) {
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
               <span>Langkah Aktif:</span>
               <strong className="text-slate-800 dark:text-slate-200">
-                {currentStep === 1 && 'Step 1 — Lokasi, Kategori & Periode'}
-                {currentStep === 2 && 'Step 2 — Parameter Teknis & Rumus Emisi'}
-                {currentStep === 3 && 'Step 3 — Hasil Hitung & Konfirmasi Simpan'}
+                {currentStep === 1 && 'Step 1: Lokasi, Kategori & Periode'}
+                {currentStep === 2 && 'Step 2: Parameter Teknis & Rumus Emisi'}
+                {currentStep === 3 && 'Step 3: Hasil Hitung & Konfirmasi Simpan'}
               </strong>
             </div>
           </div>
@@ -1436,7 +1436,7 @@ export default function InputDataTab({ setActiveTab }) {
                     >
                       {filteredFacilities.map((fac) => (
                         <option key={fac.id} value={fac.id}>
-                          [{fac.facilityType}] {fac.code} — {fac.name} ({fac.region}) • Grid: {fac.gridRegion} ({fac.gridFactor} kgCO₂/kWh)
+                          [{fac.facilityType}] {fac.code}: {fac.name} ({fac.region}) • Grid: {fac.gridRegion} ({fac.gridFactor} kgCO₂/kWh)
                         </option>
                       ))}
                     </select>

@@ -177,7 +177,7 @@ export function buildScope2AnnualLoadDashboard({
 
   return {
     source: 'ISOLAR_ANNUAL_REPORT_MONTHLY_LOAD',
-    sourceLabel: 'iSolarCloud Annual Report — Monthly load consumption(kWh)',
+    sourceLabel: 'iSolarCloud Annual Report (Monthly load consumption, kWh)',
     years,
     current: {
       year: currentYear,

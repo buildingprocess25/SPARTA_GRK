@@ -373,6 +373,7 @@ export default function TabProductionTarget({ filters }) {
                       const row = payload[0]?.payload;
                       if (!row) return null;
                       return (
+                        // backdrop-blur-xs keeps this tooltip legible over chart gridlines behind it
                         <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-3 shadow-lg backdrop-blur-xs text-xs space-y-2 min-w-[210px]">
                           <div className="font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1 flex justify-between items-center">
                             <span>Bulan {row.month}</span>

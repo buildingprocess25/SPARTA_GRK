@@ -4,7 +4,7 @@ import React, { useState, useMemo, useRef, useEffect, lazy, Suspense } from 'rea
 import {
   Plus, Sun, Droplets, Fuel, Zap, ArrowRight,
   FileCheck2, ShieldCheck, TrendingDown, TrendingUp, CheckCircle2,
-  ExternalLink, Sparkles, AlertCircle, ChevronDown, ChevronUp,
+  ExternalLink, AlertCircle, ChevronDown, ChevronUp,
   Award, BarChart3, Activity, Scale, Percent, ArrowDownRight, Layers,
   Calculator, X, FileDown, RefreshCw
 } from 'lucide-react';
@@ -58,7 +58,7 @@ function CalculatorLoadingSkeleton() {
 }
 
 export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCalculator = false }) {
-  const { resumeKPI, scope1, scope2, pltsData, waterData, inputHistory } = useSustainability();
+  const { scope1, scope2, pltsData, waterData, inputHistory } = useSustainability();
   const [showDetailedMapping, setShowDetailedMapping] = useState(false);
   const [chartMetricView, setChartMetricView] = useState('net'); // 'net' | 'all' | 'penambahan' | 'pengurangan'
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(initialOpenCalculator);
@@ -66,6 +66,56 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
   const [isExportingSrnPpi, setIsExportingSrnPpi] = useState(false);
   const [isExportingOjk, setIsExportingOjk] = useState(false);
   const [exportError, setExportError] = useState(null);
+
+  // Real top-level KPIs (Net/Gross/Offset/Cost Saving), sourced from the same
+  // real APIs the report export and the Scope 1/2 bridge panels already use,
+  // not the mock seed data in SustainabilityContext - this card row is the
+  // first thing a reader sees, so it must never show invented numbers.
+  const [realKpiState, setRealKpiState] = useState({ loading: true, data: null, error: null });
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      fetchAnnualReportData(),
+      fetch('/api/plts/dashboard/summary').then((r) => r.json()),
+    ])
+      .then(([reportData, pltsSummaryRes]) => {
+        if (cancelled) return;
+        if (!pltsSummaryRes.success) throw new Error(pltsSummaryRes.error || 'Gagal memuat ringkasan PLTS');
+        const scope1Ton = reportData.scope1.genset.summary.totalEmissionTon + reportData.scope1.vehicle.summary.totalEmissionTon;
+        const scope2Ton = reportData.emissions.data.reduce((sum, d) => sum + (d.scope2EmissionTon || 0), 0);
+        const grossEmissionTon = scope1Ton + scope2Ton;
+        const pltsAvoidedTon = reportData.emissions.data.reduce((sum, d) => sum + (d.avoidedEmissionTon || 0), 0);
+        const waterAvoidedTon = reportData.water.summary.totalEmissionAvoidedTon;
+        const avoidedEmissionTon = pltsAvoidedTon + waterAvoidedTon;
+        const netEmissionTon = grossEmissionTon - avoidedEmissionTon;
+        const netReductionPct = grossEmissionTon > 0 ? `${((avoidedEmissionTon / grossEmissionTon) * 100).toFixed(1)}%` : '0%';
+        const scope1SharePct = grossEmissionTon > 0 ? ((scope1Ton / grossEmissionTon) * 100).toFixed(1) : '0';
+        const scope2SharePct = grossEmissionTon > 0 ? ((scope2Ton / grossEmissionTon) * 100).toFixed(1) : '0';
+        const pltsProdMwh = reportData.emissions.data.reduce((sum, d) => sum + (d.pltsProdMWh || 0), 0);
+        const pltsCostSavingJuta = (pltsSummaryRes.data?.summary?.costSavings?.totalIdr || 0) / 1_000_000;
+        const waterCostSavingJuta = reportData.water.summary.totalCostSavedJuta;
+        setRealKpiState({
+          loading: false,
+          error: null,
+          data: {
+            scope1Ton, scope2Ton, grossEmissionTon, pltsAvoidedTon, waterAvoidedTon, avoidedEmissionTon,
+            netEmissionTon, netReductionPct, scope1SharePct, scope2SharePct, pltsProdMwh,
+            waterVolumeM3: reportData.water.summary.totalVolumeM3,
+            totalCostSavingJuta: pltsCostSavingJuta + waterCostSavingJuta,
+          },
+        });
+      })
+      .catch((err) => {
+        if (!cancelled) setRealKpiState({ loading: false, data: null, error: err.message });
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  const resumeKPI = realKpiState.data || {
+    netEmissionTon: 0, grossEmissionTon: 0, avoidedEmissionTon: 0, netReductionPct: '0%', totalCostSavingJuta: 0,
+    scope1SharePct: '0', scope2SharePct: '0', pltsProdMwh: 0, waterVolumeM3: 0,
+  };
 
   const handleExportSrnPpi = async () => {
     setIsExportingSrnPpi(true);
@@ -195,16 +245,23 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       <MainScope1Bridge onNavigate={handleNav} />
 
       {/* scope2Bridge: canonical connection to Scope 2 and PLTS without double counting */}
-      <MainScope2Bridge scope1Ton={scope1.summary.totalEmissionCO2e} onNavigate={handleNav} />
+      <MainScope2Bridge scope1Ton={realKpiState.data?.scope1Ton ?? 0} onNavigate={handleNav} />
+
+      {realKpiState.error && (
+        <div className="flex items-center gap-2 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-4 py-3 text-xs font-semibold text-rose-800 dark:text-rose-300">
+          <AlertCircle size={16} className="shrink-0" />
+          <span>Gagal memuat ringkasan emisi: {realKpiState.error}</span>
+        </div>
+      )}
 
       {/* 2. Ringkasan Metrik (High Priority First Sight) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
         {/* Metric 1: Net Emission */}
         <KpiCard
           label="NET EMISSIONS (BERSIH)"
-          value={formatNum(resumeKPI.netEmissionTon, 1)}
+          value={realKpiState.loading ? '—' : formatNum(resumeKPI.netEmissionTon, 1)}
           unit="tCO₂e"
-          trend={`Terkoreksi ${resumeKPI.netReductionPct} oleh offset PLTS & Air`}
+          trend={realKpiState.loading ? 'Memuat...' : `Terkoreksi ${resumeKPI.netReductionPct} oleh offset PLTS & Air`}
           icon={Award}
           theme="emission"
         />
@@ -212,9 +269,9 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         {/* Metric 2: Gross Emission (Scope 1 + 2) */}
         <KpiCard
           label="EMISI KOTOR (SCOPE 1 & 2)"
-          value={formatNum(resumeKPI.grossEmissionTon, 1)}
+          value={realKpiState.loading ? '—' : formatNum(resumeKPI.grossEmissionTon, 1)}
           unit="tCO₂e"
-          trend="Listrik PLN (97.9%) & Solar Genset (2.1%)"
+          trend={realKpiState.loading ? 'Memuat...' : `Listrik PLN (${resumeKPI.scope2SharePct}%) & Solar Genset (${resumeKPI.scope1SharePct}%)`}
           icon={TrendingUp}
           theme="emission"
         />
@@ -222,9 +279,9 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         {/* Metric 3: Avoided Carbon (Offset) */}
         <KpiCard
           label="TOTAL OFFSET (PENGURANG)"
-          value={formatNum(resumeKPI.avoidedEmissionTon, 1)}
+          value={realKpiState.loading ? '—' : formatNum(resumeKPI.avoidedEmissionTon, 1)}
           unit="tCO₂e"
-          trend={`${formatNum(pltsData.summary.energyGeneratedYTD / 1000)} MWh PLTS + ${formatNum(waterData.summary.waterSavedYTD)} m³ Air`}
+          trend={realKpiState.loading ? 'Memuat...' : `${formatNum(resumeKPI.pltsProdMwh)} MWh PLTS + ${formatNum(resumeKPI.waterVolumeM3)} m³ Air`}
           icon={Sun}
           theme="savings"
         />
@@ -232,10 +289,10 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         {/* Metric 4: Cost Saving */}
         <KpiCard
           label="TOTAL PENGHEMATAN BIAYA"
-          value={`Rp ${formatNum(resumeKPI.totalCostSavingJuta, 1)}`}
+          value={realKpiState.loading ? '—' : `Rp ${formatNum(resumeKPI.totalCostSavingJuta, 1)}`}
           unit="Juta"
-          trend="Efisiensi tagihan listrik & pengolahan air"
-          icon={Sparkles}
+          trend={realKpiState.loading ? 'Memuat...' : 'Efisiensi tagihan listrik & pengolahan air'}
+          icon={Calculator}
           theme="savings"
         />
       </div>
@@ -286,7 +343,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 animate-in fade-in duration-300">
               <div className="mb-5 flex items-center justify-between rounded-xl bg-blue-50/70 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 px-4 py-2.5 text-xs text-blue-800 dark:text-blue-200">
                 <span className="font-semibold">
-                  Panel Simulasi Aktif — Seluruh entri dan perhitungan tersimpan otomatis secara lokal tanpa mengubah data master.
+                  Panel Simulasi Aktif: seluruh entri dan perhitungan tersimpan otomatis secara lokal tanpa mengubah data master.
                 </span>
                 <button
                   type="button"

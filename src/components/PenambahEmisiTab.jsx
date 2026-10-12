@@ -127,7 +127,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
     <div className="space-y-6 animate-in">
       {/* 1. Header Halaman */}
       <PageHeader
-        title={activeSubScope === 'scope1' ? 'Scope 1 — BBM' : 'Scope 2 — Listrik'}
+        title={activeSubScope === 'scope1' ? 'Scope 1: BBM' : 'Scope 2: Listrik'}
         subtitle={
           activeSubScope === 'scope1'
             ? 'Konsumsi BBM genset dan kendaraan operasional.'
@@ -473,7 +473,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
               {activeSubScope === 'scope1'
                 ? (scope1Category === 'genset' ? 'Tren Konsumsi & Emisi Genset Bulanan' : 'Tren Konsumsi & Emisi Kendaraan Bulanan')
-                : `Tren Konsumsi Listrik & Emisi 12 Bulan — ${selectedBranch === 'all' ? 'Seluruh Cabang' : currentBranchObj?.name || 'Cabang'} (${selectedFacility.toUpperCase()})`}
+                : `Tren Konsumsi Listrik & Emisi 12 Bulan: ${selectedBranch === 'all' ? 'Seluruh Cabang' : currentBranchObj?.name || 'Cabang'} (${selectedFacility.toUpperCase()})`}
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               {activeSubScope === 'scope1'

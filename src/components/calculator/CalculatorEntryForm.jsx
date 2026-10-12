@@ -23,7 +23,7 @@ const defaults = {
 };
 
 const fieldClass = 'mt-1 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-500/20';
-const option = item => ({ value: item.code, label: `${item.label} — ${item.value ?? 'perlu faktor'} ${item.unit}` });
+const option = item => ({ value: item.code, label: `${item.label} (${item.value ?? 'perlu faktor'} ${item.unit})` });
 
 function NumberField({ id, label, value, onChange, unit, min = '0', step = 'any', helper }) {
   return <label htmlFor={id} className="block text-sm font-semibold text-slate-700 dark:text-slate-300">{label}<span className="ml-1 text-rose-600 dark:text-rose-400" aria-hidden="true">*</span><div className="relative"><input id={id} type="number" min={min} step={step} required value={value ?? ''} onChange={event => onChange(event.target.value)} className={`${fieldClass} ${unit ? 'pr-24' : ''}`} />{unit && <span className="pointer-events-none absolute right-3 top-3 text-xs text-slate-500 dark:text-slate-400">{unit}</span>}</div>{helper && <span className="mt-1 block text-xs font-normal text-slate-500 dark:text-slate-400">{helper}</span>}</label>;
@@ -114,7 +114,7 @@ export default function CalculatorEntryForm({ categoryId, profile, initialEntry,
       const input = buildInput();
       const calculated = calculateEntry(input, EMISSION_FACTORS);
       const factorLabel = calculated.factorSnapshots?.map(item => item.label).join(' + ');
-      onSave({ input, calculated, label: `${category.title}${factorLabel ? ` — ${factorLabel}` : ''}` });
+      onSave({ input, calculated, label: `${category.title}${factorLabel ? ` (${factorLabel})` : ''}` });
       if (event.nativeEvent.submitter?.value === 'save-next') onSaveAndNext();
     } catch (caught) { setError(caught.message || 'Data belum valid'); }
   };
@@ -159,6 +159,7 @@ export default function CalculatorEntryForm({ categoryId, profile, initialEntry,
       {preview?.status === 'calculated' && <p className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 p-3 text-sm text-slate-700 dark:text-slate-300"><strong>Pratinjau:</strong> {category.kind === 'reduction' ? '− ' : '+ '}{formatEmission(preview.kgCo2e)}{categoryId === 'renewable' && <> · {formatNumber(preview.details.selfConsumedKwh)} kWh × ({formatNumber(preview.details.gridFactor)} − {formatNumber(preview.details.lifecycleFactor)})</>}</p>}
       {error && <p role="alert" className="flex items-center gap-2 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-3 text-sm font-semibold text-rose-700 dark:text-rose-300"><AlertCircle size={17} />{error}</p>}
       <button type="submit" value="add" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 px-5 py-2.5 text-sm font-bold text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">{initialEntry ? <Save size={17} /> : <Plus size={17} />}{initialEntry ? 'Simpan perubahan' : 'Tambah entri'}</button>
+      {/* Sticky nav bar over scrolling form content: blur keeps its buttons legible when content scrolls under it */}
       <div className="sticky bottom-3 z-10 -mx-2 mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-3 shadow-lg backdrop-blur">
         <button type="button" disabled={isFirst} onClick={onPrevious} className="min-h-11 rounded-xl border border-slate-200 dark:border-slate-700 px-4 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40">← Sebelumnya</button>
         <div className="flex flex-1 justify-end gap-2"><button type="button" onClick={onSkip} className="min-h-11 rounded-xl px-4 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">Lewati</button><button type="submit" value="save-next" className="min-h-11 rounded-xl bg-blue-600 px-5 text-sm font-bold text-white shadow-sm hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">{isLast ? 'Simpan & Lihat Rekapitulasi' : 'Simpan & Selanjutnya'} →</button></div>

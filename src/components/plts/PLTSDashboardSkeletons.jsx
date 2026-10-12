@@ -6,7 +6,7 @@ export function SummaryCardsSkeleton() {
       {[1, 2, 3, 4].map((i) => (
         <div
           key={i}
-          className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 p-5 shadow-xs backdrop-blur-md animate-pulse"
+          className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 p-5 shadow-xs animate-pulse"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="h-4 w-24 rounded-md bg-slate-200 dark:bg-slate-800" />

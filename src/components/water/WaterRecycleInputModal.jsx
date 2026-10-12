@@ -198,7 +198,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
                 }`}
               >
                 {filteredFacilities.map((fac) => (
-                  <option key={fac.id} value={fac.id}>[{fac.code || 'DC'}] {fac.name} — {fac.region}</option>
+                  <option key={fac.id} value={fac.id}>[{fac.code || 'DC'}] {fac.name} ({fac.region})</option>
                 ))}
               </select>
             </div>

@@ -415,7 +415,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
     <BaseModal
       open={isOpen}
       onClose={handleCloseRequest}
-      title="Input Data Scope 2 — Listrik PLN"
+      title="Input Data Scope 2: Listrik PLN"
       subtitle="Catat konsumsi energi listrik yang dibeli dari PLN per Distribution Center."
       icon={<Zap size={20} className="text-amber-600 dark:text-amber-400" />}
       badge="Listrik Purchased"
@@ -502,7 +502,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                   >
                     {filteredDcs.map((dc) => (
                       <option key={dc.psId || dc.dcId} value={String(dc.psId || dc.dcId)}>
-                        {dc.name} — Grid {dc.grid} ({dc.factor} tCO₂e/MWh)
+                        {dc.name}, Grid {dc.grid} ({dc.factor} tCO₂e/MWh)
                       </option>
                     ))}
                   </select>
