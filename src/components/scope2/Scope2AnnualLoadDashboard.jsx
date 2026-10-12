@@ -123,7 +123,7 @@ function Scope2ChartTooltip({ active, payload, label }) {
         <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 font-mono">
           <span className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-amber-500 shrink-0" />
-            <span className="text-slate-600 dark:text-slate-400 font-sans">Pakai Sendiri (PLTS):</span>
+            <span className="text-slate-600 dark:text-slate-400 font-sans">PLTS:</span>
           </span>
           <strong className="text-amber-700 dark:text-amber-400">{row?.selfMwh != null ? `${show(row.selfMwh)} MWh` : '—'}</strong>
         </div>
@@ -420,7 +420,7 @@ export default function Scope2AnnualLoadDashboard() {
             </h2>
             <MetricInfoIcon infoKey="scope2_waterfall" />
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Produksi PLTS yang dipakai sendiri mengurangi kebutuhan listrik dari PLN; listrik yang dibeli kemudian dikalikan faktor emisi resmi.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Produksi PLTS mengurangi kebutuhan listrik dari PLN; listrik yang dibeli kemudian dikalikan faktor emisi resmi.</p>
         </div>
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0 self-start sm:self-auto">
           Alur: (Beban − PLTS) × Faktor = Emisi
@@ -444,7 +444,7 @@ export default function Scope2AnnualLoadDashboard() {
           <ChartPillLegend
             items={[
               { label: 'Listrik PLN', color: CHART_PALETTE.pln },
-              { label: 'PLTS Pakai Sendiri', color: CHART_PALETTE.plts },
+              { label: 'PLTS', color: CHART_PALETTE.plts },
               { label: 'Emisi Scope 2', color: CHART_PALETTE.emission },
             ]}
           />
@@ -490,7 +490,7 @@ export default function Scope2AnnualLoadDashboard() {
                     <Cell key={`pln-cell-${idx}`} opacity={entry.periodStatus === 'partial' ? PARTIAL_OPACITY : 1} />
                   ))}
                 </Bar>
-                <Bar yAxisId="left" dataKey="selfMwh" stackId="plts" name="PLTS dipakai sendiri" fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} maxBarSize={18} animationDuration={800} animationEasing="ease-out">
+                <Bar yAxisId="left" dataKey="selfMwh" stackId="plts" name="PLTS" fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} maxBarSize={18} animationDuration={800} animationEasing="ease-out">
                   {monthly.map((entry, idx) => (
                     <Cell key={`plts-cell-${idx}`} opacity={entry.periodStatus === 'partial' ? PARTIAL_OPACITY : 1} />
                   ))}
@@ -511,7 +511,7 @@ export default function Scope2AnnualLoadDashboard() {
             </div>
             <div className="flex items-center gap-2">
               <span className="size-3 rounded bg-amber-500" />
-              <span>PLTS dipakai sendiri (MWh)</span>
+              <span>PLTS (MWh)</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="size-3 rounded bg-rose-600" />
@@ -525,7 +525,7 @@ export default function Scope2AnnualLoadDashboard() {
                 <tr>
                   <th className="p-3 text-left">Bulan</th>
                   <th className="p-3 text-right">Beban total</th>
-                  <th className="p-3 text-right">PLTS dipakai sendiri</th>
+                  <th className="p-3 text-right">PLTS</th>
                   <th className="p-3 text-right">Dibeli PLN</th>
                   <th className="p-3 text-right">Emisi (tCO₂e)</th>
                   <th className="p-3 text-right">Cakupan DC</th>

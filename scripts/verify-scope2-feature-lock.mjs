@@ -11,7 +11,7 @@ const files = {
 const checks = [
   ['legacy: empat KPI utama', 'baseline', (files.scope2.match(/<StatCard/g) || []).length >= 4],
   ['legacy: grafik bulanan tersedia lewat toggle', 'baseline', /showLegacyChart/.test(files.scope2) && /totalMwh/.test(files.scope2)],
-  ['tabel Bulan\/Total\/Median-P10-P90\/Cakupan', 'baseline', /Median/.test(files.scope2) && /P10–P90/.test(files.scope2) && /Cakupan/.test(files.scope2)],
+  ['tabel Bulan/Total/Median-P10-P90/Cakupan', 'baseline', /Median/.test(files.scope2) && /P10–P90/.test(files.scope2) && /Cakupan/.test(files.scope2)],
   ['legacy: panel sumber dan cara membaca angka', 'baseline', /Sumber dan cara membaca angka/.test(files.scope2)],
   ['filter query bersama', 'final', /Scope2Filters/.test(files.scope2)],
   ['waterfall beban ke emisi', 'final', /Scope2Waterfall/.test(files.scope2)],

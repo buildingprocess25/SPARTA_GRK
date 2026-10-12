@@ -27,7 +27,7 @@ test('all requested calculator views and home groups remain available', () => {
 });
 
 test('forms expose EBT, dashboard prefill, travel modes and inline methodology', () => {
-  for (const token of ['Jenis EBT', 'Lokasi dan jaringan listrik', 'Ambil dari data PLTS Atap', 'Ambil dari data DC', 'Energi dipakai sendiri', 'Energi diekspor ke grid', 'Taksi / ride-hailing', 'Biomassa/biogas bersifat biogenik']) assert.match(entryForm, new RegExp(token));
+  for (const token of ['Jenis EBT', 'Lokasi dan jaringan listrik', 'Ambil dari data PLTS Atap', 'Ambil dari data DC', 'Energi PLTS', 'Energi diekspor ke grid', 'Taksi / ride-hailing', 'Biomassa/biogas bersifat biogenik']) assert.match(entryForm, new RegExp(token));
   assert.match(entryForm, /calculateEntry/); assert.match(entryForm, /role="alert"/); assert.match(entryForm, /ownershipStart: profile\.periodStart/);
 });
 

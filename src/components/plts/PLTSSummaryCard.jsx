@@ -885,7 +885,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold block">
                   {dashboardData?.summary?.emission?.coalAvoidedTon ? `~${formatNum(dashboardData.summary.emission.coalAvoidedTon, 1, 1)} Ton Batubara (estimasi)` : 'Batubara Terhindar'}
                 </span>
-                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400" title="Estimasi SFC PLTU 0,40 kg batubara/kWh untuk energi pakai sendiri 37 plant resmi ESDM">
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400" title="Estimasi SFC PLTU 0,40 kg batubara/kWh untuk energi PLTS 37 plant resmi ESDM">
                   Ekuivalen 0,40 kg batubara / kWh (37 plant resmi)
                 </div>
               </div>
@@ -903,7 +903,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             subtitle={
               <div className="space-y-1">
                 <span>Setara {formatNum(kpi.treeEquivalent, 0, 0)} pohon</span>
-                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400" title="Energi PLTS yang dipakai sendiri dikali faktor emisi tunggal dashboard">
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400" title="Energi PLTS dikali faktor emisi tunggal dashboard">
                   Faktor emisi: {PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh
                 </div>
               </div>

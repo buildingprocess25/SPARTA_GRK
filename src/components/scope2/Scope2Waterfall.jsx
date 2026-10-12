@@ -40,7 +40,7 @@ export default function Scope2Waterfall({ summary }) {
       role: 'Reduksi Mandiri',
       value: number.format(pltsKwh / 1_000),
       unit: 'MWh',
-      note: 'Produksi PLTS dipakai sendiri',
+      note: 'Produksi PLTS',
       icon: Sun,
       iconColor: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10',
       operator: '=',

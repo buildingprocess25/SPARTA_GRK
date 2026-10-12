@@ -122,8 +122,8 @@ export default function PltsScope2Reconciliation({ defaultOpen = false, classNam
               <span className="text-[10px] text-emerald-400 font-mono">STATUS: LOLOS VALIDASI</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 text-slate-300 font-mono text-[11px]">
-              <div>• Produksi PLTS: <strong>{formatNum(ytdProdMwh, 2)} MWh</strong> = Pakai Sendiri ({formatNum(ytdSelfMwh, 2)}) + Ekspor ({formatNum(ytdFeedInMwh, 2)})</div>
-              <div>• Beban Total: <strong>{formatNum(ytdLoadMwh, 2)} MWh</strong> = Dibeli PLN ({formatNum(ytdPurchasedMwh, 2)}) + Pakai Sendiri ({formatNum(ytdSelfMwh, 2)})</div>
+              <div>• Produksi PLTS: <strong>{formatNum(ytdProdMwh, 2)} MWh</strong> = PLTS ({formatNum(ytdSelfMwh, 2)}) + Ekspor ({formatNum(ytdFeedInMwh, 2)})</div>
+              <div>• Beban Total: <strong>{formatNum(ytdLoadMwh, 2)} MWh</strong> = Dibeli PLN ({formatNum(ytdPurchasedMwh, 2)}) + PLTS ({formatNum(ytdSelfMwh, 2)})</div>
               <div>• Emisi Terhindar PLTS (35 DC resmi): <strong className="text-emerald-400">3.591,95 tCO₂e</strong> (KPI = Tooltip Chart = Tabel)</div>
               <div>• Emisi Scope 2 YTD (35 DC resmi): <strong className="text-rose-400">10.257,90 tCO₂e</strong> (Intensitas: 0,82 tCO₂e/MWh)</div>
             </div>
@@ -133,7 +133,7 @@ export default function PltsScope2Reconciliation({ defaultOpen = false, classNam
           <div className="flex items-start gap-2 text-slate-500 dark:text-slate-400 text-[11px] bg-slate-50/80 dark:bg-slate-800/40 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700">
             <Info size={14} className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5" />
             <p>
-              <strong>Aturan Emisi Defensif:</strong> Emisi terhindar PLTS dihitung murni dari energi yang <em>dipakai sendiri</em> (ekspor 92,18 MWh tidak mengurangi emisi Scope 2 perusahaan). Bulan Oktober berstatus data berjalan (parsial) dan tidak dimasukkan ke dalam Total YTD.
+              <strong>Aturan Emisi Defensif:</strong> Emisi terhindar PLTS dihitung murni dari energi <em>PLTS</em> (ekspor 92,18 MWh tidak mengurangi emisi Scope 2 perusahaan). Bulan Oktober berstatus data berjalan (parsial) dan tidak dimasukkan ke dalam Total YTD.
             </p>
           </div>
         </div>

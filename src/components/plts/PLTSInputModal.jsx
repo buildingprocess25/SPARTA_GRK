@@ -52,10 +52,10 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
     const exported = Number(exportKwh);
     if (!selectedPlant) next.dc = 'Pilih plant PLTS.';
     if (!(production > 0)) next.production = 'Produksi harus lebih dari 0 kWh.';
-    if (!(selfUse >= 0)) next.selfUse = 'Pemakaian sendiri tidak boleh negatif.';
+    if (!(selfUse >= 0)) next.selfUse = 'Konsumsi PLTS tidak boleh negatif.';
     if (!(exported >= 0)) next.export = 'Ekspor tidak boleh negatif.';
     if (production > 0 && Math.abs(production - selfUse - exported) > 0.01) {
-      next.balance = 'Produksi harus sama dengan pemakaian sendiri + ekspor.';
+      next.balance = 'Produksi harus sama dengan PLTS + ekspor.';
     }
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -157,7 +157,7 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
             <input type="number" min="0" step="any" value={productionKwh} onChange={(event) => setProductionKwh(event.target.value)} className={inputClass} />
             {errors.production && <span className="mt-1 block text-[11px] text-rose-600 dark:text-rose-400">{errors.production}</span>}
           </label>
-          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Pakai sendiri (kWh) <span className="text-rose-500 dark:text-rose-400">*</span>
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">PLTS (kWh) <span className="text-rose-500 dark:text-rose-400">*</span>
             <input type="number" min="0" step="any" value={selfConsumptionKwh} onChange={(event) => setSelfConsumptionKwh(event.target.value)} className={inputClass} />
             {errors.selfUse && <span className="mt-1 block text-[11px] text-rose-600 dark:text-rose-400">{errors.selfUse}</span>}
           </label>
