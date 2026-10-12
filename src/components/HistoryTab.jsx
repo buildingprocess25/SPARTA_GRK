@@ -51,7 +51,7 @@ export default function HistoryTab({ setActiveTab }) {
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-5 lg:p-6 space-y-4">
         {inputHistory.length === 0 ? (
           <div className="py-16 text-center space-y-3">
-            <div className="size-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center mx-auto shadow-inner">
+            <div className="size-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center mx-auto shadow-inner">
               <History size={28} />
             </div>
             <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
@@ -97,7 +97,7 @@ export default function HistoryTab({ setActiveTab }) {
                       <td className="px-4 py-3 text-center whitespace-nowrap">
                         <button
                           type="button"
-                          className="p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+                          className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
                           onClick={() => handleDelete(item)}
                           title="Hapus log ini"
                         >
@@ -125,7 +125,7 @@ export default function HistoryTab({ setActiveTab }) {
                     </span>
                     <button
                       type="button"
-                      className="p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+                      className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
                       onClick={() => handleDelete(item)}
                       title="Hapus"
                     >

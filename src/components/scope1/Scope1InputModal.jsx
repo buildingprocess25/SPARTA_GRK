@@ -440,7 +440,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
               }`}
             >
-              <Fuel size={14} className={activeTab === 'manual' ? 'text-rose-500 dark:text-rose-400' : 'text-slate-400 dark:text-slate-500'} />
+              <Fuel size={14} className={activeTab === 'manual' ? 'text-rose-500 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'} />
               <span>Input Manual</span>
             </button>
 
@@ -453,7 +453,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
               }`}
             >
-              <FileSpreadsheet size={14} className={activeTab === 'excel' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} />
+              <FileSpreadsheet size={14} className={activeTab === 'excel' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'} />
               <span>Upload Excel (.xlsx / .csv)</span>
             </button>
           </div>
@@ -494,7 +494,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                   >
-                    <Fuel size={16} className={category === 'GENSET' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-slate-500'} />
+                    <Fuel size={16} className={category === 'GENSET' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'} />
                     <div>
                       <div className="font-bold text-xs text-slate-900 dark:text-slate-100">Genset</div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400">Genset cadangan Toko & DC</div>
@@ -509,7 +509,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                   >
-                    <Car size={16} className={category === 'VEHICLE' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-slate-500'} />
+                    <Car size={16} className={category === 'VEHICLE' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'} />
                     <div>
                       <div className="font-bold text-xs text-slate-900 dark:text-slate-100">Kendaraan</div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400">BBM kendaraan operasional</div>
@@ -535,7 +535,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                     value={facilitySearch}
                     onChange={(e) => setFacilitySearch(e.target.value)}
                     placeholder="Cari DC/kode..."
-                    className="sm:col-span-1 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-rose-500"
+                    className="sm:col-span-1 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                   />
                   <select
                     id="modal-dc-select"
@@ -548,7 +548,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                         setGensetAssetCode(`GEN-${fac.code || 'DC'}-01`);
                       }
                     }}
-                    className={`sm:col-span-2 rounded-xl border bg-white dark:bg-slate-900 px-3 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-rose-500 ${
+                    className={`sm:col-span-2 rounded-xl border bg-white dark:bg-slate-900 px-3 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 ${
                       formErrors.facility ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700'
                     }`}
                   >
@@ -575,7 +575,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                       id="modal-month-select"
                       value={periodMonth}
                       onChange={(e) => handlePeriodChange(e.target.value, periodYear)}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-rose-500"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                     >
                       <option value="01">01 - Januari</option>
                       <option value="02">02 - Februari</option>
@@ -600,7 +600,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                       id="modal-year-select"
                       value={periodYear}
                       onChange={(e) => handlePeriodChange(periodMonth, e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-rose-500"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                     >
                       <option value="2026">2026</option>
                       <option value="2025">2025</option>
@@ -617,7 +617,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                       type="date"
                       value={activityDate}
                       onChange={(e) => setActivityDate(e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-rose-500"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                     />
                     {formErrors.date && <p className="mt-1 text-[10px] font-semibold text-rose-600 dark:text-rose-400">{formErrors.date}</p>}
                   </div>
@@ -739,11 +739,11 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                         value={fuelLiters}
                         onChange={(e) => setFuelLiters(e.target.value)}
                         placeholder={`Jumlah liter ${fuelType === 'SOLAR' ? 'Solar' : fuelType === 'PERTALITE' ? 'Pertalite' : 'Pertamax'} (contoh: 1850)`}
-                        className={`w-full rounded-xl border px-3.5 py-2.5 pr-14 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-rose-500 ${
+                        className={`w-full rounded-xl border px-3.5 py-2.5 pr-14 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 ${
                           formErrors.liters ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700 dark:bg-slate-900'
                         }`}
                       />
-                      <span className="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400 dark:text-slate-500">
+                      <span className="absolute right-3.5 top-2.5 text-xs font-bold text-slate-500 dark:text-slate-400">
                         Liter
                       </span>
                     </div>
@@ -764,7 +764,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                         value={costRupiah}
                         onChange={(e) => setCostRupiah(e.target.value)}
                         placeholder="Contoh: 27750000"
-                        className={`w-full rounded-xl border px-3 py-2 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-rose-500 ${
+                        className={`w-full rounded-xl border px-3 py-2 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 ${
                           formErrors.cost ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700 dark:bg-slate-900'
                         }`}
                       />
@@ -783,7 +783,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                         value={pricePerLiter}
                         onChange={(e) => setPricePerLiter(e.target.value)}
                         placeholder="Contoh: 15000"
-                        className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-rose-500"
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                       />
                     </div>
                   </div>
@@ -794,7 +794,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
               {category === 'VEHICLE' ? (
                 <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 space-y-2.5">
                   <span className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                    <Car size={14} className="text-slate-400 dark:text-slate-500" />
+                    <Car size={14} className="text-slate-500 dark:text-slate-400" />
                     <span>Detail Kendaraan</span>
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -839,7 +839,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                     className="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-colors"
                   >
                     <span className="flex items-center gap-2">
-                      <Settings2 size={14} className="text-slate-400 dark:text-slate-500" />
+                      <Settings2 size={14} className="text-slate-500 dark:text-slate-400" />
                       <span>Detail Teknis Mesin Genset (Opsional)</span>
                     </span>
                     <span className="text-slate-500 dark:text-slate-400 text-[11px] flex items-center gap-1 font-semibold">
@@ -905,7 +905,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                   value={proofRef}
                   onChange={(e) => setProofRef(e.target.value)}
                   placeholder={`Contoh: INV-SOLAR-${selectedDC.code || 'DC'}-${periodMonth}26-001`}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:border-rose-500"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                 />
               </div>
 

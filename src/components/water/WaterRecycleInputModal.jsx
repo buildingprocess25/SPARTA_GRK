@@ -187,13 +187,13 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
                 value={facilitySearch}
                 onChange={(e) => setFacilitySearch(e.target.value)}
                 placeholder="Cari DC/kode..."
-                className="sm:col-span-1 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
+                className="sm:col-span-1 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
               />
               <select
                 id="wr-dc-select"
                 value={selectedFacilityId}
                 onChange={(e) => setSelectedFacilityId(e.target.value)}
-                className={`sm:col-span-2 rounded-xl border bg-white dark:bg-slate-900 px-3 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-cyan-500 ${
+                className={`sm:col-span-2 rounded-xl border bg-white dark:bg-slate-900 px-3 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 ${
                   formErrors.facility ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700'
                 }`}
               >
@@ -218,7 +218,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
                   id="wr-month-select"
                   value={periodMonth}
                   onChange={(e) => handlePeriodChange(e.target.value, periodYear)}
-                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                 >
                   <option value="01">01 - Januari</option>
                   <option value="02">02 - Februari</option>
@@ -242,7 +242,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
                   id="wr-year-select"
                   value={periodYear}
                   onChange={(e) => handlePeriodChange(periodMonth, e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                 >
                   <option value="2026">2026</option>
                   <option value="2025">2025</option>
@@ -258,7 +258,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
                   type="date"
                   value={activityDate}
                   onChange={(e) => setActivityDate(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                 />
               </div>
             </div>
@@ -281,7 +281,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
                   value={meterStart}
                   onChange={(e) => setMeterStart(e.target.value)}
                   placeholder="Contoh: 2017.8"
-                  className={`w-full rounded-xl border px-3 py-2 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-cyan-500 ${
+                  className={`w-full rounded-xl border px-3 py-2 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 ${
                     formErrors.meterStart ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700 dark:bg-slate-900'
                   }`}
                 />
@@ -298,7 +298,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
                   value={meterEnd}
                   onChange={(e) => setMeterEnd(e.target.value)}
                   placeholder="Contoh: 2019.15"
-                  className={`w-full rounded-xl border px-3 py-2 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-cyan-500 ${
+                  className={`w-full rounded-xl border px-3 py-2 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 ${
                     formErrors.meterEnd ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700 dark:bg-slate-900'
                   }`}
                 />
@@ -319,7 +319,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
               value={pdamRate}
               onChange={(e) => setPdamRate(e.target.value)}
               placeholder="8000"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-cyan-500"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
             />
           </div>
 
@@ -334,7 +334,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
               value={proofRef}
               onChange={(e) => setProofRef(e.target.value)}
               placeholder={`Contoh: WR-${selectedDC?.code || 'DC'}-${periodMonth}26-001`}
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
             />
           </div>
 

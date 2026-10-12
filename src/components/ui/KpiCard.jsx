@@ -84,7 +84,7 @@ export default function KpiCard({
             {label}
           </span>
           {sourceBadge && (
-            <span className="inline-block mt-0.5 text-[10px] font-mono font-medium text-slate-400 dark:text-slate-500">
+            <span className="inline-block mt-0.5 text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400">
               {sourceBadge}
             </span>
           )}
@@ -113,7 +113,7 @@ export default function KpiCard({
             {value != null ? value : '—'}
           </span>
           {unit && (
-            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 ml-1.5 shrink-0">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1.5 shrink-0">
               {unit}
             </span>
           )}
@@ -122,7 +122,7 @@ export default function KpiCard({
 
       {/* Bottom Row: Description / Footnote - intentionally quieter than the number above */}
       {descriptionContent && (
-        <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-medium text-slate-400 dark:text-slate-500 leading-snug">
+        <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-snug">
           {descriptionContent}
         </div>
       )}

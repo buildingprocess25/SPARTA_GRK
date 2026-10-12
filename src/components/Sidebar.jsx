@@ -147,7 +147,7 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setIsMo
         <nav className="space-y-6 my-4 flex-1 overflow-y-auto pr-1">
           {navItems.map((section, idx) => (
             <div key={idx}>
-              <div className="text-xs uppercase tracking-wider font-semibold text-slate-400 dark:text-slate-500 px-3 mb-2">
+              <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 dark:text-slate-400 px-3 mb-2">
                 {section.group}
               </div>
               <div className="space-y-1">
@@ -175,7 +175,7 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setIsMo
                         {item.subItems && (
                           <ChevronDown
                             size={16}
-                            className={`text-slate-400 dark:text-slate-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                            className={`text-slate-500 dark:text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
                           />
                         )}
                       </button>

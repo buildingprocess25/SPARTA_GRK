@@ -164,7 +164,7 @@ export default function Scope2Waterfall({ summary }) {
                 </span>
                 <span
                   className={`ml-1.5 text-xs font-semibold ${
-                    step.isResult ? 'text-rose-600/90 dark:text-rose-400/90 font-bold' : 'text-slate-400 dark:text-slate-500'
+                    step.isResult ? 'text-rose-600/90 dark:text-rose-400/90 font-bold' : 'text-slate-500 dark:text-slate-400'
                   }`}
                 >
                   {step.unit}

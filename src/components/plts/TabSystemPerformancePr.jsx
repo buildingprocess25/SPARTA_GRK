@@ -158,7 +158,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
               setSelectedScope(e.target.value);
               setSelectedTargetId('ALL');
             }}
-            className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:border-blue-500 shadow-2xs"
+            className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
           >
             <option value="national">Nasional (39 Plant Terbobot)</option>
             <option value="grid">Per Wilayah Grid</option>
@@ -170,7 +170,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
             <select
               value={selectedTargetId}
               onChange={(e) => setSelectedTargetId(e.target.value)}
-              className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:border-blue-500 shadow-2xs"
+              className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
             >
               <option value="ALL">Semua Grid</option>
               {(apiData?.meta?.availableGrids || []).map(g => (
@@ -183,7 +183,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
             <select
               value={selectedTargetId}
               onChange={(e) => setSelectedTargetId(e.target.value)}
-              className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:border-blue-500 shadow-2xs max-w-[200px]"
+              className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-2xs max-w-[200px]"
             >
               <option value="ALL">Semua DC</option>
               {(apiData?.meta?.availableDcs || []).map(d => (
@@ -196,7 +196,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
           <select
             value={selectedParamId}
             onChange={(e) => setSelectedParamId(e.target.value)}
-            className="text-xs font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl px-3 py-1.5 focus:outline-none focus:border-red-500 shadow-2xs"
+            className="text-xs font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-2xs"
           >
             {PARAM_OPTIONS.map(opt => (
               <option key={opt.id} value={opt.id}>
@@ -214,7 +214,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
             <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">PR Aktual (Terbobot)</span>
             <div className="flex items-baseline gap-1 mt-1">
               <span className="text-xl font-black text-blue-700 dark:text-blue-300 font-mono">{summaryMetrics.avgPr}%</span>
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">perkiraan</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">perkiraan</span>
             </div>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
               Rata-rata Jan-Sep ({summaryMetrics.avgPlants}/{summaryMetrics.totalPlants} plant dihitung)
@@ -341,7 +341,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
                         <span>Cakupan Plant:</span>
                         <span>{item.includedPlantCount} dari {item.totalPlantCount} plant</span>
                       </div>
-                      <div className="text-[10px] text-slate-400 dark:text-slate-500">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400">
                         Sumber Radiasi: {item.sensorPlantsCount > 0 ? 'Sensor iSolar + Open-Meteo' : 'Estimasi Open-Meteo GHI'}
                       </div>
                     </div>

@@ -144,11 +144,11 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
       <details className="group border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 shadow-sm [&_summary::-webkit-details-marker]:hidden">
         <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-4 text-slate-900 dark:text-slate-100">
           <div className="flex items-center gap-2">
-            <Calculator size={18} className="text-slate-400 dark:text-slate-500 group-open:text-blue-600 dark:group-open:text-blue-400 transition-colors" />
+            <Calculator size={18} className="text-slate-500 dark:text-slate-400 group-open:text-blue-600 dark:group-open:text-blue-400 transition-colors" />
             <span className="font-semibold text-sm">Metode & sumber data</span>
           </div>
           <span className="relative size-5 shrink-0">
-            <svg className="absolute inset-0 size-5 opacity-100 transition-opacity group-open:opacity-0 text-slate-400 dark:text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+            <svg className="absolute inset-0 size-5 opacity-100 transition-opacity group-open:opacity-0 text-slate-500 dark:text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
             <svg className="absolute inset-0 size-5 opacity-0 transition-opacity group-open:opacity-100 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -204,12 +204,12 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
 
             {/* Periode Selector */}
             <div className="flex items-center gap-2 shrink-0">
-              <Calendar size={15} className="text-slate-400 dark:text-slate-500 hidden sm:block" />
+              <Calendar size={15} className="text-slate-500 dark:text-slate-400 hidden sm:block" />
               <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Periode:</span>
               <select
                 value={selectedPeriod}
                 onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:border-blue-500"
+                className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="ytd">YTD (Januari - Agustus 2026)</option>
                 {MONTH_NAMES_FULL.map((m, idx) => (
@@ -229,7 +229,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
               <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value)}
-                className="w-full text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:border-blue-500"
+                className="w-full text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">Semua Cabang (Konsolidasi Nasional)</option>
                 {branchHierarchyList.map(b => (
@@ -631,7 +631,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
               <select
                 value={scope1Period || scope1Api?.period || ''}
                 onChange={(e) => setScope1Period(e.target.value)}
-                className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:border-blue-500"
+                className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 {scope1PeriodOptions.length === 0 && scope1Api?.period && (
                   <option value={scope1Api.period}>Periode berjalan</option>
@@ -641,7 +641,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 ))}
               </select>
               <label className="relative shrink-0">
-                <Search className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500" size={14} />
+                <Search className="absolute left-3 top-2.5 text-slate-500 dark:text-slate-400" size={14} />
                 <input
                   value={scope1Search}
                   onChange={(event) => setScope1Search(event.target.value)}
@@ -680,7 +680,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                   </tr>
                 ) : scope1Loading ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
+                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                       <div className="flex items-center justify-center gap-2">
                         <RefreshCw size={16} className="animate-spin text-blue-500" />
                         <span>Memuat data Scope 1...</span>

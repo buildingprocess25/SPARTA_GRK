@@ -91,22 +91,22 @@ export default function PltsScope2Reconciliation({ defaultOpen = false, classNam
           {/* Metadata Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/40 p-3 shadow-2xs">
-              <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 block tracking-wider">Cakupan Entitas</span>
+              <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block tracking-wider">Cakupan Entitas</span>
               <p className="mt-1 font-bold text-slate-800 dark:text-slate-200 text-sm">37 Distribution Center</p>
               <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">2 pilot Toko Drive Thru disembunyikan</span>
             </div>
             <div className="rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/40 p-3 shadow-2xs">
-              <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 block tracking-wider">Jumlah Observasi</span>
+              <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block tracking-wider">Jumlah Observasi</span>
               <p className="mt-1 font-bold text-slate-800 dark:text-slate-200 text-sm">333 DC-Bulan Lengkap</p>
               <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">Jan–Sep 2026 + 37 bulan parsial Okt</span>
             </div>
             <div className="rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/40 p-3 shadow-2xs">
-              <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 block tracking-wider">Faktor Emisi Grid</span>
+              <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block tracking-wider">Faktor Emisi Grid</span>
               <p className="mt-1 font-bold text-slate-800 dark:text-slate-200 text-sm">Regional ESDM (7 Resmi)</p>
               <span className="text-[10px] text-amber-700 dark:text-amber-400 block mt-0.5">1 Grid Sementara: Sulutgo (2 DC)</span>
             </div>
             <div className="rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/40 p-3 shadow-2xs">
-              <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 block tracking-wider">Waktu Pembaruan</span>
+              <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block tracking-wider">Waktu Pembaruan</span>
               <p className="mt-1 font-bold text-slate-800 dark:text-slate-200 text-sm">{data.current?.partialDataThroughDate || '2026-10-02'}</p>
               <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">Sync otomatis via energy-data layer</span>
             </div>
@@ -131,7 +131,7 @@ export default function PltsScope2Reconciliation({ defaultOpen = false, classNam
 
           {/* Summary Notes */}
           <div className="flex items-start gap-2 text-slate-500 dark:text-slate-400 text-[11px] bg-slate-50/80 dark:bg-slate-800/40 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700">
-            <Info size={14} className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5" />
+            <Info size={14} className="text-slate-500 dark:text-slate-400 shrink-0 mt-0.5" />
             <p>
               <strong>Aturan Emisi Defensif:</strong> Emisi terhindar PLTS dihitung murni dari energi <em>PLTS</em> (ekspor 92,18 MWh tidak mengurangi emisi Scope 2 perusahaan). Bulan Oktober berstatus data berjalan (parsial) dan tidak dimasukkan ke dalam Total YTD.
             </p>

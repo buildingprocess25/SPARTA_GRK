@@ -286,7 +286,7 @@ export default function TabProductionTarget({ filters }) {
                       </td>
                       <td className="p-2.5 text-right font-mono text-purple-700 dark:text-purple-300">
                         {row.targetKwh != null ? formatNum(row.targetKwh, 0, 0) : (
-                          <span className="text-slate-400 dark:text-slate-500 font-sans text-[10px]">Belum ada target</span>
+                          <span className="text-slate-500 dark:text-slate-400 font-sans text-[10px]">Belum ada target</span>
                         )}
                       </td>
                       <td className="p-2.5 text-right font-mono">
@@ -301,7 +301,7 @@ export default function TabProductionTarget({ filters }) {
                             {formatNum(row.achievementPct, 1, 1)}%
                           </span>
                         ) : (
-                          <span className="text-slate-400 dark:text-slate-500 font-sans text-[10px]">Belum ada target</span>
+                          <span className="text-slate-500 dark:text-slate-400 font-sans text-[10px]">Belum ada target</span>
                         )}
                       </td>
                     </tr>
@@ -377,7 +377,7 @@ export default function TabProductionTarget({ filters }) {
                         <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-3 shadow-lg backdrop-blur-xs text-xs space-y-2 min-w-[210px]">
                           <div className="font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1 flex justify-between items-center">
                             <span>Bulan {row.month}</span>
-                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">{isLikeForLike ? 'Like-for-like' : 'Semua plant'}</span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">{isLikeForLike ? 'Like-for-like' : 'Semua plant'}</span>
                           </div>
                           <div className="space-y-1.5">
                             <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
@@ -469,13 +469,13 @@ export default function TabProductionTarget({ filters }) {
                     <tr key={row.yearMonth} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="p-2.5 font-bold text-slate-800 dark:text-slate-200">{row.month}</td>
                       <td className="p-2.5 text-right font-mono text-blue-700 dark:text-blue-300 font-medium">
-                        {row.val2025 != null ? formatNum(row.val2025, unitDecimals, unitDecimals) : <span className="text-slate-400 dark:text-slate-500 font-sans">—</span>}
+                        {row.val2025 != null ? formatNum(row.val2025, unitDecimals, unitDecimals) : <span className="text-slate-500 dark:text-slate-400 font-sans">—</span>}
                       </td>
                       <td className="p-2.5 text-center font-mono text-slate-500 dark:text-slate-400 text-[10px]">
                         {row.plantCount2025 > 0 ? `${row.plantCount2025} plant` : '—'}
                       </td>
                       <td className="p-2.5 text-right font-mono text-amber-700 dark:text-amber-300 font-bold">
-                        {row.val2026 != null ? formatNum(row.val2026, unitDecimals, unitDecimals) : <span className="text-slate-400 dark:text-slate-500 font-sans">—</span>}
+                        {row.val2026 != null ? formatNum(row.val2026, unitDecimals, unitDecimals) : <span className="text-slate-500 dark:text-slate-400 font-sans">—</span>}
                       </td>
                       <td className="p-2.5 text-center font-mono text-slate-500 dark:text-slate-400 text-[10px]">
                         {row.plantCount2026 > 0 ? `${row.plantCount2026} plant` : '—'}

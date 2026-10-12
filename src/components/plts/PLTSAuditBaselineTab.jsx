@@ -29,7 +29,7 @@ export default function PLTSAuditBaselineTab() {
           </div>
         </div>
         <label className="relative">
-          <Search className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500" size={15} />
+          <Search className="absolute left-3 top-2.5 text-slate-500 dark:text-slate-400" size={15} />
           <input value={search} onChange={(event) => setSearch(event.target.value)} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-2 pl-9 pr-3 text-xs" placeholder="Cari plant" />
         </label>
       </div>

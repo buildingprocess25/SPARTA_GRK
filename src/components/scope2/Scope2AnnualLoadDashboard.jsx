@@ -112,7 +112,7 @@ function Scope2ChartTooltip({ active, payload, label }) {
       </div>
 
       <div className="space-y-1">
-        <div className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Energi Listrik (MWh)</div>
+        <div className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Energi Listrik (MWh)</div>
         <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 font-mono">
           <span className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-slate-400 shrink-0" />
@@ -366,7 +366,7 @@ export default function Scope2AnnualLoadDashboard() {
           <Activity size={14} className="text-blue-600 dark:text-blue-400" />
           Indikator Kinerja Utama (KPI) Scope 2
         </h2>
-        <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Ringkasan Eksekutif YTD</span>
+        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Ringkasan Eksekutif YTD</span>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 relative z-20 has-[[data-popover-open='true']]:z-40">
         <KpiCard

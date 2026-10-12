@@ -100,7 +100,7 @@ export default function AlarmDialog() {
                 <button
                   type="button"
                   onClick={disableNotificationPermission}
-                  className="text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 underline decoration-dotted"
+                  className="text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 underline decoration-dotted"
                   title="Matikan push notification di perangkat ini"
                 >
                   Matikan
@@ -108,12 +108,12 @@ export default function AlarmDialog() {
               </>
             ) : notificationPermission === 'disabled' ? (
               <span className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
-                <Bell size={13} className="text-slate-400 dark:text-slate-500 shrink-0" />
+                <Bell size={13} className="text-slate-500 dark:text-slate-400 shrink-0" />
                 <span>Notifikasi browser dinonaktifkan pada build</span>
               </span>
             ) : notificationPermission === 'denied' ? (
               <span className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
-                <Bell size={13} className="text-slate-400 dark:text-slate-500 shrink-0" />
+                <Bell size={13} className="text-slate-500 dark:text-slate-400 shrink-0" />
                 <span>Notifikasi browser diblokir di setelan</span>
               </span>
             ) : (
@@ -132,7 +132,7 @@ export default function AlarmDialog() {
               className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold px-2 py-1 rounded-lg transition"
               title="Kirim notifikasi uji coba"
             >
-              <Bell size={12} className="text-slate-400 dark:text-slate-500" />
+              <Bell size={12} className="text-slate-500 dark:text-slate-400" />
               <span>Tes Notifikasi</span>
             </button>
             <span className="text-slate-500 dark:text-slate-400 hidden sm:inline">
@@ -262,7 +262,7 @@ export default function AlarmDialog() {
                         )}
 
                         <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                          <MapPin size={12} className="text-slate-400 dark:text-slate-500 shrink-0" />
+                          <MapPin size={12} className="text-slate-500 dark:text-slate-400 shrink-0" />
                           <span>{alarm.dcName}</span>
                         </span>
 
@@ -271,7 +271,7 @@ export default function AlarmDialog() {
                             Baru
                           </span>
                         ) : (
-                          <span className="text-slate-400 dark:text-slate-500 text-[10px]">Sudah dibaca</span>
+                          <span className="text-slate-500 dark:text-slate-400 text-[10px]">Sudah dibaca</span>
                         )}
                       </div>
 
@@ -285,7 +285,7 @@ export default function AlarmDialog() {
 
                       <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 pt-0.5">
                         <span className="inline-flex items-center gap-1">
-                          <Clock size={12} className="text-slate-400 dark:text-slate-500 shrink-0" />
+                          <Clock size={12} className="text-slate-500 dark:text-slate-400 shrink-0" />
                           <span>{formatWibDate(alarm.occurredAt)}</span>
                         </span>
                         <span className="text-slate-300 dark:text-slate-600">•</span>

@@ -696,7 +696,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             <select
               value={data?.history?.activePeriod?.value || period}
               onChange={(e) => handlePeriodChange(e.target.value)}
-              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
+              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
             >
               {(data?.history?.periodOptions || []).map(p => (
                 <option key={p.value} value={p.value}>{p.label}</option>
@@ -762,7 +762,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                   <option key={g.value} value={g.value}>{g.label}</option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" size={14} />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none" size={14} />
             </div>
           </div>
 
@@ -785,7 +785,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" size={14} />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none" size={14} />
             </div>
           </div>
 
@@ -926,21 +926,21 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 </span>
                 <span className="text-slate-300">·</span>
                 <span
-                  className={`font-mono ${statusBreakdown.faultCount > 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-400 dark:text-slate-500'} cursor-help`}
+                  className={`font-mono ${statusBreakdown.faultCount > 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'} cursor-help`}
                   title={`Fault (${statusBreakdown.faultNames.length} lokasi):\n${statusBreakdown.faultNames.join(', ') || 'Tidak ada'}`}
                 >
                   {statusBreakdown.faultCount} Fault
                 </span>
                 <span className="text-slate-300">·</span>
                 <span
-                  className={`font-mono ${statusBreakdown.alarmCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'} cursor-help`}
+                  className={`font-mono ${statusBreakdown.alarmCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400'} cursor-help`}
                   title={`Alarm (${statusBreakdown.alarmNames.length} lokasi):\n${statusBreakdown.alarmNames.join(', ') || 'Tidak ada'}`}
                 >
                   {statusBreakdown.alarmCount} Alarm
                 </span>
                 <span className="text-slate-300">·</span>
                 <span
-                  className={`font-mono ${statusBreakdown.offlineCount > 0 ? 'text-slate-700 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500'} cursor-help`}
+                  className={`font-mono ${statusBreakdown.offlineCount > 0 ? 'text-slate-700 dark:text-slate-300' : 'text-slate-500 dark:text-slate-400'} cursor-help`}
                   title={`Offline (${statusBreakdown.offlineNames.length} lokasi):\n${statusBreakdown.offlineNames.join(', ') || 'Tidak ada'}`}
                 >
                   {statusBreakdown.offlineCount} Offline
@@ -1114,7 +1114,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         {/* Search Box & Actions */}
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:w-64">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
             <input
               type="text"
               value={searchQuery}
@@ -1275,7 +1275,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
             {filteredRows.length === 0 ? (
               <tr>
-                <td colSpan={isSingleMonth ? 7 : 6} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500">
+                <td colSpan={isSingleMonth ? 7 : 6} className="px-4 py-12 text-center text-slate-500 dark:text-slate-400">
                   <AlertCircle size={28} className="mx-auto mb-2 text-slate-300" />
                   <p className="font-medium text-slate-600 dark:text-slate-400">Tidak ada lokasi yang cocok dengan filter</p>
                   {searchQuery && (
@@ -1368,16 +1368,16 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
                       {/* Column 3: Produksi (MWh) */}
                       <td className="px-3 py-2.5 text-right font-mono font-bold text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
-                        {loc.productionMwh == null ? <span className="text-slate-400 dark:text-slate-500 font-sans">Belum tersedia</span> : formatNum(loc.productionMwh, 2, 2)}
+                        {loc.productionMwh == null ? <span className="text-slate-500 dark:text-slate-400 font-sans">Belum tersedia</span> : formatNum(loc.productionMwh, 2, 2)}
                       </td>
 
                       {/* Column 4: Specific Yield (kWh/kWp) */}
                       <td className="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">
-                        {formatNum(loc.specificYield, 1, 1)} <span className="text-[10px] text-slate-400 dark:text-slate-500">kWh/kWp</span>
+                        {formatNum(loc.specificYield, 1, 1)} <span className="text-[10px] text-slate-500 dark:text-slate-400">kWh/kWp</span>
                       </td>
 
                       <td className="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap">
-                        {loc.prValue == null ? <span className="font-sans text-slate-400 dark:text-slate-500">—</span> : `${formatNum(loc.prValue, 1, 1)}%`}
+                        {loc.prValue == null ? <span className="font-sans text-slate-500 dark:text-slate-400">—</span> : `${formatNum(loc.prValue, 1, 1)}%`}
                       </td>
 
                       {/* Column 5: vs Bulan Lalu (Only for single month) */}
@@ -1393,7 +1393,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                               {loc.vsPrevMonthPct > 0 ? '+' : ''}{loc.vsPrevMonthPct}%
                             </span>
                           ) : (
-                            <span className="text-slate-400 dark:text-slate-500">—</span>
+                            <span className="text-slate-500 dark:text-slate-400">—</span>
                           )}
                         </td>
                       )}
@@ -1461,7 +1461,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                       loc.subPlants.map((sp, spIdx) => (
                         <tr key={spIdx} className="bg-purple-50/30 dark:bg-purple-500/10 text-[11px] border-b border-purple-100 dark:border-purple-500/20">
                           <td className="px-4 py-1.5 pl-11 text-slate-600 dark:text-slate-400 sticky left-0 bg-purple-50/50 dark:bg-purple-500/10 z-10 border-r border-slate-100 dark:border-slate-800 font-mono">
-                            ↳ {sp.name} <span className="text-[10px] text-slate-400 dark:text-slate-500">({sp.psId})</span>
+                            ↳ {sp.name} <span className="text-[10px] text-slate-500 dark:text-slate-400">({sp.psId})</span>
                           </td>
                           <td className="px-3 py-1.5 text-right font-mono text-slate-600 dark:text-slate-400">
                             {formatNum(sp.capacityKwp, 1, 2)}

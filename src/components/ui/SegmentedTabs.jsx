@@ -32,7 +32,7 @@ export default function SegmentedTabs({ value, onChange, options, className = ''
                 size={14}
                 className={isActive
                   ? (opt.activeIconClassName || 'text-rose-500 dark:text-rose-400')
-                  : (opt.inactiveIconClassName || 'text-slate-400 dark:text-slate-500')}
+                  : (opt.inactiveIconClassName || 'text-slate-500 dark:text-slate-400')}
               />
             )}
             <span>{opt.label}</span>

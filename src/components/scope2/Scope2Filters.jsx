@@ -32,7 +32,7 @@ export default function Scope2Filters({ filters, grids, plants, onChange }) {
         </select>
       </label>
       <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Pencarian
-        <span className="mt-1 flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2"><Search size={14} className="text-slate-400 dark:text-slate-500" /><input value={filters.q || ''} onChange={event => set('q', event.target.value)} placeholder="Nama DC…" className="min-w-0 flex-1 px-2 py-2 outline-none dark:bg-slate-900 dark:text-slate-200" /></span>
+        <span className="mt-1 flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2"><Search size={14} className="text-slate-500 dark:text-slate-400" /><input value={filters.q || ''} onChange={event => set('q', event.target.value)} placeholder="Nama DC…" className="min-w-0 flex-1 px-2 py-2 outline-none dark:bg-slate-900 dark:text-slate-200" /></span>
       </label>
     </div>
   );

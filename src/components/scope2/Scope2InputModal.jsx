@@ -434,7 +434,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
               }`}
             >
-              <Zap size={14} className={activeTab === 'manual' ? 'text-amber-500 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'} />
+              <Zap size={14} className={activeTab === 'manual' ? 'text-amber-500 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400'} />
               <span>Input Manual</span>
             </button>
 
@@ -447,7 +447,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
               }`}
             >
-              <FileSpreadsheet size={14} className={activeTab === 'excel' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'} />
+              <FileSpreadsheet size={14} className={activeTab === 'excel' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'} />
               <span>Upload Excel (.xlsx / .csv)</span>
             </button>
           </div>
@@ -490,13 +490,13 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Cari nama DC..."
-                    className="sm:col-span-1 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500"
+                    className="sm:col-span-1 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   />
                   <select
                     id="modal-scope2-dc"
                     value={selectedPsId}
                     onChange={(e) => setSelectedPsId(e.target.value)}
-                    className={`sm:col-span-2 rounded-xl border bg-white dark:bg-slate-900 px-3 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-500 ${
+                    className={`sm:col-span-2 rounded-xl border bg-white dark:bg-slate-900 px-3 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
                       formErrors.dc ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700'
                     }`}
                   >
@@ -523,7 +523,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                       id="modal-scope2-month"
                       value={periodMonth}
                       onChange={(e) => handlePeriodChange(e.target.value, periodYear)}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     >
                       <option value="01">01 - Januari</option>
                       <option value="02">02 - Februari</option>
@@ -548,7 +548,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                       id="modal-scope2-year"
                       value={periodYear}
                       onChange={(e) => handlePeriodChange(periodMonth, e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     >
                       <option value="2026">2026</option>
                       <option value="2025">2025</option>
@@ -564,7 +564,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                       type="date"
                       value={activityDate}
                       onChange={(e) => setActivityDate(e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500"
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     />
                     {formErrors.date && <p className="mt-1 text-[10px] font-semibold text-rose-600 dark:text-rose-400">{formErrors.date}</p>}
                   </div>
@@ -611,11 +611,11 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                     value={energyValue}
                     onChange={(e) => setEnergyValue(e.target.value)}
                     placeholder={energyUnit === 'mwh' ? 'Contoh: 147.64' : 'Contoh: 147640'}
-                    className={`w-full rounded-xl border px-3.5 py-2.5 pr-16 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-500 ${
+                    className={`w-full rounded-xl border px-3.5 py-2.5 pr-16 text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
                       formErrors.energy ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700 dark:bg-slate-900'
                     }`}
                   />
-                  <span className="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400 dark:text-slate-500">
+                  <span className="absolute right-3.5 top-2.5 text-xs font-bold text-slate-500 dark:text-slate-400">
                     {energyUnit.toUpperCase()}
                   </span>
                 </div>
@@ -662,7 +662,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                   className="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-colors"
                 >
                   <span className="flex items-center gap-2">
-                    <FileText size={14} className="text-slate-400 dark:text-slate-500" />
+                    <FileText size={14} className="text-slate-500 dark:text-slate-400" />
                     <span>Data Tambahan (Opsional)</span>
                   </span>
                   <span className="text-slate-500 dark:text-slate-400 text-[11px] flex items-center gap-1 font-semibold">
@@ -683,7 +683,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                         value={plnCustomerNumber}
                         onChange={(e) => setPlnCustomerNumber(e.target.value)}
                         placeholder="538100912401"
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                       />
                     </div>
 
@@ -697,7 +697,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                         value={invoiceRef}
                         onChange={(e) => setInvoiceRef(e.target.value)}
                         placeholder={`INV-PLN-${selectedDC.name.replace(/\s+/g, '')}-01`}
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                       />
                     </div>
                   </div>

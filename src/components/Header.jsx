@@ -279,7 +279,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                         onChange={(e) => setPasswordState({ ...passwordState, currentPass: e.target.value })}
                         autoComplete="current-password"
                         required
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-9 text-xs focus:outline-none focus:border-blue-500 disabled:opacity-60"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-9 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
                       />
                       <button
                         type="button"
@@ -303,7 +303,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                           autoComplete="new-password"
                           minLength={8}
                           required
-                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-8 text-xs focus:outline-none focus:border-blue-500 disabled:opacity-60"
+                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
                         />
                         <button
                           type="button"
@@ -325,7 +325,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                         autoComplete="new-password"
                         minLength={8}
                         required
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500 disabled:opacity-60"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
                       />
                     </div>
                   </div>

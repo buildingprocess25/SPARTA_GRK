@@ -534,7 +534,7 @@ const DCRowItem = React.memo(function DCRowItem({
               </span>
             )}
           </div>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 block truncate">
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">
             {dc.region || 'Nasional'} • Kapasitas API: {dc.installedKwp} kWp
           </span>
         </div>
@@ -543,9 +543,9 @@ const DCRowItem = React.memo(function DCRowItem({
       <div className="text-right shrink-0 pl-2">
         <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
           {dc.isUnderConstruction ? (
-            <span className="text-slate-400 dark:text-slate-500 font-normal italic text-[11px]">Dalam Pembangunan</span>
+            <span className="text-slate-500 dark:text-slate-400 font-normal italic text-[11px]">Dalam Pembangunan</span>
           ) : isExcludedFromRanking && selectedMetric !== 'pr' ? (
-            <span className="text-slate-400 dark:text-slate-500" title="Dikecualikan dari ranking & rata-rata">
+            <span className="text-slate-500 dark:text-slate-400" title="Dikecualikan dari ranking & rata-rata">
               {hasValidMetric ? `${dc.metricValue} ${activeMetricUnit}` : '—'}
             </span>
           ) : hasValidMetric ? (
@@ -558,7 +558,7 @@ const DCRowItem = React.memo(function DCRowItem({
             '—'
           )}
         </span>
-        <span className="text-[10px] text-slate-400 dark:text-slate-500 block">
+        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">
           #{rankDisplay}
         </span>
       </div>
@@ -1199,7 +1199,7 @@ export default function PLTSAnalyticsSection({
           {/* Search Box */}
           <div className="py-2 space-y-2 shrink-0 border-b border-slate-100/80 dark:border-slate-800">
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
@@ -1217,8 +1217,8 @@ export default function PLTSAnalyticsSection({
 
               if (filteredList.length === 0) {
                 return (
-                  <div className="h-full flex flex-col items-center justify-center p-6 text-center space-y-2 text-slate-400 dark:text-slate-500">
-                    <AlertCircle size={24} className="text-slate-400 dark:text-slate-500" />
+                  <div className="h-full flex flex-col items-center justify-center p-6 text-center space-y-2 text-slate-500 dark:text-slate-400">
+                    <AlertCircle size={24} className="text-slate-500 dark:text-slate-400" />
                     <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                       Tidak ada lokasi yang cocok dengan &ldquo;{searchQuery}&rdquo;
                     </p>
@@ -1387,12 +1387,12 @@ export default function PLTSAnalyticsSection({
           {/* Chart Canvas Area */}
           <div className="flex-1 min-h-[320px] w-full pt-3 relative">
             {!isMounted ? (
-              <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs">
+              <div className="h-full flex items-center justify-center text-slate-500 dark:text-slate-400 text-xs">
                 Memuat grafik...
               </div>
             ) : activeChosenCount === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-500 space-y-3">
-                <div className="size-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500">
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 dark:text-slate-400 space-y-3">
+                <div className="size-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
                   <CheckSquare size={24} />
                 </div>
                 <div>
@@ -1615,7 +1615,7 @@ export default function PLTSAnalyticsSection({
                   </span>
                 )}
               </div>
-              <span className="text-[10px] text-slate-400 dark:text-slate-500">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400">
                 Sumber: audit_baseline April 2026 (Titik baseline audit, bukan data realtime)
               </span>
             </div>
@@ -1649,7 +1649,7 @@ export default function PLTSAnalyticsSection({
                   );
                 })()}
               </div>
-              <span className="text-[10px] text-slate-400 dark:text-slate-500">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400">
                 Data historis kanonik 2026 (Gorontalo dikecualikan)
               </span>
             </div>
@@ -1715,7 +1715,7 @@ export default function PLTSAnalyticsSection({
                 <select
                   value={tablePageSize}
                   onChange={(e) => setTablePageSize(e.target.value)}
-                  className="text-xs bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-700 dark:text-slate-300 focus:outline-none"
+                  className="text-xs bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="all">Tampil Semua ({tableDisplayItems.length})</option>
                   <option value="10">10 per halaman</option>
@@ -1910,7 +1910,7 @@ export default function PLTSAnalyticsSection({
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
                 {tableDisplayItems.length === 0 ? (
                   <tr>
-                    <td colSpan={isAuditBaselineEnabled ? 12 : 11} className="p-10 text-center text-slate-400 dark:text-slate-500 text-xs">
+                    <td colSpan={isAuditBaselineEnabled ? 12 : 11} className="p-10 text-center text-slate-500 dark:text-slate-400 text-xs">
                       Tidak ada data yang cocok dengan pilihan filter saat ini.
                     </td>
                   </tr>
@@ -1962,19 +1962,19 @@ export default function PLTSAnalyticsSection({
                                     </span>
                                   )}
                                 </div>
-                                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{d.dcId}</span>
+                                <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">{d.dcId}</span>
                               </div>
                             </div>
                           </td>
                           <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
-                            {d.region || <span className="text-slate-400 dark:text-slate-500">—</span>}
+                            {d.region || <span className="text-slate-500 dark:text-slate-400">—</span>}
                           </td>
                           <td className="px-3 py-3 font-mono text-right text-slate-800 dark:text-slate-200 font-bold">
                             {d.installedKwp !== null && d.installedKwp !== undefined ? `${d.installedKwp} kWp` : '—'}
                           </td>
                           <td className="px-3 py-3 font-mono text-right text-slate-900 dark:text-slate-100 font-bold">
                             {d.isUnderConstruction ? (
-                              <span className="text-slate-400 dark:text-slate-500 font-normal italic text-[11px]">Dalam Pembangunan</span>
+                              <span className="text-slate-500 dark:text-slate-400 font-normal italic text-[11px]">Dalam Pembangunan</span>
                             ) : d.productionMwh !== null && d.productionMwh !== undefined ? (
                               `${formatNum(d.productionMwh, 2)} MWh`
                             ) : d.monthYieldMwh !== null && d.monthYieldMwh !== undefined ? (
@@ -2000,7 +2000,7 @@ export default function PLTSAnalyticsSection({
                                   </span>
                                 </span>
                               ) : (
-                                <span className="text-slate-400 dark:text-slate-500" title="Data Proxy PR tidak tersedia">—</span>
+                                <span className="text-slate-500 dark:text-slate-400" title="Data Proxy PR tidak tersedia">—</span>
                               )}
                             </td>
                           )}
@@ -2014,7 +2014,7 @@ export default function PLTSAnalyticsSection({
                                     Manual
                                   </span>
                                 </span>
-                                <span className="text-[9px] text-slate-400 dark:text-slate-500">
+                                <span className="text-[9px] text-slate-500 dark:text-slate-400">
                                   per {d.portalPrManual.formattedDate}
                                 </span>
                                 {d.historicalMonthlyPr !== null && (
@@ -2025,7 +2025,7 @@ export default function PLTSAnalyticsSection({
                                 )}
                               </div>
                             ) : (
-                              <span className="text-slate-400 dark:text-slate-500 text-[11px]">—</span>
+                              <span className="text-slate-500 dark:text-slate-400 text-[11px]">—</span>
                             )}
                           </td>
                           {/* Inverter Temperature (p4) */}
@@ -2035,12 +2035,12 @@ export default function PLTSAnalyticsSection({
                                 <span className="font-bold text-slate-800 dark:text-slate-200">
                                   {d.inverterStats.tempMax} ℃
                                 </span>
-                                <span className="text-[9px] text-slate-400 dark:text-slate-500">
+                                <span className="text-[9px] text-slate-500 dark:text-slate-400">
                                   avg {d.inverterStats.tempAvg} ℃
                                 </span>
                               </div>
                             ) : (
-                              <span className="text-slate-400 dark:text-slate-500 text-xs">—</span>
+                              <span className="text-slate-500 dark:text-slate-400 text-xs">—</span>
                             )}
                           </td>
                           <td className="px-3 py-3 font-mono text-right text-slate-600 dark:text-slate-400">
@@ -2096,7 +2096,7 @@ export default function PLTSAnalyticsSection({
                                     <Layers size={13} className="text-purple-600 dark:text-purple-400" />
                                     Rincian Sub-Plant {name} ({d.subPlants.length} Plant Fisik OpenAPI)
                                   </span>
-                                  <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
                                     *Hanya rincian informatif, TIDAK dihitung terpisah di roll-up nasional
                                   </span>
                                 </div>
@@ -2229,7 +2229,7 @@ export default function PLTSAnalyticsSection({
                         <div className="flex items-start justify-between gap-2 mb-2 pb-2 border-b border-slate-100 dark:border-slate-800">
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 block">{psId}</span>
+                              <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 block">{psId}</span>
                               {st.isDataStale && (
                                 <span className="text-[9px] px-1 py-0.2 rounded bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 font-bold">
                                   Usang
@@ -2261,7 +2261,7 @@ export default function PLTSAnalyticsSection({
                           <div className="flex justify-between items-center py-0.5 border-b border-slate-100/60 dark:border-slate-800">
                             <span className="text-slate-500 dark:text-slate-400 text-[11px]">Daya Live</span>
                             <strong className="font-mono text-amber-600 dark:text-amber-400 font-bold">
-                              {currentKw !== null && currentKw !== undefined ? `${currentKw} kW` : <span className="text-slate-400 dark:text-slate-500 font-normal">Offline / null</span>}
+                              {currentKw !== null && currentKw !== undefined ? `${currentKw} kW` : <span className="text-slate-500 dark:text-slate-400 font-normal">Offline / null</span>}
                             </strong>
                           </div>
                           <div className="flex justify-between items-center py-0.5 border-b border-slate-100/60 dark:border-slate-800">
@@ -2303,12 +2303,12 @@ export default function PLTSAnalyticsSection({
                           </div>
                         )}
 
-                        <div className="flex flex-col gap-0.5 pt-2 mt-1 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 dark:text-slate-500">
+                        <div className="flex flex-col gap-0.5 pt-2 mt-1 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-500 dark:text-slate-400">
                           <div className="flex justify-between items-center">
                             <span>Waktu Telemetri:</span>
                             <span className="text-slate-600 dark:text-slate-400 font-mono font-medium">{formatWibTime(st.lastUpdate)}</span>
                           </div>
-                          <span className="text-[9px] text-slate-400 dark:text-slate-500 italic">
+                          <span className="text-[9px] text-slate-500 dark:text-slate-400 italic">
                             Data inverter dilaporkan tiap 5 menit; sinkron dashboard tiap 30 menit
                           </span>
                         </div>
@@ -2359,7 +2359,7 @@ export default function PLTSAnalyticsSection({
                             <td className="px-3 py-2.5 font-bold text-slate-900 dark:text-slate-100">
                               <div className="flex items-center gap-1.5 flex-wrap">
                                 <span>{psName}</span>
-                                <span className="font-mono text-slate-400 dark:text-slate-500 text-[10px] font-normal">({psId})</span>
+                                <span className="font-mono text-slate-500 dark:text-slate-400 text-[10px] font-normal">({psId})</span>
                                 {st.isDataStale && (
                                   <span className="text-[9px] px-1 py-0.2 rounded bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 font-bold">
                                     Usang
@@ -2385,7 +2385,7 @@ export default function PLTSAnalyticsSection({
                               </span>
                             </td>
                             <td className="px-3 py-2.5 font-mono text-right text-amber-600 dark:text-amber-400 font-bold">
-                              {currentKw !== null && currentKw !== undefined ? `${currentKw} kW` : <span className="text-slate-400 dark:text-slate-500 font-normal">Offline / null</span>}
+                              {currentKw !== null && currentKw !== undefined ? `${currentKw} kW` : <span className="text-slate-500 dark:text-slate-400 font-normal">Offline / null</span>}
                             </td>
                             <td className="px-3 py-2.5 font-mono text-right text-emerald-700 dark:text-emerald-300 font-bold">{todayKwh} kWh</td>
                             <td className="px-3 py-2.5 font-mono text-right text-blue-700 dark:text-blue-300 font-bold">

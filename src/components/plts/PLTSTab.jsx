@@ -1366,7 +1366,7 @@ export default function PLTSTab() {
                                         <span className="text-slate-500 dark:text-slate-400 font-sans">Kumulatif YTD:</span>
                                         <strong className="text-emerald-700 dark:text-emerald-300 font-semibold">{Number(currentPoint.cumAvoidedEmissionTon).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} tCO₂e</strong>
                                       </div>
-                                      <div className="text-[10px] text-slate-400 dark:text-slate-500">
+                                      <div className="text-[10px] text-slate-500 dark:text-slate-400">
                                         Faktor 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂ &middot; {currentPoint.includedPlantCount ?? 37} plant dihitung
                                       </div>
                                     </div>
@@ -1426,7 +1426,7 @@ export default function PLTSTab() {
                   <div>
                     <div className="flex justify-between text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                       <span className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
-                        <Zap size={14} className="text-slate-400 dark:text-slate-500" /> PLN (Grid)
+                        <Zap size={14} className="text-slate-500 dark:text-slate-400" /> PLN (Grid)
                       </span>
                       <span className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">{dynamicEnergyBreakdown.plnPercentage}%</span>
                     </div>
@@ -1520,7 +1520,7 @@ export default function PLTSTab() {
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Periode:</span>
                 <select
-                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
+                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
                   value={selectedPeriod}
                   onChange={(e) => setSelectedPeriod(e.target.value)}
                 >
@@ -1536,9 +1536,9 @@ export default function PLTSTab() {
               <div className="flex-1 space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Wilayah Grid</label>
                 <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={14} />
+                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" size={14} />
                   <select
-                    className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-amber-500 appearance-none"
+                    className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
                     value={selectedGridFilter}
                     onChange={(e) => {
                       setSelectedGridFilter(e.target.value);
@@ -1555,15 +1555,15 @@ export default function PLTSTab() {
                     <option value="BATAM">Batam</option>
                     <option value="NTB_LOMBOK">NTB - Lombok</option>
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" size={14} />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none" size={14} />
                 </div>
               </div>
               <div className="flex-1 space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Cabang / DC</label>
                 <div className="relative">
-                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={14} />
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" size={14} />
                   <select
-                    className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-amber-500 appearance-none"
+                    className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
                     value={selectedDcFilter}
                     onChange={(e) => setSelectedDcFilter(e.target.value)}
                   >
@@ -1572,22 +1572,22 @@ export default function PLTSTab() {
                       <option key={dc.id} value={dc.id}>{dc.name}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" size={14} />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none" size={14} />
                 </div>
               </div>
               <div className="flex-1 space-y-1.5">
                 <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Pencarian</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={14} />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" size={14} />
                   <input
                     type="text"
                     placeholder="Cari nama cabang/DC..."
-                    className="w-full pl-9 pr-8 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:border-amber-500"
+                    className="w-full pl-9 pr-8 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     value={dcSearch}
                     onChange={(e) => setDcSearch(e.target.value)}
                   />
                   {dcSearch && (
-                    <button onClick={() => setDcSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
+                    <button onClick={() => setDcSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                       <X size={14} />
                     </button>
                   )}
@@ -1600,17 +1600,17 @@ export default function PLTSTab() {
               <span className="font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700">
                 {selectedGridFilter === 'ALL' ? 'Semua Grid' : selectedGridFilter}
               </span>
-              <span className="text-slate-400 dark:text-slate-500">•</span>
+              <span className="text-slate-500 dark:text-slate-400">•</span>
               <span className="font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700">
                 {dcTableData.length} DC dengan data
               </span>
-              <span className="text-slate-400 dark:text-slate-500">•</span>
+              <span className="text-slate-500 dark:text-slate-400">•</span>
               <span className="text-slate-600 dark:text-slate-400">
                 {emissionsPeriods.find(p => p.value === selectedPeriod)?.label || selectedPeriod}
               </span>
               {dcTableData.length > 0 && (
                 <>
-                  <span className="text-slate-400 dark:text-slate-500">•</span>
+                  <span className="text-slate-500 dark:text-slate-400">•</span>
                   <span className={`font-semibold px-2 py-1 rounded-md border ${hasAnyPln
                       ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30'
                       : 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30'
@@ -1655,7 +1655,7 @@ export default function PLTSTab() {
                     </tr>
                   ) : emissionsLoading ? (
                     <tr>
-                      <td colSpan={7} className="px-4 py-8 text-center text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
+                      <td colSpan={7} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                         <div className="flex items-center justify-center gap-2">
                           <RefreshCw size={16} className="animate-spin text-amber-500" />
                           <span>Memuat data emisi...</span>
@@ -1706,7 +1706,7 @@ export default function PLTSTab() {
                       <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">
                         {hasAnyPln ? formatNum(totalPlnMWh) : <span className="text-slate-300 dark:text-slate-600">—</span>}
                       </td>
-                      <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-center px-4 py-3 text-slate-400 dark:text-slate-500 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">—</td>
+                      <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-center px-4 py-3 text-slate-500 dark:text-slate-400 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">—</td>
                       <td className="sticky bottom-0 z-10 bg-amber-100 dark:bg-amber-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-amber-700 dark:text-amber-300 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">
                         {hasAnyScope2 ? formatNum(totalScope2Ton) : <span className="text-amber-300 dark:text-amber-700/60">—</span>}
                       </td>

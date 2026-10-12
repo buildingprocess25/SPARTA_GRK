@@ -99,7 +99,7 @@ export default function WaterRecycleTab() {
             <select
               value={period || api?.period || ''}
               onChange={(e) => setPeriod(e.target.value)}
-              className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:border-cyan-500"
+              className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
             >
               {periodOptions.length === 0 && api?.period && (
                 <option value={api.period}>Periode berjalan</option>
@@ -210,7 +210,7 @@ export default function WaterRecycleTab() {
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Volume daur ulang, emisi terhindar, dan penghematan biaya per DC</p>
           </div>
           <label className="relative shrink-0">
-            <Search className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500" size={14} />
+            <Search className="absolute left-3 top-2.5 text-slate-500 dark:text-slate-400" size={14} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -246,7 +246,7 @@ export default function WaterRecycleTab() {
                 </tr>
               ) : loading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
+                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center justify-center gap-2">
                       <RefreshCw size={16} className="animate-spin text-cyan-500" />
                       <span>Memuat data Water Recycle...</span>

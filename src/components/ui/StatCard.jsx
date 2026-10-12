@@ -36,7 +36,7 @@ export default function StatCard({
             {title}
           </span>
           {sourceBadge && (
-            <span className="inline-block mt-0.5 text-[10px] font-mono font-medium text-slate-400 dark:text-slate-500">
+            <span className="inline-block mt-0.5 text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400">
               {sourceBadge}
             </span>
           )}

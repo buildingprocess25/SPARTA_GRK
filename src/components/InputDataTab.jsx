@@ -922,7 +922,7 @@ export default function InputDataTab({ setActiveTab }) {
             {/* Program Tertunda / Belum Tersedia Note */}
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/40 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-slate-600 dark:text-slate-400">
               <div className="flex items-center gap-2">
-                <Info size={15} className="text-slate-400 dark:text-slate-500 shrink-0" />
+                <Info size={15} className="text-slate-500 dark:text-slate-400 shrink-0" />
                 <span>
                   <strong>Status Kategori Lain:</strong> Scope 3 ditunda sesuai kebijakan perusahaan. EV & Efisiensi Energi berstatus <em>Pending Validasi Model Database</em>.
                 </span>
@@ -1030,7 +1030,7 @@ export default function InputDataTab({ setActiveTab }) {
                   </div>
                   <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                     <span>Kategori Terdeteksi: <strong className="text-blue-600 dark:text-blue-400">{previewResult.category}</strong></span>
-                    <span className="text-xs text-slate-400 dark:text-slate-500 font-normal">| Versi: {previewResult.templateVersion || 'v2026.1'}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">| Versi: {previewResult.templateVersion || 'v2026.1'}</span>
                   </h3>
                 </div>
 
@@ -1162,7 +1162,7 @@ export default function InputDataTab({ setActiveTab }) {
                           <td className="px-3.5 py-2.5 font-mono text-slate-500 dark:text-slate-400">{r.rowNumber}</td>
                           <td className="px-3.5 py-2.5 font-bold text-slate-900 dark:text-slate-100">
                             <div>{r.facilityName || r.facilityCode || '-'}</div>
-                            <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">{r.facilityCode}</span>
+                            <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">{r.facilityCode}</span>
                           </td>
                           <td className="px-3.5 py-2.5 text-slate-600 dark:text-slate-400">{r.period || r.date || '-'}</td>
                           <td className="px-3.5 py-2.5 text-slate-700 dark:text-slate-300">
@@ -1996,28 +1996,28 @@ export default function InputDataTab({ setActiveTab }) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                       <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1">
-                        <span className="text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider block">Nilai Aktivitas</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider block">Nilai Aktivitas</span>
                         <div className="text-base font-bold font-mono text-white">
                           {liveCalculation.activityValue.toLocaleString('id-ID', { maximumFractionDigits: 2 })} {liveCalculation.activityUnit}
                         </div>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1">
-                        <span className="text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider block">Faktor Emisi</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider block">Faktor Emisi</span>
                         <div className="text-base font-bold font-mono text-amber-400">
                           {liveCalculation.factorValue} {liveCalculation.factorUnit}
                         </div>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1">
-                        <span className="text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider block">Hasil Emisi (kg)</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider block">Hasil Emisi (kg)</span>
                         <div className="text-base font-bold font-mono text-cyan-300">
                           {liveCalculation.impactSign}{liveCalculation.resultKg.toLocaleString('id-ID', { maximumFractionDigits: 2 })} kgCO₂e
                         </div>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1">
-                        <span className="text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider block">Hasil Emisi (Ton)</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider block">Hasil Emisi (Ton)</span>
                         <div className={`text-base font-bold font-mono ${liveCalculation.impactSign === '+' ? 'text-rose-400' : 'text-emerald-400'}`}>
                           {liveCalculation.impactSign}{liveCalculation.resultTon.toFixed(4)} Ton CO₂e
                         </div>
@@ -2026,7 +2026,7 @@ export default function InputDataTab({ setActiveTab }) {
 
                     {/* Mathematical substitution formula */}
                     <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 space-y-1">
-                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                         Rumus Substitusi Matematis:
                       </span>
                       <div className="font-mono text-xs font-semibold text-emerald-400">
@@ -2035,7 +2035,7 @@ export default function InputDataTab({ setActiveTab }) {
                     </div>
 
                     {/* Source & Audit Notes */}
-                    <div className="text-xs text-slate-400 dark:text-slate-500 space-y-1 pt-1">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 space-y-1 pt-1">
                       <div>Sumber Faktor: <strong className="text-slate-200">{liveCalculation.factorSource}</strong></div>
                       <div>Catatan Metrik: {liveCalculation.statusNote}</div>
                     </div>

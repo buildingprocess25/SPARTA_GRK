@@ -153,7 +153,7 @@ export default function TabSupportingParameters({ filters }) {
           <div className="flex items-center justify-between mb-2">
             <div>
               <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">2. Suhu Modul Panel (°C) & Curah Hujan (mm)</span>
-              <span className="text-[10px] text-slate-400 dark:text-slate-500">Estimasi Sandia PV & ERA5 Reanalysis</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400">Estimasi Sandia PV & ERA5 Reanalysis</span>
             </div>
             <div className="flex items-center gap-2 text-[10px]">
               <span className="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400">

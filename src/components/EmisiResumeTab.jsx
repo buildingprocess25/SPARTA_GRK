@@ -526,7 +526,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                             </span>
                             <strong className="text-rose-700 dark:text-rose-300">+{formatYAxisNumber(data.penambahanTon)} tCO₂e</strong>
                           </div>
-                          <div className="text-[10px] text-slate-400 dark:text-slate-500 pl-3.5">
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 pl-3.5">
                             Genset: {formatYAxisNumber(data.scope1Ton)} &middot; PLN: {formatYAxisNumber(data.scope2Ton)}
                           </div>
 
@@ -537,7 +537,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                             </span>
                             <strong className="text-emerald-700 dark:text-emerald-300">-{formatYAxisNumber(data.penguranganTon)} tCO₂e</strong>
                           </div>
-                          <div className="text-[10px] text-slate-400 dark:text-slate-500 pl-3.5">
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 pl-3.5">
                             PLTS: {formatYAxisNumber(data.pltsAvoided)} &middot; Air: {formatYAxisNumber(data.waterAvoided)}
                           </div>
 
@@ -709,7 +709,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       <CardBox className="p-5 lg:p-6">
         <button
           type="button"
-          className="w-full flex items-center justify-between text-left cursor-pointer focus:outline-none"
+          className="w-full flex items-center justify-between text-left cursor-pointer rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           onClick={() => setShowDetailedMapping(!showDetailedMapping)}
         >
           <div className="flex items-center gap-3">
@@ -751,7 +751,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
                           <span className="font-bold text-slate-900 dark:text-slate-100">Produksi PLTS</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500">IsolarCloud Gateway</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">IsolarCloud Gateway</span>
                         </div>
                         <p className="text-blue-700 dark:text-blue-300 font-mono font-semibold mt-1">
                           {formatNum(pltsData.summary.energyGeneratedYTD / 1000)} MWh YTD • Avoided {formatNum(pltsData.summary.co2Avoided)} tCO₂e
@@ -763,7 +763,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
                           <span className="font-bold text-slate-900 dark:text-slate-100">Penggunaan Molis</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500">Logistik Delivery</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">Logistik Delivery</span>
                         </div>
                         <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">Peralihan armada kurir DC ramah lingkungan</p>
                       </div>
@@ -782,7 +782,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
                           <span className="font-bold text-slate-900 dark:text-slate-100">Water Recycle</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500">Monitoring Meteran</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">Monitoring Meteran</span>
                         </div>
                         <p className="text-cyan-700 dark:text-cyan-300 font-mono font-semibold mt-1">
                           {formatNum(waterData.summary.waterSavedYTD)} m³ YTD • Avoided {waterData.summary.co2Avoided} tCO₂e
@@ -794,7 +794,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
                           <span className="font-bold text-slate-900 dark:text-slate-100">Project Relokasi AC & LED</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500">Efisiensi Chiller</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">Efisiensi Chiller</span>
                         </div>
                       </div>
                     </li>
@@ -832,7 +832,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
                           <span className="font-bold text-slate-900 dark:text-slate-100">Solar Genset Toko & DC</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500">Solar Genset</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">Solar Genset</span>
                         </div>
                         <p className="text-red-700 dark:text-red-300 font-mono font-semibold mt-1">
                           {formatNum(scope1.summary.totalFuelLitersYTD)} Liter • Emisi {formatNum(scope1.summary.totalEmissionCO2e, 1)} tCO₂e
@@ -844,7 +844,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
                           <span className="font-bold text-slate-900 dark:text-slate-100">BBM Kendaraan Operasional</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500">Intranet</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">Intranet</span>
                         </div>
                       </div>
                     </li>
@@ -893,14 +893,14 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                   NET GHG BALANCE
                 </span>
                 <h3 className="text-base font-bold text-white">Total Emisi Bersih Alfamart (Net Emissions)</h3>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Perhitungan: Emisi Kotor (Scope 1 + 2) dikurangi Total Pengurang Emisi (PLTS & Water)
                 </p>
               </div>
               <div className="flex items-center gap-5 shrink-0">
                 <div className="text-right">
                   <div className="text-2xl font-black font-mono text-white">
-                    {formatNum(resumeKPI.netEmissionTon, 1)} <span className="text-sm font-medium text-slate-400 dark:text-slate-500">tCO₂e</span>
+                    {formatNum(resumeKPI.netEmissionTon, 1)} <span className="text-sm font-medium text-slate-500 dark:text-slate-400">tCO₂e</span>
                   </div>
                   <div className="text-xs text-emerald-400 font-semibold mt-0.5">
                     Saving: Rp {formatNum(resumeKPI.totalCostSavingJuta, 1)} Juta

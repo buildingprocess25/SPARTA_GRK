@@ -121,7 +121,7 @@ export default function MetricInfoIcon({
         className={`p-1 rounded-full transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
           isOpen
             ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 shadow-xs'
-            : 'text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800'
         }`}
         title={`Klik / hover untuk melihat rumus & sumber data ${info.title}`}
       >
@@ -167,7 +167,7 @@ export default function MetricInfoIcon({
           <div className="mt-3 space-y-3 text-xs">
             {/* 1. Definisi */}
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                 1. Definisi Metrik
               </span>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-[11px]">
