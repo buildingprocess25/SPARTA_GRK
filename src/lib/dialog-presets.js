@@ -55,6 +55,13 @@ export const dialogPresets = Object.freeze({
     confirmLabel: 'Simpan Batch',
     cancelLabel: 'Periksa Lagi',
   },
+  simpanWaterRecycle: {
+    variant: 'success',
+    title: 'Simpan data Water Recycle?',
+    description: 'Pastikan angka meter awal dan akhir sudah benar sebelum disimpan.',
+    confirmLabel: 'Simpan Data',
+    cancelLabel: 'Periksa Lagi',
+  },
   simpanPlts: {
     variant: 'success',
     title: 'Simpan data PLTS?',

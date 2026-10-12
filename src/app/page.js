@@ -54,7 +54,7 @@ export default function Home() {
           />
 
           {/* Area Konten Utama dengan offset md:pl-72 agar tidak tertutup sidebar fixed */}
-          <div className="md:pl-72 flex min-w-0 flex-col min-h-screen overflow-x-clip">
+          <div className="md:pl-72 print:pl-0 flex min-w-0 flex-col min-h-screen overflow-x-clip">
             {/* Header atas dengan trigger drawer mobile & Profile */}
             <Header
               isProfileOpen={isProfileOpen}

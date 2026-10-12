@@ -123,7 +123,7 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setIsMo
         role={isMobileOpen ? 'dialog' : undefined}
         aria-modal={isMobileOpen ? 'true' : undefined}
         aria-label="Navigasi utama"
-        className={`fixed inset-y-0 left-0 w-72 h-screen h-dvh shrink-0 border-r border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between px-4 py-6 z-40 transition-transform duration-200 ${isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0 md:shadow-none'
+        className={`print:hidden fixed inset-y-0 left-0 w-72 h-screen h-dvh shrink-0 border-r border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between px-4 py-6 z-40 transition-transform duration-200 ${isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0 md:shadow-none'
           }`}
       >
         {/* Brand Lockup */}

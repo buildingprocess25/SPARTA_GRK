@@ -148,6 +148,28 @@
   }
 }
 
+/* window.print() output (Kalkulator Emisi "Unduh PDF" and similar export
+   buttons). Browsers strip background colors by default on print unless
+   told otherwise, and dark backgrounds waste ink/toner, so force light,
+   full-color rendering here rather than per-component. Page-break-inside
+   avoidance for individual cards/rows is handled via the print:break-inside-avoid
+   utility class applied where content was observed splitting across pages. */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  html, body {
+    background: #fff !important;
+  }
+
+  * {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    box-shadow: none !important;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

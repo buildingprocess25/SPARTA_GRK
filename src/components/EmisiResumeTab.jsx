@@ -6,7 +6,7 @@ import {
   FileCheck2, ShieldCheck, TrendingDown, TrendingUp, CheckCircle2,
   ExternalLink, Sparkles, AlertCircle, ChevronDown, ChevronUp,
   Award, BarChart3, Activity, Scale, Percent, ArrowDownRight, Layers,
-  Calculator, X
+  Calculator, X, FileDown, RefreshCw
 } from 'lucide-react';
 import {
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis,
@@ -28,6 +28,10 @@ import KpiCard from '@/components/ui/KpiCard';
 import InputDataButton from '@/components/ui/InputDataButton';
 import CardBox from '@/components/ui/CardBox';
 import MainScope2Bridge from '@/components/scope2/MainScope2Bridge';
+import MainScope1Bridge from '@/components/scope1/MainScope1Bridge';
+import { fetchAnnualReportData } from '@/lib/reports/reportDataService.js';
+import { exportSrnPpiReport } from '@/lib/reports/srnPpiReport.js';
+import { exportOjkReport } from '@/lib/reports/ojkReport.js';
 
 // Lazy-load EmissionCalculatorPage agar halaman tetap ringan dan cepat saat awal render
 const EmissionCalculatorPage = lazy(() => import('@/components/calculator/EmissionCalculatorPage'));
@@ -59,6 +63,35 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
   const [chartMetricView, setChartMetricView] = useState('net'); // 'net' | 'all' | 'penambahan' | 'pengurangan'
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(initialOpenCalculator);
   const calculatorRef = useRef(null);
+  const [isExportingSrnPpi, setIsExportingSrnPpi] = useState(false);
+  const [isExportingOjk, setIsExportingOjk] = useState(false);
+  const [exportError, setExportError] = useState(null);
+
+  const handleExportSrnPpi = async () => {
+    setIsExportingSrnPpi(true);
+    setExportError(null);
+    try {
+      const reportData = await fetchAnnualReportData();
+      await exportSrnPpiReport(reportData);
+    } catch (err) {
+      setExportError(`Gagal membuat laporan SRN-PPI: ${err.message}`);
+    } finally {
+      setIsExportingSrnPpi(false);
+    }
+  };
+
+  const handleExportOjk = async () => {
+    setIsExportingOjk(true);
+    setExportError(null);
+    try {
+      const reportData = await fetchAnnualReportData();
+      await exportOjkReport(reportData);
+    } catch (err) {
+      setExportError(`Gagal membuat Sustainability Report: ${err.message}`);
+    } finally {
+      setIsExportingOjk(false);
+    }
+  };
 
   useEffect(() => {
     if (initialOpenCalculator) {
@@ -157,6 +190,9 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
           />
         }
       />
+
+      {/* scope1Bridge: canonical connection to Scope 1 (Genset + Kendaraan) */}
+      <MainScope1Bridge onNavigate={handleNav} />
 
       {/* scope2Bridge: canonical connection to Scope 2 and PLTS without double counting */}
       <MainScope2Bridge scope1Ton={scope1.summary.totalEmissionCO2e} onNavigate={handleNav} />
@@ -387,7 +423,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         </div>
 
         {/* Grafik Utama Recharts */}
-        <div className="w-full h-72 lg:h-[300px] pt-2">
+        <div className="w-full h-72 lg:h-[300px] pt-2 print:break-inside-avoid">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={monthlyComparisonData} margin={{ top: 12, right: 16, bottom: 0, left: 16 }}>
               <CartesianGrid {...CHART_GRID_PROPS} />
@@ -521,7 +557,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             </thead>
             <tbody>
               {monthlyComparisonData.map((d, i) => (
-                <tr key={i} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                <tr key={i} className="print:break-inside-avoid border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                   <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800">{d.month} 2026</td>
                   <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-500 dark:text-slate-400 font-mono">{d.scope1Ton.toFixed(1)}</td>
                   <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 font-mono">{d.scope2Ton.toFixed(1)}</td>
@@ -556,6 +592,61 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       </CardBox>
 
       {/* Sections 3, 4, 5 removed to follow padat secukupnya hierarchy */}
+
+      {/* Export Laporan Resmi (SRN-PPI & OJK Sustainability Report) */}
+      <CardBox className="space-y-4">
+        <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <FileCheck2 size={20} />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Export Laporan Resmi</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Data lingkungan diambil langsung dari dashboard real-time. Bagian naratif (strategi, tata kelola, verifikasi, dll) perlu dilengkapi manual sebelum disubmit.
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            type="button"
+            disabled={isExportingSrnPpi}
+            onClick={handleExportSrnPpi}
+            className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 text-left hover:border-blue-300 dark:hover:border-blue-500/50 hover:bg-blue-50/30 dark:hover:bg-blue-500/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div>
+              <div className="text-sm font-bold text-slate-900 dark:text-slate-100">SRN-PPI (Kementerian LHK)</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Data aktivitas, faktor emisi, emisi GRK bulanan, metodologi</div>
+            </div>
+            {isExportingSrnPpi ? (
+              <RefreshCw size={18} className="text-blue-500 animate-spin shrink-0" />
+            ) : (
+              <FileDown size={18} className="text-blue-500 shrink-0" />
+            )}
+          </button>
+          <button
+            type="button"
+            disabled={isExportingOjk}
+            onClick={handleExportOjk}
+            className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 text-left hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:bg-emerald-50/30 dark:hover:bg-emerald-500/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div>
+              <div className="text-sm font-bold text-slate-900 dark:text-slate-100">Sustainability Report (OJK)</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Ikhtisar kinerja &amp; Poin F pilar lingkungan (POJK 51/2017)</div>
+            </div>
+            {isExportingOjk ? (
+              <RefreshCw size={18} className="text-emerald-500 animate-spin shrink-0" />
+            ) : (
+              <FileDown size={18} className="text-emerald-500 shrink-0" />
+            )}
+          </button>
+        </div>
+        {exportError && (
+          <div className="flex items-center gap-2 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-4 py-3 text-xs font-semibold text-rose-800 dark:text-rose-300">
+            <AlertCircle size={16} className="shrink-0" />
+            <span>{exportError}</span>
+          </div>
+        )}
+      </CardBox>
 
       {/* 6. COLLAPSIBLE DETAILED PROTOCOL MAPPING */}
       <CardBox className="p-5 lg:p-6">

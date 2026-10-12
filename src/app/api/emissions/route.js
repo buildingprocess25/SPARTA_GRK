@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma.js';
 import { createPrismaHistoryRepository, getPltsHistory } from '@/lib/solar/history';
 import { fetchRawEnergyFlows } from '@/lib/energy-data.js';
 import { factorForGrid } from '@/lib/scope2/dashboardService.js';
+import { CANONICAL_DC_ENTITIES, isDcLocation } from '@/lib/solar/plantMap.js';
 
 function round(value, digits = 3) {
   if (value === null || value === undefined || !Number.isFinite(Number(value))) return null;
@@ -21,6 +22,44 @@ async function buildPlnConsumptionByDc({ year, startYearMonth, endYearMonth }) {
     purchasedByDc.set(flow.dcId, (purchasedByDc.get(flow.dcId) || 0) + flow.purchasedKwh);
   }
   return purchasedByDc;
+}
+
+/**
+ * Month-by-month Scope 2 emission trend (for annual report exports, which
+ * need a monthly breakdown rather than the single period-total this route
+ * otherwise returns). Applies the same official-factor-only gating as the
+ * per-DC totals above, so a monthly figure never silently includes a grid
+ * whose factor is still unvalidated.
+ */
+async function buildMonthlyScope2Trend({ year, startYearMonth, endYearMonth }) {
+  const flows = await fetchRawEnergyFlows({ year, rootDir: process.cwd() });
+  // flow.grid comes straight from the plant_master DB column, which stores
+  // human labels ("Jamali", "Sulutenggo") rather than the app's canonical
+  // grid keys ("JAMALI", "SULUTGO") - factorForGrid() would silently never
+  // resolve it. Resolve grid via CANONICAL_DC_ENTITIES by dcId instead, the
+  // same way the already-trusted Scope 2 dashboard (dashboardService.js)
+  // does, rather than trusting the raw column.
+  const entityByDcId = new Map(CANONICAL_DC_ENTITIES.map(e => [e.dcId, e]));
+  const byMonth = new Map();
+  for (const flow of flows) {
+    if (!flow.dcId || flow.storageYearMonth < startYearMonth || flow.storageYearMonth > endYearMonth) continue;
+    const entity = entityByDcId.get(flow.dcId);
+    if (!entity || !isDcLocation(entity)) continue; // exclude Drive Thru pilot stores, same as everywhere else
+    const ym = flow.storageYearMonth;
+    if (!byMonth.has(ym)) byMonth.set(ym, { purchasedKwh: 0, emissionKg: 0 });
+    const agg = byMonth.get(ym);
+    agg.purchasedKwh += flow.purchasedKwh;
+    const canonicalGrid = entity.grid;
+    const gridFactor = factorForGrid(canonicalGrid);
+    if (gridFactor.status === 'official' && gridFactor.value !== null) {
+      agg.emissionKg += flow.purchasedKwh * gridFactor.value;
+    }
+  }
+  return [...byMonth.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([ym, agg]) => ({
+    yearMonth: `${ym.slice(0, 4)}-${ym.slice(4, 6)}`,
+    plnConsumptionMWh: round(agg.purchasedKwh / 1000),
+    scope2EmissionTon: round(agg.emissionKg / 1000, 3),
+  }));
 }
 
 /**
@@ -52,11 +91,18 @@ export async function GET(req) {
       repository: createPrismaHistoryRepository(prisma),
       period: rawPeriod,
     });
-    const purchasedByDc = await buildPlnConsumptionByDc({
-      year: history.activePeriod.year,
-      startYearMonth: history.activePeriod.startYearMonth,
-      endYearMonth: history.activePeriod.endYearMonth,
-    });
+    const [purchasedByDc, monthlyScope2Trend] = await Promise.all([
+      buildPlnConsumptionByDc({
+        year: history.activePeriod.year,
+        startYearMonth: history.activePeriod.startYearMonth,
+        endYearMonth: history.activePeriod.endYearMonth,
+      }),
+      buildMonthlyScope2Trend({
+        year: history.activePeriod.year,
+        startYearMonth: history.activePeriod.startYearMonth,
+        endYearMonth: history.activePeriod.endYearMonth,
+      }),
+    ]);
     const data = history.locations.map(location => {
       // Reuses the Scope 2 dashboard's own factor resolver so a grid with an
       // unvalidated/temporary factor (e.g. SULUTGO) is withheld here exactly
@@ -87,9 +133,23 @@ export async function GET(req) {
       };
     });
 
+    const scope2TrendByMonth = new Map(monthlyScope2Trend.map(m => [m.yearMonth, m]));
+    const monthlyTrend = history.months.map(m => {
+      const ym = `${m.yearMonth.slice(0, 4)}-${m.yearMonth.slice(4, 6)}`;
+      const scope2 = scope2TrendByMonth.get(ym);
+      return {
+        yearMonth: ym,
+        label: m.label,
+        pltsProdKwh: m.energyKwh,
+        plnConsumptionMWh: scope2?.plnConsumptionMWh ?? null,
+        scope2EmissionTon: scope2?.scope2EmissionTon ?? null,
+      };
+    });
+
     return Response.json({
       success: true,
       data,
+      monthlyTrend,
       availableMonths: history.availableMonths,
       availableYears: history.availableYears,
       activePeriod: history.activePeriod,
