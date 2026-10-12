@@ -62,7 +62,7 @@ export function ToastProvider({ children }) {
                 <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{toast.title}</p>
                 {toast.description && <p className="mt-0.5 text-xs leading-relaxed text-slate-600 dark:text-slate-400">{toast.description}</p>}
               </div>
-              <button type="button" onClick={() => dismiss(toast.id)} aria-label="Tutup notifikasi" className="flex size-7 shrink-0 items-center justify-center rounded-md text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400">
+              <button type="button" onClick={() => dismiss(toast.id)} aria-label="Tutup notifikasi" className="flex size-11 shrink-0 items-center justify-center rounded-md text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400">
                 <X size={15} />
               </button>
             </div>

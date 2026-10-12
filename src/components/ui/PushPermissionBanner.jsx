@@ -57,7 +57,7 @@ export default function PushPermissionBanner() {
           type="button"
           onClick={dismiss}
           aria-label="Tutup"
-          className="text-blue-400 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-300 p-1"
+          className="flex size-11 shrink-0 items-center justify-center text-blue-400 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-300"
         >
           <X size={15} />
         </button>
