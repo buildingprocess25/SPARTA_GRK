@@ -120,8 +120,10 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
 
       const minYm = `${years[0]}01`;
       const maxYm = `${years.at(-1)}12`;
+      const minDateStr = `${years[0]}-01-01`;
+      const maxDateStr = `${years.at(-1)}-12-31`;
 
-      const [plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows] = await Promise.all([
+      const [plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly] = await Promise.all([
         db.plantMaster.findMany({
           select: {
             dcId: true,
@@ -203,9 +205,22 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
           WHERE year_month BETWEEN ${minYm} AND ${maxYm}
           ORDER BY year_month ASC, ps_id ASC
         `.catch(() => []),
+        db.$queryRaw`
+          SELECT 
+            SUBSTRING(date, 1, 7) as "yearMonth",
+            location_key as "locationKey",
+            ROUND(AVG(module_temp_c)::numeric, 1)::float as "avgModuleTempC",
+            ROUND(AVG(temp_mean_c)::numeric, 1)::float as "avgAmbientTempC",
+            ROUND(SUM(precipitation_mm)::numeric, 1)::float as "precipitationMm",
+            ROUND(AVG(ghi_kwh_m2)::numeric, 2)::float as "avgGhiKwhM2"
+          FROM weather_daily
+          WHERE date >= ${minDateStr} AND date <= ${maxDateStr}
+          GROUP BY SUBSTRING(date, 1, 7), location_key
+          ORDER BY "yearMonth" ASC
+        `.catch(() => []),
       ]);
 
-      return { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows };
+      return { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly };
     } finally {
       inFlightPromises.delete(flightKey);
     }
@@ -232,7 +247,7 @@ export async function getPltsDashboard(rawQuery = {}, { db = prisma, now = new D
     Number(String(query.period || '').slice(0, 4)) || query.compareYears.at(-1) || now.getFullYear(),
   ])].sort();
 
-  const { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows } = await fetchPltsRawData({ years, db, simulateLatencyMs });
+  const { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly } = await fetchPltsRawData({ years, db, simulateLatencyMs });
 
   const latestByPsId = new Map(latestPlants.map((row) => [Number(row.psId), row]));
 
@@ -267,6 +282,7 @@ export async function getPltsDashboard(rawQuery = {}, { db = prisma, now = new D
     lastSync,
     statuses: latestPlants,
     energyFlows,
+    weatherMonthly,
   });
 
   if (!skipCache) {
@@ -319,7 +335,7 @@ async function executeWithTiming(cachePrefix, rawQuery, builderFn, options = {})
   ])].sort();
 
   const tDbStart = performance.now();
-  const { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows } = await fetchPltsRawData({
+  const { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly } = await fetchPltsRawData({
     years,
     db: options.db || prisma,
     simulateLatencyMs: options.simulateLatencyMs,
@@ -359,6 +375,7 @@ async function executeWithTiming(cachePrefix, rawQuery, builderFn, options = {})
     lastSync,
     statuses: latestPlants,
     energyFlows,
+    weatherMonthly,
   });
 
   const sliceData = builderFn(fullData);
@@ -485,6 +502,9 @@ export async function getPltsSupportDashboardWithTiming(rawQuery = {}, options =
     monthly: fullData.monthly.map((m) => ({
       yearMonth: m.yearMonth,
       radiationKwhM2: m.radiationKwhM2,
+      moduleTempC: m.moduleTempC,
+      precipitationMm: m.precipitationMm,
+      ambientTempC: m.ambientTempC,
     })),
   }), options);
 }

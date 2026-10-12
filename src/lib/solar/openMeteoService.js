@@ -63,7 +63,7 @@ export async function fetchHistoricalWeatherForLocation(loc, startDate = '2025-0
     longitude: String(loc.lon),
     start_date: startDate,
     end_date: endDate,
-    daily: 'temperature_2m_mean,temperature_2m_max,shortwave_radiation_sum',
+    daily: 'temperature_2m_mean,temperature_2m_max,shortwave_radiation_sum,precipitation_sum',
     hourly: 'temperature_2m,relative_humidity_2m',
     timezone: 'Asia/Jakarta',
   });
@@ -111,6 +111,8 @@ export async function fetchHistoricalWeatherForLocation(loc, startDate = '2025-0
     const tempMax = daily.temperature_2m_max ? daily.temperature_2m_max[i] : null;
     const radMj = daily.shortwave_radiation_sum ? daily.shortwave_radiation_sum[i] : null;
     const ghiKwhM2 = radMj !== null && radMj !== undefined ? Number((radMj / 3.6).toFixed(3)) : null;
+    const precip = daily.precipitation_sum ? daily.precipitation_sum[i] : null;
+    const precipitationMm = precip !== null && precip !== undefined ? Number(Number(precip).toFixed(1)) : 0;
 
     const hEntry = hourlyByDate.get(date) || { daytimeTemps: [], hums: [] };
     const tempDayMean = hEntry.daytimeTemps.length > 0
@@ -119,6 +121,14 @@ export async function fetchHistoricalWeatherForLocation(loc, startDate = '2025-0
     const humidityMean = hEntry.hums.length > 0
       ? Number((hEntry.hums.reduce((s, v) => s + v, 0) / hEntry.hums.length).toFixed(1))
       : null;
+
+    // Sandia PV Module Temperature Model: T_panel = T_daytime + (G_effective / 800) * (NOCT - 20)
+    // With nominal NOCT = 45 C => (NOCT - 20) = 25 C
+    let moduleTempC = null;
+    if (tempDayMean !== null && ghiKwhM2 !== null && ghiKwhM2 > 0) {
+      const effectiveDayGhiWm2 = Math.min(1000, (ghiKwhM2 * 1000) / 10);
+      moduleTempC = Number((tempDayMean + (effectiveDayGhiWm2 / 800) * 25).toFixed(1));
+    }
 
     rows.push({
       date,
@@ -130,6 +140,8 @@ export async function fetchHistoricalWeatherForLocation(loc, startDate = '2025-0
       tempDayMeanC: tempDayMean,
       ghiKwhM2,
       humidityMean,
+      precipitationMm,
+      moduleTempC,
       source: 'open-meteo-archive',
       isFinal: true,
     });
@@ -149,7 +161,7 @@ export async function fetchForecastWeatherForLocation(loc, pastDays = 2, forecas
     longitude: String(loc.lon),
     past_days: String(pastDays),
     forecast_days: String(forecastDays),
-    daily: 'temperature_2m_mean,temperature_2m_max,shortwave_radiation_sum',
+    daily: 'temperature_2m_mean,temperature_2m_max,shortwave_radiation_sum,precipitation_sum',
     hourly: 'temperature_2m,relative_humidity_2m',
     timezone: 'Asia/Jakarta',
   });
@@ -196,6 +208,8 @@ export async function fetchForecastWeatherForLocation(loc, pastDays = 2, forecas
     const tempMax = daily.temperature_2m_max ? daily.temperature_2m_max[i] : null;
     const radMj = daily.shortwave_radiation_sum ? daily.shortwave_radiation_sum[i] : null;
     const ghiKwhM2 = radMj !== null && radMj !== undefined ? Number((radMj / 3.6).toFixed(3)) : null;
+    const precip = daily.precipitation_sum ? daily.precipitation_sum[i] : null;
+    const precipitationMm = precip !== null && precip !== undefined ? Number(Number(precip).toFixed(1)) : 0;
 
     const hEntry = hourlyByDate.get(date) || { daytimeTemps: [], hums: [] };
     const tempDayMean = hEntry.daytimeTemps.length > 0
@@ -204,6 +218,13 @@ export async function fetchForecastWeatherForLocation(loc, pastDays = 2, forecas
     const humidityMean = hEntry.hums.length > 0
       ? Number((hEntry.hums.reduce((s, v) => s + v, 0) / hEntry.hums.length).toFixed(1))
       : null;
+
+    // Sandia PV Module Temperature Model
+    let moduleTempC = null;
+    if (tempDayMean !== null && ghiKwhM2 !== null && ghiKwhM2 > 0) {
+      const effectiveDayGhiWm2 = Math.min(1000, (ghiKwhM2 * 1000) / 10);
+      moduleTempC = Number((tempDayMean + (effectiveDayGhiWm2 / 800) * 25).toFixed(1));
+    }
 
     rows.push({
       date,
@@ -215,6 +236,8 @@ export async function fetchForecastWeatherForLocation(loc, pastDays = 2, forecas
       tempDayMeanC: tempDayMean,
       ghiKwhM2,
       humidityMean,
+      precipitationMm,
+      moduleTempC,
       source: 'open-meteo-forecast',
       isFinal: false,
     });
@@ -240,16 +263,19 @@ export async function upsertWeatherDailyRows(rows = []) {
     const tempDayMean = r.tempDayMeanC !== null && r.tempDayMeanC !== undefined ? Number(r.tempDayMeanC) : 'NULL';
     const ghi = r.ghiKwhM2 !== null && r.ghiKwhM2 !== undefined ? Number(r.ghiKwhM2) : 'NULL';
     const hum = r.humidityMean !== null && r.humidityMean !== undefined ? Number(r.humidityMean) : 'NULL';
+    const precip = r.precipitationMm !== null && r.precipitationMm !== undefined ? Number(r.precipitationMm) : 'NULL';
+    const modTemp = r.moduleTempC !== null && r.moduleTempC !== undefined ? Number(r.moduleTempC) : 'NULL';
     const src = `'${r.source}'`;
     const isFin = r.isFinal ? 'true' : 'false';
 
-    return `(${id}, ${date}, ${loc}, ${lat}, ${lon}, ${tempMean}, ${tempMax}, ${tempDayMean}, ${ghi}, ${hum}, ${src}, ${isFin}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
+    return `(${id}, ${date}, ${loc}, ${lat}, ${lon}, ${tempMean}, ${tempMax}, ${tempDayMean}, ${ghi}, ${hum}, ${precip}, ${modTemp}, ${src}, ${isFin}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
   }).join(',\n');
 
   const query = `
     INSERT INTO "weather_daily" (
       "id", "date", "location_key", "lat", "lon", "temp_mean_c", "temp_max_c",
-      "temp_day_mean_c", "ghi_kwh_m2", "humidity_mean", "source", "is_final", "fetched_at", "updated_at"
+      "temp_day_mean_c", "ghi_kwh_m2", "humidity_mean", "precipitation_mm", "module_temp_c",
+      "source", "is_final", "fetched_at", "updated_at"
     )
     VALUES
     ${valuesSql}
@@ -269,6 +295,8 @@ export async function upsertWeatherDailyRows(rows = []) {
       "temp_day_mean_c" = EXCLUDED."temp_day_mean_c",
       "ghi_kwh_m2" = EXCLUDED."ghi_kwh_m2",
       "humidity_mean" = EXCLUDED."humidity_mean",
+      "precipitation_mm" = EXCLUDED."precipitation_mm",
+      "module_temp_c" = EXCLUDED."module_temp_c",
       "source" = EXCLUDED."source",
       "is_final" = EXCLUDED."is_final",
       "updated_at" = CURRENT_TIMESTAMP;

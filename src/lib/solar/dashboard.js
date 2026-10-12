@@ -356,6 +356,7 @@ export function buildPltsDashboardFromRows({
   lastSync = null,
   statuses = [],
   energyFlows = [],
+  weatherMonthly = [],
 }) {
   const query = rawQuery?.mode ? rawQuery : parseDashboardQuery(rawQuery);
   const year = periodYear(query);
@@ -823,6 +824,29 @@ export function buildPltsDashboardFromRows({
       }
     }
 
+    // Weather parameters from Open-Meteo
+    const normYm = ym.includes('-') ? ym : `${ym.slice(0, 4)}-${ym.slice(4, 6)}`;
+    const monthWeatherRows = weatherMonthly.filter((w) => w.yearMonth === normYm || w.yearMonth === ym);
+    let monthModuleTempC = null;
+    let monthPrecipitationMm = null;
+    let monthAmbientTempC = null;
+
+    if (monthWeatherRows.length > 0) {
+      const temps = monthWeatherRows.map((w) => Number(w.avgModuleTempC)).filter((v) => Number.isFinite(v));
+      const ambTemps = monthWeatherRows.map((w) => Number(w.avgAmbientTempC)).filter((v) => Number.isFinite(v));
+      const precips = monthWeatherRows.map((w) => Number(w.precipitationMm)).filter((v) => Number.isFinite(v));
+
+      if (temps.length > 0) {
+        monthModuleTempC = round(temps.reduce((s, v) => s + v, 0) / temps.length, 1);
+      }
+      if (ambTemps.length > 0) {
+        monthAmbientTempC = round(ambTemps.reduce((s, v) => s + v, 0) / ambTemps.length, 1);
+      }
+      if (precips.length > 0) {
+        monthPrecipitationMm = round(precips.reduce((s, v) => s + v, 0) / precips.length, 1);
+      }
+    }
+
     return {
       yearMonth: ym,
       actualMwh,
@@ -851,6 +875,9 @@ export function buildPltsDashboardFromRows({
       loadKwh,
       loadMwh,
       radiationKwhM2: avgRadiationKwhM2,
+      moduleTempC: monthModuleTempC,
+      precipitationMm: monthPrecipitationMm,
+      ambientTempC: monthAmbientTempC,
       prValuePct: monthPr?.valuePct ?? null,
       partial: ym >= currentYearMonth || plantRows.some((plant) => plant.monthly.find((item) => item.yearMonth === ym)?.partial),
       source: [...new Set(plantRows.map((plant) => plant.monthly.find((item) => item.yearMonth === ym)?.source).filter(Boolean))].join('+') || null,
@@ -1051,8 +1078,16 @@ export function buildPltsDashboardFromRows({
       },
       climate: {
         avgRadiationKwhM2,
-        avgModuleTempC: null, // Data sensor suhu modul belum terpasang fisik di DB
+        avgModuleTempC: (() => {
+          const validTemps = monthly.map((m) => m.moduleTempC).filter((v) => Number.isFinite(v));
+          return validTemps.length ? round(validTemps.reduce((s, v) => s + v, 0) / validTemps.length, 1) : null;
+        })(),
+        avgPrecipitationMm: (() => {
+          const validPrecips = monthly.map((m) => m.precipitationMm).filter((v) => Number.isFinite(v));
+          return validPrecips.length ? round(validPrecips.reduce((s, v) => s + v, 0) / validPrecips.length, 1) : null;
+        })(),
         totalMeasurements: allSelectedClimate.length,
+        source: 'Laporan Iradiasi iSolarCloud + Open-Meteo API',
       },
       sync: {
         lastSyncTime: lastSync?.startedAt ? new Intl.DateTimeFormat('id-ID', {

@@ -160,6 +160,7 @@ model ClimateMonthly {
   psId           Int      @map("ps_id")
   radiationKwhM2 Float?   @map("radiation_kwh_m2")
   moduleTempC    Float?   @map("module_temp_c")
+  precipitationMm Float?  @map("precipitation_mm")
   source         String
   sourceRef      String?  @map("source_ref")
   metadata       Json     @default("{}")
@@ -613,6 +614,8 @@ model WeatherDaily {
   tempDayMeanC  Float?    @map("temp_day_mean_c")
   ghiKwhM2      Float?    @map("ghi_kwh_m2")
   humidityMean  Float?    @map("humidity_mean")
+  precipitationMm Float?  @map("precipitation_mm")
+  moduleTempC   Float?    @map("module_temp_c")
   source        String    @default("open-meteo-archive") @map("source")
   isFinal       Boolean   @default(false) @map("is_final")
   prevTempMeanC Float?    @map("prev_temp_mean_c")
