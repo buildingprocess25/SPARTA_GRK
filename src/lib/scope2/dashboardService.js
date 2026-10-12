@@ -17,7 +17,7 @@ function rounded(value, digits = 3) {
   return Number(Number(value).toFixed(digits));
 }
 
-function factorForGrid(grid) {
+export function factorForGrid(grid) {
   const config = CARBON_FACTORS.GRID[grid] || null;
   const registry = FACTOR_REGISTRY_PROVENANCE.find(item =>
     item.factorKey === `GRID_${grid}` && item.validationStatus === 'ACTIVE',
@@ -183,7 +183,7 @@ export async function buildScope2CanonicalDashboard({ rootDir = process.cwd(), n
     topPltsShare: [...currentRows].filter(row => row.selfConsumedKwh !== null && row.loadKwh > 0).sort((a, b) => (b.selfConsumedKwh / b.loadKwh) - (a.selfConsumedKwh / a.loadKwh)).slice(0, 10),
     anomalies: detectAnomalies(rows, { field: 'loadKwh' }),
   };
-  const factorRows = CANONICAL_DC_ENTITIES.map(entity => {
+  const factorRows = CANONICAL_DC_ENTITIES.filter(isDcLocation).map(entity => {
     const factor = factorForGrid(entity.grid);
     return {
       psId: Number(entity.sungrowPsIds[0]), dcName: entity.canonicalName, grid: entity.grid,

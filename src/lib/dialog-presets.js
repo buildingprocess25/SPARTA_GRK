@@ -20,6 +20,13 @@ export const dialogPresets = Object.freeze({
     confirmLabel: 'Keluar',
     cancelLabel: 'Tetap di sini',
   },
+  logoutDashboard: {
+    variant: 'warning',
+    title: 'Keluar dari dashboard?',
+    description: 'Kamu perlu login ulang untuk mengakses dashboard ini lagi.',
+    confirmLabel: 'Keluar',
+    cancelLabel: 'Batal',
+  },
   simpanScope1: {
     variant: 'info',
     title: 'Simpan data Scope 1?',

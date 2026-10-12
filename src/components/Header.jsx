@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { getProfileFor, getInitials } from '@/lib/profileMeta';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
+import { dialogPresets } from '@/lib/dialog-presets';
 
 export default function Header({ isProfileOpen: externalProfileOpen, setIsProfileOpen: setExternalProfileOpen, onToggleMobileSidebar }) {
   const router = useRouter();
@@ -32,7 +34,10 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
     return () => { cancelled = true; };
   }, []);
 
+  const confirm = useConfirm();
+
   const handleLogout = async () => {
+    if (!await confirm(dialogPresets.logoutDashboard)) return;
     setLoggingOut(true);
     try {
       await fetch('/api/auth/logout', { method: 'POST' });

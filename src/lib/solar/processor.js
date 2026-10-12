@@ -5,7 +5,7 @@
  * Cilacap 1, 2, 3 and Lombok A, B are independent entities without double counting.
  */
 
-import { CANONICAL_DC_ENTITIES, lookupPlantMetadata, PLANT_REGISTRY } from './plantMap.js';
+import { CANONICAL_DC_ENTITIES, isDcLocation, lookupPlantMetadata, PLANT_REGISTRY } from './plantMap.js';
 import { CONVERSION_CONFIG } from './conversionConfig.js';
 
 export const SOLAR_CONSTANTS = {
@@ -375,7 +375,15 @@ export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAudit
     });
   }
 
-  return CANONICAL_DC_ENTITIES.map(dc => {
+  // Drive Thru pilot stores ("Tk. Drive Thru ...") are physical plants with
+  // real telemetry, but they are NOT Distribution Centers - they were never
+  // supposed to count toward DC totals/rankings/averages. dashboard.js's
+  // aggregate path already filtered them out via isDcLocation(), but this
+  // function (which feeds the PLTS ranking list and the live "Daya
+  // Realtime"/"Produksi PLTS" summary cards via /api/isolar) never did,
+  // which is why Drive Thru kept showing up there specifically even though
+  // every other DC-only view correctly excluded it.
+  return CANONICAL_DC_ENTITIES.filter(isDcLocation).map(dc => {
     // Find all raw plants belonging to this DC
     const matchingPlants = rawApiPlants.filter(p => {
       const psId = Number(p.ps_id || p.psId || 0);

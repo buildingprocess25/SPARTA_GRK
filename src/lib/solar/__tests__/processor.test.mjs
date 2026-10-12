@@ -37,13 +37,13 @@ describe('Solar Telemetry & Canonical DC Entities Processor Test Suite', () => {
     assert.ok(lombokA && lombokB, 'Lombok A and Lombok B must be independent');
   });
 
-  test('2. Total Capacity Reconciliation: Runtime API capacity = 5.876,12 kWp and Baseline = 5.748,35 kWp', () => {
+  test('2. Total Capacity Reconciliation: Runtime API capacity = 5.778,8 kWp and Baseline = 5.650,35 kWp across the 37 DC entities (Drive Thru pilots excluded)', () => {
     const canonical = aggregateRawApiIntoCanonicalDCs(rawApiStationsFixture, aprilDataRaw);
     const totalApiKwp = Number(canonical.reduce((sum, dc) => sum + dc.installedKwp, 0).toFixed(2));
     const totalBaselineKwp = Number(canonical.reduce((sum, dc) => sum + dc.baselineCapKwp, 0).toFixed(2));
 
-    assert.equal(totalApiKwp, 5876.12, 'Total API capacity across all 39 entities must dynamically sum to 5876.12 kWp');
-    assert.equal(totalBaselineKwp, 5748.35, 'Total Baseline capacity across unique physical sites must equal 5748.35 kWp');
+    assert.equal(totalApiKwp, 5778.8, 'Total API capacity across the 37 DC entities must dynamically sum to 5778.8 kWp');
+    assert.equal(totalBaselineKwp, 5650.35, 'Total Baseline capacity across the 37 DC entities must equal 5650.35 kWp');
   });
 
   test('3. Metric Object Parsing: "--" or empty unit = null (not 0), energy correctly converts to kWh', () => {
@@ -84,7 +84,7 @@ describe('Solar Telemetry & Canonical DC Entities Processor Test Suite', () => {
     ];
 
     const canonical = aggregateRawApiIntoCanonicalDCs(mockRawApi, aprilDataRaw);
-    assert.equal(canonical.length, 39);
+    assert.equal(canonical.length, 37, 'Drive Thru pilot stores are excluded; only the 37 DC entities remain');
 
     const cileungsi = canonical.find(dc => dc.canonicalName === 'Cileungsi');
     assert.equal(cileungsi.currentPowerKw, null, 'Offline curr_power must be null');

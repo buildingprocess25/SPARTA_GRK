@@ -197,9 +197,9 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setIsMo
                                   }`}
                                 onClick={() => handleSubNavClick(item.id, sub.id)}
                               >
-                                <SubIcon size={16} className={isSubActive ? 'text-blue-700' : sub.colorClass} />
-                                <span className="truncate">{sub.label}</span>
-                                <AlarmBadges sourceTab={sub.id} interactive={false} className="ml-auto shrink-0" />
+                                <SubIcon size={16} className={`shrink-0 ${isSubActive ? 'text-blue-700' : sub.colorClass}`} />
+                                <span className="truncate flex-1 min-w-0">{sub.label}</span>
+                                <AlarmBadges sourceTab={sub.id} interactive={false} compact className="ml-auto shrink-0" />
                               </button>
                             );
                           })}

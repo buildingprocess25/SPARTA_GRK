@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useSustainability } from '@/context/SustainabilityContext';
 import { getGridFactor } from '@/lib/emission-factors.js';
-import { CANONICAL_DC_ENTITIES } from '@/lib/solar/plantMap.js';
+import { CANONICAL_DC_ENTITIES, isDcLocation } from '@/lib/solar/plantMap.js';
 import BaseModal from '@/components/ui/BaseModal';
 import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { notify } from '@/components/ui/ToastProvider';
@@ -32,7 +32,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
         factor: p.emissionFactor || p.gridFactorKgPerKwh || 0.87
       }));
     }
-    return CANONICAL_DC_ENTITIES.map(c => {
+    return CANONICAL_DC_ENTITIES.filter(isDcLocation).map(c => {
       const g = (c.grid || 'JAMALI').toUpperCase();
       const factorObj = getGridFactor(g);
       return {

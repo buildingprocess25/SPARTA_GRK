@@ -44,7 +44,7 @@ export const CARBON_FACTORS = {
   // sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)
   GRID: {
     JAMALI: { factor: 0.87, label: 'Jawa-Madura-Bali', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
-    KALIMANTAN_SELATAN: { factor: 1.20, label: 'Kalimantan Selatan & Tengah', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
+    KALSELTENG: { factor: 1.20, label: 'Kalimantan Selatan & Tengah', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
     KALBAR: { factor: 0.95, label: 'Kalimantan Barat', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
     BATAM: { factor: 0.76, label: 'Batam', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
     SULUTGO: { factor: 0.60, label: 'Sulutgo (Sulawesi Utara & Gorontalo)', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
@@ -324,8 +324,8 @@ export const LOCATION_GRID_MAP = {
   'DC TEGAL': 'JAMALI',
 
   // Kalimantan Selatan (1.20 kgCO2/kWh)
-  'BANJARMASIN': 'KALIMANTAN_SELATAN',
-  'DC BANJARMASIN': 'KALIMANTAN_SELATAN',
+  'BANJARMASIN': 'KALSELTENG',
+  'DC BANJARMASIN': 'KALSELTENG',
 
   // Batam (0.76 kgCO2/kWh)
   'BATAM': 'BATAM',
@@ -375,8 +375,8 @@ export const LOCATION_GRID_MAP = {
   'SULUTGO': 'SULUTGO',
   'SULSELRABAR': 'SULSELRABAR',
   'KALBAR': 'KALBAR',
-  'KALIMANTAN_SELATAN': 'KALIMANTAN_SELATAN',
-  'KALSELTENG': 'KALIMANTAN_SELATAN',
+  'KALIMANTAN_SELATAN': 'KALSELTENG',
+  'KALSELTENG': 'KALSELTENG',
   'NTB_LOMBOK': 'NTB_LOMBOK'
 };
 

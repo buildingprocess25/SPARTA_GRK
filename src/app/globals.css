@@ -115,6 +115,25 @@
     color: #E2E8F0;
   }
 
+  /* Cross-fade dark/light toggle everywhere, not just <body> - previously
+     only body had a transition, so flipping the theme made the page
+     background fade smoothly while every single card/border/text color
+     (hundreds of individual Tailwind dark: utilities) snapped instantly,
+     which read as jarring/unfinished. Base-layer rule only applies where no
+     more specific transition utility (transition-colors, transition-all,
+     etc.) is already set on an element - Tailwind's utility classes have
+     higher specificity and simply override this, so existing hover/focus
+     transition timing is untouched. Excludes SVG chart internals (Recharts
+     drives those with its own animationDuration) so toggling theme doesn't
+     fight the chart's own enter animation. */
+  *, *::before, *::after {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease, fill 0.15s ease, stroke 0.15s ease;
+  }
+
+  svg *, svg {
+    transition: none;
+  }
+
   button, input, select, textarea {
     font: inherit;
   }

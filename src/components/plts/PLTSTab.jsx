@@ -1620,6 +1620,18 @@ export default function PLTSTab() {
               <span className="text-slate-600 dark:text-slate-400">
                 {emissionsPeriods.find(p => p.value === selectedPeriod)?.label || selectedPeriod}
               </span>
+              {dcTableData.length > 0 && (
+                <>
+                  <span className="text-slate-400 dark:text-slate-500">•</span>
+                  <span className={`font-semibold px-2 py-1 rounded-md border ${hasAnyPln
+                      ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30'
+                      : 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30'
+                    }`}
+                  >
+                    {dcTableData.filter(d => d.plnConsumptionMWh !== null).length}/{dcTableData.length} DC sudah lapor konsumsi PLN
+                  </span>
+                </>
+              )}
             </div>
 
             {/* Data Table */}
@@ -1674,12 +1686,14 @@ export default function PLTSTab() {
                             {dc.grid || dc.gridRegion}
                           </span>
                         </td>
-                        <td className="text-right px-4 py-3 font-mono text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800">{formatNum(dc.plnConsumptionMWh)}</td>
+                        <td className="text-right px-4 py-3 font-mono text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800">
+                          {dc.plnConsumptionMWh !== null ? formatNum(dc.plnConsumptionMWh) : <span className="text-slate-300 dark:text-slate-600" title="Belum ada laporan konsumsi PLN untuk periode ini">—</span>}
+                        </td>
                         <td className="text-center px-4 py-3 font-mono text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                           {typeof dc.factor === 'number' ? dc.factor.toFixed(3) : (dc.gridFactor ? Number(dc.gridFactor).toFixed(3) : '—')}
                         </td>
                         <td className="text-right px-4 py-3 font-mono font-bold text-amber-700 dark:text-amber-300 bg-amber-50/30 dark:bg-amber-500/10 border-b border-slate-100 dark:border-slate-800">
-                          {formatNum(dc.scope2EmissionTon)}
+                          {dc.scope2EmissionTon !== null ? formatNum(dc.scope2EmissionTon) : <span className="text-amber-300 dark:text-amber-700/60" title="Belum ada laporan konsumsi PLN untuk periode ini">—</span>}
                         </td>
                         <td className="text-right px-4 py-3 font-mono text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800">
                           {dc.pltsProdMWh > 0 ? formatNum(dc.pltsProdMWh) : <span className="text-slate-300">—</span>}
@@ -1698,14 +1712,18 @@ export default function PLTSTab() {
                   )}
                 </tbody>
                 {dcTableData.length > 0 && (
-                  <tfoot className="bg-slate-50 dark:bg-slate-800/40 font-bold">
+                  <tfoot className="bg-slate-100 dark:bg-slate-800 font-bold">
                     <tr>
-                      <td colSpan={2} className="sticky bottom-0 left-0 z-30 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-300 dark:border-slate-600 px-4 py-3 text-slate-900 dark:text-slate-100 text-right shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">TOTAL CAKUPAN TERPILIH</td>
-                      <td className="sticky bottom-0 z-10 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalPlnMWh)}</td>
-                      <td className="sticky bottom-0 z-10 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-300 dark:border-slate-600 text-center px-4 py-3 text-slate-400 dark:text-slate-500 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">—</td>
-                      <td className="sticky bottom-0 z-10 bg-amber-50/80 dark:bg-amber-500/10 border-t border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-amber-700 dark:text-amber-300 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalScope2Ton)}</td>
-                      <td className="sticky bottom-0 z-10 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalPltsMWh)}</td>
-                      <td className="sticky bottom-0 z-10 bg-emerald-50/80 dark:bg-emerald-500/10 border-t border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-emerald-700 dark:text-emerald-300 shadow-[0_-1px_2px_rgba(0,0,0,0.05)]">{formatNum(totalAvoidedTon)}</td>
+                      <td colSpan={2} className="sticky bottom-0 left-0 z-30 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3 text-slate-900 dark:text-slate-100 text-right shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">TOTAL CAKUPAN TERPILIH</td>
+                      <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">
+                        {hasAnyPln ? formatNum(totalPlnMWh) : <span className="text-slate-300 dark:text-slate-600">—</span>}
+                      </td>
+                      <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-center px-4 py-3 text-slate-400 dark:text-slate-500 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">—</td>
+                      <td className="sticky bottom-0 z-10 bg-amber-100 dark:bg-amber-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-amber-700 dark:text-amber-300 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">
+                        {hasAnyScope2 ? formatNum(totalScope2Ton) : <span className="text-amber-300 dark:text-amber-700/60">—</span>}
+                      </td>
+                      <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">{formatNum(totalPltsMWh)}</td>
+                      <td className="sticky bottom-0 z-10 bg-emerald-100 dark:bg-emerald-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-emerald-700 dark:text-emerald-300 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">{formatNum(totalAvoidedTon)}</td>
                     </tr>
                   </tfoot>
                 )}
