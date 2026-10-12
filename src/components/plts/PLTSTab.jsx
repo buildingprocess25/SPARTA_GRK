@@ -38,6 +38,7 @@ import { isFeatureEnabled, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib
 import { buildCacheKey } from '@/lib/solar/cacheKey';
 import { SummaryCardsSkeleton, ChartSkeleton, TabContentSkeleton, TableSkeleton } from '@/components/plts/PLTSDashboardSkeletons';
 import InputDataButton from '@/components/ui/InputDataButton';
+import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import PLTSInputModal from '@/components/plts/PLTSInputModal';
 import { useAlarms } from '@/context/AlarmContext';
 
@@ -689,42 +690,29 @@ export default function PLTSTab() {
         actions={
           <div className="flex shrink-0 flex-col items-end gap-2 self-start">
             <InputDataButton label="Input Data PLTS" icon={Sun} onClick={() => setIsInputModalOpen(true)} />
-            <div className="inline-flex flex-wrap gap-1 rounded-full bg-slate-100 dark:bg-slate-800 p-1">
-              <button
-                type="button"
-                className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'overview'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-semibold'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-                  }`}
-                onClick={() => setActivePltsSubView('overview')}
-              >
-                Target
-              </button>
-              {isAuditBaselineEnabled && (
-                <button
-                  type="button"
-                  className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'april-audit'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-semibold'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-                    }`}
-                  onClick={() => setActivePltsSubView('april-audit')}
-                >
-                  <FileSpreadsheet size={14} className="text-emerald-600 dark:text-emerald-400" />
-                  <span>Audit Baseline (April 2026)</span>
-                </button>
-              )}
-              <button
-                type="button"
-                className={`flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium rounded-full transition-all ${activePltsSubView === 'isolar-api'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm font-semibold'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-                  }`}
-                onClick={() => setActivePltsSubView('isolar-api')}
-              >
-                <Radio size={14} className="text-emerald-500 animate-pulse" />
-                <span>Live iSolarCloud API</span>
-              </button>
-            </div>
+            <SegmentedTabs
+              value={activePltsSubView}
+              onChange={setActivePltsSubView}
+              fullWidthOnMobile={false}
+              options={[
+                { value: 'overview', label: 'Target' },
+                {
+                  value: 'april-audit',
+                  label: 'Audit Baseline (April 2026)',
+                  icon: FileSpreadsheet,
+                  activeIconClassName: 'text-emerald-600 dark:text-emerald-400',
+                  inactiveIconClassName: 'text-emerald-600 dark:text-emerald-400',
+                  hidden: !isAuditBaselineEnabled,
+                },
+                {
+                  value: 'isolar-api',
+                  label: 'Live iSolarCloud API',
+                  icon: Radio,
+                  activeIconClassName: 'text-emerald-500 animate-pulse',
+                  inactiveIconClassName: 'text-emerald-500 animate-pulse',
+                },
+              ]}
+            />
           </div>
         }
       />

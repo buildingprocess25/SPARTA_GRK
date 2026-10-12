@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   Fuel, FileSpreadsheet, Download, RefreshCw,
   CheckCircle2, AlertCircle, AlertTriangle, Calculator,
-  Database, UploadCloud, Check, ChevronDown, Settings2
+  Database, UploadCloud, Check, ChevronDown, Settings2, Car
 } from 'lucide-react';
 import { useSustainability } from '@/context/SustainabilityContext';
 import { calculateScope1FuelEmission } from '@/lib/carbon/carbonEngine';
@@ -14,7 +14,7 @@ import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { notify } from '@/components/ui/ToastProvider';
 import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 
-export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
+export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCategory = 'GENSET' }) {
   const { dcLocations, addDataEntry, importBatchData, refreshData } = useSustainability();
   const confirm = useConfirm();
 
@@ -25,6 +25,14 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
   const [facilities, setFacilities] = useState(dcLocations?.length > 0 ? dcLocations : MASTER_FACILITIES);
   const [facilitySearch, setFacilitySearch] = useState('');
   const [selectedFacilityId, setSelectedFacilityId] = useState('');
+
+  // Kategori input: menentukan apakah BBM ini untuk genset stasioner (DC/Toko)
+  // atau kendaraan operasional (mobile) - backend /api/sustainability sudah
+  // mendukung keduanya via field `module`, modal ini sebelumnya selalu
+  // mengirim 'genset' saja.
+  const [category, setCategory] = useState(initialCategory === 'VEHICLE' ? 'VEHICLE' : 'GENSET'); // 'GENSET' | 'VEHICLE'
+  const [vehiclePlateNo, setVehiclePlateNo] = useState('');
+  const [operatorUnit, setOperatorUnit] = useState('');
 
   // Form Fields (Scope 1 Genset)
   const [fuelType, setFuelType] = useState('SOLAR'); // 'SOLAR' | 'PERTALITE' | 'PERTAMAX'
@@ -127,6 +135,9 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
     if (!activityDate || !activityDate.startsWith(`${periodYear}-${periodMonth.padStart(2, '0')}`)) {
       errors.date = 'Tanggal pengisian harus berada dalam periode yang dipilih.';
     }
+    if (category === 'VEHICLE' && !vehiclePlateNo.trim()) {
+      errors.vehiclePlateNo = 'Plat nomor kendaraan wajib diisi';
+    }
     if (fuelInputMode === 'liter') {
       const l = parseFloat(fuelLiters);
       if (!fuelLiters || isNaN(l) || l <= 0) {
@@ -159,11 +170,13 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
 
     const periodStr = `${periodYear}-${periodMonth.padStart(2, '0')}`;
     const dateStr = activityDate || `${periodStr}-15`;
-    const idempotencyKey = `tx-genset-${selectedDC.id}-${dateStr}-${Date.now()}`;
-    const refCode = proofRef.trim() || `GEN-${selectedDC.code || 'DC'}-${periodMonth}${periodYear.slice(2)}-${Date.now().toString().slice(-4)}`;
+    const isVehicle = category === 'VEHICLE';
+    const idempotencyKey = `tx-${isVehicle ? 'vehicle' : 'genset'}-${selectedDC.id}-${dateStr}-${Date.now()}`;
+    const refPrefix = isVehicle ? 'VHC' : 'GEN';
+    const refCode = proofRef.trim() || `${refPrefix}-${selectedDC.code || 'DC'}-${periodMonth}${periodYear.slice(2)}-${Date.now().toString().slice(-4)}`;
 
     const payload = {
-      module: 'genset',
+      module: isVehicle ? 'vehicle' : 'genset',
       dcId: selectedDC.id,
       dcName: selectedDC.name,
       dcCode: selectedDC.code,
@@ -173,9 +186,13 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
       fuelLiters: fuelInputMode === 'liter' ? parseFloat(fuelLiters) || 0 : liveCalc.liters,
       costRupiah: fuelInputMode === 'rupiah' ? parseFloat(costRupiah) || null : (liveCalc.costJuta * 1000000),
       pricePerLiter: parseFloat(pricePerLiter) || 15000,
-      runHours: parseFloat(runHours) || 40,
-      gensetAssetCode: gensetAssetCode.trim() || `GEN-${selectedDC.code || 'DC'}-01`,
-      gensetKva: parseFloat(gensetKva) || 500,
+      ...(isVehicle
+        ? { vehiclePlateNo: vehiclePlateNo.trim(), operatorUnit: operatorUnit.trim() || '-' }
+        : {
+          runHours: parseFloat(runHours) || 40,
+          gensetAssetCode: gensetAssetCode.trim() || `GEN-${selectedDC.code || 'DC'}-01`,
+          gensetKva: parseFloat(gensetKva) || 500,
+        }),
       status: fuelType === 'PERTAMAX' ? 'DRAFT' : 'ACTIVE',
       proofRef: refCode,
       source: 'MANUAL_MODAL',
@@ -199,7 +216,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
 
       setStatusMessage({
         type: 'success',
-        text: `Data konsumsi solar ${selectedDC.name} (${payload.fuelLiters.toLocaleString('id-ID')} L / +${liveCalc.emissionTon.toFixed(2)} tCO₂e) berhasil disimpan!`
+        text: `Data ${isVehicle ? 'kendaraan' : 'genset'} ${selectedDC.name} (${payload.fuelLiters.toLocaleString('id-ID')} L / +${liveCalc.emissionTon.toFixed(2)} tCO₂e) berhasil disimpan!`
       });
       notify.success(toastPresets.saveSuccess);
 
@@ -402,10 +419,12 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
     <BaseModal
       open={isOpen}
       onClose={handleCloseRequest}
-      title="Input Data Scope 1 — Solar Genset"
-      subtitle="Pencatatan konsumsi BBM solar genset cadangan operasional DC & fasilitas."
-      icon={<Fuel size={20} className="text-rose-600 dark:text-rose-400" />}
-      badge="BBM Stasioner"
+      title={category === 'VEHICLE' ? 'Input Data Scope 1 — Kendaraan' : 'Input Data Scope 1 — Genset'}
+      subtitle={category === 'VEHICLE'
+        ? 'Pencatatan konsumsi BBM kendaraan operasional (mobile combustion).'
+        : 'Pencatatan konsumsi BBM genset cadangan operasional DC & fasilitas.'}
+      icon={category === 'VEHICLE' ? <Car size={20} className="text-rose-600 dark:text-rose-400" /> : <Fuel size={20} className="text-rose-600 dark:text-rose-400" />}
+      badge={category === 'VEHICLE' ? 'BBM Mobile' : 'BBM Stasioner'}
       size="md"
       loading={isSubmitting || isProcessingExcel}
     >
@@ -460,6 +479,45 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
         <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
           {activeTab === 'manual' ? (
             <form id="scope1-manual-form" onSubmit={handleManualSubmit} className="space-y-4">
+              {/* Bagian 0: Kategori Input */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                  Kategori Input <span className="text-rose-500 dark:text-rose-400">*</span>
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCategory('GENSET')}
+                    className={`p-3 rounded-xl border-2 text-left transition-all flex items-center gap-2.5 ${
+                      category === 'GENSET'
+                        ? 'bg-rose-50/40 dark:bg-rose-500/10 border-rose-500 dark:border-rose-500/60 shadow-xs'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                    }`}
+                  >
+                    <Fuel size={16} className={category === 'GENSET' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-slate-500'} />
+                    <div>
+                      <div className="font-bold text-xs text-slate-900 dark:text-slate-100">Genset</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400">Genset cadangan Toko & DC</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCategory('VEHICLE')}
+                    className={`p-3 rounded-xl border-2 text-left transition-all flex items-center gap-2.5 ${
+                      category === 'VEHICLE'
+                        ? 'bg-rose-50/40 dark:bg-rose-500/10 border-rose-500 dark:border-rose-500/60 shadow-xs'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                    }`}
+                  >
+                    <Car size={16} className={category === 'VEHICLE' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-slate-500'} />
+                    <div>
+                      <div className="font-bold text-xs text-slate-900 dark:text-slate-100">Kendaraan</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400">BBM kendaraan operasional</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
               {/* Bagian 1: Lokasi / Fasilitas Operasional */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
@@ -619,7 +677,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                     </div>
                     <div>
                       <div className="text-[11px] text-amber-700 dark:text-amber-400 font-mono font-semibold">2.6685 kgCO₂e/L</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Genset Utama DC (ESDM)</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Faktor ESDM</div>
                     </div>
                   </button>
 
@@ -642,7 +700,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                     </div>
                     <div>
                       <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-mono font-semibold">2.2951 kgCO₂e/L</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Genset Portable Toko</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Faktor ESDM</div>
                     </div>
                   </button>
 
@@ -665,7 +723,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                     </div>
                     <div>
                       <div className="text-[11px] text-blue-700 dark:text-blue-400 font-mono font-semibold">2.2868 kgCO₂e/L</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Cadangan Khusus</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Status: Pending Validasi</div>
                     </div>
                   </button>
                 </div>
@@ -732,67 +790,109 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess }) {
                 )}
               </div>
 
-              {/* Bagian 4: Detail Teknis Mesin Genset (Collapsible, Default Tertutup) */}
-              <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-slate-50/60 dark:bg-slate-800/40">
-                <button
-                  type="button"
-                  onClick={() => setIsGensetDetailsOpen(!isGensetDetailsOpen)}
-                  className="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-colors"
-                >
-                  <span className="flex items-center gap-2">
-                    <Settings2 size={14} className="text-slate-400 dark:text-slate-500" />
-                    <span>Detail Teknis Mesin Genset (Opsional)</span>
+              {/* Bagian 4: Detail Teknis - berbeda untuk Genset (stasioner) vs Kendaraan (mobile) */}
+              {category === 'VEHICLE' ? (
+                <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 space-y-2.5">
+                  <span className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                    <Car size={14} className="text-slate-400 dark:text-slate-500" />
+                    <span>Detail Kendaraan</span>
                   </span>
-                  <span className="text-slate-500 dark:text-slate-400 text-[11px] flex items-center gap-1 font-semibold">
-                    {isGensetDetailsOpen ? 'Sembunyikan' : 'Buka Detail'}
-                    <ChevronDown size={14} className={`transition-transform duration-200 ${isGensetDetailsOpen ? 'rotate-180' : ''}`} />
-                  </span>
-                </button>
-
-                {isGensetDetailsOpen && (
-                  <div className="p-3.5 pt-1 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-2.5 animate-in fade-in duration-150">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
-                      <label htmlFor="modal-asset-code" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                        Kode Aset Genset
+                      <label htmlFor="modal-vehicle-plate" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                        Plat Nomor <span className="text-rose-500 dark:text-rose-400">*</span>
                       </label>
                       <input
-                        id="modal-asset-code"
+                        id="modal-vehicle-plate"
                         type="text"
-                        value={gensetAssetCode}
-                        onChange={(e) => setGensetAssetCode(e.target.value)}
-                        placeholder="GEN-DC-500KVA"
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-bold text-slate-800 dark:text-slate-200"
+                        value={vehiclePlateNo}
+                        onChange={(e) => setVehiclePlateNo(e.target.value.toUpperCase())}
+                        placeholder="B 1234 XYZ"
+                        className={`w-full rounded-lg border bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 ${
+                          formErrors.vehiclePlateNo ? 'border-rose-400 dark:border-rose-500/60' : 'border-slate-200 dark:border-slate-700'
+                        }`}
                       />
+                      {formErrors.vehiclePlateNo && (
+                        <p className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 mt-1">{formErrors.vehiclePlateNo}</p>
+                      )}
                     </div>
                     <div>
-                      <label htmlFor="modal-kva-rating" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                        Kapasitas (kVA)
+                      <label htmlFor="modal-operator-unit" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                        Unit / Nama Pengemudi (Opsional)
                       </label>
                       <input
-                        id="modal-kva-rating"
-                        type="number"
-                        value={gensetKva}
-                        onChange={(e) => setGensetKva(e.target.value)}
-                        placeholder="500"
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="modal-run-hours" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                        Jam Operasi (Hour Meter)
-                      </label>
-                      <input
-                        id="modal-run-hours"
-                        type="number"
-                        value={runHours}
-                        onChange={(e) => setRunHours(e.target.value)}
-                        placeholder="40"
+                        id="modal-operator-unit"
+                        type="text"
+                        value={operatorUnit}
+                        onChange={(e) => setOperatorUnit(e.target.value)}
+                        placeholder="Contoh: Pengiriman Toko"
                         className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200"
                       />
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-slate-50/60 dark:bg-slate-800/40">
+                  <button
+                    type="button"
+                    onClick={() => setIsGensetDetailsOpen(!isGensetDetailsOpen)}
+                    className="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Settings2 size={14} className="text-slate-400 dark:text-slate-500" />
+                      <span>Detail Teknis Mesin Genset (Opsional)</span>
+                    </span>
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px] flex items-center gap-1 font-semibold">
+                      {isGensetDetailsOpen ? 'Sembunyikan' : 'Buka Detail'}
+                      <ChevronDown size={14} className={`transition-transform duration-200 ${isGensetDetailsOpen ? 'rotate-180' : ''}`} />
+                    </span>
+                  </button>
+
+                  {isGensetDetailsOpen && (
+                    <div className="p-3.5 pt-1 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-2.5 animate-in fade-in duration-150">
+                      <div>
+                        <label htmlFor="modal-asset-code" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                          Kode Aset Genset
+                        </label>
+                        <input
+                          id="modal-asset-code"
+                          type="text"
+                          value={gensetAssetCode}
+                          onChange={(e) => setGensetAssetCode(e.target.value)}
+                          placeholder="GEN-DC-500KVA"
+                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-bold text-slate-800 dark:text-slate-200"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="modal-kva-rating" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                          Kapasitas (kVA)
+                        </label>
+                        <input
+                          id="modal-kva-rating"
+                          type="number"
+                          value={gensetKva}
+                          onChange={(e) => setGensetKva(e.target.value)}
+                          placeholder="500"
+                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="modal-run-hours" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                          Jam Operasi (Hour Meter)
+                        </label>
+                        <input
+                          id="modal-run-hours"
+                          type="number"
+                          value={runHours}
+                          onChange={(e) => setRunHours(e.target.value)}
+                          placeholder="40"
+                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Bagian 5: Bukti Transaksi */}
               <div className="space-y-1">

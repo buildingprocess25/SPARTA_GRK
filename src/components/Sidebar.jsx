@@ -24,7 +24,7 @@ const navItems = [
         icon: TrendingDown,
         badge: 'PLTS & Air',
         subItems: [
-          { id: 'plts', label: 'Kelistrikan PLTS Atap', icon: Sun, colorClass: 'text-orange-500' },
+          { id: 'plts', label: 'PLTS', icon: Sun, colorClass: 'text-orange-500' },
           { id: 'water', label: 'Water Recycle', icon: Droplets, colorClass: 'text-cyan-500' }
         ]
       },
@@ -34,8 +34,8 @@ const navItems = [
         icon: TrendingUp,
         badge: 'Scope 1 & 2',
         subItems: [
-          { id: 'scope1', label: 'Scope 1: Solar Genset', icon: Fuel, colorClass: 'text-rose-500' },
-          { id: 'scope2', label: 'Scope 2: Listrik PLN', icon: Zap, colorClass: 'text-amber-500' }
+          { id: 'scope1', label: 'Scope 1', icon: Fuel, colorClass: 'text-rose-500' },
+          { id: 'scope2', label: 'Scope 2', icon: Zap, colorClass: 'text-amber-500' }
         ]
       },
     ],

@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   TrendingUp, Fuel, Zap, AlertCircle,
   Calculator, Gauge, Factory, Building2, Flame,
-  Layers, MapPin, Store, Calendar, ArrowRight, PlusCircle, Search
+  Layers, MapPin, Store, Calendar, ArrowRight, PlusCircle, Search, Car, RefreshCw
 } from 'lucide-react';
 import {
-  BarChart, Bar, LineChart, Line, XAxis, YAxis,
+  Bar, Line, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart, Cell
 } from 'recharts';
 import {
@@ -18,10 +18,10 @@ import {
   formatYAxisNumber,
   ChartPillLegend,
 } from '@/components/ui/ChartTheme';
-import { useSustainability } from '@/context/SustainabilityContext';
 import PageHeader from '@/components/ui/PageHeader';
 import KpiCard from '@/components/ui/KpiCard';
 import CardBox from '@/components/ui/CardBox';
+import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import Scope2AnnualLoadDashboard from '@/components/scope2/Scope2AnnualLoadDashboard';
 import Scope1InputModal from '@/components/scope1/Scope1InputModal';
 import InputDataButton from '@/components/ui/InputDataButton';
@@ -34,7 +34,6 @@ import {
 } from '@/data/sustainabilityData';
 
 export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveSubScope }) {
-  const { scope1, scope2, dcLocations } = useSustainability();
   const [isInputModalOpen, setIsInputModalOpen] = useState(false);
 
   // Hierarchy filter state
@@ -42,17 +41,64 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
   const [selectedFacility, setSelectedFacility] = useState('all'); // 'all' | 'office' | 'warehouse' | 'toko'
   const [selectedWarehouseSub, setSelectedWarehouseSub] = useState('all'); // 'all' | 'wh' | 'bulky' | 'depo' | 'storeHub'
   const [selectedPeriod, setSelectedPeriod] = useState('ytd'); // 'ytd' or '0'..'11'
-  const [gensetSearch, setGensetSearch] = useState('');
 
-  const filteredDcLocations = useMemo(() => {
-    const query = gensetSearch.trim().toLowerCase();
-    if (!query) return dcLocations;
-    return dcLocations.filter((dc) => (
-      (dc.name || '').toLowerCase().includes(query)
-      || (dc.code || '').toLowerCase().includes(query)
-      || (dc.region || '').toLowerCase().includes(query)
+  // Scope 1 real-data state (FuelActivity: Genset stasioner + Kendaraan operasional)
+  const [scope1Period, setScope1Period] = useState('');
+  const [scope1Api, setScope1Api] = useState(null);
+  const [scope1Loading, setScope1Loading] = useState(true);
+  const [scope1Error, setScope1Error] = useState(null);
+  const [scope1Search, setScope1Search] = useState('');
+  const [scope1Category, setScope1Category] = useState('genset'); // 'genset' | 'vehicle'
+
+  const loadScope1Data = async (period) => {
+    setScope1Loading(true);
+    setScope1Error(null);
+    try {
+      const url = period ? `/api/scope1?period=${encodeURIComponent(period)}` : '/api/scope1';
+      const res = await fetch(url);
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || `HTTP ${res.status}`);
+      setScope1Api(json);
+      if (!period) setScope1Period(json.period);
+    } catch (e) {
+      setScope1Error(e.message);
+    } finally {
+      setScope1Loading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadScope1Data(scope1Period || undefined);
+  }, [scope1Period]);
+
+  const scope1PeriodOptions = useMemo(() => {
+    const months = scope1Api?.availableMonths || [];
+    if (months.length === 0) return [];
+    const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const years = [...new Set(months.map(m => m.slice(0, 4)))].sort().reverse();
+    const options = [];
+    years.forEach(year => {
+      const monthsInYear = months.filter(m => m.startsWith(year));
+      const last = monthsInYear.at(-1);
+      options.push({ value: `${year}-01_${last}`, label: `Jan-${monthNames[Number(last.slice(5, 7)) - 1].slice(0, 3)} ${year} (YTD)` });
+      [...monthsInYear].reverse().forEach(ym => {
+        options.push({ value: `${ym}_${ym}`, label: `${monthNames[Number(ym.slice(5, 7)) - 1]} ${year}` });
+      });
+    });
+    return options;
+  }, [scope1Api?.availableMonths]);
+
+  const scope1Slice = scope1Api?.[scope1Category] || null;
+  const filteredScope1Rows = useMemo(() => {
+    const rows = scope1Slice?.rows || [];
+    const query = scope1Search.trim().toLowerCase();
+    if (!query) return rows;
+    return rows.filter(r => (
+      (r.name || '').toLowerCase().includes(query)
+      || (r.region || '').toLowerCase().includes(query)
+      || (r.grid || '').toLowerCase().includes(query)
     ));
-  }, [dcLocations, gensetSearch]);
+  }, [scope1Slice?.rows, scope1Search]);
 
   const handleScopeChange = (scope) => {
     if (setActiveSubScope) {
@@ -114,7 +160,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           <div>
             <strong className="text-slate-900 dark:text-slate-100 font-semibold">Sumber:</strong>{' '}
             {activeSubScope === 'scope1'
-              ? 'Konsumsi solar unit Genset cadangan di ~23.000 toko & Distribution Center serta kendaraan operasional.'
+              ? 'Solar (Biosolar B35) untuk genset cadangan Toko & DC, serta Pertalite/Pertamax untuk kendaraan operasional.'
               : 'Konsumsi energi listrik gedung kantor cabang (Office), warehouse logistik (WH, Bulky, Depo, Store Hub), dan jaringan toko ritel dari PLN.'}
           </div>
           <div>
@@ -129,6 +175,18 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           </div>
         </div>
       </details>
+
+      {/* Switcher Kategori Scope 1: Genset (stasioner) vs Kendaraan (mobile) - dipisah total, bukan digabung satu tabel/chart */}
+      {activeSubScope === 'scope1' && (
+        <SegmentedTabs
+          value={scope1Category}
+          onChange={setScope1Category}
+          options={[
+            { value: 'genset', label: 'Genset', icon: Fuel },
+            { value: 'vehicle', label: 'Kendaraan Operasional', icon: Car },
+          ]}
+        />
+      )}
 
       {/* FILTER HIERARKI CABANG & FASILITAS (KHUSUS SCOPE 2 LISTRIK PLN) */}
       {activeSubScope === 'scope2' && (
@@ -299,38 +357,77 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
       {/* 3. Baris 4 KPI */}
       {activeSubScope === 'scope1' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
-          <KpiCard
-            label="TOTAL KONSUMSI SOLAR YTD"
-            value={formatNum(scope1.summary.totalFuelLitersYTD)}
-            unit="Liter"
-            trend="Pemakaian darurat genset saat outage PLN"
-            icon={Fuel}
-            theme="genset"
-          />
-          <KpiCard
-            label="TOTAL EMISI SCOPE 1"
-            value={formatNum(scope1.summary.totalEmissionCO2e, 1)}
-            unit="tCO₂e"
-            trend="+ Liter × 2.6685 kgCO₂e/L"
-            icon={Flame}
-            theme="emission"
-          />
-          <KpiCard
-            label="BIAYA SOLAR INDUSTRI"
-            value={`Rp ${formatNum(scope1.summary.fuelCostTotalJuta, 1)}`}
-            unit="Juta"
-            trend="Est. Rp 15.000 / Liter industri"
-            icon={Calculator}
-            theme="calc"
-          />
-          <KpiCard
-            label="UNIT GENSET AKTIF"
-            value={scope1.summary.activeGensetUnits}
-            unit="Unit DC"
-            trend={`Rata-rata ${scope1.summary.avgRunHoursPerMonth} jam operasi/bulan`}
-            icon={Factory}
-            theme="pln"
-          />
+          {scope1Category === 'genset' ? (
+            <>
+              <KpiCard
+                label="KONSUMSI SOLAR GENSET"
+                value={scope1Loading ? '—' : formatNum(scope1Slice?.summary?.totalLiters ?? 0)}
+                unit="Liter"
+                trend="Genset cadangan Toko & DC saat outage PLN"
+                icon={Fuel}
+                theme="genset"
+              />
+              <KpiCard
+                label="FASILITAS BER-GENSET"
+                value={scope1Loading ? '—' : (scope1Slice?.summary?.facilityCount ?? 0)}
+                unit="Lokasi"
+                trend={`${scope1Slice?.summary?.recordCount ?? 0} transaksi pengisian tercatat`}
+                icon={Factory}
+                theme="pln"
+              />
+              <KpiCard
+                label="EMISI GENSET"
+                value={scope1Loading ? '—' : formatNum(scope1Slice?.summary?.totalEmissionTon ?? 0, 2)}
+                unit="tCO₂e"
+                trend="Scope 1A Stationary Combustion"
+                icon={Flame}
+                theme="emission"
+              />
+              <KpiCard
+                label="BIAYA BBM GENSET"
+                value={scope1Loading ? '—' : `Rp ${formatNum(scope1Slice?.summary?.totalCostJuta ?? 0, 1)}`}
+                unit="Juta"
+                trend="Solar/Pertalite/Pertamax genset"
+                icon={Calculator}
+                theme="calc"
+              />
+            </>
+          ) : (
+            <>
+              <KpiCard
+                label="KONSUMSI BENSIN KENDARAAN"
+                value={scope1Loading ? '—' : formatNum(scope1Slice?.summary?.totalLiters ?? 0)}
+                unit="Liter"
+                trend="Pertalite/Pertamax kendaraan operasional"
+                icon={Car}
+                theme="pln"
+              />
+              <KpiCard
+                label="FASILITAS PELAPOR"
+                value={scope1Loading ? '—' : (scope1Slice?.summary?.facilityCount ?? 0)}
+                unit="Lokasi"
+                trend={`${scope1Slice?.summary?.recordCount ?? 0} transaksi pengisian tercatat`}
+                icon={Building2}
+                theme="default"
+              />
+              <KpiCard
+                label="EMISI KENDARAAN"
+                value={scope1Loading ? '—' : formatNum(scope1Slice?.summary?.totalEmissionTon ?? 0, 2)}
+                unit="tCO₂e"
+                trend="Scope 1B Mobile Combustion"
+                icon={Flame}
+                theme="emission"
+              />
+              <KpiCard
+                label="BIAYA BBM KENDARAAN"
+                value={scope1Loading ? '—' : `Rp ${formatNum(scope1Slice?.summary?.totalCostJuta ?? 0, 1)}`}
+                unit="Juta"
+                trend="Pertalite/Pertamax kendaraan"
+                icon={Calculator}
+                theme="calc"
+              />
+            </>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
@@ -375,19 +472,19 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           <div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
               {activeSubScope === 'scope1'
-                ? 'Tren Konsumsi Solar & Emisi Genset Bulanan (2026)'
+                ? (scope1Category === 'genset' ? 'Tren Konsumsi & Emisi Genset Bulanan' : 'Tren Konsumsi & Emisi Kendaraan Bulanan')
                 : `Tren Konsumsi Listrik & Emisi 12 Bulan — ${selectedBranch === 'all' ? 'Seluruh Cabang' : currentBranchObj?.name || 'Cabang'} (${selectedFacility.toUpperCase()})`}
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               {activeSubScope === 'scope1'
-                ? 'Data pemakaian genset cadangan operasional'
+                ? (scope1Category === 'genset' ? 'Data pemakaian genset cadangan operasional' : 'Data pemakaian BBM kendaraan operasional')
                 : 'Pola konsumsi listrik bulanan PLN (kWh) dan kalkulasi emisi Scope 2 (tCO₂e)'}
             </p>
           </div>
           <ChartPillLegend
             items={activeSubScope === 'scope1' ? [
-              { label: 'Konsumsi Solar', color: CHART_PALETTE.genset },
-              { label: 'Emisi CO₂e', color: CHART_PALETTE.emission },
+              { label: scope1Category === 'genset' ? 'Solar Genset' : 'Bensin Kendaraan', color: CHART_PALETTE.genset },
+              { label: 'Emisi CO₂e', color: CHART_PALETTE.emission, type: 'line' },
             ] : [
               { label: 'Konsumsi Listrik PLN', color: CHART_PALETTE.plts },
               { label: 'Emisi Scope 2', color: CHART_PALETTE.emission, type: 'line' },
@@ -398,7 +495,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
         <div className="w-full h-80 lg:h-96 pt-2">
           <ResponsiveContainer width="100%" height="100%">
             {activeSubScope === 'scope1' ? (
-              <BarChart data={scope1.monthlyTrend} margin={{ top: 12, right: 16, left: 16, bottom: 4 }}>
+              <ComposedChart data={scope1Slice?.monthlyTrend || []} margin={{ top: 12, right: 16, left: 16, bottom: 4 }}>
                 <CartesianGrid {...CHART_GRID_PROPS} />
                 <XAxis dataKey="month" {...CHART_AXIS_PROPS} />
                 <YAxis
@@ -407,7 +504,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                   tick={{ fontSize: 10, fill: '#64748B' }}
                   width={72}
                   tickFormatter={v => `${formatYAxisNumber(v)} L`}
-                  label={{ value: 'Liter Solar', angle: -90, position: 'insideLeft', offset: 0, style: { fill: '#94A3B8', fontSize: 10, textAnchor: 'middle' } }}
+                  label={{ value: scope1Category === 'genset' ? 'Liter Solar' : 'Liter Bensin', angle: -90, position: 'insideLeft', offset: 0, style: { fill: '#94A3B8', fontSize: 10, textAnchor: 'middle' } }}
                 />
                 <YAxis
                   yAxisId="right"
@@ -421,16 +518,10 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 <Tooltip
                   content={({ active, payload, label }) => {
                     if (active && payload && payload.length) {
-                      const isPartial = label?.includes('*') || label === 'Okt';
                       return (
                         <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs space-y-1.5 min-w-[220px] select-text">
                           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1 mb-1">
-                            <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {label} 2026</span>
-                            {isPartial && (
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
-                                Parsial
-                              </span>
-                            )}
+                            <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {label}</span>
                           </div>
                           <div className="space-y-1 font-mono">
                             {payload.map((entry, idx) => (
@@ -440,7 +531,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                                   <span>{entry.name}:</span>
                                 </div>
                                 <strong className="text-slate-900 dark:text-slate-100">
-                                  {formatYAxisNumber(entry.value)} {entry.dataKey === 'fuelLiters' ? 'Liter' : 'tCO₂e'}
+                                  {formatYAxisNumber(entry.value)} {entry.dataKey === 'emissionTon' ? 'tCO₂e' : 'Liter'}
                                 </strong>
                               </div>
                             ))}
@@ -451,17 +542,9 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     return null;
                   }}
                 />
-                <Bar yAxisId="left" dataKey="fuelLiters" name="Konsumsi Solar (Liter)" fill={CHART_PALETTE.genset} radius={[4, 4, 0, 0]} maxBarSize={32} animationDuration={800} animationEasing="ease-out">
-                  {scope1.monthlyTrend.map((d, i) => (
-                    <Cell key={`genset-cell-${i}`} opacity={d.month?.includes('*') || d.month === 'Okt' ? PARTIAL_OPACITY : 1} />
-                  ))}
-                </Bar>
-                <Bar yAxisId="right" dataKey="emissionTon" name="Emisi CO₂e (Ton)" fill={CHART_PALETTE.emission} radius={[4, 4, 0, 0]} maxBarSize={32} animationDuration={800} animationEasing="ease-out">
-                  {scope1.monthlyTrend.map((d, i) => (
-                    <Cell key={`emi-cell-${i}`} opacity={d.month?.includes('*') || d.month === 'Okt' ? PARTIAL_OPACITY : 1} />
-                  ))}
-                </Bar>
-              </BarChart>
+                <Bar yAxisId="left" dataKey="liters" name={scope1Category === 'genset' ? 'Solar Genset (Liter)' : 'Bensin Kendaraan (Liter)'} fill={CHART_PALETTE.genset} radius={[4, 4, 0, 0]} maxBarSize={32} animationDuration={800} animationEasing="ease-out" />
+                <Line yAxisId="right" type="monotone" dataKey="emissionTon" name="Emisi Scope 1 (tCO₂e)" stroke={CHART_PALETTE.emission} strokeWidth={2.5} dot={{ r: 3.5, fill: CHART_PALETTE.emission }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
+              </ComposedChart>
             ) : (
               <ComposedChart data={hierarchyStats.monthlyData} margin={{ top: 12, right: 16, left: 16, bottom: 4 }}>
                 <CartesianGrid {...CHART_GRID_PROPS} />
@@ -534,66 +617,122 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           <div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
               {activeSubScope === 'scope1'
-                ? 'Rincian Operasional Genset DC'
+                ? (scope1Category === 'genset' ? 'Rincian Konsumsi Genset per Fasilitas' : 'Rincian Konsumsi Kendaraan per Fasilitas')
                 : 'Breakdown Konsumsi Listrik & Emisi per Cabang / Fasilitas'}
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               {activeSubScope === 'scope1'
-                ? `Status mesin genset dan konsumsi solar per cabang • ${filteredDcLocations.length} dari ${dcLocations.length} DC`
+                ? `${scope1Category === 'genset' ? 'Genset cadangan' : 'Kendaraan operasional'} per fasilitas • ${scope1Slice?.summary?.facilityCount ?? 0} fasilitas tercatat`
                 : 'Rincian data per fasilitas (Office, WH Utama, Bulky, Depo, Store Hub, Toko) dan kalkulasi emisi'}
             </p>
           </div>
           {activeSubScope === 'scope1' && (
-            <label className="relative shrink-0">
-              <Search className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500" size={14} />
-              <input
-                value={gensetSearch}
-                onChange={(event) => setGensetSearch(event.target.value)}
-                className="w-full sm:w-56 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-2 pl-9 pr-3 text-xs placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Cari DC, kode, atau wilayah..."
-              />
-            </label>
+            <div className="flex items-center gap-2 shrink-0">
+              <select
+                value={scope1Period || scope1Api?.period || ''}
+                onChange={(e) => setScope1Period(e.target.value)}
+                className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:border-blue-500"
+              >
+                {scope1PeriodOptions.length === 0 && scope1Api?.period && (
+                  <option value={scope1Api.period}>Periode berjalan</option>
+                )}
+                {scope1PeriodOptions.map(p => (
+                  <option key={p.value} value={p.value}>{p.label}</option>
+                ))}
+              </select>
+              <label className="relative shrink-0">
+                <Search className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500" size={14} />
+                <input
+                  value={scope1Search}
+                  onChange={(event) => setScope1Search(event.target.value)}
+                  className="w-full sm:w-56 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-2 pl-9 pr-3 text-xs placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Cari fasilitas atau wilayah..."
+                />
+              </label>
+            </div>
           )}
         </div>
 
         <div className={`overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800 ${activeSubScope === 'scope1' ? 'max-h-[560px] overflow-y-auto' : ''}`}>
           {activeSubScope === 'scope1' ? (
-            <table className="w-full text-left text-xs border-collapse">
-              <thead className="sticky top-0 z-20 bg-slate-900 dark:bg-slate-950 text-white text-xs uppercase">
+            <table className="w-full text-left text-xs border-collapse border-spacing-0">
+              <thead className="sticky top-0 z-20 bg-slate-900 text-white text-xs uppercase">
                 <tr>
-                  <th className="sticky left-0 bg-slate-900 dark:bg-slate-950 px-4 py-3 font-semibold z-10">Kode</th>
-                  <th className="px-4 py-3 font-semibold">Distribution Center</th>
+                  <th className="sticky left-0 top-0 z-30 bg-slate-900 px-4 py-3 font-semibold">Fasilitas</th>
                   <th className="px-4 py-3 font-semibold">Wilayah / Grid</th>
-                  <th className="px-4 py-3 font-semibold">Kapasitas Genset</th>
-                  <th className="text-right px-4 py-3 font-semibold">Konsumsi Solar / Bln</th>
-                  <th className="text-right px-4 py-3 font-semibold">Emisi Scope 1</th>
-                  <th className="text-right px-4 py-3 font-semibold">Beban PLN / Bln</th>
+                  <th className="text-right px-4 py-3 font-semibold">{scope1Category === 'genset' ? 'Konsumsi Solar' : 'Konsumsi Bensin'}</th>
+                  <th className="text-right px-4 py-3 font-semibold text-amber-300">Emisi Scope 1</th>
+                  <th className="text-right px-4 py-3 font-semibold">Biaya BBM</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredDcLocations.length === 0 && (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-400 dark:text-slate-500">Tidak ada DC yang cocok dengan pencarian "{gensetSearch}"</td></tr>
-                )}
-                {filteredDcLocations.map((dc, index) => {
-                  const gensetLiters = dc.genset?.monthlyFuelLiters || 0;
-                  const scope1Ton = ((gensetLiters * 2.68) / 1000).toFixed(2);
-                  return (
-                    <tr key={dc.id} className={`border-b border-slate-100 dark:border-slate-800 hover:bg-blue-50/60 dark:hover:bg-slate-800 transition-colors ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900'}`}>
-                      <td className={`sticky left-0 font-mono text-slate-500 dark:text-slate-400 font-bold px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900'}`}>
-                        {dc.code || 'DC'}
+                {scope1Error ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center border-b border-slate-100 dark:border-slate-800">
+                      <div className="flex flex-col items-center justify-center gap-2 text-rose-600 dark:text-rose-400">
+                        <AlertCircle size={20} />
+                        <span className="font-semibold text-xs">Gagal memuat data Scope 1: {scope1Error}</span>
+                        <button type="button" onClick={() => loadScope1Data(scope1Period || undefined)} className="mt-1 px-3 py-1 text-xs font-bold bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors">
+                          Coba lagi
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : scope1Loading ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center justify-center gap-2">
+                        <RefreshCw size={16} className="animate-spin text-blue-500" />
+                        <span>Memuat data Scope 1...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredScope1Rows.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                      {scope1Search
+                        ? `Tidak ada fasilitas yang cocok dengan pencarian "${scope1Search}"`
+                        : `Belum ada data ${scope1Category === 'genset' ? 'genset' : 'kendaraan'} tercatat untuk periode ini. Gunakan tombol "Input Data Scope 1" untuk mulai mencatat.`}
+                    </td>
+                  </tr>
+                ) : (
+                  filteredScope1Rows.map((row, index) => (
+                    <tr key={row.id} className={`border-b border-slate-100 dark:border-slate-800 hover:bg-blue-50/60 dark:hover:bg-slate-800 transition-colors ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900'}`}>
+                      <td className={`sticky left-0 z-10 px-4 py-3 border-r border-slate-100 dark:border-slate-800 ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900'}`}>
+                        <div className="font-semibold text-slate-900 dark:text-slate-100">{row.name}</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400">{row.facilityType || '—'}</div>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-slate-900 dark:text-slate-100">{dc.name}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{dc.region} ({dc.grid || dc.gridRegion || 'JAMALI'})</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400 font-mono">{dc.genset?.capacityKva || 400} kVA</td>
-                      <td className="px-4 py-3 font-mono text-right text-slate-800 dark:text-slate-200">{formatNum(gensetLiters)} Liter</td>
-                      <td className="px-4 py-3 font-mono text-right text-red-600 dark:text-red-400 font-bold">+{scope1Ton} tCO₂e</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{row.region || '—'} {row.grid ? `(${row.grid})` : ''}</td>
+                      <td className="px-4 py-3 font-mono text-right text-slate-800 dark:text-slate-200">
+                        {row.liters > 0 ? `${formatNum(row.liters)} L` : <span className="text-slate-300 dark:text-slate-600">—</span>}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-right text-amber-700 dark:text-amber-300 font-bold bg-amber-50/30 dark:bg-amber-500/10">
+                        +{formatNum(row.emissionTon, 2)} tCO₂e
+                      </td>
                       <td className="px-4 py-3 font-mono text-right text-slate-600 dark:text-slate-400">
-                        {formatNum(dc.plnMonthlyKwh || 200000)} kWh
+                        Rp {formatNum(row.costRupiah / 1_000_000, 2)} Jt
                       </td>
                     </tr>
-                  );
-                })}
+                  ))
+                )}
               </tbody>
+              {filteredScope1Rows.length > 0 && (
+                <tfoot className="bg-slate-100 dark:bg-slate-800 font-bold">
+                  <tr>
+                    <td className="sticky bottom-0 left-0 z-20 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3 text-slate-900 dark:text-slate-100">TOTAL</td>
+                    <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3"></td>
+                    <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100">
+                      {formatNum(filteredScope1Rows.reduce((s, r) => s + r.liters, 0))} L
+                    </td>
+                    <td className="sticky bottom-0 z-10 bg-amber-100 dark:bg-amber-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-amber-700 dark:text-amber-300">
+                      +{formatNum(filteredScope1Rows.reduce((s, r) => s + r.emissionTon, 0), 2)} tCO₂e
+                    </td>
+                    <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100">
+                      Rp {formatNum(filteredScope1Rows.reduce((s, r) => s + r.costRupiah, 0) / 1_000_000, 2)} Jt
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           ) : (
             <table className="w-full text-left text-xs border-collapse">
@@ -715,6 +854,8 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
         <Scope1InputModal
           isOpen={isInputModalOpen}
           onClose={() => setIsInputModalOpen(false)}
+          initialCategory={scope1Category === 'vehicle' ? 'VEHICLE' : 'GENSET'}
+          onSuccess={() => loadScope1Data(scope1Period || undefined)}
         />
       )}
     </div>
