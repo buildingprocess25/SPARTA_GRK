@@ -134,7 +134,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
           </button>
 
           <div className="flex items-center gap-2.5">
-            <h1 className="max-w-[9rem] truncate text-sm sm:max-w-none sm:text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight uppercase">
+            <h1 className="max-w-[9rem] truncate text-sm sm:max-w-none sm:text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               {displayName}
             </h1>
             <span className="hidden lg:inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-500/10 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20">
@@ -143,15 +143,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
           </div>
         </div>
 
-        {/* KANAN: System Live indicator & Theme Toggle */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20 shrink-0">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="hidden sm:inline">System Live</span>
-          </div>
           <ThemeToggle />
           <button
             type="button"
@@ -231,9 +223,9 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
               {/* Informasi akun */}
               <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100">
                     <User size={15} className="text-emerald-600 dark:text-emerald-400" />
-                    <span>Identitas Akun Alfamart</span>
+                    <span>Data akun</span>
                   </div>
                   <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{profileData.nip}</span>
                 </div>
@@ -261,11 +253,10 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
               {/* Reset password */}
               <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100">
                     <KeyRound size={15} className="text-amber-600 dark:text-amber-400" />
-                    <span>Reset Password Akun</span>
+                    <span>Ganti password</span>
                   </div>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400">Enkripsi 256-bit</span>
                 </div>
 
                 <form onSubmit={handleResetPassword} className="space-y-3">
@@ -348,7 +339,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
             <div className="border-t border-slate-100 dark:border-slate-800 px-6 py-3.5 bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-xs shrink-0 gap-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1 min-w-0">
                 <Shield size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span className="truncate">Terlindungi SPARTA Protocol</span>
+                <span className="truncate">Masuk lewat SPARTA</span>
               </span>
               <div className="flex items-center gap-2 shrink-0">
                 <button

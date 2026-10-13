@@ -16,16 +16,12 @@ test('metricExplanations has complete structure for all entries', () => {
   });
 });
 
-test('getMetricExplanation returns definition and fallback gracefully', () => {
+test('getMetricExplanation returns the entry, and null for unknown keys', () => {
   const plts = getMetricExplanation('plts_avoided_emission');
-  assert.equal(plts.title, 'Emisi Terhindar');
+  assert.equal(plts.title, 'Emisi yang dicegah');
   assert.match(plts.formula, /0,997/);
 
-  const fallback = getMetricExplanation('unknown_key_123');
-  assert.ok(fallback.definition);
-  assert.ok(fallback.formula);
-  assert.ok(fallback.source);
-  assert.ok(fallback.varianceReason);
+  assert.equal(getMetricExplanation('unknown_key_123'), null);
 });
 
 test('verifies all expected PLTS and Scope 2 keys exist in config', () => {

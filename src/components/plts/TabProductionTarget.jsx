@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { usePltsEndpoint } from '@/hooks/usePltsData';
 import { TabContentSkeleton } from './PLTSDashboardSkeletons';
+import InfoHint from '@/components/ui/InfoHint';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -145,7 +146,7 @@ export default function TabProductionTarget({ filters }) {
   }, [yoyChartRows, unitMultiplier, unitDecimals]);
 
   if (loading && !data) return <TabContentSkeleton />;
-  if (error && !data) return <EmptyMeasurement title="Tab Produksi vs Target" message={error} />;
+  if (error && !data) return <EmptyMeasurement title="Produksi vs target belum bisa dimuat" message={error} />;
 
   return (
     <div className="space-y-4" data-testid="tab-production-target">
@@ -168,14 +169,12 @@ export default function TabProductionTarget({ filters }) {
               productionViewMode === 'yoy' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs font-bold' : 'hover:text-slate-900 dark:hover:text-slate-100'
             }`}
           >
-            Tahun Ini vs Tahun Lalu (YoY)
+            Dibanding tahun lalu
           </button>
         </div>
 
         {productionViewMode === 'actual-vs-target' ? (
-          <span className="text-[11px] text-slate-500 dark:text-slate-400">
-            *Seluruh metrik produksi dan target disajikan dalam satuan <strong>kWh</strong>
-          </span>
+          <span className="text-[11px] text-slate-600 dark:text-slate-400">Satuan: kWh</span>
         ) : (
           <div className="flex items-center gap-3">
             {/* Toggle Like-for-Like */}
@@ -186,7 +185,7 @@ export default function TabProductionTarget({ filters }) {
                 onChange={(e) => setIsLikeForLike(e.target.checked)}
                 className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 size-3.5"
               />
-              <span>Plant yang sama di kedua tahun (Like-for-Like)</span>
+              <span>Hanya plant yang sudah jalan sejak 2025</span>
             </label>
 
             {/* Toggle Unit kWh / MWh */}
@@ -214,7 +213,7 @@ export default function TabProductionTarget({ filters }) {
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,.6fr)] gap-4">
           <div className="h-[320px] min-w-0">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Grafik Produksi Aktual vs Target (kWh)</span>
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Produksi vs target (kWh)</span>
               <div className="flex items-center gap-3 text-[11px]">
                 <span className="flex items-center gap-1.5 text-amber-700 dark:text-amber-300 font-semibold">
                   <span className="size-2.5 rounded-xs bg-amber-500" /> Aktual
@@ -271,7 +270,7 @@ export default function TabProductionTarget({ filters }) {
                     <th className="p-2.5 text-left">Bulan</th>
                     <th className="p-2.5 text-right">Aktual (kWh)</th>
                     <th className="p-2.5 text-right">Target (kWh)</th>
-                    <th className="p-2.5 text-right">Capai (%)</th>
+                    <th className="p-2.5 text-right">Tercapai</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -313,11 +312,12 @@ export default function TabProductionTarget({ filters }) {
             <div className="border-t border-slate-200 dark:border-slate-700 p-2 bg-slate-50/50 dark:bg-slate-800/40">
               <button
                 type="button"
-                className="w-full text-left text-[11px] font-bold text-blue-700 dark:text-blue-300 flex items-center justify-between"
+                className="w-full min-h-8 text-left text-[11px] font-bold text-blue-700 dark:text-blue-300 flex items-center justify-between"
+                aria-expanded={reconciliationOpen}
                 onClick={() => setReconciliationOpen((v) => !v)}
               >
-                <span>Rekonsiliasi CSV vs Telemetri ({data?.conflicts?.length || 0} variasi &gt;5%)</span>
-                <span>{reconciliationOpen ? '▲' : '▼'}</span>
+                <span>Selisih laporan CSV dan data API lebih dari 5% ({data?.conflicts?.length || 0} bulan)</span>
+                <span aria-hidden="true">{reconciliationOpen ? '▲' : '▼'}</span>
               </button>
               {reconciliationOpen && (
                 <div className="mt-2 max-h-28 overflow-y-auto rounded-lg bg-amber-50 dark:bg-amber-500/10 p-2 text-[10px] text-amber-900 dark:text-amber-200 space-y-1">
@@ -328,7 +328,7 @@ export default function TabProductionTarget({ filters }) {
                       </div>
                     ))
                   ) : (
-                    <div>Tidak ada konflik sumber pada cakupan filter ini.</div>
+                    <div>Tidak ada selisih untuk pilihan ini.</div>
                   )}
                 </div>
               )}
@@ -339,20 +339,18 @@ export default function TabProductionTarget({ filters }) {
         <div className="space-y-4">
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-              <div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Perbandingan Produksi YoY (2025 vs 2026)</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  {isLikeForLike
-                    ? 'Analisis perbandingan Like-for-Like: hanya menghitung plant yang beroperasi di kedua tahun'
-                    : 'Analisis perbandingan agregat seluruh plant terdata per bulan'}
-                </p>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Produksi 2025 vs 2026</h4>
+                <InfoHint
+                  title="Produksi 2025 vs 2026"
+                  text={isLikeForLike
+                    ? 'Hanya menghitung plant yang sudah beroperasi sejak 2025, supaya perbandingannya adil.'
+                    : 'Menghitung semua plant yang punya data di bulan itu, termasuk plant baru.'}
+                />
               </div>
-
-              {/* Status Badge */}
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-300">
-                <span className="size-2 rounded-full bg-emerald-500" />
-                <span>{isLikeForLike ? 'Mode: Like-for-Like' : 'Mode: Semua Plant Terdata'}</span>
-              </div>
+              <span className="text-[11px] text-slate-600 dark:text-slate-300">
+                {isLikeForLike ? 'Plant yang sama' : 'Semua plant'}
+              </span>
             </div>
 
             {/* YoY Line Chart */}
@@ -445,10 +443,7 @@ export default function TabProductionTarget({ filters }) {
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
             <div className="p-3.5 bg-slate-50 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
               <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                Rekapitulasi Bulanan Perbandingan Produksi 2025 vs 2026 ({unit})
-              </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                {isLikeForLike ? '*Hanya menghitung plant operasional di kedua tahun' : '*Menghitung seluruh plant terdata'}
+                Rincian per bulan ({unit})
               </span>
             </div>
             <div className="overflow-x-auto">
@@ -456,12 +451,12 @@ export default function TabProductionTarget({ filters }) {
                 <thead className="bg-slate-50/70 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 font-bold">
                   <tr>
                     <th className="p-2.5 text-left">Bulan</th>
-                    <th className="p-2.5 text-right">Tahun 2025 ({unit})</th>
+                    <th className="p-2.5 text-right">2025 ({unit})</th>
                     <th className="p-2.5 text-center">Plant 2025</th>
-                    <th className="p-2.5 text-right">Tahun 2026 ({unit})</th>
+                    <th className="p-2.5 text-right">2026 ({unit})</th>
                     <th className="p-2.5 text-center">Plant 2026</th>
                     <th className="p-2.5 text-right">Selisih ({unit})</th>
-                    <th className="p-2.5 text-right">Pertumbuhan YoY (%)</th>
+                    <th className="p-2.5 text-right">Naik/turun</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">

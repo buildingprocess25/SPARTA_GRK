@@ -4,6 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Activity, BarChart3, CloudSun, Gauge, PlugZap } from 'lucide-react';
 import CardBox from '@/components/ui/CardBox';
+import InfoHint from '@/components/ui/InfoHint';
 import { TabContentSkeleton } from '@/components/plts/PLTSDashboardSkeletons';
 import { prefetchPltsEndpoint } from '@/hooks/usePltsData';
 
@@ -29,9 +30,9 @@ const TabLoadVsPlts = dynamic(() => import('@/components/plts/TabLoadVsPlts'), {
 
 const TABS = [
   ['production', 'Produksi vs Target', BarChart3, '/api/plts/dashboard/performance'],
-  ['pr', 'Performa Sistem (PR)', Gauge, '/api/plts/dashboard/pr'],
-  ['support', 'Parameter Pendukung', CloudSun, '/api/plts/dashboard/support'],
-  ['load', 'Beban vs PLTS', PlugZap, '/api/plts/dashboard/load'],
+  ['pr', 'Kinerja panel', Gauge, '/api/plts/dashboard/pr'],
+  ['support', 'Cuaca dan suhu', CloudSun, '/api/plts/dashboard/support'],
+  ['load', 'Kebutuhan listrik vs PLTS', PlugZap, '/api/plts/dashboard/load'],
 ];
 
 export default function PLTSPerformanceAnalysis({ filters, onPlantSelect }) {
@@ -52,10 +53,10 @@ export default function PLTSPerformanceAnalysis({ filters, onPlantSelect }) {
             <Activity size={20} />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Analisis Kinerja PLTS</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Satu sumber agregasi untuk produksi, target, PR, parameter radiasi, dan bauran energi (dalam satuan kWh)
-            </p>
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Analisis kinerja PLTS</h3>
+              <InfoHint title="Analisis kinerja PLTS" text="Pilih tab untuk melihat produksi dibanding target, seberapa baik panel bekerja, pengaruh cuaca, dan berapa bagian kebutuhan listrik DC yang dipenuhi PLTS." />
+            </div>
           </div>
         </div>
         <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-slate-100 dark:bg-slate-800 p-1 [scrollbar-width:none]">
@@ -72,7 +73,7 @@ export default function PLTSPerformanceAnalysis({ filters, onPlantSelect }) {
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
-              <Icon size={13} />
+              <Icon size={13} aria-hidden="true" />
               {label}
             </button>
           ))}
@@ -82,10 +83,7 @@ export default function PLTSPerformanceAnalysis({ filters, onPlantSelect }) {
       {/* When no tab is active, show clean prompt */}
       {tab === null && (
         <div className="rounded-xl border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 p-6 text-center">
-          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Pilih Sub-Tab Analisis</p>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Klik salah satu tab di atas untuk memuat grafik dan rincian analitik kinerja secara on-demand.
-          </p>
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Pilih analisis yang ingin dilihat</p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             {TABS.map(([key, label, Icon, endpoint]) => (
               <button

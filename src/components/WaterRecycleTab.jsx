@@ -83,19 +83,13 @@ export default function WaterRecycleTab() {
   return (
     <div className="space-y-6 animate-in">
       <PageHeader
-        title="Water Recycle"
-        subtitle="Volume air daur ulang dan manfaat yang dihitung."
-        badge={
-          <>
-            <span>{summary?.facilityCount ?? 0} Fasilitas</span>
-            <span>&middot;</span>
-            <span>Diperbarui {new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
-          </>
-        }
+        title="Daur Ulang Air"
+        info="Air yang didaur ulang di DC, dihitung dari angka meter. Emisi yang dicegah = volume × 0,344 kgCO₂e/m³ (metode workbook internal, belum diverifikasi sumber luar). Penghematan biaya = volume × Rp 8.000/m³ (perkiraan tarif PDAM industri)."
         actions={
           <div className="flex shrink-0 flex-col items-end gap-2 self-start">
-            <InputDataButton label="Input Data Water Recycle" icon={Droplets} onClick={() => setIsInputModalOpen(true)} />
+            <InputDataButton label="Input data air" icon={Droplets} onClick={() => setIsInputModalOpen(true)} />
             <select
+              aria-label="Periode"
               value={period || api?.period || ''}
               onChange={(e) => setPeriod(e.target.value)}
               className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
@@ -114,34 +108,34 @@ export default function WaterRecycleTab() {
       {/* 4 KPI */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
         <KpiCard
-          label="FASILITAS TERCATAT"
+          label="Lokasi tercatat"
           value={loading ? '—' : (summary?.facilityCount ?? 0)}
           unit="Lokasi"
-          trend={`${summary?.recordCount ?? 0} transaksi meter tercatat`}
+          trend={`${summary?.recordCount ?? 0} catatan meter`}
           icon={Factory}
           theme="water"
         />
         <KpiCard
-          label="AIR DAUR ULANG"
+          label="Air didaur ulang"
           value={loading ? '—' : formatNum(summary?.totalVolumeM3 ?? 0)}
           unit="m³"
-          trend="Volume periode terpilih"
+          trend="Periode terpilih"
           icon={Recycle}
           theme="water"
         />
         <KpiCard
-          label="EMISI TERHINDAR"
+          label="Emisi yang dicegah"
           value={loading ? '—' : formatNum(summary?.totalEmissionAvoidedTon ?? 0, 3)}
           unit="tCO₂e"
-          trend="Volume × 0,344 kgCO₂e/m³"
+          tooltip="Volume × 0,344 kgCO₂e/m³. Faktor dari workbook internal, belum diverifikasi sumber luar."
           icon={ArrowDownRight}
           theme="savings"
         />
         <KpiCard
-          label="PENGHEMATAN BIAYA"
+          label="Penghematan biaya"
           value={loading ? '—' : `Rp ${formatNum(summary?.totalCostSavedJuta ?? 0, 2)}`}
           unit="Juta"
-          trend="@ Rp 8.000/m³ (asumsi tarif PDAM)"
+          tooltip="Volume × Rp 8.000/m³, perkiraan tarif PDAM industri."
           icon={Calculator}
           theme="savings"
         />
@@ -155,8 +149,7 @@ export default function WaterRecycleTab() {
               <Waves size={20} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Tren Bulanan Water Recycle</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Volume air daur ulang per bulan, dari angka meter fasilitas</p>
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Air didaur ulang per bulan</h3>
             </div>
           </div>
           <ChartPillLegend items={[{ label: 'Air Daur Ulang', color: CHART_PALETTE.water }]} />
@@ -205,8 +198,7 @@ export default function WaterRecycleTab() {
       <CardBox className="space-y-4">
         <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">Rincian Water Recycle per Fasilitas</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Volume daur ulang, emisi terhindar, dan penghematan biaya per DC</p>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">Rincian per lokasi</h3>
           </div>
           <label className="relative shrink-0">
             <Search className="absolute left-3 top-2.5 text-slate-500 dark:text-slate-400" size={14} />
@@ -221,12 +213,12 @@ export default function WaterRecycleTab() {
 
         <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800 max-h-[560px] overflow-y-auto">
           <table className="w-full text-left text-xs border-collapse border-spacing-0">
-            <thead className="sticky top-0 z-20 bg-slate-900 text-white text-xs uppercase">
+            <thead className="sticky top-0 z-20 bg-slate-900 text-white text-xs">
               <tr>
-                <th className="sticky left-0 top-0 z-30 bg-slate-900 px-4 py-3 font-semibold">Fasilitas</th>
+                <th className="sticky left-0 top-0 z-30 bg-slate-900 px-4 py-3 font-semibold">Lokasi</th>
                 <th className="px-4 py-3 font-semibold">Wilayah</th>
-                <th className="text-right px-4 py-3 font-semibold">Volume Daur Ulang</th>
-                <th className="text-right px-4 py-3 font-semibold text-emerald-300">Emisi Terhindar</th>
+                <th className="text-right px-4 py-3 font-semibold">Volume</th>
+                <th className="text-right px-4 py-3 font-semibold text-emerald-300">Emisi dicegah</th>
                 <th className="text-right px-4 py-3 font-semibold">Penghematan</th>
               </tr>
             </thead>
@@ -236,7 +228,7 @@ export default function WaterRecycleTab() {
                   <td colSpan={5} className="px-4 py-8 text-center border-b border-slate-100 dark:border-slate-800">
                     <div className="flex flex-col items-center justify-center gap-2 text-rose-600 dark:text-rose-400">
                       <AlertCircle size={20} />
-                      <span className="font-semibold text-xs">Gagal memuat data Water Recycle: {error}</span>
+                      <span className="font-semibold text-xs">Data daur ulang air belum bisa dimuat: {error}</span>
                       <button type="button" onClick={() => loadData(period || undefined)} className="mt-1 px-3 py-1 text-xs font-bold bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors">
                         Coba lagi
                       </button>
@@ -248,7 +240,7 @@ export default function WaterRecycleTab() {
                   <td colSpan={5} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center justify-center gap-2">
                       <RefreshCw size={16} className="animate-spin text-cyan-500" />
-                      <span>Memuat data Water Recycle...</span>
+                      <span role="status">Memuat data daur ulang air...</span>
                     </div>
                   </td>
                 </tr>
@@ -257,7 +249,7 @@ export default function WaterRecycleTab() {
                   <td colSpan={5} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                     {search
                       ? `Tidak ada fasilitas yang cocok dengan pencarian "${search}"`
-                      : 'Belum ada data water recycle tercatat untuk periode ini. Gunakan tombol "Input Data Water Recycle" untuk mulai mencatat.'}
+                      : 'Belum ada data daur ulang air untuk periode ini. Tambahkan lewat tombol "Input data air".'}
                   </td>
                 </tr>
               ) : (
@@ -296,28 +288,6 @@ export default function WaterRecycleTab() {
               </tfoot>
             )}
           </table>
-        </div>
-      </CardBox>
-
-      {/* Formula */}
-      <CardBox className="space-y-3">
-        <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <div className="size-9 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
-            <Gauge size={18} />
-          </div>
-          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Formula Perhitungan</h3>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="p-3.5 rounded-xl bg-cyan-50/70 dark:bg-cyan-500/10 border border-cyan-100 dark:border-cyan-500/20 text-xs space-y-1">
-            <div className="font-bold uppercase tracking-wider text-cyan-800 dark:text-cyan-200 text-[10px]">PENGHEMATAN AIR</div>
-            <div className="text-cyan-900 dark:text-cyan-200 font-bold text-xs">Volume Recycled (m³) × Tarif PDAM/m³</div>
-            <div className="text-cyan-700 dark:text-cyan-300 text-[11px] pt-0.5">*Asumsi tarif rata-rata PDAM industri: Rp 8.000/m³</div>
-          </div>
-          <div className="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-xs space-y-1">
-            <div className="font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-200 text-[10px]">EMISI TERHINDAR</div>
-            <div className="text-emerald-900 dark:text-emerald-200 font-bold text-xs">Volume Recycled × 0,344 kgCO₂e/m³</div>
-            <div className="text-emerald-700 dark:text-emerald-300 text-[11px] pt-0.5">*Metode workbook internal, sumber eksternal belum diverifikasi independen</div>
-          </div>
         </div>
       </CardBox>
 

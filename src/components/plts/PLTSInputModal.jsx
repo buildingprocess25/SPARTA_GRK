@@ -52,10 +52,10 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
     const exported = Number(exportKwh);
     if (!selectedPlant) next.dc = 'Pilih plant PLTS.';
     if (!(production > 0)) next.production = 'Produksi harus lebih dari 0 kWh.';
-    if (!(selfUse >= 0)) next.selfUse = 'Konsumsi PLTS tidak boleh negatif.';
-    if (!(exported >= 0)) next.export = 'Ekspor tidak boleh negatif.';
+    if (!(selfUse >= 0)) next.selfUse = 'Listrik yang dipakai sendiri tidak boleh negatif.';
+    if (!(exported >= 0)) next.export = 'Listrik yang dikirim ke PLN tidak boleh negatif.';
     if (production > 0 && Math.abs(production - selfUse - exported) > 0.01) {
-      next.balance = 'Produksi harus sama dengan PLTS + ekspor.';
+      next.balance = 'Produksi harus sama dengan dipakai sendiri + dikirim ke PLN.';
     }
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -114,10 +114,9 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
     <BaseModal
       open={open}
       onClose={handleCloseRequest}
-      title="Input Data Kelistrikan PLTS Atap"
-      subtitle="Catat neraca energi PLTS per Distribution Center dan periode."
+      title="Input data PLTS"
+      subtitle="Isi produksi PLTS satu DC untuk satu bulan."
       icon={<Sun size={21} className="text-amber-600 dark:text-amber-400" />}
-      badge="Energi Terbarukan"
       size="md"
       loading={loading}
       footer={(
@@ -125,16 +124,16 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
           <button type="button" onClick={handleCloseRequest} disabled={loading} className="rounded-xl border border-slate-300 dark:border-slate-600 px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50">Batal</button>
           <button type="submit" form="plts-input-form" disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-slate-950 hover:bg-amber-400 disabled:opacity-50">
             {loading ? <RefreshCw size={16} className="animate-spin" /> : <Check size={16} />}
-            {loading ? 'Menyimpan...' : 'Simpan Data PLTS'}
+            {loading ? 'Menyimpan...' : 'Simpan'}
           </button>
         </>
       )}
     >
       <form id="plts-input-form" onSubmit={handleSubmit} className="space-y-5 p-5 sm:p-6">
-        <label className="block text-xs font-bold uppercase tracking-wide text-slate-700 dark:text-slate-300">
-          Distribution Center <span className="text-rose-500 dark:text-rose-400">*</span>
+        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+          DC <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
           <select value={plantKey} onChange={(event) => setPlantKey(event.target.value)} className={inputClass}>
-            {plantOptions.map((plant) => <option key={plant.key} value={plant.key}>{plant.name} · PS {plant.psId} · {plant.grid || 'Grid belum dipetakan'}</option>)}
+            {plantOptions.map((plant) => <option key={plant.key} value={plant.key}>{plant.name} · PS {plant.psId} · {plant.grid || 'wilayah belum diisi'}</option>)}
           </select>
           {errors.dc && <span className="mt-1 block text-[11px] normal-case text-rose-600 dark:text-rose-400">{errors.dc}</span>}
         </label>
@@ -153,15 +152,15 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Produksi (kWh) <span className="text-rose-500 dark:text-rose-400">*</span>
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Produksi (kWh) <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
             <input type="number" min="0" step="any" value={productionKwh} onChange={(event) => setProductionKwh(event.target.value)} className={inputClass} />
             {errors.production && <span className="mt-1 block text-[11px] text-rose-600 dark:text-rose-400">{errors.production}</span>}
           </label>
-          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">PLTS (kWh) <span className="text-rose-500 dark:text-rose-400">*</span>
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Dipakai sendiri (kWh) <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
             <input type="number" min="0" step="any" value={selfConsumptionKwh} onChange={(event) => setSelfConsumptionKwh(event.target.value)} className={inputClass} />
             {errors.selfUse && <span className="mt-1 block text-[11px] text-rose-600 dark:text-rose-400">{errors.selfUse}</span>}
           </label>
-          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Ekspor (kWh) <span className="text-rose-500 dark:text-rose-400">*</span>
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Dikirim ke PLN (kWh) <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
             <input type="number" min="0" step="any" value={exportKwh} onChange={(event) => setExportKwh(event.target.value)} className={inputClass} />
             {errors.export && <span className="mt-1 block text-[11px] text-rose-600 dark:text-rose-400">{errors.export}</span>}
           </label>
@@ -169,7 +168,7 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
         {errors.balance && <p role="alert" className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-700 dark:text-rose-300">{errors.balance}</p>}
 
         <div className="rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Emisi Terhindar</p>
+          <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Emisi yang dicegah</p>
           <p className="mt-1 text-2xl font-black text-emerald-900 dark:text-emerald-200">{avoidedEmissionTon.toLocaleString('id-ID', { maximumFractionDigits: 3 })} tCO₂e</p>
           <p className="mt-1 text-[11px] text-emerald-800 dark:text-emerald-300">{Number(selfConsumptionKwh || 0).toLocaleString('id-ID')} kWh × {PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH} kgCO₂/kWh ÷ 1.000</p>
         </div>

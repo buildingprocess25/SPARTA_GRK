@@ -72,6 +72,21 @@ function wibYearMonth(now = new Date()) {
   return `${parts.find((part) => part.type === 'year')?.value}${parts.find((part) => part.type === 'month')?.value}`;
 }
 
+// Current month uses the larger month-to-date total: api_live_partial (only scripts/sync-isolar.mjs
+// writes it) or the sum of daily_yield, which the in-app sync keeps current.
+export function withDailyMonthToDate(observations = [], dailyTotals = [], yearMonth) {
+  const isCurrentPartial = (row) => row.yearMonth === yearMonth && row.source === 'api_live_partial';
+  const partialByPs = new Map(observations.filter(isCurrentPartial).map((row) => [Number(row.psId), Number(row.energyKwh)]));
+  const dailyByPs = new Map(dailyTotals.map((row) => [Number(row.psId), Number(row.energyKwh)]));
+  const merged = observations.filter((row) => !isCurrentPartial(row));
+  for (const psId of new Set([...partialByPs.keys(), ...dailyByPs.keys()])) {
+    const candidates = [partialByPs.get(psId), dailyByPs.get(psId)].filter(Number.isFinite);
+    if (!candidates.length) continue;
+    merged.push({ yearMonth, psId, source: 'api_live_partial', energyKwh: Math.max(...candidates), measurementType: 'MONTHLY_YIELD' });
+  }
+  return merged;
+}
+
 const PLANT_LATEST_SELECT = {
   psId: true,
   name: true,
@@ -123,7 +138,10 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
       const minDateStr = `${years[0]}-01-01`;
       const maxDateStr = `${years.at(-1)}-12-31`;
 
-      const [plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly] = await Promise.all([
+      const currentYm = wibYearMonth();
+      const currentMonthPrefix = `${currentYm.slice(0, 4)}-${currentYm.slice(4, 6)}-%`;
+
+      const [plants, rawObservations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly, dailyMonthToDate] = await Promise.all([
         db.plantMaster.findMany({
           select: {
             dcId: true,
@@ -218,8 +236,15 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
           GROUP BY SUBSTRING(date, 1, 7), location_key
           ORDER BY "yearMonth" ASC
         `.catch(() => []),
+        db.$queryRaw`
+          SELECT ps_id as "psId", SUM(yield_kwh)::float as "energyKwh"
+          FROM daily_yield
+          WHERE date_wib LIKE ${currentMonthPrefix}
+          GROUP BY ps_id
+        `.catch(() => []),
       ]);
 
+      const observations = withDailyMonthToDate(rawObservations, dailyMonthToDate, currentYm);
       return { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly };
     } finally {
       inFlightPromises.delete(flightKey);

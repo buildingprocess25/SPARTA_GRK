@@ -5,6 +5,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { PlugZap } from 'lucide-react';
 import { usePltsEndpoint } from '@/hooks/usePltsData';
 import { TabContentSkeleton } from './PLTSDashboardSkeletons';
+import InfoHint from '@/components/ui/InfoHint';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -58,7 +59,7 @@ export default function TabLoadVsPlts({ filters }) {
   const totalProdKwh = data?.productionKwh;
 
   if (loading && !data) return <TabContentSkeleton />;
-  if (error && !data) return <EmptyMeasurement title="Tab Beban vs PLTS" message={error} />;
+  if (error && !data) return <EmptyMeasurement title="Kebutuhan listrik vs PLTS" message={error} />;
 
   return (
     <div className="space-y-4" data-testid="tab-load-vs-plts">
@@ -71,7 +72,7 @@ export default function TabLoadVsPlts({ filters }) {
               loadViewMode === 'monthly' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs font-bold' : 'hover:text-slate-900 dark:hover:text-slate-100'
             }`}
           >
-            Tren Bulanan (kWh)
+            Per bulan
           </button>
           <button
             type="button"
@@ -86,15 +87,16 @@ export default function TabLoadVsPlts({ filters }) {
 
         {loadViewMode === 'by-branch' && (
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-500 dark:text-slate-400 font-semibold">Tampilkan:</span>
+            <span className="text-slate-600 dark:text-slate-400 font-semibold">Tampilkan:</span>
             <select
+              aria-label="Jumlah DC yang ditampilkan"
               value={branchLoadLimit}
               onChange={(e) => setBranchLoadLimit(Number(e.target.value))}
               className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1 font-bold text-slate-800 dark:text-slate-200 shadow-2xs"
             >
-              <option value={10}>Top 10 Beban Terbesar</option>
-              <option value={20}>Top 20 Beban Terbesar</option>
-              <option value={39}>Semua 39 Cabang DC</option>
+              <option value={10}>10 DC terbesar</option>
+              <option value={20}>20 DC terbesar</option>
+              <option value={1000}>Semua DC</option>
             </select>
           </div>
         )}
@@ -105,11 +107,11 @@ export default function TabLoadVsPlts({ filters }) {
         <div className="h-[320px] rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-              {loadViewMode === 'monthly' ? 'Perbandingan Konsumsi Beban PLN vs Produksi PLTS Bulanan (kWh)' : `Beban PLN vs PLTS (${visibleBranchLoadRows.length} Cabang DC Terbesar)`}
+              {loadViewMode === 'monthly' ? 'Listrik PLN vs produksi PLTS per bulan (kWh)' : `Listrik PLN vs PLTS, ${visibleBranchLoadRows.length} DC (kWh)`}
             </span>
             <div className="flex items-center gap-3 text-[11px]">
               <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 font-semibold">
-                <span className="size-2.5 rounded-xs bg-slate-400" /> Beban PLN
+                <span className="size-2.5 rounded-xs bg-slate-400" /> Listrik PLN
               </span>
               <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
                 <span className="size-2.5 rounded-xs bg-amber-500" /> PLTS
@@ -132,7 +134,7 @@ export default function TabLoadVsPlts({ filters }) {
                   <Tooltip
                     formatter={(val, name) => [
                       `${formatNum(val, 0, 0)} kWh`,
-                      name === 'loadKwh' ? 'Beban Konsumsi PLN' : 'Produksi PLTS',
+                      name === 'loadKwh' ? 'Listrik PLN' : 'Produksi PLTS',
                     ]}
                     contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '11px' }}
                   />
@@ -158,7 +160,7 @@ export default function TabLoadVsPlts({ filters }) {
                   <Tooltip
                     formatter={(val, name, item) => [
                       `${formatNum(val, 0, 0)} kWh (${item?.payload?.pltsSharePct || 0}% PLTS)`,
-                      name === 'loadKwh' ? 'Beban Konsumsi PLN' : 'Produksi PLTS',
+                      name === 'loadKwh' ? 'Listrik PLN' : 'Produksi PLTS',
                     ]}
                     contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '11px' }}
                   />
@@ -174,14 +176,15 @@ export default function TabLoadVsPlts({ filters }) {
         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
-              <PlugZap size={16} className="text-amber-600 dark:text-amber-400" />
-              <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Bauran Energi (Energy Mix)</h4>
+              <PlugZap size={16} className="text-amber-600 dark:text-amber-400" aria-hidden="true" />
+              <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Asal listrik DC</h4>
+              <InfoHint size={12} title="Asal listrik DC" text="Bagian kebutuhan listrik DC yang dipenuhi PLTS (listrik PLTS yang dipakai sendiri) dibanding yang dibeli dari PLN." />
             </div>
 
             <div className="mt-4 space-y-3">
               <div>
                 <div className="flex justify-between text-xs font-bold mb-1">
-                  <span className="text-amber-700 dark:text-amber-300">Porsi PLTS (Self-Consumption)</span>
+                  <span className="text-amber-800 dark:text-amber-300">Dari PLTS</span>
                   <span className="text-amber-900 dark:text-amber-200 font-mono font-black">
                     {energyMix.pltsSharePct != null ? `${formatNum(energyMix.pltsSharePct, 1, 1)}%` : '—'}
                   </span>
@@ -196,7 +199,7 @@ export default function TabLoadVsPlts({ filters }) {
 
               <div>
                 <div className="flex justify-between text-xs font-bold mb-1">
-                  <span className="text-slate-600 dark:text-slate-400">Porsi Listrik PLN Grid</span>
+                  <span className="text-slate-600 dark:text-slate-400">Dari PLN</span>
                   <span className="text-slate-800 dark:text-slate-200 font-mono font-black">
                     {energyMix.plnSharePct != null ? `${formatNum(energyMix.plnSharePct, 1, 1)}%` : '—'}
                   </span>
@@ -212,7 +215,7 @@ export default function TabLoadVsPlts({ filters }) {
 
             <div className="mt-4 rounded-lg bg-slate-50 dark:bg-slate-800/40 p-2.5 text-[11px] space-y-1">
               <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                <span>Total Beban DC:</span>
+                <span>Total kebutuhan listrik DC:</span>
                 <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{formatNum(totalLoadKwh, 0, 0)} kWh</span>
               </div>
               <div className="flex justify-between text-amber-700 dark:text-amber-300">
@@ -223,8 +226,8 @@ export default function TabLoadVsPlts({ filters }) {
           </div>
 
           <div className="mt-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 p-2.5 text-[10px] text-amber-900 dark:text-amber-200">
-            <strong className="block font-bold">🎯 Target Bauran Energi 2027:</strong>
-            <span>PLTS ≥ 20% dari Total Konsumsi Listrik DC Nasional</span>
+            <strong className="block font-bold">Target 2027</strong>
+            <span>PLTS memenuhi minimal 20% kebutuhan listrik semua DC</span>
           </div>
         </div>
       </div>

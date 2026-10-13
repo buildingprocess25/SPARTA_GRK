@@ -8,6 +8,17 @@ import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { notify } from '@/components/ui/ToastProvider';
 import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 
+const MODULE_LABELS = {
+  genset: 'Genset',
+  pln: 'Listrik PLN',
+  plts: 'PLTS',
+  water: 'Daur ulang air',
+  vehicle: 'Kendaraan',
+  fuel: 'BBM',
+  ev: 'Kendaraan listrik',
+  efficiency: 'Efisiensi energi',
+};
+
 export default function HistoryTab({ setActiveTab }) {
   const { inputHistory, deleteHistoryItem, resetToDefault } = useSustainability();
   const confirm = useConfirm();
@@ -27,21 +38,16 @@ export default function HistoryTab({ setActiveTab }) {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       <PageHeader
-        title="Riwayat Input & Audit Emisi"
-        subtitle="Daftar seluruh aktivitas pencatatan emisi Scope 1, Scope 2, PLTS, dan Water Recycle di Distribution Center Alfamart."
-        badge={
-          <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
-            LOG AUDIT & INPUT
-          </span>
-        }
+        title="Riwayat Input"
+        info="Semua data Scope 1, Scope 2, PLTS, dan daur ulang air yang pernah dicatat."
         actions={
           <button
             type="button"
             className="inline-flex items-center gap-2 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 px-4 py-2.5 text-sm font-medium hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:border-rose-300 dark:hover:border-rose-500/50 transition-colors shadow-2xs self-start sm:self-auto focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
             onClick={handleReset}
           >
-            <RotateCcw size={15} />
-            <span>Reset Data Default</span>
+            <RotateCcw size={15} aria-hidden="true" />
+            <span>Kembalikan data awal</span>
           </button>
         }
       />
@@ -50,10 +56,10 @@ export default function HistoryTab({ setActiveTab }) {
         {inputHistory.length === 0 ? (
           <div className="py-16 text-center space-y-3">
             <div className="size-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center mx-auto shadow-inner">
-              <History size={28} />
+              <History size={28} aria-hidden="true" />
             </div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-              Belum ada log transaksi. Buka menu Input / Audit untuk menambahkan data baru.
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-400 max-w-sm mx-auto">
+              Belum ada riwayat. Tambahkan data lewat tombol "Input data" di halaman Scope 1, Scope 2, PLTS, atau Daur Ulang Air.
             </p>
           </div>
         ) : (
@@ -61,12 +67,12 @@ export default function HistoryTab({ setActiveTab }) {
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
               <table className="w-full text-left text-sm border-collapse">
-                <thead className="bg-slate-900 dark:bg-slate-950 text-white text-xs uppercase font-semibold">
+                <thead className="bg-slate-900 dark:bg-slate-950 text-white text-xs font-semibold">
                   <tr>
-                    <th className="px-4 py-3 sticky left-0 bg-slate-900 dark:bg-slate-950 z-10">Waktu Pencatatan</th>
+                    <th className="px-4 py-3 sticky left-0 bg-slate-900 dark:bg-slate-950 z-10">Waktu</th>
                     <th className="px-4 py-3">Kategori</th>
-                    <th className="px-4 py-3">Distribution Center</th>
-                    <th className="px-4 py-3">Rincian Parameter & Emisi</th>
+                    <th className="px-4 py-3">DC</th>
+                    <th className="px-4 py-3">Rincian</th>
                     <th className="px-4 py-3 text-center">Aksi</th>
                   </tr>
                 </thead>
@@ -77,13 +83,13 @@ export default function HistoryTab({ setActiveTab }) {
                         {item.recordedAt}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium uppercase ${
+                        <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
                           item.module === 'genset' ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-500/30' :
                           item.module === 'pln' ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-500/30' :
                           item.module === 'plts' ? 'bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-200/60 dark:border-cyan-500/30' :
                           'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-500/30'
                         }`}>
-                          {item.module.toUpperCase()}
+                          {MODULE_LABELS[item.module] || item.module}
                         </span>
                       </td>
                       <td className="px-4 py-3 font-semibold text-slate-900 dark:text-slate-100 whitespace-nowrap">
@@ -113,13 +119,13 @@ export default function HistoryTab({ setActiveTab }) {
               {inputHistory.map((item) => (
                 <div key={item.id} className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ${
+                    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                       item.module === 'genset' ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-500/30' :
                       item.module === 'pln' ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-500/30' :
                       item.module === 'plts' ? 'bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-200/60 dark:border-cyan-500/30' :
                       'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-500/30'
                     }`}>
-                      {item.module.toUpperCase()}
+                      {MODULE_LABELS[item.module] || item.module}
                     </span>
                     <button
                       type="button"

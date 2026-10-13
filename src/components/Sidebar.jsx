@@ -10,13 +10,13 @@ import { getProfileFor, getInitials } from '@/lib/profileMeta';
 
 const navItems = [
   {
-    group: 'DASHBOARD UTAMA',
+    group: 'Ringkasan',
     items: [
       { id: 'resume', label: 'Resume Emisi GRK', icon: LayoutDashboard },
     ],
   },
   {
-    group: 'MANAJEMEN EMISI',
+    group: 'Emisi',
     items: [
       {
         id: 'pengurang',
@@ -25,7 +25,7 @@ const navItems = [
         badge: 'PLTS & Air',
         subItems: [
           { id: 'plts', label: 'PLTS', icon: Sun, colorClass: 'text-orange-500' },
-          { id: 'water', label: 'Water Recycle', icon: Droplets, colorClass: 'text-cyan-500' }
+          { id: 'water', label: 'Daur Ulang Air', icon: Droplets, colorClass: 'text-cyan-500' }
         ]
       },
       {
@@ -41,7 +41,7 @@ const navItems = [
     ],
   },
   {
-    group: 'AUDIT & RIWAYAT',
+    group: 'Riwayat',
     items: [
       { id: 'history', label: 'Riwayat Audit', icon: History },
     ],
@@ -147,7 +147,7 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setIsMo
         <nav className="space-y-6 my-4 flex-1 overflow-y-auto pr-1">
           {navItems.map((section, idx) => (
             <div key={idx}>
-              <div className="text-xs uppercase tracking-wider font-semibold text-slate-500 dark:text-slate-400 px-3 mb-2">
+              <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 px-3 mb-2">
                 {section.group}
               </div>
               <div className="space-y-1">

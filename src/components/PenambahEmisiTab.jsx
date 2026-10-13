@@ -130,53 +130,17 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
     <div className="space-y-6 animate-in">
       <PageHeader
         title={activeSubScope === 'scope1' ? 'Scope 1: BBM' : 'Scope 2: Listrik'}
-        subtitle={
+        info={
           activeSubScope === 'scope1'
-            ? 'Konsumsi BBM genset dan kendaraan operasional.'
-            : 'Konsumsi listrik yang dibeli dan emisi per fasilitas.'
+            ? 'Emisi dari BBM yang dibakar sendiri: solar untuk genset cadangan toko dan DC, serta bensin untuk kendaraan operasional. Rumus: liter BBM × faktor emisi. Acuan: GHG Protocol dan pedoman KLHK/ESDM.'
+            : 'Emisi dari listrik PLN yang dibeli. Rumus: kWh listrik PLN × faktor emisi wilayah PLN. Acuan: GHG Protocol dan pedoman KLHK/ESDM.'
         }
         actions={
           activeSubScope === 'scope1' ? (
-            <InputDataButton label="Input Data Scope 1" icon={Fuel} onClick={() => setIsInputModalOpen(true)} />
+            <InputDataButton label="Input data Scope 1" icon={Fuel} onClick={() => setIsInputModalOpen(true)} />
           ) : null
         }
       />
-
-      {/* Metode & sumber */}
-      <details className="group border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 shadow-sm [&_summary::-webkit-details-marker]:hidden">
-        <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-4 text-slate-900 dark:text-slate-100">
-          <div className="flex items-center gap-2">
-            <Calculator size={18} className="text-slate-500 dark:text-slate-400 group-open:text-blue-600 dark:group-open:text-blue-400 transition-colors" />
-            <span className="font-semibold text-sm">Metode & sumber data</span>
-          </div>
-          <span className="relative size-5 shrink-0">
-            <svg className="absolute inset-0 size-5 opacity-100 transition-opacity group-open:opacity-0 text-slate-500 dark:text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-            <svg className="absolute inset-0 size-5 opacity-0 transition-opacity group-open:opacity-100 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-            </svg>
-          </span>
-        </summary>
-        <div className="border-t border-slate-100 dark:border-slate-800 p-4 text-sm text-slate-600 dark:text-slate-400 space-y-3 bg-slate-50 dark:bg-slate-800/40 rounded-b-xl">
-          <div>
-            <strong className="text-slate-900 dark:text-slate-100 font-semibold">Sumber:</strong>{' '}
-            {activeSubScope === 'scope1'
-              ? 'Solar (Biosolar B35) untuk genset cadangan Toko & DC, serta Pertalite/Pertamax untuk kendaraan operasional.'
-              : 'Konsumsi energi listrik gedung kantor cabang (Office), warehouse logistik (WH, Bulky, Depo, Store Hub), dan jaringan toko ritel dari PLN.'}
-          </div>
-          <div>
-            <strong className="text-slate-900 dark:text-slate-100 font-semibold">Metode Hitung:</strong>{' '}
-            <span className={`font-mono text-xs font-semibold ${activeSubScope === 'scope1' ? 'text-emerald-700 dark:text-emerald-300' : 'text-blue-700 dark:text-blue-300'}`}>
-              {activeSubScope === 'scope1' ? 'Liter BBM × Faktor Emisi' : 'kWh Listrik PLN × Grid Emission Factor'}
-            </span>
-          </div>
-          <div>
-            <strong className="text-slate-900 dark:text-slate-100 font-semibold">Referensi:</strong>{' '}
-            <span className="italic">Greenhouse Gas (GHG) Protocol & Pedoman Penghitungan Emisi KLHK / ESDM.</span>
-          </div>
-        </div>
-      </details>
 
       {/* Switcher Kategori Scope 1: Genset (stasioner) vs Kendaraan (mobile) - dipisah total, bukan digabung satu tabel/chart */}
       {activeSubScope === 'scope1' && (
@@ -185,7 +149,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           onChange={setScope1Category}
           options={[
             { value: 'genset', label: 'Genset', icon: Fuel },
-            { value: 'vehicle', label: 'Kendaraan Operasional', icon: Car },
+            { value: 'vehicle', label: 'Kendaraan', icon: Car },
           ]}
         />
       )}
@@ -362,34 +326,33 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           {scope1Category === 'genset' ? (
             <>
               <KpiCard
-                label="KONSUMSI SOLAR GENSET"
+                label="Solar genset"
                 value={scope1Loading ? '—' : formatNum(scope1Slice?.summary?.totalLiters ?? 0)}
                 unit="Liter"
-                trend="Genset cadangan Toko & DC saat outage PLN"
+                trend="Genset cadangan saat listrik PLN padam"
                 icon={Fuel}
                 theme="genset"
               />
               <KpiCard
-                label="FASILITAS BER-GENSET"
+                label="Lokasi dengan genset"
                 value={scope1Loading ? '—' : (scope1Slice?.summary?.facilityCount ?? 0)}
                 unit="Lokasi"
-                trend={`${scope1Slice?.summary?.recordCount ?? 0} transaksi pengisian tercatat`}
+                trend={`${scope1Slice?.summary?.recordCount ?? 0} kali pengisian`}
                 icon={Factory}
                 theme="pln"
               />
               <KpiCard
-                label="EMISI GENSET"
+                label="Emisi genset"
                 value={scope1Loading ? '—' : formatNum(scope1Slice?.summary?.totalEmissionTon ?? 0, 2)}
                 unit="tCO₂e"
-                trend="Scope 1A Stationary Combustion"
+                trend="Dari pembakaran solar genset"
                 icon={Flame}
                 theme="emission"
               />
               <KpiCard
-                label="BIAYA BBM GENSET"
+                label="Biaya solar genset"
                 value={scope1Loading ? '—' : `Rp ${formatNum(scope1Slice?.summary?.totalCostJuta ?? 0, 1)}`}
                 unit="Juta"
-                trend="Solar/Pertalite/Pertamax genset"
                 icon={Calculator}
                 theme="calc"
               />
@@ -397,34 +360,33 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           ) : (
             <>
               <KpiCard
-                label="KONSUMSI BENSIN KENDARAAN"
+                label="Bensin kendaraan"
                 value={scope1Loading ? '—' : formatNum(scope1Slice?.summary?.totalLiters ?? 0)}
                 unit="Liter"
-                trend="Pertalite/Pertamax kendaraan operasional"
+                trend="Pertalite dan Pertamax"
                 icon={Car}
                 theme="pln"
               />
               <KpiCard
-                label="FASILITAS PELAPOR"
+                label="Lokasi yang melapor"
                 value={scope1Loading ? '—' : (scope1Slice?.summary?.facilityCount ?? 0)}
                 unit="Lokasi"
-                trend={`${scope1Slice?.summary?.recordCount ?? 0} transaksi pengisian tercatat`}
+                trend={`${scope1Slice?.summary?.recordCount ?? 0} kali pengisian`}
                 icon={Building2}
                 theme="default"
               />
               <KpiCard
-                label="EMISI KENDARAAN"
+                label="Emisi kendaraan"
                 value={scope1Loading ? '—' : formatNum(scope1Slice?.summary?.totalEmissionTon ?? 0, 2)}
                 unit="tCO₂e"
-                trend="Scope 1B Mobile Combustion"
+                trend="Dari pembakaran bensin kendaraan"
                 icon={Flame}
                 theme="emission"
               />
               <KpiCard
-                label="BIAYA BBM KENDARAAN"
+                label="Biaya bensin kendaraan"
                 value={scope1Loading ? '—' : `Rp ${formatNum(scope1Slice?.summary?.totalCostJuta ?? 0, 1)}`}
                 unit="Juta"
-                trend="Pertalite/Pertamax kendaraan"
                 icon={Calculator}
                 theme="calc"
               />
@@ -434,7 +396,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
           <KpiCard
-            label={`LISTRIK PLN (${selectedPeriod === 'ytd' ? 'YTD' : MONTH_NAMES_SHORT[Number(selectedPeriod)]})`}
+            label={`Listrik PLN (${selectedPeriod === 'ytd' ? 'YTD' : MONTH_NAMES_SHORT[Number(selectedPeriod)]})`}
             value={formatNum(hierarchyStats.summary.totalKwh > 1000000 ? hierarchyStats.summary.totalKwh / 1000000 : hierarchyStats.summary.totalKwh / 1000, 2)}
             unit={hierarchyStats.summary.totalKwh > 1000000 ? "GWh" : "MWh"}
             trend={`${hierarchyStats.summary.branchCount} Cabang • ${selectedFacility === 'all' ? 'Semua Fasilitas' : selectedFacility.toUpperCase()}`}
@@ -442,7 +404,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
             theme="pln"
           />
           <KpiCard
-            label="TOTAL EMISI SCOPE 2"
+            label="Emisi Scope 2"
             value={formatNum(hierarchyStats.summary.totalEmissionTon, 1)}
             unit="tCO₂e"
             trend={`Grid Factor: ${hierarchyStats.summary.avgEmissionFactor} tCO₂/MWh`}
@@ -450,7 +412,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
             theme="emission"
           />
           <KpiCard
-            label="ESTIMASI BIAYA LISTRIK"
+            label="Perkiraan biaya listrik"
             value={`Rp ${formatNum(hierarchyStats.summary.totalCostJuta > 1000 ? hierarchyStats.summary.totalCostJuta / 1000 : hierarchyStats.summary.totalCostJuta, 2)}`}
             unit={hierarchyStats.summary.totalCostJuta > 1000 ? "Miliar" : "Juta"}
             trend="Tarif Gol. I-3/TM Rp 1.400/kWh"
@@ -458,7 +420,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
             theme="calc"
           />
           <KpiCard
-            label="JARINGAN TRANSMISI"
+            label="Wilayah PLN"
             value={hierarchyStats.summary.activeGrid.split(' ')[0]}
             unit={hierarchyStats.summary.activeGrid.includes('(') ? hierarchyStats.summary.activeGrid.split('(')[1].replace(')', '') : 'Nasional'}
             trend="Faktor Emisi Regional ESDM"
@@ -474,14 +436,9 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           <div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
               {activeSubScope === 'scope1'
-                ? (scope1Category === 'genset' ? 'Tren Konsumsi & Emisi Genset Bulanan' : 'Tren Konsumsi & Emisi Kendaraan Bulanan')
+                ? (scope1Category === 'genset' ? 'Pemakaian dan emisi genset per bulan' : 'Pemakaian dan emisi kendaraan per bulan')
                 : `Tren Konsumsi Listrik & Emisi 12 Bulan: ${selectedBranch === 'all' ? 'Seluruh Cabang' : currentBranchObj?.name || 'Cabang'} (${selectedFacility.toUpperCase()})`}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              {activeSubScope === 'scope1'
-                ? (scope1Category === 'genset' ? 'Data pemakaian genset cadangan operasional' : 'Data pemakaian BBM kendaraan operasional')
-                : 'Pola konsumsi listrik bulanan PLN (kWh) dan kalkulasi emisi Scope 2 (tCO₂e)'}
-            </p>
           </div>
           <ChartPillLegend
             items={activeSubScope === 'scope1' ? [
@@ -578,7 +535,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                             <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {label} 2026</span>
                             {isPartial && (
                               <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
-                                Parsial
+                                Sebagian
                               </span>
                             )}
                           </div>
@@ -619,18 +576,19 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           <div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
               {activeSubScope === 'scope1'
-                ? (scope1Category === 'genset' ? 'Rincian Konsumsi Genset per Fasilitas' : 'Rincian Konsumsi Kendaraan per Fasilitas')
+                ? (scope1Category === 'genset' ? 'Genset per lokasi' : 'Kendaraan per lokasi')
                 : 'Breakdown Konsumsi Listrik & Emisi per Cabang / Fasilitas'}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              {activeSubScope === 'scope1'
-                ? `${scope1Category === 'genset' ? 'Genset cadangan' : 'Kendaraan operasional'} per fasilitas • ${scope1Slice?.summary?.facilityCount ?? 0} fasilitas tercatat`
-                : 'Rincian data per fasilitas (Office, WH Utama, Bulky, Depo, Store Hub, Toko) dan kalkulasi emisi'}
-            </p>
+            {activeSubScope === 'scope1' && (
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                {scope1Slice?.summary?.facilityCount ?? 0} lokasi
+              </p>
+            )}
           </div>
           {activeSubScope === 'scope1' && (
             <div className="flex items-center gap-2 shrink-0">
               <select
+                aria-label="Periode"
                 value={scope1Period || scope1Api?.period || ''}
                 onChange={(e) => setScope1Period(e.target.value)}
                 className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -643,12 +601,13 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 ))}
               </select>
               <label className="relative shrink-0">
-                <Search className="absolute left-3 top-2.5 text-slate-500 dark:text-slate-400" size={14} />
+                <Search className="absolute left-3 top-2.5 text-slate-500 dark:text-slate-400" size={14} aria-hidden="true" />
                 <input
+                  aria-label="Cari lokasi"
                   value={scope1Search}
                   onChange={(event) => setScope1Search(event.target.value)}
                   className="w-full sm:w-56 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 py-2 pl-9 pr-3 text-xs placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Cari fasilitas atau wilayah..."
+                  placeholder="Cari lokasi atau wilayah..."
                 />
               </label>
             </div>
@@ -658,13 +617,13 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
         <div className={`overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800 ${activeSubScope === 'scope1' ? 'max-h-[560px] overflow-y-auto' : ''}`}>
           {activeSubScope === 'scope1' ? (
             <table className="w-full text-left text-xs border-collapse border-spacing-0">
-              <thead className="sticky top-0 z-20 bg-slate-900 text-white text-xs uppercase">
+              <thead className="sticky top-0 z-20 bg-slate-900 text-white text-xs">
                 <tr>
-                  <th className="sticky left-0 top-0 z-30 bg-slate-900 px-4 py-3 font-semibold">Fasilitas</th>
-                  <th className="px-4 py-3 font-semibold">Wilayah / Grid</th>
-                  <th className="text-right px-4 py-3 font-semibold">{scope1Category === 'genset' ? 'Konsumsi Solar' : 'Konsumsi Bensin'}</th>
-                  <th className="text-right px-4 py-3 font-semibold text-amber-300">Emisi Scope 1</th>
-                  <th className="text-right px-4 py-3 font-semibold">Biaya BBM</th>
+                  <th className="sticky left-0 top-0 z-30 bg-slate-900 px-4 py-3 font-semibold">Lokasi</th>
+                  <th className="px-4 py-3 font-semibold">Wilayah</th>
+                  <th className="text-right px-4 py-3 font-semibold">{scope1Category === 'genset' ? 'Solar' : 'Bensin'}</th>
+                  <th className="text-right px-4 py-3 font-semibold text-amber-300">Emisi</th>
+                  <th className="text-right px-4 py-3 font-semibold">Biaya</th>
                 </tr>
               </thead>
               <tbody>
@@ -673,7 +632,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     <td colSpan={5} className="px-4 py-8 text-center border-b border-slate-100 dark:border-slate-800">
                       <div className="flex flex-col items-center justify-center gap-2 text-rose-600 dark:text-rose-400">
                         <AlertCircle size={20} />
-                        <span className="font-semibold text-xs">Gagal memuat data Scope 1: {scope1Error}</span>
+                        <span className="font-semibold text-xs">Data Scope 1 belum bisa dimuat: {scope1Error}</span>
                         <button type="button" onClick={() => loadScope1Data(scope1Period || undefined)} className="mt-1 px-3 py-1 text-xs font-bold bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-500/30 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors">
                           Coba lagi
                         </button>
@@ -685,7 +644,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     <td colSpan={5} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                       <div className="flex items-center justify-center gap-2">
                         <RefreshCw size={16} className="animate-spin text-blue-500" />
-                        <span>Memuat data Scope 1...</span>
+                        <span role="status">Memuat data Scope 1...</span>
                       </div>
                     </td>
                   </tr>
@@ -693,8 +652,8 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                   <tr>
                     <td colSpan={5} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                       {scope1Search
-                        ? `Tidak ada fasilitas yang cocok dengan pencarian "${scope1Search}"`
-                        : `Belum ada data ${scope1Category === 'genset' ? 'genset' : 'kendaraan'} tercatat untuk periode ini. Gunakan tombol "Input Data Scope 1" untuk mulai mencatat.`}
+                        ? `Tidak ada lokasi yang cocok dengan "${scope1Search}"`
+                        : `Belum ada data ${scope1Category === 'genset' ? 'genset' : 'kendaraan'} untuk periode ini. Tambahkan lewat tombol "Input data Scope 1".`}
                     </td>
                   </tr>
                 ) : (
@@ -738,7 +697,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
             </table>
           ) : (
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-900 dark:bg-slate-950 text-white text-xs uppercase">
+              <thead className="bg-slate-900 dark:bg-slate-950 text-white text-xs">
                 <tr>
                   <th className="sticky left-0 bg-slate-900 dark:bg-slate-950 px-4 py-3 font-semibold z-10">Cabang & Fasilitas</th>
                   <th className="px-4 py-3 font-semibold">Kategori</th>

@@ -6,6 +6,7 @@ import {
   CheckCircle2, TrendingUp, Sun, Zap, Building2, Trees, BatteryCharging
 } from 'lucide-react';
 import CardBox from '@/components/ui/CardBox';
+import InfoHint from '@/components/ui/InfoHint';
 import { CONVERSION_CONFIG } from '@/lib/solar/conversionConfig';
 
 const MONTH_NAMES = [
@@ -24,7 +25,8 @@ export default function PLTSMonthlyMatrixTable({
   onFilterChange,
 }) {
   // Local Controls
-  const [selectedThroughMonth, setSelectedThroughMonth] = useState(filters?.throughMonth || 9);
+  const currentMonth = new Date().getMonth() + 1;
+  const [selectedThroughMonth, setSelectedThroughMonth] = useState(filters?.throughMonth || Math.max(1, currentMonth - 1));
   const [unit, setUnit] = useState('kWh'); // 'kWh' | 'MWh' (default: kWh)
   const [selectedPlant, setSelectedPlant] = useState(filters?.plant || 'ALL');
   const selectedYear = Number(dashboardData?.selectedYear || String(filters?.period || '2026').slice(0, 4));
@@ -325,15 +327,16 @@ export default function PLTSMonthlyMatrixTable({
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-3">
           <div className="size-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-            <Award size={20} />
+            <Award size={20} aria-hidden="true" />
           </div>
-          <div>
+          <div className="flex items-center gap-2">
             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-              Rekapitulasi Bulanan Kinerja PLTS & Indikator Lingkungan 2026
+              Rekap PLTS per bulan, {selectedYear}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Monitoring target Sustainability, realisasi energi terbarukan, PR ratio, dan reduksi emisi resmi (ESDM)
-            </p>
+            <InfoHint
+              title="Rekap PLTS per bulan"
+              text={`Target dan realisasi produksi, kinerja panel, kapasitas, emisi yang dicegah, batubara, dan setara pohon. Emisi = listrik PLTS yang dipakai sendiri × ${CONVERSION_CONFIG.emission.factorKgPerKwh} kgCO₂/kWh. Batubara = produksi × ${CONVERSION_CONFIG.coal.factorKgPerKwh} kg/kWh. Pohon = emisi ÷ ${CONVERSION_CONFIG.tree.factorKgPerTreePerYear} kgCO₂ per pohon per tahun. Progres setahun = realisasi s.d. bulan terpilih ÷ target setahun. Proyeksi akhir tahun = (realisasi ÷ target s.d. bulan terpilih) × target setahun.`}
+            />
           </div>
         </div>
 
@@ -341,15 +344,16 @@ export default function PLTSMonthlyMatrixTable({
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Dropdown Sampai Bulan */}
           <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1 text-xs">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sampai Bulan:</span>
+            <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Sampai bulan:</span>
             <select
+              aria-label="Sampai bulan"
               className="bg-transparent font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
               value={selectedThroughMonth}
               onChange={(e) => setSelectedThroughMonth(Number(e.target.value))}
             >
               {FULL_MONTH_NAMES.map((name, idx) => (
                 <option key={idx + 1} value={idx + 1}>
-                  {name} {idx + 1 <= 9 ? '(Aktif)' : '(Prognosa)'}
+                  {name}{idx + 1 > currentMonth ? ' (belum berjalan)' : ''}
                 </option>
               ))}
             </select>
@@ -357,8 +361,9 @@ export default function PLTSMonthlyMatrixTable({
 
           {/* Dropdown Cabang */}
           <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1 text-xs">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Cabang:</span>
+            <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">DC:</span>
             <select
+              aria-label="DC"
               className="bg-transparent font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer max-w-[150px] truncate"
               value={selectedPlant}
               onChange={(e) => {
@@ -369,7 +374,7 @@ export default function PLTSMonthlyMatrixTable({
                 }
               }}
             >
-              <option value="ALL">Semua DC (39 Plant)</option>
+              <option value="ALL">Semua DC</option>
               {plantList.map(p => (
                 <option key={p.dcId} value={p.dcId}>
                   {p.canonicalName} ({p.capacityKwp?.toFixed(1)} kWp)
@@ -409,10 +414,9 @@ export default function PLTSMonthlyMatrixTable({
             type="button"
             onClick={handleExportCsv}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors shadow-2xs"
-            title="Export data rekap bulanan ke format CSV"
           >
-            <Download size={13} />
-            <span>Export CSV</span>
+            <Download size={13} aria-hidden="true" />
+            <span>Unduh CSV</span>
           </button>
         </div>
       </div>
@@ -420,7 +424,7 @@ export default function PLTSMonthlyMatrixTable({
       {/* Main Table Container */}
       <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs">
         <table className="w-full text-left text-xs border-collapse">
-          <thead className="bg-slate-900 text-white text-[11px] uppercase tracking-wider">
+          <thead className="bg-slate-900 text-white text-[11px]">
             <tr>
               <th className="sticky left-0 bg-slate-900 px-3.5 py-3 font-semibold z-20 min-w-[140px] border-r border-slate-800">
                 Parameter
@@ -441,24 +445,24 @@ export default function PLTSMonthlyMatrixTable({
                   >
                     <div>{m}</div>
                     {isPartial && (
-                      <span className="inline-block mt-0.5 text-[8px] font-bold px-1 py-0.2 bg-amber-400/20 text-amber-300 rounded border border-amber-400/30 uppercase tracking-tight">
-                        Parsial
+                      <span className="inline-block mt-0.5 text-[9px] font-bold px-1 py-0.2 bg-amber-400/20 text-amber-300 rounded border border-amber-400/30">
+                        Berjalan
                       </span>
                     )}
                   </th>
                 );
               })}
               <th className="text-right px-3 py-3 font-bold bg-slate-800 min-w-[95px] text-amber-300 border-l border-slate-700">
-                TOTAL YTD
+                Total s.d. bulan ini
               </th>
               <th className="text-right px-3 py-3 font-semibold bg-slate-900 min-w-[95px]">
-                TARGET SETAHUN
+                Target setahun
               </th>
-              <th className="text-center px-3 py-3 font-bold bg-slate-800 text-emerald-300 min-w-[85px] border-l border-slate-700" title="Progres terhadap target setahun = Aktual YTD / Target Setahun">
-                % EOY
+              <th className="text-center px-3 py-3 font-bold bg-slate-800 text-emerald-300 min-w-[85px] border-l border-slate-700" >
+                Progres setahun
               </th>
-              <th className="text-right px-3 py-3 font-semibold bg-slate-900 min-w-[95px]" title="Proyeksi EOY = (Aktual YTD / Target YTD) × Target Setahun">
-                PROYEKSI EOY
+              <th className="text-right px-3 py-3 font-semibold bg-slate-900 min-w-[95px]" >
+                Proyeksi akhir tahun
               </th>
             </tr>
           </thead>
@@ -473,7 +477,7 @@ export default function PLTSMonthlyMatrixTable({
               >
                 <div className="flex items-center gap-1.5">
                   <Sun size={14} className="text-amber-500 shrink-0" />
-                  <span>Energi Listrik</span>
+                  <span>Produksi listrik</span>
                 </div>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal block mt-0.5">
                   ({unit})
@@ -506,7 +510,7 @@ export default function PLTSMonthlyMatrixTable({
               <td rowSpan={3} className="font-mono font-black text-center text-emerald-700 dark:text-emerald-300 text-sm align-middle bg-emerald-50/40 dark:bg-emerald-500/10 border-l border-slate-200 dark:border-slate-700 px-3">
                 {formatVal(totals.progressEoyPct, 2)}%
                 <span className="block text-[9px] font-normal text-emerald-600 dark:text-emerald-400 mt-0.5">
-                  Progres EOY
+                  dari target setahun
                 </span>
               </td>
               <td rowSpan={3} className="font-mono font-bold text-right text-slate-800 dark:text-slate-200 align-middle bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
@@ -520,7 +524,7 @@ export default function PLTSMonthlyMatrixTable({
             {/* Realisasi aktual */}
             <tr className="hover:bg-slate-50/60 dark:hover:bg-slate-800 transition-colors">
               <td className="sticky left-[140px] bg-white dark:bg-slate-900 font-bold text-emerald-800 dark:text-emerald-300 px-3 py-2.5 z-10 border-r border-slate-200 dark:border-slate-700">
-                Realisasi Aktual
+                Realisasi
               </td>
               {monthlyRows.map((m, idx) => {
                 const isDimmed = m.month > selectedThroughMonth;
@@ -532,7 +536,7 @@ export default function PLTSMonthlyMatrixTable({
                     className={`font-mono text-right px-2 py-2.5 font-bold ${
                       val !== null ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-500 dark:text-slate-400 italic text-[11px]'
                     } ${isHighlight ? 'bg-amber-50/40 dark:bg-amber-500/10' : isDimmed ? 'opacity-40 text-slate-500 dark:text-slate-400' : ''}`}
-                    title={val === null ? (m.month < 10 ? 'Data observasi belum masuk' : 'Bulan prognosa') : undefined}
+                    title={val === null ? (m.month <= currentMonth ? 'Data belum masuk' : 'Bulan belum berjalan') : undefined}
                   >
                     {val !== null ? formatVal(val, unitDecimals) : 'Belum masuk'}
                   </td>
@@ -549,7 +553,7 @@ export default function PLTSMonthlyMatrixTable({
             {/* % pencapaian */}
             <tr className="hover:bg-slate-50/60 dark:hover:bg-slate-800 transition-colors">
               <td className="sticky left-[140px] bg-white dark:bg-slate-900 font-bold text-slate-800 dark:text-slate-200 px-3 py-2.5 z-10 border-r border-slate-200 dark:border-slate-700">
-                % Pencapaian
+                % tercapai
               </td>
               {monthlyRows.map((m, idx) => {
                 const isDimmed = m.month > selectedThroughMonth;
@@ -582,14 +586,14 @@ export default function PLTSMonthlyMatrixTable({
               >
                 <div className="flex items-center gap-1.5">
                   <BatteryCharging size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>Performa (PR)</span>
+                  <span>Kinerja panel (PR)</span>
                 </div>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal block mt-0.5">
                   (Rasio %)
                 </span>
               </td>
               <td className="sticky left-[140px] bg-white dark:bg-slate-900 font-semibold text-slate-700 dark:text-slate-300 px-3 py-2.5 z-10 border-r border-slate-200 dark:border-slate-700">
-                PR Aktual
+                Realisasi
               </td>
               {monthlyRows.map((m, idx) => {
                 const isDimmed = m.month > selectedThroughMonth;
@@ -693,7 +697,7 @@ export default function PLTSMonthlyMatrixTable({
               <td className="sticky left-0 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-3.5 py-3 z-10 border-r border-slate-200 dark:border-slate-700 align-middle shadow-xs">
                 <div className="flex items-center gap-1.5">
                   <TrendingUp size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>Emisi Terhindar</span>
+                  <span>Emisi yang dicegah</span>
                 </div>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal block mt-0.5">
                   (tCO₂e)
@@ -735,7 +739,7 @@ export default function PLTSMonthlyMatrixTable({
               <td className="sticky left-0 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-3.5 py-3 z-10 border-r border-slate-200 dark:border-slate-700 align-middle shadow-xs">
                 <div className="flex items-center gap-1.5">
                   <Zap size={14} className="text-amber-600 dark:text-amber-400 shrink-0" />
-                  <span>Batubara Terhindar</span>
+                  <span>Batubara yang dihemat</span>
                 </div>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal block mt-0.5">
                   (Ton Batubara)
@@ -815,31 +819,6 @@ export default function PLTSMonthlyMatrixTable({
             </tr>
           </tbody>
         </table>
-      </div>
-
-      {/* Footnote & Metodologi Konversi */}
-      <div className="rounded-xl bg-slate-50/90 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700 p-3.5 text-xs text-slate-600 dark:text-slate-400 space-y-1.5 leading-relaxed">
-        <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-slate-200 text-xs">
-          <Info size={14} className="text-blue-600 dark:text-blue-400" />
-          <span>Catatan Metodologi & Konfigurasi Faktor Resmi:</span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-[11px]">
-          <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-700">
-            <strong className="text-slate-800 dark:text-slate-200 block">1. Emisi Karbon ({CONVERSION_CONFIG.emission.factorTonPerMwh} tCO₂e/MWh):</strong>
-            <span>{CONVERSION_CONFIG.emission.source}. Dihitung dari faktor emisi marjinal kombinasi (CM PLTS) per sistem grid kelistrikan.</span>
-          </div>
-          <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-700">
-            <strong className="text-slate-800 dark:text-slate-200 block">2. Batubara Terhindar ({CONVERSION_CONFIG.coal.factorKgPerKwh} kg/kWh):</strong>
-            <span>{CONVERSION_CONFIG.coal.source}. Asumsi konsumsi spesifik batubara terhindar pada PLTU termal sub-kritis.</span>
-          </div>
-          <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-700">
-            <strong className="text-slate-800 dark:text-slate-200 block">3. Pohon Setara ({CONVERSION_CONFIG.tree.factorKgPerTreePerYear} kgCO₂/thn):</strong>
-            <span>{CONVERSION_CONFIG.tree.source}. Daya serap rata-rata 1 pohon dewasa tropis per tahun (~45,9 pohon per tCO₂e).</span>
-          </div>
-        </div>
-        <p className="text-[10px] text-slate-500 dark:text-slate-400 pt-0.5">
-          * Rumus Progres EOY = <code>(Aktual YTD / Target Setahun) × 100%</code>. Proyeksi EOY = <code>(Aktual YTD / Target YTD) × Target Setahun</code>. Kolom setelah bulan terpilih diredupkan.
-        </p>
       </div>
     </CardBox>
   );

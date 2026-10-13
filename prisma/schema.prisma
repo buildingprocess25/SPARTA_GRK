@@ -774,3 +774,43 @@ model PushSubscription {
   @@index([username])
   @@map("push_subscription")
 }
+
+/// Alfamart store master, synced monthly from the "SPARTA - Store Database" Google Sheet.
+/// A store missing from the latest sync is kept and marked inactive, so fuel records that reference it stay traceable.
+model StoreMaster {
+  code          String    @id
+  name          String
+  branch        String
+  ownership     String // 'R' (Reguler, operated by Alfa) | 'F' (Franchise)
+  latitude      Float?
+  longitude     Float?
+  isActive      Boolean   @default(true) @map("is_active")
+  firstSeenAt   DateTime  @default(now()) @map("first_seen_at") @db.Timestamptz(6)
+  lastSeenAt    DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz(6)
+  deactivatedAt DateTime? @map("deactivated_at") @db.Timestamptz(6)
+  lastSyncRunId String?   @map("last_sync_run_id")
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([branch])
+  @@index([isActive, ownership])
+  @@map("store_master")
+}
+
+model StoreSyncRun {
+  id               String    @id @default(cuid())
+  trigger          String // 'monthly' | 'manual'
+  status           String    @default("RUNNING") // RUNNING | SUCCESS | FAILED
+  startedAt        DateTime  @default(now()) @map("started_at") @db.Timestamptz(6)
+  finishedAt       DateTime? @map("finished_at") @db.Timestamptz(6)
+  rowCount         Int       @default(0) @map("row_count")
+  addedCount       Int       @default(0) @map("added_count")
+  updatedCount     Int       @default(0) @map("updated_count")
+  reactivatedCount Int       @default(0) @map("reactivated_count")
+  deactivatedCount Int       @default(0) @map("deactivated_count")
+  skippedRows      Json      @default("[]") @map("skipped_rows")
+  errorMessage     String?   @map("error_message")
+  triggeredBy      String?   @map("triggered_by")
+
+  @@index([startedAt])
+  @@map("store_sync_run")
+}

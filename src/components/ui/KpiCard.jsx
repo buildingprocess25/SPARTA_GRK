@@ -2,6 +2,7 @@
 
 import React from 'react';
 import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
+import InfoHint from '@/components/ui/InfoHint';
 
 const SEMANTIC_THEMES = {
   emission: {
@@ -60,7 +61,7 @@ export default function KpiCard({
   icon: Icon = null,
   theme = 'default',
   infoKey = null,
-  sourceBadge = null,
+  sourceBadge: _sourceBadge = null, // Ignored: raw source codes are not shown to users.
   className = '',
   tooltip = null,
   ...props
@@ -70,28 +71,19 @@ export default function KpiCard({
 
   return (
     <div
-      className={`relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 sm:p-5 flex flex-col justify-between h-full shadow-2xs hover:-translate-y-0.5 hover:shadow-xs dark:shadow-none transition-all duration-200 min-w-0 has-[[data-popover-open="true"]]:z-50 has-[[data-popover-open="true"]]:relative ${themeConfig.accentBorder} ${className}`}
-      title={tooltip || label}
+      className={`relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 sm:p-5 flex flex-col justify-between h-full shadow-2xs dark:shadow-none transition-colors duration-200 min-w-0 has-[[data-popover-open="true"]]:z-50 has-[[data-popover-open="true"]]:relative ${themeConfig.accentBorder} ${className}`}
       {...props}
     >
       {/* Top Row: Label & Icons */}
       <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-2">
         <div className="flex flex-col min-w-0 pr-1 flex-1">
-          <span
-            className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 line-clamp-2 leading-tight break-words"
-            title={label}
-          >
+          <span className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 line-clamp-2 leading-tight break-words">
             {label}
           </span>
-          {sourceBadge && (
-            <span className="inline-block mt-0.5 text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400">
-              {sourceBadge}
-            </span>
-          )}
         </div>
 
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          {infoKey && <MetricInfoIcon infoKey={infoKey} />}
+          {infoKey ? <MetricInfoIcon infoKey={infoKey} /> : <InfoHint title={label} text={tooltip} />}
           {Icon && (
             <div
               className={`size-8 sm:size-9 rounded-xl flex items-center justify-center shrink-0 ${themeConfig.iconBg}`}

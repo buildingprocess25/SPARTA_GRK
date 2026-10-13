@@ -64,7 +64,7 @@ function formatNum(num, min = 1, max = 2) {
 }
 
 export const GRID_OPTIONS = [
-  { value: 'ALL', label: 'Semua Sistem Grid' },
+  { value: 'ALL', label: 'Semua wilayah' },
   { value: 'JAMALI', label: 'JAMALI (Jawa-Madura-Bali)' },
   { value: 'SUMATERA', label: 'Sumatera' },
   { value: 'KALBAR', label: 'Kalimantan Barat' },
@@ -258,7 +258,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       console.error('[PLTSSummaryCard] Error fetching data:', err);
       const isTimeout = err.name === 'AbortError';
       setError(isTimeout
-        ? 'Batas waktu memuat ringkasan PLTS terlampaui (10 detik). Silakan coba muat ulang.'
+        ? 'Server terlalu lama merespons (lebih dari 10 detik). Coba muat ulang.'
         : (err.message || 'Terjadi kesalahan saat memuat data')
       );
     } finally {
@@ -614,7 +614,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       <CardBox className="p-6">
         <div className="flex items-center justify-center py-16 text-slate-500 dark:text-slate-400 gap-3">
           <div className="size-5 rounded-full border-2 border-amber-500 border-t-transparent animate-spin" />
-          <span className="text-sm font-medium">Memuat ringkasan performa 37 plant PLTS...</span>
+          <span className="text-sm font-medium" role="status">Memuat ringkasan PLTS...</span>
         </div>
       </CardBox>
     );
@@ -625,15 +625,15 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       <CardBox className="p-6 border-rose-200 dark:border-rose-500/30 bg-rose-50/40 dark:bg-rose-500/10">
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <AlertCircle size={36} className="text-rose-500 mb-3" />
-          <h3 className="text-base font-bold text-rose-900">Gagal Memuat Ringkasan PLTS</h3>
+          <h3 className="text-base font-bold text-rose-900 dark:text-rose-200">Ringkasan PLTS belum bisa dimuat</h3>
           <p className="text-xs text-rose-700 dark:text-rose-300 max-w-md mt-1">{error}</p>
           <button
             type="button"
             onClick={() => fetchSummary(true)}
-            className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
+            className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-rose-700 hover:bg-rose-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
           >
-            <RotateCcw size={13} />
-            <span>Coba Muat Ulang</span>
+            <RotateCcw size={13} aria-hidden="true" />
+            <span>Coba lagi</span>
           </button>
         </div>
       </CardBox>
@@ -644,8 +644,8 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
     totalKwp: 0,
     totalProductionMwh: 0,
     totalCo2ReducedTon: 0,
-    normalCount: 36,
-    attentionCount: 1,
+    normalCount: null,
+    attentionCount: null,
     treeEquivalent: 0,
     unmappedGridCount: 0,
     unmappedGridMwh: 0,
@@ -677,25 +677,19 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-              <Sun size={20} />
+              <Sun size={20} aria-hidden="true" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                  Ringkasan PLTS (37 Lokasi DC)
-                </h3>
-                <MetricInfoIcon infoKey="plts_multi_dc_analytics" />
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Monitoring energi tersimpan, kapasitas terpasang, dan emisi terhindar
-              </p>
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Ringkasan PLTS</h3>
+              <MetricInfoIcon infoKey="plts_multi_dc_analytics" />
             </div>
           </div>
 
           {/* Period Selector */}
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Periode:</span>
+            <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Periode:</span>
             <select
+              aria-label="Periode"
               value={data?.history?.activePeriod?.value || period}
               onChange={(e) => handlePeriodChange(e.target.value)}
               className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
@@ -710,8 +704,8 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               onChange={(event) => handleModeChange(event.target.value)}
               className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-300"
             >
-              <option value="YTD">Jan–bulan (YTD)</option>
-              <option value="MONTH">Bulan terpilih</option>
+              <option value="YTD">Sejak Januari</option>
+              <option value="MONTH">Satu bulan</option>
             </select>
             {periodMode === 'MONTH' && (
               <select
@@ -750,12 +744,13 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50/70 dark:bg-slate-800/40 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700">
           {/* Wilayah grid */}
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-1">
-              <Globe size={11} className="text-blue-600 dark:text-blue-400" />
-              1. Wilayah Grid
+            <label htmlFor="plts-summary-grid" className="text-[11px] font-bold text-slate-600 dark:text-slate-400 ml-1 flex items-center gap-1">
+              <Globe size={11} className="text-blue-600 dark:text-blue-400" aria-hidden="true" />
+              Wilayah PLN
             </label>
             <div className="relative">
               <select
+                id="plts-summary-grid"
                 value={selectedGrid}
                 onChange={(e) => handleGridChange(e.target.value)}
                 className="w-full pl-3 pr-8 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none shadow-2xs cursor-pointer"
@@ -770,17 +765,18 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
           {/* Cabang / DC / fasilitas */}
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-1">
-              <Building2 size={11} className="text-amber-600 dark:text-amber-400" />
-              2. Cabang / DC / Fasilitas
+            <label htmlFor="plts-summary-dc" className="text-[11px] font-bold text-slate-600 dark:text-slate-400 ml-1 flex items-center gap-1">
+              <Building2 size={11} className="text-amber-600 dark:text-amber-400" aria-hidden="true" />
+              DC
             </label>
             <div className="relative">
               <select
+                id="plts-summary-dc"
                 value={selectedDc}
                 onChange={(e) => handleDcChange(e.target.value)}
                 className="w-full pl-3 pr-8 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 appearance-none shadow-2xs cursor-pointer"
               >
-                <option value="ALL">Semua Cabang / DC {selectedGrid !== 'ALL' ? `(${selectedGrid})` : ''}</option>
+                <option value="ALL">Semua DC {selectedGrid !== 'ALL' ? `(${selectedGrid})` : ''}</option>
                 {availableDcOptions.map(dc => (
                   <option key={dc.dcId} value={dc.dcId}>
                     {dc.canonicalName} ({dc.grid})
@@ -793,18 +789,18 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
           {/* Status filter & reset */}
           <div className="space-y-1 flex flex-col justify-between">
-            <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-1">
-              <Filter size={11} className="text-emerald-600 dark:text-emerald-400" />
-              3. Filter Aktif & Reset
-            </label>
+            <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 ml-1 flex items-center gap-1">
+              <Filter size={11} className="text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+              Pilihan saat ini
+            </span>
             <div className="flex items-center gap-2">
               <div className="flex-1 text-xs text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 flex items-center justify-between">
                 <span className="font-semibold truncate">
-                  {selectedGrid === 'ALL' ? 'Semua Grid' : selectedGrid}
+                  {selectedGrid === 'ALL' ? 'Semua wilayah' : selectedGrid}
                   {selectedDc !== 'ALL' ? ` • ${data?.locations?.find(l => l.dcId === selectedDc)?.canonicalName || selectedDc}` : ''}
                 </span>
                 <span className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded">
-                  {filteredRows.length} Lokasi
+                  {filteredRows.length} lokasi
                 </span>
               </div>
               {isFiltered && (
@@ -819,9 +815,9 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                     syncUrlParam('dc', '');
                   }}
                   className="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 shrink-0"
-                  title="Reset semua filter"
+                  aria-label="Hapus semua filter"
                 >
-                  <RotateCcw size={12} />
+                  <RotateCcw size={12} aria-hidden="true" />
                   Reset
                 </button>
               )}
@@ -834,7 +830,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           <div className="flex items-center gap-2 rounded-xl bg-amber-50/70 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/30 px-3 py-1.5 text-[11px] text-amber-800 dark:text-amber-300">
             <AlertCircle size={13} className="text-amber-600 dark:text-amber-400 shrink-0" />
             <span>
-              <strong>Perhatian Data:</strong> {unmatchedOrPartialRows.length} lokasi memiliki catatan histori parsial ({unmatchedOrPartialRows.map(r => r.canonicalName).slice(0, 3).join(', ')}{unmatchedOrPartialRows.length > 3 ? ` +${unmatchedOrPartialRows.length - 3} lainnya` : ''}).
+              <strong>Data belum lengkap:</strong> {unmatchedOrPartialRows.length} lokasi ({unmatchedOrPartialRows.map(r => r.canonicalName).slice(0, 3).join(', ')}{unmatchedOrPartialRows.length > 3 ? ` +${unmatchedOrPartialRows.length - 3} lainnya` : ''}).
             </span>
           </div>
         )}
@@ -843,10 +839,10 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 pt-1 relative z-20 has-[[data-popover-open='true']]:z-40">
           {/* Card 1: Kapasitas */}
           <KpiCard
-            label="Kapasitas Terpasang"
+            label="Kapasitas terpasang"
             value={kpi.totalKwp != null ? formatNum(kpi.totalKwp, 1, 2) : '—'}
             unit="kWp"
-            subtitle={`${filteredRows.length} plant fisik aktif`}
+            subtitle={`${filteredRows.length} plant`}
             icon={Zap}
             theme="plts"
             infoKey="plts_summary_capacity"
@@ -854,16 +850,16 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
           {/* Card 2: Total Produksi */}
           <KpiCard
-            label="Total Produksi"
+            label="Total produksi"
             value={(dashboardData?.summary?.productionKwh ?? Math.round(totalFooter.totalMwh * 1000))?.toLocaleString('id-ID')}
             unit="kWh"
             subtitle={
               <div className="space-y-1">
-                <span>Periode {data?.history?.activePeriod?.label || data?.period}</span>
-                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400">
+                <span>{data?.history?.activePeriod?.label || data?.period}</span>
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-600 dark:text-slate-400">
                   {isNational && dashboardData?.summary?.targetMwh != null
-                    ? <>Target {Math.round(dashboardData.summary.targetMwh * 1000).toLocaleString('id-ID')} kWh · Capai <strong className="text-emerald-700 dark:text-emerald-300">{formatNum(dashboardData.summary.achievementPct, 1, 1)}%</strong></>
-                    : 'Target nasional'}
+                    ? <>Target {Math.round(dashboardData.summary.targetMwh * 1000).toLocaleString('id-ID')} kWh · tercapai <strong className="text-emerald-700 dark:text-emerald-300">{formatNum(dashboardData.summary.achievementPct, 1, 1)}%</strong></>
+                    : 'Target hanya tersedia untuk semua DC'}
                   {isNational && dashboardData?.summary?.achievementPct != null && (
                     <div className="mt-1 h-1 overflow-hidden rounded-full bg-amber-100 dark:bg-amber-500/20">
                       <div className="h-full rounded-full bg-amber-500" style={{ width: `${Math.min(100, dashboardData.summary.achievementPct)}%` }} />
@@ -879,17 +875,14 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
           {/* Card 3: Penghematan Energi Bersih (Non-Nominal) */}
           <KpiCard
-            label="Penghematan Energi"
+            label="Listrik yang dihemat"
             value={(dashboardData?.summary?.savingsKwh ?? dashboardData?.summary?.productionKwh ?? Math.round(totalFooter.totalMwh * 1000))?.toLocaleString('id-ID')}
             unit="kWh"
             subtitle={
               <div className="space-y-1">
                 <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold block">
-                  {dashboardData?.summary?.emission?.coalAvoidedTon ? `~${formatNum(dashboardData.summary.emission.coalAvoidedTon, 1, 1)} Ton Batubara (estimasi)` : 'Batubara Terhindar'}
+                  {dashboardData?.summary?.emission?.coalAvoidedTon ? `Setara sekitar ${formatNum(dashboardData.summary.emission.coalAvoidedTon, 1, 1)} ton batubara` : 'Setara batubara: belum tersedia'}
                 </span>
-                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400" title="Estimasi SFC PLTU 0,40 kg batubara/kWh untuk energi PLTS 37 plant resmi ESDM">
-                  Ekuivalen 0,40 kg batubara / kWh (37 plant resmi)
-                </div>
               </div>
             }
             icon={Zap}
@@ -899,13 +892,13 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
           {/* Card 4: Reduksi Emisi */}
           <KpiCard
-            label="Emisi Terhindar"
+            label="Emisi yang dicegah"
             value={kpi.totalCo2ReducedTon != null ? formatNum(kpi.totalCo2ReducedTon, 2, 2) : '—'}
             unit="tCO₂e"
             subtitle={
               <div className="space-y-1">
                 <span>Setara {kpi.treeEquivalent != null ? formatNum(kpi.treeEquivalent, 0, 0) : '—'} pohon</span>
-                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400" title="Energi PLTS dikali faktor emisi tunggal dashboard">
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-600 dark:text-slate-400">
                   Faktor emisi: {PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh
                 </div>
               </div>
@@ -917,7 +910,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
           {/* Card 5: Status Operasional Stasiun */}
           <KpiCard
-            label="Status Operasional"
+            label="Status plant"
             value={
               <div className="flex items-center gap-1.5 flex-wrap text-sm sm:text-base font-bold">
                 <span
@@ -952,8 +945,8 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             subtitle={
               <div className="space-y-1">
                 <span>{statusBreakdown.attentionCount === 0 ? 'Semua lokasi beroperasi normal' : `${statusBreakdown.attentionCount} lokasi perlu perhatian`}</span>
-                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400">
-                  PR: {dashboardData?.summary?.pr?.valuePct ? <strong className="text-cyan-800 dark:text-cyan-300">{formatNum(dashboardData.summary.pr.valuePct, 1, 1)}%</strong> : 'Belum tersedia'}
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-600 dark:text-slate-400">
+                  Kinerja panel (PR): {dashboardData?.summary?.pr?.valuePct ? <strong className="text-cyan-800 dark:text-cyan-300">{formatNum(dashboardData.summary.pr.valuePct, 1, 1)}%</strong> : 'Belum tersedia'}
                 </div>
               </div>
             }
@@ -968,8 +961,8 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
               <div className="flex items-center gap-2">
                 <div>
-                  <h4 className="text-sm font-black text-slate-900 dark:text-slate-100">Perbandingan Produksi {comparison.years[0]} vs {comparison.years[1]}</h4>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Batas bulan sejajar: {comparison.label}</p>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-slate-100">Produksi {comparison.years[0]} vs {comparison.years[1]}</h4>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-400">{comparison.label}</p>
                 </div>
                 <MetricInfoIcon infoKey="plts_summary_yoy" />
               </div>
@@ -1014,7 +1007,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                               value: p.value != null ? `${formatNum(p.value, 2, 2)} MWh` : '—',
                               dotColor: p.color,
                             }))}
-                            footer={label?.includes('*') ? 'Data parsial bulan berjalan' : null}
+                            footer={label?.includes('*') ? 'Bulan berjalan, data belum lengkap' : null}
                           />
                         );
                       }
@@ -1076,7 +1069,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 : 'text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-200 hover:bg-amber-50 dark:hover:bg-amber-500/10'
               }`}
           >
-            Bottom 5 Produksi
+            5 produksi terendah
           </button>
           <button
             type="button"
@@ -1086,8 +1079,8 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 : 'text-rose-700 dark:text-rose-300 hover:text-rose-900 dark:hover:text-rose-200 hover:bg-rose-50 dark:hover:bg-rose-500/10'
               }`}
           >
-            <span className="size-1.5 rounded-full bg-rose-500" />
-            Perlu Perhatian / Histori Parsial
+            <span className="size-1.5 rounded-full bg-rose-500" aria-hidden="true" />
+            Perlu dicek
           </button>
           <button
             type="button"
@@ -1141,7 +1134,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 <div
                   data-testid="data-freshness-badge"
                   className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 px-3 text-xs font-semibold text-emerald-800 dark:text-emerald-300 shadow-2xs shrink-0"
-                  title={`Data telemetri terbaru (disinkronkan: ${lastSyncTime || timeDisplay})`}
+                  title={`Data terbaru (diperbarui: ${lastSyncTime || timeDisplay})`}
                 >
                   <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Data terbaru · {timeDisplay}</span>
@@ -1154,7 +1147,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 <div
                   data-testid="data-freshness-badge"
                   className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-3 text-xs font-semibold text-amber-800 dark:text-amber-300 shadow-2xs shrink-0"
-                  title={lastSyncTime ? `Terakhir disinkronkan: ${lastSyncTime}` : 'Data dalam rentang 30 menit - 3 jam'}
+                  title={lastSyncTime ? `Terakhir diperbarui: ${lastSyncTime}` : undefined}
                 >
                   <span className="size-2 rounded-full bg-amber-500" />
                   <span>Data {formatDataAge(dataAgeMinutes)}</span>
@@ -1176,9 +1169,8 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                       type="button"
                       onClick={onNavigateToIsolar}
                       className="font-bold text-rose-700 dark:text-rose-300 underline hover:text-rose-950 dark:hover:text-rose-100 transition-colors inline-flex items-center gap-0.5"
-                      title="Buka tab Live iSolarCloud API untuk menyegarkan data"
                     >
-                      <span>Refresh melalui tab iSolar</span>
+                      <span>Perbarui di tab iSolar</span>
                       <ArrowUpRight size={12} />
                     </button>
                   </>
@@ -1207,7 +1199,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         className="max-h-[460px] overflow-auto overscroll-contain rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs bg-white dark:bg-slate-900"
       >
         <table className="w-full text-left text-xs border-separate border-spacing-0">
-          <thead className="bg-slate-50 dark:bg-slate-800/40 text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 sticky top-0 z-20 shadow-[0_1px_0_0_#e2e8f0]">
+          <thead className="bg-slate-50 dark:bg-slate-800/40 text-[11px] text-slate-600 dark:text-slate-400 sticky top-0 z-20 shadow-[0_1px_0_0_#e2e8f0]">
             <tr>
               <th
                 onClick={() => handleSort('canonicalName')}
@@ -1241,7 +1233,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
               >
                 <div className="flex items-center justify-end gap-1.5">
-                  <span>Specific Yield</span>
+                  <span>Produksi per kWp</span>
                   {sortKey === 'specificYield' && (sortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
                 </div>
               </th>
@@ -1258,7 +1250,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                   className="px-3 py-3 font-bold text-right cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
                 >
                   <div className="flex items-center justify-end gap-1.5">
-                    <span>vs Bulan Lalu (%)</span>
+                    <span>vs bulan lalu</span>
                     {sortKey === 'vsPrevMonthPct' && (sortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
                   </div>
                 </th>
@@ -1269,7 +1261,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 className="px-3 py-3 font-bold text-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
               >
                 <div className="flex items-center justify-center gap-1.5">
-                  <span>Status Operasional</span>
+                  <span>Status</span>
                   {sortKey === 'status' && (sortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
                 </div>
               </th>
@@ -1439,14 +1431,14 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                           if (opStatus.key === 'WAITING_DATA') {
                             return (
                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600" title={tooltipText}>
-                                Menunggu Data
+                                Menunggu data
                               </span>
                             );
                           }
                           if (opStatus.key === 'DEVICE_OFFLINE') {
                             return (
                               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-300" title={tooltipText}>
-                                {loc.offlineDeviceCount || 1} Device Offline
+                                {loc.offlineDeviceCount ? `${loc.offlineDeviceCount} perangkat offline` : 'Ada perangkat offline'}
                               </span>
                             );
                           }

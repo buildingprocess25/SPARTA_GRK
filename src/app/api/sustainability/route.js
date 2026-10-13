@@ -76,7 +76,8 @@ export async function GET(request) {
         loadMwh: Number((m?.loadMwh || 0).toFixed(5)),
         totalProdMwh: Number(yieldMwh.toFixed(5)),
         avoidedCo2Ton: Number((m?.avoidedEmissionTon || 0).toFixed(3)),
-        plantCount: m?.plantCount || 0
+        plantCount: m?.plantCount || 0,
+        hasData: yieldMwh > 0 || (m?.purchasedMwh || 0) > 0,
       };
     });
 
@@ -123,6 +124,7 @@ export async function GET(request) {
         yearMonth: ym,
         plnKwh: Number((m?.totalPurchasedKwh || 0).toFixed(1)),
         emissionTon: Number((m?.scope2EmissionTon || 0).toFixed(3)),
+        hasData: (m?.totalPurchasedKwh || 0) > 0,
       };
     });
     const totalPurchasedKwh = scope2MonthlyTrend.reduce((acc, m) => acc + m.plnKwh, 0);
@@ -321,7 +323,12 @@ export async function POST(request) {
           status: fuelType === 'PERTAMAX' ? 'DRAFT' : status,
           validationNote,
           source,
-          proofRef: proofRef || null
+          proofRef: proofRef || null,
+          metadata: {
+            ...(isMobile
+              ? { vehiclePlateNo: body.vehiclePlateNo || null, operatorUnit: body.operatorUnit || null }
+              : { runHours: parseFloat(body.runHours) || null, gensetAssetCode: body.gensetAssetCode || null, gensetKva: parseFloat(body.gensetKva) || null }),
+          },
         }
       });
     } else if (module === 'water') {

@@ -1,103 +1,68 @@
+// CLI twin of POST /api/plts/import-report: imports iSolarCloud "Monthly Report" CSVs with the same rules.
+// Usage: npm run import:energy-flow [-- --dry-run] [-- path/to/report.csv ...]
+// Without file arguments it picks the newest "Monthly Report_Annual report_*.csv" per year in the project root.
 import fs from 'fs';
 import path from 'path';
-import { PrismaClient } from '../src/generated/prisma/index.js';
-import { lookupPlantMetadata } from '../src/lib/solar/plantMap.js';
+import prisma from '../src/lib/prisma.js';
+import { parseIsolarMonthlyReportFile } from '../src/lib/importers/isolarMonthlyReport.js';
+import { createPrismaMonthlyImportRepository, importIsolarMonthlyReport } from '../src/lib/importers/isolarMonthlyImport.js';
+import {
+  closedMonthReport,
+  energyFlowRowsFromDecisions,
+  openMonthCutoff,
+  upsertEnergyFlowRows,
+} from '../src/lib/importers/energyFlowImport.js';
 
-const prisma = new PrismaClient();
+const REPORT_PATTERN = /^Monthly Report_Annual report_.*\.csv$/i;
 
-function parseReportCsv(filePath) {
-  const fullPath = path.resolve(process.cwd(), filePath);
-  if (!fs.existsSync(fullPath)) {
-    console.error(`File not found: ${fullPath}`);
-    return [];
+function reportYear(fullPath) {
+  const firstLine = fs.readFileSync(fullPath, 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/)[0];
+  return Number(firstLine.match(/Year_(\d{4})/)?.[1]) || null;
+}
+
+function findLatestReportsPerYear(dir) {
+  const byYear = new Map();
+  for (const fileName of fs.readdirSync(dir).filter(name => REPORT_PATTERN.test(name))) {
+    const fullPath = path.join(dir, fileName);
+    const year = reportYear(fullPath);
+    if (year && (!byYear.has(year) || fileName > path.basename(byYear.get(year)))) byYear.set(year, fullPath);
   }
-  const lines = fs.readFileSync(fullPath, 'utf8').split('\n').filter(l => l.trim().length > 0);
-  const headerCols = lines[1].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-  const rows = [];
-  for (let i = 2; i < lines.length; i++) {
-    const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-    if (cols.length < headerCols.length) continue;
-    const plantName = cols[0];
-    const time = cols[1];
-    const installedKwp = Number(cols[2]) || null;
-    const yieldKwh = Number(cols[3]);
-    const loadKwh = Number(cols[4]);
-    const purchasedKwh = Number(cols[5]);
-    const feedInKwh = Number(cols[6]);
-
-    const meta = lookupPlantMetadata({ plantName });
-    const psId = meta?.sungrowPsIds?.[0] || null;
-    if (!psId) {
-      console.warn(`Unmapped plant name in CSV: "${plantName}"`);
-      continue;
-    }
-
-    rows.push({
-      yearMonth: time.replace('-', ''),
-      psId,
-      yieldKwh: !isNaN(yieldKwh) ? yieldKwh : null,
-      feedInKwh: !isNaN(feedInKwh) ? feedInKwh : null,
-      purchasedKwh: !isNaN(purchasedKwh) ? purchasedKwh : null,
-      loadKwh: !isNaN(loadKwh) ? loadKwh : null,
-      source: 'ISOLAR_REPORT_IMPORT',
-    });
-  }
-  return rows;
+  return [...byYear.entries()].sort(([a], [b]) => a - b).map(([, fullPath]) => fullPath);
 }
 
 async function main() {
-  console.log('=== IDEMPOTENT BACKFILL: EnergyFlowMonthly ===');
-  const rows2025 = parseReportCsv('Monthly Report_Annual report_20261001111519.csv');
-  const rows2026 = parseReportCsv('Monthly Report_Annual report_20261001111530.csv');
-  const allRows = [...rows2025, ...rows2026];
+  const args = process.argv.slice(2);
+  const dryRun = args.includes('--dry-run');
+  const fileArgs = args.filter(a => !a.startsWith('--')).map(file => path.resolve(process.cwd(), file));
+  const files = fileArgs.length ? fileArgs : findLatestReportsPerYear(process.cwd());
 
-  console.log(`Total rows to upsert: ${allRows.length} (2025: ${rows2025.length}, 2026: ${rows2026.length})`);
-
-  let upserted = 0;
-  const now = new Date();
-
-  for (const r of allRows) {
-    await prisma.$executeRaw`
-      INSERT INTO energy_flow_monthly (id, year_month, ps_id, yield_kwh, feed_in_kwh, purchased_kwh, load_kwh, source, fetched_at, updated_at)
-      VALUES (
-        ${`efm_${r.yearMonth}_${r.psId}_${r.source}`},
-        ${r.yearMonth},
-        ${r.psId},
-        ${r.yieldKwh},
-        ${r.feedInKwh},
-        ${r.purchasedKwh},
-        ${r.loadKwh},
-        ${r.source},
-        ${now},
-        ${now}
-      )
-      ON CONFLICT (year_month, ps_id, source) DO UPDATE
-      SET yield_kwh = EXCLUDED.yield_kwh,
-          feed_in_kwh = EXCLUDED.feed_in_kwh,
-          purchased_kwh = EXCLUDED.purchased_kwh,
-          load_kwh = EXCLUDED.load_kwh,
-          updated_at = EXCLUDED.updated_at;
-    `;
-    upserted++;
+  if (!files.length) {
+    console.error('Tidak ada file "Monthly Report_Annual report_*.csv" di folder project. Unduh dari portal iSolarCloud atau berikan path file sebagai argumen.');
+    process.exitCode = 1;
+    return;
   }
 
-  console.log(`Successfully upserted ${upserted} rows into energy_flow_monthly.`);
+  const repository = createPrismaMonthlyImportRepository(prisma);
+  const now = new Date();
+  for (const fullPath of files) {
+    const fileName = path.basename(fullPath);
+    const closed = closedMonthReport(parseIsolarMonthlyReportFile(fullPath), openMonthCutoff({ now, filename: fileName }));
+    console.log(`${fileName} (tahun ${closed.reportYear})`);
+    console.log(`  ${closed.summary.validCount} plant-bulan valid, ${closed.openMonthRecords} baris bulan belum tutup dilewati, ${closed.summary.errorCount} baris error`);
+    if (closed.summary.validCount === 0) continue;
+    if (closed.summary.errorCount > 0) { console.error('  dilewati karena ada baris error'); process.exitCode = 1; continue; }
 
-  // Validation query
-  const count = await prisma.$queryRaw`SELECT count(*)::int as count FROM energy_flow_monthly`;
-  const summary2026 = await prisma.$queryRaw`
-    SELECT 
-      COUNT(*)::int as row_count,
-      SUM(yield_kwh) as sum_yield,
-      SUM(feed_in_kwh) as sum_feed_in,
-      SUM(purchased_kwh) as sum_purchased,
-      SUM(load_kwh) as sum_load
-    FROM energy_flow_monthly
-    WHERE year_month BETWEEN '202601' AND '202609'
-  `;
+    const result = await importIsolarMonthlyReport({ report: closed, repository, commit: !dryRun, now });
+    const flowRows = energyFlowRowsFromDecisions(result.preview.decisions);
+    const months = [...new Set(flowRows.map(row => row.yearMonth))].sort();
+    console.log(`  rekonsiliasi: ${JSON.stringify(result.preview.summary)}${result.duplicateFile ? ' (file ini sudah pernah diimpor)' : ''}`);
+    console.log(`  energy_flow_monthly: ${flowRows.length} baris, bulan ${months[0] ?? '-'} s.d. ${months.at(-1) ?? '-'}`);
+    if (!dryRun) await upsertEnergyFlowRows(prisma, flowRows, now);
+  }
 
-  console.log('Total table count:', count[0].count);
-  console.log('Jan-Sep 2026 Summary in DB:', summary2026[0]);
+  console.log(dryRun
+    ? '\n--dry-run: tidak ada yang ditulis ke database.'
+    : '\nSelesai. Cache dashboard PLTS diperbarui paling lambat 30 menit, atau segera lewat POST /api/plts/revalidate.');
 }
 
-main().catch(console.error).finally(() => prisma.$disconnect());
+main().catch((err) => { console.error(err); process.exitCode = 1; }).finally(() => prisma.$disconnect());

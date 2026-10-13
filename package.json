@@ -11,6 +11,7 @@
     "daemon": "node scripts/solar-daemon.mjs",
     "sync:once": "node scripts/sync-once.mjs",
     "import:isolar-history": "node --env-file=.env scripts/import-isolar-monthly-history.mjs",
+    "import:energy-flow": "node --env-file=.env scripts/backfill-energy-flow.mjs",
     "import:rkap-targets": "node --env-file=.env scripts/import-rkap-targets.mjs",
     "verify:plts-lock": "node scripts/verify-plts-overview-lock.mjs",
     "test": "node scripts/run-unit-tests.mjs",

@@ -1,5 +1,6 @@
 import React from 'react';
 import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
+import InfoHint from '@/components/ui/InfoHint';
 
 export default function StatCard({
   title,
@@ -8,7 +9,7 @@ export default function StatCard({
   trendText,
   icon: Icon,
   theme = 'default',
-  sourceBadge = null,
+  sourceBadge: _sourceBadge = null, // Ignored: raw source codes are not shown to users.
   tooltip = null,
   infoKey = null,
 }) {
@@ -22,34 +23,19 @@ export default function StatCard({
   const iconColor = themes[theme] || themes.default;
 
   return (
-    <div
-      className="relative w-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col justify-between overflow-visible"
-      title={tooltip || title}
-    >
-      {/* Top Row: Title, Source Badge, Info Icon & Main Icon */}
+    <div className="relative w-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex flex-col justify-between overflow-visible">
       <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="flex flex-col min-w-0 pr-1">
-          <span
-            className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate"
-            title={title}
-          >
-            {title}
-          </span>
-          {sourceBadge && (
-            <span className="inline-block mt-0.5 text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400">
-              {sourceBadge}
-            </span>
-          )}
-        </div>
+        <span className="min-w-0 pr-1 text-sm font-semibold text-slate-600 dark:text-slate-400">
+          {title}
+        </span>
         <div className="flex items-center gap-1.5 shrink-0">
-          {infoKey && <MetricInfoIcon infoKey={infoKey} />}
+          {infoKey ? <MetricInfoIcon infoKey={infoKey} /> : <InfoHint title={title} text={tooltip} />}
           <div className={`shrink-0 ${iconColor}`}>
-            {Icon && <Icon size={18} strokeWidth={2} />}
+            {Icon && <Icon size={18} strokeWidth={2} aria-hidden="true" />}
           </div>
         </div>
       </div>
 
-      {/* Middle: Value */}
       <div className="flex flex-col justify-end">
         <div className="flex items-baseline flex-wrap">
           <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
@@ -62,10 +48,9 @@ export default function StatCard({
           )}
         </div>
 
-        {/* Footer: Keterangan */}
         {trendText && (
           <div className="mt-1">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate max-w-full block">
+            <span className="text-xs font-medium text-slate-600 dark:text-slate-400 block">
               {trendText}
             </span>
           </div>
@@ -74,4 +59,3 @@ export default function StatCard({
     </div>
   );
 }
-

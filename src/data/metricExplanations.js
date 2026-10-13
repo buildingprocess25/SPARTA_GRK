@@ -1,212 +1,184 @@
 /**
- * Konfigurasi Tunggal Penjelasan Metrik & Card (Kelistrikan PLTS Atap & Scope 2)
+ * Isi ikon "i" (MetricInfoIcon) per kartu dan grafik.
  *
- * Setiap entri memuat 4 bagian utama yang mudah dipahami oleh non-teknis:
- * 1. definition      : Definisi metrik
- * 2. formula         : Rumus perhitungan (misal: kWh × 0,997)
- * 3. source          : Sumber data
- * 4. varianceReason  : Alasan angka bisa berbeda (data parsial, PR perkiraan, faktor grid, dsb)
+ * Bagian yang dipakai:
+ * 1. definition      : artinya
+ * 2. formula         : cara hitung
+ * 3. source          : sumber data
+ * 4. varianceReason  : kenapa angkanya bisa beda
  */
 
 export const METRIC_EXPLANATIONS = {
-  // PLTS atap: stat card utama
+  // PLTS atap: kartu utama
   plts_capacity: {
     title: 'Kapasitas PLTS',
-    badge: 'kWp',
-    definition: 'Total kapasitas daya puncak maksimum panel surya yang terpasang di atap gedung Distribution Center (DC).',
-    formula: 'Total Kapasitas = Jumlah seluruh kapasitas panel/inverter di lokasi terpilih (kWp)',
-    source: 'Spesifikasi teknis inverter Sungrow & konfigurasi portal iSolarCloud.',
-    varianceReason: 'Angka kapasitas terpasang (nama plat) dapat berbeda dengan kapasitas operasional jika ada plant dalam tahap pembangunan (misal DC Gorontalo) atau perbedaan baseline verifikasi fisik.',
+    definition: 'Total kapasitas panel surya yang terpasang di atap DC.',
+    formula: 'Jumlah kapasitas semua plant di pilihan saat ini (kWp).',
+    source: 'Data plant di iSolarCloud.',
+    varianceReason: 'Plant yang masih dibangun tidak dihitung sebagai kapasitas yang beroperasi.',
   },
 
   plts_production: {
     title: 'Produksi PLTS',
-    badge: 'kWh / MWh',
-    definition: 'Total energi listrik bersih yang berhasil dibangkitkan oleh panel surya dari sinar matahari.',
-    formula: 'Total Produksi = PLTS + Listrik Diekspor ke Jaringan PLN',
-    source: 'Sensor telemetri pembacaan energi harian & bulanan inverter iSolarCloud.',
-    varianceReason: 'Bulan berjalan masih berstatus parsial (hari belum genap 30/31 hari). Cuaca mendung, bayangan, atau pembersihan modul surya juga mempengaruhi capaian target.',
+    definition: 'Listrik yang dihasilkan panel surya.',
+    formula: 'Produksi = listrik yang dipakai sendiri + listrik yang dikirim ke PLN.',
+    source: 'Laporan bulanan iSolarCloud. Bulan berjalan memakai data harian.',
+    varianceReason: 'Bulan berjalan belum lengkap. Cuaca mendung, bayangan, dan panel kotor juga menurunkan produksi.',
   },
 
   plts_savings: {
-    title: 'Penghematan Energi',
-    badge: 'kWh / Rupiah',
-    definition: 'Energi listrik PLTS yang langsung dikonsumsi untuk menyuplai beban gedung DC sehingga mengurangi pembelian listrik dari PLN.',
-    formula: 'Penghematan = Produksi PLTS − Listrik Ekspor ke PLN (rata-rata 98% diserap operasional)',
-    source: 'Kwh-meter ekspor-impor inverter Sungrow & kalkulasi neraca beban gedung.',
-    varianceReason: 'Hari libur atau akhir pekan saat operasional gudang rendah menyebabkan porsi ekspor sedikit lebih tinggi daripada hari kerja.',
+    title: 'Listrik yang dihemat',
+    definition: 'Listrik PLTS yang langsung dipakai DC, sehingga tidak perlu dibeli dari PLN.',
+    formula: 'Listrik dihemat = produksi PLTS − listrik yang dikirim ke PLN.',
+    source: 'Laporan bulanan iSolarCloud (pemakaian sendiri dan kiriman ke PLN).',
+    varianceReason: 'Saat hari libur pemakaian DC turun, jadi lebih banyak listrik terkirim ke PLN dan bagian yang dihemat lebih kecil.',
   },
 
   plts_avoided_emission: {
-    title: 'Emisi Terhindar',
-    badge: 'tCO₂e',
-    definition: 'Jumlah emisi gas rumah kaca yang berhasil dicegah terlepas ke udara karena menggantikan listrik PLN berbahan bakar fosil dengan energi surya.',
-    formula: 'Emisi Terhindar (tCO₂e) = Energi PLTS (kWh) × 0,997 kgCO₂/kWh ÷ 1.000',
-    source: 'Telemetri iSolarCloud & faktor emisi tunggal dashboard (0,997 kgCO₂/kWh setara target RKAP).',
-    varianceReason: 'Listrik yang diekspor ke PLN tidak dihitung sebagai penghematan emisi DC. Angka juga bisa berbeda bila dibandingkan dengan faktor emisi grid regional ESDM (0,87 kgCO₂/kWh).',
+    title: 'Emisi yang dicegah',
+    definition: 'Emisi yang tidak terjadi karena DC memakai listrik PLTS, bukan listrik PLN.',
+    formula: 'Emisi dicegah (tCO₂e) = listrik PLTS yang dipakai sendiri (kWh) × 0,997 kgCO₂/kWh ÷ 1.000.',
+    source: 'Laporan bulanan iSolarCloud dan faktor emisi PLTS dashboard (0,997 kgCO₂/kWh).',
+    varianceReason: 'Listrik yang dikirim ke PLN tidak dihitung. Plant yang masih dibangun juga tidak dihitung.',
   },
 
-  // PLTS atap: grafik & komposisi
+  // PLTS atap: grafik dan komposisi
   plts_monthly_comparison: {
-    title: 'Produksi PLTS vs Konsumsi PLN (Bulanan)',
-    badge: 'Tren Bulanan',
-    definition: 'Grafik perbandingan antara konsumsi listrik yang dibeli dari PLN, pasokan PLTS, dan emisi yang berhasil dihemat setiap bulannya.',
-    formula: 'Beban Gedung = Beli PLN + PLTS. Emisi Terhindar diplot pada sumbu kanan.',
-    source: 'Kombinasi data billing/meter PLN dan telemetri bulanan inverter iSolarCloud.',
-    varianceReason: 'Bulan berjalan ditandai sebagai data "Parsial". Tanggal tutup buku pencatatan meter PLN di beberapa cabang berbeda beberapa hari dengan siklus kalender telemetri.',
+    title: 'PLTS vs listrik PLN per bulan',
+    definition: 'Perbandingan listrik dari PLN, listrik dari PLTS, dan emisi yang dicegah setiap bulan.',
+    formula: 'Kebutuhan listrik DC = listrik dari PLN + listrik PLTS yang dipakai sendiri.',
+    source: 'Laporan bulanan pemakaian listrik dan produksi PLTS.',
+    varianceReason: 'Bulan berjalan belum lengkap, jadi angkanya lebih kecil dari bulan penuh.',
   },
 
   plts_energy_composition: {
-    title: 'Komposisi Pemakaian Energi',
-    badge: 'Proporsi Bauran',
-    definition: 'Porsi kontribusi energi surya dibandingkan listrik jaringan PLN dalam memenuhi total kebutuhan operasional gudang DC.',
-    formula: 'Persentase PLTS = (PLTS ÷ Total Beban Listrik Gedung) × 100%',
-    source: 'Agregasi konsumsi PLN dan produksi bersih PLTS terintegrasi.',
-    varianceReason: 'Bauran energi bervariasi musiman (musim kemarau vs hujan) serta luas atap dan kapasitas PLTS yang berbeda pada masing-masing DC.',
+    title: 'Asal listrik DC',
+    definition: 'Berapa bagian kebutuhan listrik DC yang dipenuhi PLTS dan berapa yang dibeli dari PLN.',
+    formula: 'Bagian PLTS = listrik PLTS yang dipakai sendiri ÷ total kebutuhan listrik × 100%.',
+    source: 'Laporan bulanan pemakaian listrik dan produksi PLTS.',
+    varianceReason: 'Bagian PLTS naik turun mengikuti cuaca dan berbeda antar DC karena luas atap dan kapasitas panelnya berbeda.',
   },
 
-  // PLTS atap: summary card & tabel DC
+  // PLTS atap: ringkasan dan tabel per DC
   plts_summary_capacity: {
-    title: 'Kapasitas Terpasang (Ringkasan)',
-    badge: 'kWp',
-    definition: 'Kapasitas total seluruh panel surya yang aktif terpantau pada sistem pemantauan.',
-    formula: 'Jumlah kapasitas nominal seluruh plant yang masuk filter (kWp)',
-    source: 'Master data plant iSolarCloud.',
-    varianceReason: 'DC Gorontalo berstatus dalam pembangunan sehingga dikecualikan dari kapasitas operasional aktif.',
+    title: 'Kapasitas terpasang',
+    definition: 'Total kapasitas panel surya pada lokasi yang sedang dipilih.',
+    formula: 'Jumlah kapasitas semua plant di pilihan saat ini (kWp).',
+    source: 'Data plant di iSolarCloud.',
+    varianceReason: 'Plant yang masih dibangun tidak dihitung.',
   },
 
   plts_summary_production: {
-    title: 'Total Produksi Terpilih',
-    badge: 'MWh',
-    definition: 'Akumulasi energi listrik surya yang dihasilkan untuk rentang periode waktu yang sedang dipilih.',
-    formula: 'Penjumlahan produksi bulanan seluruh lokasi DC pada filter aktif (MWh)',
-    source: 'Database histori produksi bulanan dan telemetri hari berjalan.',
-    varianceReason: 'Jika memilih periode Jan-Sep 2026, angka mencakup 9 bulan penuh. Jika memilih bulan berjalan, angka bersifat parsial.',
+    title: 'Total produksi',
+    definition: 'Listrik PLTS yang dihasilkan pada periode yang dipilih.',
+    formula: 'Jumlah produksi bulanan semua lokasi di pilihan saat ini.',
+    source: 'Laporan bulanan iSolarCloud. Bulan berjalan memakai data harian.',
+    varianceReason: 'Jika periode memuat bulan berjalan, bulan itu belum lengkap.',
   },
 
   plts_summary_specific_yield: {
-    title: 'Specific Yield Rata-rata',
-    badge: 'kWh/kWp',
-    definition: 'Indikator produktivitas PLTS: berapa kWh energi yang dihasilkan oleh setiap 1 kWp panel surya terpasang.',
-    formula: 'Specific Yield = Total Produksi (kWh) ÷ Total Kapasitas Terpasang (kWp)',
-    source: 'Hasil bagi produksi terhadap kapasitas terpasang dari data inverter.',
-    varianceReason: 'Plant dengan iradiasi matahari tinggi (misal Sulawesi/Indonesia Timur) memiliki specific yield lebih tinggi daripada wilayah berkabut atau sering hujan.',
+    title: 'Produksi per kWp',
+    definition: 'Berapa kWh yang dihasilkan tiap 1 kWp panel (specific yield). Dipakai untuk membandingkan plant yang ukurannya berbeda.',
+    formula: 'Produksi per kWp = total produksi (kWh) ÷ total kapasitas (kWp).',
+    source: 'Produksi dan kapasitas dari iSolarCloud.',
+    varianceReason: 'Daerah yang lebih banyak sinar matahari menghasilkan angka lebih tinggi daripada daerah yang sering hujan.',
   },
 
   plts_summary_co2: {
-    title: 'Emisi Terhindar (Tabel)',
-    badge: 'tCO₂e',
-    definition: 'Total reduksi emisi karbon dari lokasi-lokasi DC yang sedang ditampilkan di tabel.',
-    formula: 'Emisi Terhindar (tCO₂e) = Produksi PLTS (MWh) × Faktor Emisi Grid Regional (tCO₂e/MWh)',
-    source: 'Perhitungan berbasis faktor emisi grid resmi Kementerian ESDM (CM Plts).',
-    varianceReason: 'Lokasi tanpa faktor resmi grid (misal sistem off-grid lokal) tidak dihitung untuk menjaga kepatuhan pelaporan audit.',
+    title: 'Emisi yang dicegah',
+    definition: 'Total emisi yang dicegah oleh PLTS di lokasi yang sedang dipilih.',
+    formula: 'Emisi dicegah (tCO₂e) = listrik PLTS yang dipakai sendiri (kWh) × 0,997 kgCO₂/kWh ÷ 1.000. Setara pohon = emisi ÷ 21,77 kg per pohon per tahun.',
+    source: 'Laporan bulanan iSolarCloud dan faktor emisi PLTS dashboard.',
+    varianceReason: 'Plant yang masih dibangun tidak dihitung.',
   },
 
   plts_summary_status: {
-    title: 'Status Operasional Stasiun',
-    badge: 'Telemetri Perangkat',
-    definition: 'Kondisi kesehatan inverter dan komunikasi stasiun secara real-time dari portal iSolarCloud.',
-    formula: 'Prioritas: Offline (0) > Fault (Hardware rusak) > Alarm (Peringatan) > Dalam Pembangunan > Normal',
-    source: 'Parameter ps_status, ps_fault_status, dan alarm_count dari API Sungrow.',
-    varianceReason: 'Inverter yang mengalami trip/fault proteksi hardware tidak dianggap offline jika koneksi komunikasi tetap hidup.',
+    title: 'Status plant',
+    definition: 'Kondisi inverter tiap lokasi menurut iSolarCloud. Normal: berjalan baik. Fault: ada kerusakan. Alarm: ada peringatan. Offline: tidak terhubung.',
+    formula: 'Jika satu lokasi punya beberapa kondisi, yang ditampilkan berurutan: Offline, Fault, Alarm, masih dibangun, lalu Normal.',
+    source: 'Status plant dari iSolarCloud.',
+    varianceReason: 'Inverter yang fault tetapi masih terhubung tetap dihitung sebagai Fault, bukan Offline.',
   },
 
   plts_summary_yoy: {
-    title: 'Perbandingan Produksi Tahunan (YoY)',
-    badge: '2025 vs 2026',
-    definition: 'Analisis komparasi kinerja output PLTS antara tahun 2025 dan 2026 pada rentang bulan yang sejajar.',
-    formula: 'Selisih (%) = ((Produksi 2026 − Produksi 2025) ÷ Produksi 2025) × 100%',
-    source: 'Laporan histori rekonsiliasi tahunan iSolarCloud.',
-    varianceReason: 'Pada awal 2025 beberapa DC belum rampung instalasinya (histori parsial), sehingga produksi 2026 cenderung lebih tinggi.',
+    title: 'Produksi tahun ini vs tahun lalu',
+    definition: 'Perbandingan produksi PLTS 2025 dan 2026 pada bulan yang sama.',
+    formula: 'Perubahan (%) = (produksi 2026 − produksi 2025) ÷ produksi 2025 × 100%.',
+    source: 'Laporan bulanan iSolarCloud.',
+    varianceReason: 'Beberapa DC baru mulai beroperasi di 2025, jadi produksi 2026 cenderung lebih tinggi.',
   },
 
   plts_multi_dc_analytics: {
-    title: 'Analisis Multi-DC & Ranking Kinerja',
-    badge: 'Benchmarking',
-    definition: 'Peringkat kinerja dan efisiensi pembangkitan 38 plant PLTS operasional di seluruh Indonesia.',
-    formula: 'Diurutkan berdasarkan Specific Yield (kWh/kWp) atau Equivalent Hours (jam/hari)',
-    source: 'Data realtime dan histori bulanan iSolarCloud.',
-    varianceReason: 'Plant dalam pembangunan (DC Gorontalo) dikecualikan dari perangkingan dan rata-rata nasional.',
+    title: 'Ringkasan per DC',
+    definition: 'Kapasitas, produksi, emisi yang dicegah, dan status PLTS untuk setiap DC.',
+    formula: 'Angka tiap DC dijumlahkan dari semua plant di DC tersebut.',
+    source: 'Laporan bulanan dan status langsung iSolarCloud.',
+    varianceReason: 'Plant yang masih dibangun tidak ikut peringkat dan rata-rata.',
   },
 
-  // Scope 2 listrik PLN: stat card utama
+  // Scope 2 listrik PLN: kartu utama
   scope2_emission_ytd: {
-    title: 'Emisi Scope 2 YTD',
-    badge: 'tCO₂e',
-    definition: 'Emisi gas rumah kaca tidak langsung yang berasal dari konsumsi listrik jaringan PLN yang dibeli untuk operasional gedung DC.',
-    formula: 'Emisi Scope 2 (tCO₂e) = Listrik Dibeli PLN (MWh) × Faktor Emisi Grid Regional (tCO₂e/MWh)',
-    source: 'Pencatatan meter kWh invoice PLN dan Faktor Emisi Grid Resmi Kementerian ESDM (CM Ex-Post).',
-    varianceReason: 'Faktor emisi berbeda per pulau (misal Jamali 0,870 tCO₂e/MWh, Sumatera 0,810 tCO₂e/MWh). Bulan berjalan berstatus parsial.',
+    title: 'Emisi Scope 2',
+    definition: 'Emisi dari listrik PLN yang dibeli untuk operasional DC.',
+    formula: 'Emisi Scope 2 (tCO₂e) = listrik dari PLN (MWh) × faktor emisi wilayah PLN (tCO₂e/MWh).',
+    source: 'Laporan bulanan pemakaian listrik dan daftar faktor emisi wilayah PLN.',
+    varianceReason: 'Faktor emisi berbeda tiap wilayah PLN (lihat kolom faktor emisi di tabel per DC). Wilayah dengan faktor sementara tidak dihitung. Bulan berjalan belum lengkap.',
   },
 
   scope2_purchased_mwh: {
-    title: 'Listrik Dibeli PLN YTD',
-    badge: 'MWh',
-    definition: 'Total konsumsi energi listrik yang disuplai dan ditagihkan oleh PLN ke distribution center.',
-    formula: 'Total Pembelian = Jumlah kWh yang tertera pada meter PLN ÷ 1.000 (dikonversi ke MWh)',
-    source: 'Invoice bulanan PLN dan pencatatan kWh-meter fasilitas DC.',
-    varianceReason: 'Jika ada DC yang invoice bulan terakhirnya belum diunggah, data menggunakan estimasi berbasis rata-rata beban sebelumnya.',
+    title: 'Listrik dari PLN',
+    definition: 'Listrik yang dibeli dari PLN untuk DC.',
+    formula: 'Total kebutuhan listrik − listrik PLTS yang dipakai sendiri, dalam MWh.',
+    source: 'Laporan bulanan pemakaian listrik dan produksi PLTS.',
+    varianceReason: 'Jika pemakaian PLTS sendiri belum tercatat, seluruh kebutuhan listrik dianggap dibeli dari PLN (batas atas).',
   },
 
   scope2_emission_intensity: {
-    title: 'Intensitas Emisi',
-    badge: 'tCO₂e / MWh',
-    definition: 'Rata-rata jejak karbon yang dihasilkan untuk setiap 1 MWh listrik PLN yang dikonsumsi oleh Alfamart.',
-    formula: 'Intensitas Emisi = Total Emisi Scope 2 (tCO₂e) ÷ Total Listrik Dibeli PLN (MWh)',
-    source: 'Rata-rata tertimbang faktor emisi grid berdasarkan sebaran konsumsi listrik cabang.',
-    varianceReason: 'Bauran listrik nasional di wilayah dengan banyak pembangkit batubara (PLTU) memiliki intensitas emisi lebih tinggi.',
+    title: 'Emisi per MWh',
+    definition: 'Rata-rata emisi untuk setiap 1 MWh listrik PLN yang dibeli.',
+    formula: 'Emisi per MWh = total emisi Scope 2 ÷ total listrik dari PLN.',
+    source: 'Hasil hitung dari kartu Emisi Scope 2 dan Listrik dari PLN.',
+    varianceReason: 'Angka lebih tinggi jika banyak pemakaian berada di wilayah PLN dengan faktor emisi tinggi.',
   },
 
   scope2_annual_projection: {
-    title: 'Proyeksi Akhir Tahun',
-    badge: 'tCO₂e (12 Bulan)',
-    definition: 'Perkiraan total emisi Scope 2 sampai akhir tahun kalender (12 bulan penuh) jika pola pemakaian saat ini berlanjut.',
-    formula: 'Proyeksi = (Akumulasi Emisi Bulan Lengkap ÷ Jumlah Bulan Lengkap) × 12 bulan',
-    source: 'Model ekstrapolasi linier dari data histori Jan–Sep 2026 yang telah terekonsiliasi.',
-    varianceReason: 'Bulan berjalan yang belum tuntas (parsial) tidak dimasukkan dalam pembagi agar proyeksi tidak meleset ke bawah.',
+    title: 'Perkiraan akhir tahun',
+    definition: 'Perkiraan total emisi Scope 2 setahun penuh jika pola pemakaian saat ini berlanjut.',
+    formula: 'Perkiraan = rata-rata emisi bulan yang sudah tutup × 12. Kisarannya ±5%.',
+    source: 'Emisi bulanan yang sudah tutup tahun ini.',
+    varianceReason: 'Bulan berjalan tidak dipakai supaya perkiraan tidak terlalu rendah.',
   },
 
-  // Scope 2 listrik PLN: waterfall, grafik & tabel
+  // Scope 2 listrik PLN: alur, grafik, tabel
   scope2_waterfall: {
-    title: 'Dari Beban ke Emisi (Waterfall)',
-    badge: 'Neraca Energi',
-    definition: 'Alur neraca energi yang memperlihatkan bagaimana PLTS atap mengurangi listrik yang perlu dibeli dari PLN, lalu menjadi emisi karbon.',
-    formula: 'Total Beban Listrik − PLTS = Listrik Dibeli PLN → Dikalikan Faktor Grid = Emisi Scope 2',
-    source: 'Neraca energi rekonsiliasi kanonis gabungan PLN dan iSolarCloud.',
-    varianceReason: 'Prinsip akuntansi karbon: penghematan PLTS tidak dikurangi dua kali karena Scope 2 dihitung murni dari listrik yang dibeli.',
+    title: 'Dari kebutuhan listrik ke emisi',
+    definition: 'Menunjukkan bagaimana PLTS mengurangi listrik yang dibeli dari PLN, lalu berapa emisinya.',
+    formula: 'Kebutuhan listrik − listrik PLTS yang dipakai sendiri = listrik dari PLN. Listrik dari PLN × faktor emisi = emisi Scope 2.',
+    source: 'Laporan bulanan pemakaian listrik dan produksi PLTS.',
+    varianceReason: 'Penghematan dari PLTS tidak dikurangkan lagi dari emisi, karena Scope 2 sudah dihitung dari listrik yang benar-benar dibeli.',
   },
 
   scope2_monthly_trend: {
-    title: 'Tren Emisi Bulanan',
-    badge: 'MWh vs tCO₂e',
-    definition: 'Grafik bulanan yang memperlihatkan dinamika konsumsi listrik PLN (sumbu kiri MWh) dan emisi karbon yang dihasilkan (sumbu kanan tCO₂e).',
-    formula: 'Emisi dihitung per cabang tiap bulan sesuai faktor emisi grid masing-masing wilayah.',
-    source: 'Laporan historis meter PLN dan telemetri pemakaian bulanan.',
-    varianceReason: 'Bulan berjalan ditandai dengan tanda bintang (*) atau status Parsial karena pembacaan meter belum tutup buku.',
+    title: 'Emisi per bulan',
+    definition: 'Listrik dari PLN, listrik PLTS, dan emisi Scope 2 setiap bulan.',
+    formula: 'Emisi dihitung per DC tiap bulan dengan faktor emisi wilayah PLN masing-masing.',
+    source: 'Laporan bulanan pemakaian listrik dan produksi PLTS.',
+    varianceReason: 'Bulan berjalan ditandai "sebagian" karena datanya belum lengkap.',
   },
 
   scope2_ranking_table: {
-    title: 'Peringkat Emisi & Konsumsi per DC',
-    badge: 'Tabel Rincian',
-    definition: 'Tabel peringkat distribution center berdasarkan jumlah emisi karbon Scope 2 dan volume listrik yang dibeli dari PLN.',
-    formula: 'Emisi DC (tCO₂e) = kWh Dibeli PLN × Faktor Emisi Grid Regional ÷ 1.000',
-    source: 'Database terpadu fasilitas Alfamart dan invoice resmi PLN cabang.',
-    varianceReason: 'DC di Jawa-Bali memiliki faktor emisi grid sedikit lebih tinggi (0,870) dibanding Sumatera (0,810) atau Kalimantan.',
+    title: 'Emisi per DC',
+    definition: 'Daftar DC beserta listrik yang dibeli dari PLN dan emisinya.',
+    formula: 'Emisi DC (tCO₂e) = listrik dari PLN (kWh) × faktor emisi wilayah PLN (kgCO₂/kWh) ÷ 1.000.',
+    source: 'Laporan bulanan pemakaian listrik dan daftar faktor emisi wilayah PLN.',
+    varianceReason: 'DC dengan pemakaian sama bisa punya emisi berbeda karena faktor emisi wilayah PLN-nya berbeda.',
   },
 };
 
 /**
- * Helper untuk mengambil metadata penjelasan metrik berdasarkan key.
- * Jika key tidak ditemukan, mengembalikan fallback yang aman.
+ * Mengambil penjelasan berdasarkan key. Key yang tidak dikenal tidak menampilkan ikon.
  */
 export function getMetricExplanation(key) {
   if (!key) return null;
-  return METRIC_EXPLANATIONS[key] || {
-    title: 'Informasi Metrik',
-    badge: 'Metrik',
-    definition: 'Penjelasan detail mengenai metrik atau kartu pemantauan ini.',
-    formula: 'Dihitung berdasarkan standar pelaporan keberlanjutan dan telemetri resmi.',
-    source: 'Database terintegrasi Alfamart & portal vendor.',
-    varianceReason: 'Angka dapat berbeda bergantung pada status kelengkapan data periode berjalan.',
-  };
+  return METRIC_EXPLANATIONS[key] || null;
 }

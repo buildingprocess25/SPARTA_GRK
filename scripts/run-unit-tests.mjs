@@ -20,6 +20,7 @@ const unitTestScripts = [
   ['--test', 'src/lib/scope2/__tests__/export.test.mjs'],
   ['--test', 'src/lib/solar/__tests__/inverterTemperature.test.mjs'],
   ['--test', 'tests/reconciliation-identities.test.mjs'],
+  ['--test', 'src/lib/importers/__tests__/energyFlowImport.test.mjs'],
   ['--test', 'src/lib/alarms/__tests__/normalize.test.mjs'],
   ['--test', 'src/lib/alarms/__tests__/apiContract.test.mjs'],
   ['--test', 'src/context/__tests__/alarmState.test.mjs'],

@@ -249,7 +249,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
       window.open('/api/templates?category=PLN', '_blank');
       setStatusMessage({
         type: 'success',
-        text: 'Mengunduh Template Excel Resmi Scope 2 (Listrik PLN)...'
+        text: 'Mengunduh template Excel Scope 2...'
       });
     } catch (err) {
       console.error(err);
@@ -318,7 +318,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
     if (previewResult.errorCount > 0 && !allowPartialImport) {
       setStatusMessage({
         type: 'error',
-        text: 'Terdapat baris data error. Aktifkan "Izinkan Impor Parsial" untuk melanjutkan.'
+        text: 'Ada baris yang salah. Perbaiki file, atau centang "Simpan baris yang benar saja".'
       });
       return;
     }
@@ -414,10 +414,9 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
     <BaseModal
       open={isOpen}
       onClose={handleCloseRequest}
-      title="Input Data Scope 2: Listrik PLN"
-      subtitle="Catat konsumsi energi listrik yang dibeli dari PLN per Distribution Center."
+      title="Input data listrik PLN"
+      subtitle="Catat listrik yang dibeli dari PLN untuk satu DC."
       icon={<Zap size={20} className="text-amber-600 dark:text-amber-400" />}
-      badge="Listrik Purchased"
       size="md"
       loading={isSubmitting || isProcessingExcel}
     >
@@ -447,7 +446,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
               }`}
             >
               <FileSpreadsheet size={14} className={activeTab === 'excel' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'} />
-              <span>Upload Excel (.xlsx / .csv)</span>
+              <span>Upload Excel/CSV</span>
             </button>
           </div>
         </div>
@@ -475,8 +474,8 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
               {/* Bagian 1: Lokasi Distribution Center */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label htmlFor="modal-scope2-dc" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                    Distribution Center (DC) <span className="text-rose-500 dark:text-rose-400">*</span>
+                  <label htmlFor="modal-scope2-dc" className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    DC <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
                   </label>
                   <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                     Sistem Grid: <strong className="text-slate-800 dark:text-slate-200">{selectedDC.grid}</strong>
@@ -573,8 +572,8 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
               {/* Bagian 3: Konsumsi Listrik Dibeli PLN */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label htmlFor="modal-scope2-energy" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                    Listrik Dibeli dari PLN <span className="text-rose-500 dark:text-rose-400">*</span>
+                  <label htmlFor="modal-scope2-energy" className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Listrik dari PLN <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
                   </label>
                   <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
                     <button
@@ -631,8 +630,8 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">
-                        Faktor Emisi Grid: {selectedDC.grid}
+                      <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200">
+                        Faktor emisi wilayah {selectedDC.grid}
                       </span>
                       <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-amber-100/70 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-500/30">
                         ESDM Resmi
@@ -674,7 +673,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                   <div className="p-3.5 pt-1 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2.5 animate-in fade-in duration-150">
                     <div>
                       <label htmlFor="modal-scope2-customer" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                        ID Pelanggan / No. Meter PLN
+                        ID pelanggan atau nomor meter PLN
                       </label>
                       <input
                         id="modal-scope2-customer"
@@ -688,7 +687,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
 
                     <div>
                       <label htmlFor="modal-scope2-invoice" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                        No. Faktur / Invoice Tagihan PLN
+                        Nomor tagihan PLN
                       </label>
                       <input
                         id="modal-scope2-invoice"
@@ -708,8 +707,8 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                 <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                   <div className="flex items-center gap-2">
                     <Calculator size={14} className="text-amber-400" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-200">
-                      Kalkulasi Emisi Scope 2 Terhitung
+                    <span className="text-[11px] font-bold text-slate-200">
+                      Emisi dari input ini
                     </span>
                   </div>
                   <span className="text-xs font-mono font-extrabold text-amber-400 bg-amber-950/60 border border-amber-800/80 px-2.5 py-0.5 rounded-full">
@@ -719,7 +718,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   <div>
-                    <span className="text-[10px] text-slate-400 block">Listrik Dibeli</span>
+                    <span className="text-[10px] text-slate-300 block">Dari PLN</span>
                     <strong className="text-slate-100 font-mono text-xs">
                       {liveCalculation.mwh.toFixed(2)} MWh
                     </strong>
@@ -756,10 +755,10 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
                     <FileSpreadsheet size={15} className="text-emerald-600 dark:text-emerald-400" />
-                    <span>Template Resmi Excel Scope 2 (Listrik PLN)</span>
+                    <span>Template Excel Scope 2</span>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Gunakan template standar agar format kolom dan kode fasilitas langsung valid.
+                    Pakai template ini supaya kolomnya langsung terbaca.
                   </p>
                 </div>
                 <button
@@ -813,7 +812,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                         : 'Klik atau Tarik File Excel (.xlsx / .csv) ke Sini'}
                     </h4>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Mendukung template SPARTA PLN v2026.1 atau rekapan tagihan bulanan PLN
+                      Bisa memakai template di atas atau rekap tagihan bulanan PLN.
                     </p>
                   </div>
                 </label>
@@ -865,7 +864,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                           onChange={(e) => setAllowPartialImport(e.target.checked)}
                           className="rounded text-amber-600 focus:ring-amber-500"
                         />
-                        <span>Izinkan impor parsial (hanya simpan {previewResult.validCount} baris yang valid)</span>
+                        <span>Simpan baris yang benar saja ({previewResult.validCount} baris)</span>
                       </label>
                     </div>
                   )}
@@ -901,7 +900,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
               ) : (
                 <>
                   <Check size={14} className="text-amber-400" />
-                  <span>Simpan Data Scope 2</span>
+                  <span>Simpan</span>
                 </>
               )}
             </button>
@@ -915,13 +914,13 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
               {isSubmitting ? (
                 <>
                   <RefreshCw size={14} className="animate-spin text-amber-400" />
-                  <span>Mengimpor ke Database...</span>
+                  <span>Menyimpan...</span>
                 </>
               ) : (
                 <>
                   <Database size={14} className="text-amber-400" />
                   <span>
-                    Simpan Batch ({allowPartialImport ? previewResult?.validCount || 0 : previewResult?.totalRows || 0} Data)
+                    Simpan ({allowPartialImport ? previewResult?.validCount || 0 : previewResult?.totalRows || 0} baris)
                   </span>
                 </>
               )}

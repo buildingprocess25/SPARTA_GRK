@@ -72,10 +72,10 @@ export default function AlarmDialog() {
     <BaseModal
       open={isPanelOpen}
       onClose={closePanel}
-      title="Daftar Alarm & Peringatan iSolar"
-      subtitle="Pemantauan telemetri gangguan dan peringatan operasional PLTS Atap secara terpusat."
+      title="Alarm PLTS"
+      subtitle="Gangguan dan peringatan dari iSolarCloud."
       icon={<AlertOctagon size={20} className="text-rose-600 dark:text-rose-400" />}
-      badge={`${summary.activeCount} Alarm Aktif`}
+      badge={`${summary.activeCount} aktif`}
       size="lg"
     >
       <div className="flex flex-col h-full space-y-4">
@@ -86,7 +86,7 @@ export default function AlarmDialog() {
               <>
                 <span className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-semibold bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-1 rounded-lg">
                   <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>Push notification aktif di perangkat ini</span>
+                  <span>Notifikasi aktif di perangkat ini</span>
                 </span>
                 <button
                   type="button"
@@ -95,7 +95,7 @@ export default function AlarmDialog() {
                   title="Kirim push notification sungguhan ke semua perangkat terdaftar - muncul walau browser tidak dibuka"
                 >
                   <BellRing size={12} className="shrink-0" />
-                  <span>Tes Push Sungguhan</span>
+                  <span>Kirim notifikasi uji</span>
                 </button>
                 <button
                   type="button"
@@ -109,12 +109,12 @@ export default function AlarmDialog() {
             ) : notificationPermission === 'disabled' ? (
               <span className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
                 <Bell size={13} className="text-slate-500 dark:text-slate-400 shrink-0" />
-                <span>Notifikasi browser dinonaktifkan pada build</span>
+                <span>Notifikasi browser tidak tersedia di server ini</span>
               </span>
             ) : notificationPermission === 'denied' ? (
               <span className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
                 <Bell size={13} className="text-slate-500 dark:text-slate-400 shrink-0" />
-                <span>Notifikasi browser diblokir di setelan</span>
+                <span>Notifikasi diblokir di setelan browser</span>
               </span>
             ) : (
               <button
@@ -123,7 +123,7 @@ export default function AlarmDialog() {
                 className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 rounded-lg transition shadow-xs"
               >
                 <BellRing size={13} className="shrink-0" />
-                <span>Aktifkan push notification</span>
+                <span>Aktifkan notifikasi</span>
               </button>
             )}
             <button
@@ -215,7 +215,7 @@ export default function AlarmDialog() {
         {/* List of Alarms */}
         <div className="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1">
           {isLoading && !lastSuccessfulPollAt ? (
-            <div className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">Memuat status alarm iSolar...</div>
+            <div className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">Memuat alarm...</div>
           ) : pollError && !lastSuccessfulPollAt ? (
             <div className="rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-4 py-10 text-center text-sm font-semibold text-amber-900 dark:text-amber-200">
               Status alarm belum tersedia.
@@ -223,11 +223,11 @@ export default function AlarmDialog() {
           ) : filteredAlarms.length === 0 ? (
             <div className="text-center py-10 px-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 rounded-2xl">
               <ShieldCheck size={36} className="mx-auto text-emerald-500 dark:text-emerald-400 mb-2" />
-              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Kondisi Normal</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Tidak ada alarm</h4>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-sm mx-auto">
                 {activeFilter === 'UNREAD'
                   ? 'Semua alarm aktif sudah ditandai dibaca.'
-                  : 'Tidak ada alarm atau peringatan aktif yang sesuai filter.'}
+                  : 'Tidak ada alarm aktif untuk pilihan ini.'}
               </p>
             </div>
           ) : (

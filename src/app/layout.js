@@ -2,8 +2,8 @@ import './globals.css';
 import OverlayProviders from '@/components/ui/OverlayProviders';
 
 export const metadata = {
-  title: 'Alfamart - Dashboard Sustainability Energy & Water',
-  description: 'Real-time monitoring dashboard untuk pengelolaan energi (PLTS) dan air (Water Recycle) pada Distribution Center Alfamart.',
+  title: 'Dashboard Emisi DC Alfamart',
+  description: 'Emisi Scope 1 dan 2, produksi PLTS, dan daur ulang air di DC Alfamart.',
 };
 
 export const viewport = {

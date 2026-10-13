@@ -1,10 +1,12 @@
 'use client';
 
 import React from 'react';
+import InfoHint from '@/components/ui/InfoHint';
 
 export default function PageHeader({
   title,
   subtitle,
+  info = null,
   badge = null,
   actions = null,
   className = '',
@@ -14,9 +16,12 @@ export default function PageHeader({
       className={`flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800 ${className}`}
     >
       <div className="space-y-1 min-w-0">
-        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-          {title}
-        </h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            {title}
+          </h1>
+          <InfoHint title={title} text={info} size={16} />
+        </div>
         {subtitle && (
           <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl">
             {subtitle}

@@ -16,17 +16,16 @@ export default function Scope2Waterfall({ summary }) {
   // Calculate effective / weighted grid factor
   const effectiveFactor = summary?.weightedFactorKgPerKwh
     ? summary.weightedFactorKgPerKwh
-    : (purchasedMwh > 0 ? (emissionTon / purchasedMwh) : 0.87);
+    : (purchasedMwh > 0 ? (emissionTon / purchasedMwh) : null);
 
   const steps = [
     {
       id: 'load',
       stepBadge: '1',
-      title: 'Beban Total',
-      role: 'Konsumsi DC',
+      title: 'Kebutuhan listrik',
       value: number.format(totalLoadKwh / 1_000),
       unit: 'MWh',
-      note: 'Total kebutuhan listrik fasilitas',
+      note: 'Total listrik yang dipakai DC',
       icon: Layers,
       iconColor: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10',
       operator: '−',
@@ -36,25 +35,23 @@ export default function Scope2Waterfall({ summary }) {
     {
       id: 'plts',
       stepBadge: '2',
-      title: 'Dikurangi PLTS',
-      role: 'Reduksi Mandiri',
+      title: 'Dari PLTS',
       value: number.format(pltsKwh / 1_000),
       unit: 'MWh',
-      note: 'Produksi PLTS',
+      note: 'Listrik PLTS yang dipakai sendiri',
       icon: Sun,
       iconColor: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10',
       operator: '=',
-      operatorLabel: 'Sisa beban',
+      operatorLabel: 'Sisanya',
       isResult: false,
     },
     {
       id: 'purchased',
       stepBadge: '3',
-      title: 'Listrik Dibeli PLN',
-      role: 'Pasokan Grid',
+      title: 'Dari PLN',
       value: number.format(purchasedMwh),
       unit: 'MWh',
-      note: 'Kebutuhan dipasok dari PLN',
+      note: 'Listrik yang dibeli dari PLN',
       icon: Zap,
       iconColor: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10',
       operator: '×',
@@ -64,25 +61,23 @@ export default function Scope2Waterfall({ summary }) {
     {
       id: 'factor',
       stepBadge: '4',
-      title: '× Faktor Emisi',
-      role: 'Faktor Grid',
-      value: factorFormat.format(effectiveFactor),
+      title: 'Faktor emisi',
+      value: effectiveFactor == null ? '—' : factorFormat.format(effectiveFactor),
       unit: 'tCO₂e/MWh',
-      note: 'Rata-rata tertimbang ESDM',
+      note: 'Rata-rata faktor wilayah PLN',
       icon: Calculator,
       iconColor: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10',
       operator: '→',
-      operatorLabel: 'Menghasilkan',
+      operatorLabel: 'Hasilnya',
       isResult: false,
     },
     {
       id: 'emission',
       stepBadge: '5',
       title: 'Emisi Scope 2',
-      role: 'Hasil Akhir',
       value: number.format(emissionTon),
       unit: 'tCO₂e',
-      note: 'Akumulasi emisi karbon YTD',
+      note: 'Total periode terpilih',
       icon: Flame,
       iconColor: 'text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-500/20',
       operator: null,
@@ -128,24 +123,15 @@ export default function Scope2Waterfall({ summary }) {
                   >
                     {step.stepBadge}
                   </span>
-                  <span
-                    className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded truncate ${
-                      step.isResult
-                        ? 'bg-rose-100/80 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    {step.role}
-                  </span>
                 </div>
                 <div className={`size-7 rounded-lg flex items-center justify-center shrink-0 ${step.iconColor}`}>
-                  <IconComponent size={15} strokeWidth={2.2} />
+                  <IconComponent size={15} strokeWidth={2.2} aria-hidden="true" />
                 </div>
               </div>
 
               {/* Title */}
               <p
-                className={`text-xs font-bold uppercase tracking-wider truncate ${
+                className={`text-xs font-bold truncate ${
                   step.isResult ? 'text-rose-900 dark:text-rose-200' : 'text-slate-600 dark:text-slate-400'
                 }`}
                 title={step.title}
@@ -174,7 +160,7 @@ export default function Scope2Waterfall({ summary }) {
               {/* Keterangan Singkat */}
               <p
                 className={`mt-1.5 text-[11px] leading-tight line-clamp-1 ${
-                  step.isResult ? 'text-rose-700/80 dark:text-rose-300/80 font-medium' : 'text-slate-500 dark:text-slate-400'
+                  step.isResult ? 'text-rose-800 dark:text-rose-300 font-medium' : 'text-slate-600 dark:text-slate-400'
                 }`}
               >
                 {step.note}

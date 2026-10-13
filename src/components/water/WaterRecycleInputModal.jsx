@@ -147,10 +147,9 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
     <BaseModal
       open={isOpen}
       onClose={handleCloseRequest}
-      title="Input Data Water Recycle"
-      subtitle="Pencatatan volume air daur ulang per fasilitas berdasarkan angka meter."
+      title="Input data daur ulang air"
+      subtitle="Catat angka meter air daur ulang untuk satu lokasi."
       icon={<Droplets size={20} className="text-cyan-600 dark:text-cyan-400" />}
-      badge="Air Daur Ulang"
       size="md"
       loading={isSubmitting}
     >
@@ -174,8 +173,8 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
           {/* Lokasi / Fasilitas */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label htmlFor="wr-dc-select" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                Lokasi / Fasilitas Operasional <span className="text-rose-500 dark:text-rose-400">*</span>
+              <label htmlFor="wr-dc-select" className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Lokasi <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
               </label>
               <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                 {selectedDC?.region}
@@ -266,13 +265,13 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
 
           {/* Angka Meter */}
           <div className="space-y-2.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-              Angka Meter Air Daur Ulang (m³) <span className="text-rose-500 dark:text-rose-400">*</span>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Angka meter (m³) <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
                 <label htmlFor="wr-meter-start" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                  Meter Awal Periode
+                  Meter awal
                 </label>
                 <input
                   id="wr-meter-start"
@@ -289,7 +288,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
               </div>
               <div>
                 <label htmlFor="wr-meter-end" className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                  Meter Akhir Periode
+                  Meter akhir
                 </label>
                 <input
                   id="wr-meter-end"
@@ -309,7 +308,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
 
           {/* Tarif PDAM */}
           <div className="space-y-1">
-            <label htmlFor="wr-pdam-rate" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+            <label htmlFor="wr-pdam-rate" className="text-xs font-bold text-slate-700 dark:text-slate-300">
               Tarif PDAM (Rp/m³)
             </label>
             <input
@@ -325,8 +324,8 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
 
           {/* Bukti Transaksi */}
           <div className="space-y-1">
-            <label htmlFor="wr-proof-ref" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-              Nomor Bukti / Catatan Meter (Opsional)
+            <label htmlFor="wr-proof-ref" className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Nomor bukti atau catatan (opsional)
             </label>
             <input
               id="wr-proof-ref"
@@ -343,8 +342,8 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
             <div className="flex items-center justify-between pb-2 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <Calculator size={14} className="text-cyan-400" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-200">
-                  Kalkulasi Manfaat Air Daur Ulang
+                <span className="text-[11px] font-bold text-slate-200">
+                  Hasil dari input ini
                 </span>
               </div>
               <span className="text-xs font-mono font-extrabold text-cyan-400 bg-cyan-950/60 border border-cyan-800/80 px-2.5 py-0.5 rounded-full">
@@ -353,11 +352,11 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
               <div>
-                <span className="text-[10px] text-slate-400 block">Volume Daur Ulang</span>
+                <span className="text-[10px] text-slate-300 block">Volume</span>
                 <strong className="text-slate-100 font-mono text-xs">{liveCalc.volumeM3.toLocaleString('id-ID')} m³</strong>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 block">Emisi Terhindar</span>
+                <span className="text-[10px] text-slate-300 block">Emisi dicegah</span>
                 <strong className="text-emerald-400 font-mono font-bold text-xs">{liveCalc.co2AvoidedTon.toFixed(3)} tCO₂e</strong>
               </div>
               <div>

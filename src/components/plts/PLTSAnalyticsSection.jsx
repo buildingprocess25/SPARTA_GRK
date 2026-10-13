@@ -13,6 +13,7 @@ import {
   Info, ChevronDown, ChevronUp, AlertCircle
 } from 'lucide-react';
 import CardBox from '@/components/ui/CardBox';
+import InfoHint from '@/components/ui/InfoHint';
 import { processAllDCAnalytics, SOLAR_CONSTANTS } from '@/lib/solar/processor';
 import { formatNum } from '@/data/sustainabilityData';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
@@ -21,71 +22,71 @@ import { normalizePlantStatus } from '@/lib/solar/status';
 const ALL_METRIC_OPTIONS = [
   {
     id: 'specificYield',
-    label: 'Specific Yield Hari Ini',
-    trendLabel: 'Specific Yield Bulanan',
+    label: 'Produksi per kWp hari ini',
+    trendLabel: 'Produksi per kWp per bulan',
     unit: 'kWh/kWp',
     trendUnit: 'kWh/kWp',
-    desc: 'Daftar: Specific Yield aktual hari ini (kWh/kWp) • Grafik: Specific Yield bulanan per kWp terpasang (kWh/kWp)',
+    desc: 'Listrik yang dihasilkan tiap 1 kWp panel (specific yield). Daftar memakai data hari ini, grafik memakai data bulanan.',
     sourceType: 'API_LIVE',
     chartSourceType: 'EXCEL_HISTORY'
   },
   {
     id: 'equivalentHour',
-    label: 'Equivalent Hours (API)',
-    trendLabel: 'Equivalent Hours Rata-rata Harian Bulanan',
+    label: 'Jam produksi penuh hari ini',
+    trendLabel: 'Rata-rata jam produksi penuh per hari',
     unit: 'jam',
     trendUnit: 'jam/hari',
-    desc: 'Daftar: Equivalent hours produksi hari ini (jam) • Grafik: Rata-rata jam puncak harian bulanan (jam/hari)',
+    desc: 'Berapa jam panel setara bekerja di kapasitas penuh (equivalent hours). Daftar memakai data hari ini, grafik rata-rata per hari tiap bulan.',
     sourceType: 'API_LIVE',
     chartSourceType: 'EXCEL_HISTORY'
   },
   {
     id: 'pr',
-    label: 'Proxy PR (perkiraan, berbasis audit April 2026)',
-    trendLabel: 'Proxy PR Baseline Audit (April 2026)',
+    label: 'Perkiraan PR (audit April 2026)',
+    trendLabel: 'Perkiraan PR dari audit April 2026',
     unit: '%',
     trendUnit: '%',
-    desc: 'Proxy PR perkiraan berbasis audit April 2026 (Iradiasi referensi 4.2 PSH). Plant PR resmi live iSolarCloud tersedia terpisah.',
+    desc: 'Perkiraan kinerja panel dari audit April 2026 (acuan 4,2 jam matahari penuh per hari). Bukan data langsung; PR resmi iSolarCloud bisa berbeda.',
     sourceType: 'AUDIT_BASELINE',
     chartSourceType: 'AUDIT_BASELINE'
   },
   {
     id: 'yieldMwh',
-    label: 'Total Produksi',
-    trendLabel: 'Total Produksi Bulanan',
+    label: 'Total produksi',
+    trendLabel: 'Produksi per bulan',
     unit: 'MWh',
     trendUnit: 'MWh',
-    desc: 'Daftar: Total produksi bulanan berjalan (MWh) • Grafik: Histori total produksi energi bersih bulanan (MWh)',
+    desc: 'Listrik yang dihasilkan PLTS (MWh).',
     sourceType: 'EXCEL_HISTORY',
     chartSourceType: 'EXCEL_HISTORY'
   },
   {
     id: 'capacityFactor',
-    label: 'Capacity Factor',
-    trendLabel: 'Capacity Factor Bulanan',
+    label: 'Faktor kapasitas',
+    trendLabel: 'Faktor kapasitas per bulan',
     unit: '%',
     trendUnit: '%',
-    desc: 'Daftar: Capacity Factor bulanan berjalan (%) • Grafik: Rasio pemanfaatan kapasitas dalam 24 jam operasional bulanan (%)',
+    desc: 'Produksi dibanding produksi maksimal jika panel bekerja penuh 24 jam setiap hari (capacity factor).',
     sourceType: 'EXCEL_HISTORY',
     chartSourceType: 'EXCEL_HISTORY'
   },
   {
     id: 'peakPower',
-    label: 'Peak Power',
-    trendLabel: 'Peak Power / Daya Real-time',
+    label: 'Daya saat ini',
+    trendLabel: 'Daya saat ini',
     unit: 'kW',
     trendUnit: 'kW',
-    desc: 'Daya output puncak tertinggi yang tercatat / daya real-time dari telemetri API iSolarCloud (kW)',
+    desc: 'Daya yang sedang dihasilkan menurut iSolarCloud (kW).',
     sourceType: 'API_LIVE',
     chartSourceType: 'API_LIVE'
   },
   {
     id: 'co2',
-    label: 'Emisi Terhindar',
-    trendLabel: 'Emisi Terhindar Bulanan',
+    label: 'Emisi yang dicegah',
+    trendLabel: 'Emisi yang dicegah per bulan',
     unit: 'tCO₂e',
     trendUnit: 'tCO₂e',
-    desc: 'Reduksi emisi GRK dari produksi PLTS (Faktor metode aplikasi 0.77644 kgCO₂e/kWh / 0.77644 tCO₂e/MWh)',
+    desc: `Produksi PLTS × ${SOLAR_CONSTANTS.CO2_FACTOR_PLTS} kgCO₂e/kWh.`,
     sourceType: 'EXCEL_HISTORY',
     chartSourceType: 'EXCEL_HISTORY'
   }
@@ -123,7 +124,7 @@ function SafePrBarTooltip({ active, payload }) {
       <div className="bg-slate-900 text-white rounded-xl p-3 shadow-xl border border-slate-800 text-xs space-y-1.5 min-w-[220px]">
         <p className="font-bold text-slate-100 border-b border-slate-700 pb-1">{data.name}</p>
         <div className="flex justify-between items-center text-slate-300">
-          <span>Proxy PR (Audit):</span>
+          <span>Perkiraan PR (audit):</span>
           <strong className="text-emerald-400 font-mono text-sm">
             {data.pr !== null && data.pr !== undefined ? `${data.pr}%` : '—'}
           </strong>
@@ -134,15 +135,15 @@ function SafePrBarTooltip({ active, payload }) {
           </p>
         )}
         <div className="flex justify-between items-center text-slate-400 text-[11px]">
-          <span>Kapasitas API:</span>
+          <span>Kapasitas:</span>
           <span className="font-mono">{data.installedKwp} kWp</span>
         </div>
         <div className="flex justify-between items-center text-slate-400 text-[11px]">
-          <span>Produksi Audit:</span>
+          <span>Produksi (audit):</span>
           <span className="font-mono">{data.monthYieldMwh} MWh</span>
         </div>
         <p className="text-[9px] text-slate-400 pt-1 border-t border-slate-800">
-          Sumber: audit_baseline April 2026 (bukan data live)
+          Sumber: audit April 2026, bukan data langsung
         </p>
       </div>
     );
@@ -171,10 +172,10 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, 
           </div>
           <div className="bg-blue-950/60 border border-blue-800/60 rounded-lg p-2 space-y-1">
             <div className="flex justify-between items-center text-slate-200">
-              <span className="text-xs text-blue-300">Rata-rata Tertimbang:</span>
+              <span className="text-xs text-blue-300">Rata-rata (menurut kapasitas):</span>
               <strong className="text-blue-100 font-mono text-sm">{avgVal !== null && avgVal !== undefined ? avgVal : '—'} {unitSuffix}</strong>
             </div>
-            <p className="text-[9px] text-blue-400 italic">Definisi: Total energi / Total kapasitas terpasang</p>
+            <p className="text-[10px] text-blue-300">Total produksi ÷ total kapasitas</p>
           </div>
         </div>
       );
@@ -189,7 +190,7 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, 
         <div className="bg-slate-900/95 text-white rounded-xl p-3.5 shadow-2xl border border-slate-700/80 text-xs space-y-2 min-w-[230px] backdrop-blur-md">
           <div className="flex items-center justify-between border-b border-slate-700/80 pb-1.5">
             <span className="font-bold text-slate-100 text-sm">{label}</span>
-            <span className="text-[10px] text-amber-300 font-semibold px-2 py-0.5 rounded bg-amber-900/50">Rentang Min–Maks</span>
+            <span className="text-[10px] text-amber-300 font-semibold px-2 py-0.5 rounded bg-amber-900/50">Terendah sampai tertinggi</span>
           </div>
           <div className="space-y-1 bg-slate-800/60 rounded-lg p-2 border border-slate-700/50">
             <div className="flex justify-between items-center text-xs">
@@ -202,14 +203,14 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, 
             </div>
             {rangeDiff !== null && (
               <div className="flex justify-between items-center text-[10px] text-slate-300 pt-1 border-t border-slate-700/60">
-                <span className="text-slate-400">Selisih Rentang:</span>
+                <span className="text-slate-300">Selisih:</span>
                 <span className="font-mono text-slate-200 font-semibold">{rangeDiff} {unitSuffix}</span>
               </div>
             )}
           </div>
           {avgVal !== null && avgVal !== undefined && (
             <div className="flex justify-between items-center text-[11px] text-blue-300 px-1 pt-0.5">
-              <span>Rata-rata Referensi:</span>
+              <span>Rata-rata:</span>
               <strong className="font-mono">{avgVal} {unitSuffix}</strong>
             </div>
           )}
@@ -253,7 +254,7 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, 
               </div>
               <strong className="text-blue-200 font-mono text-sm">{hoveredEntry.value} {unitSuffix}</strong>
             </div>
-            <span className="text-[9px] text-blue-300 font-semibold block">★ Lokasi Disorot</span>
+            <span className="text-[9px] text-blue-300 font-semibold block">Lokasi dipilih</span>
           </div>
         )}
 
@@ -688,8 +689,10 @@ export default function PLTSAnalyticsSection({
   const rawAllDCItems = analyticsResult.items;
   const activeMetricMeta = METRIC_OPTIONS.find(m => m.id === selectedMetric) || METRIC_OPTIONS[0];
 
-  // Base list of DCs ALWAYS contains all 39 locations
   const allDCItems = rawAllDCItems;
+  const operationalItems = allDCItems.filter((d) => !d.isUnderConstruction);
+  const underConstructionCount = allDCItems.length - operationalItems.length;
+  const operationalKwp = operationalItems.reduce((sum, d) => sum + (Number(d.installedKwp) || 0), 0);
 
   const unreliableCount = useMemo(() => {
     return isAuditBaselineEnabled ? rawAllDCItems.filter(d => d.requiresManualVerification).length : 0;
@@ -1070,23 +1073,23 @@ export default function PLTSAnalyticsSection({
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-              <Award size={20} />
+              <Award size={20} aria-hidden="true" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="font-bold text-base text-slate-900 dark:text-slate-100">
-                  Analisis Multi-DC & Ranking Kinerja PLTS
+                  Perbandingan antar DC
                 </h2>
+                <InfoHint title="Perbandingan antar DC" text="Bandingkan dan urutkan kinerja PLTS tiap DC. Plant yang masih dibangun tidak ikut peringkat dan rata-rata." />
                 <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20">
-                  38 plant operasional (1 dalam pembangunan)
+                  {operationalItems.length} plant beroperasi{underConstructionCount > 0 ? `, ${underConstructionCount} masih dibangun` : ''}
                 </span>
-                <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20">
-                  Kapasitas Operasional 5.791,42 kWp
-                </span>
+                {operationalKwp > 0 && (
+                  <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20">
+                    {formatNum(operationalKwp, 2)} kWp
+                  </span>
+                )}
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                39 plant PLTS independen terpetakan (Gorontalo dikecualikan dari ranking & rata-rata)
-              </p>
             </div>
           </div>
 
@@ -1173,9 +1176,9 @@ export default function PLTSAnalyticsSection({
         <CardBox className="xl:col-span-5 flex flex-col xl:h-[580px] p-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
             <div>
-              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">Daftar Lokasi DC ({allDCItems.length})</h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                {activeChosenCount} dipilih, {rankedChosenCount} masuk ranking, {excludedChosenCount} dikecualikan
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">Daftar DC ({allDCItems.length})</h3>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">
+                {activeChosenCount} dipilih, {rankedChosenCount} masuk peringkat, {excludedChosenCount} tidak dihitung
               </p>
             </div>
             <div className="flex items-center gap-1.5">
@@ -1294,9 +1297,6 @@ export default function PLTSAnalyticsSection({
                   : '—'}
               </strong>
             </div>
-            <span className="text-[10px] text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded border border-blue-200/60 dark:border-blue-500/30 font-medium self-start sm:self-center">
-              Gorontalo dikeluarkan
-            </span>
           </div>
         </CardBox>
 
@@ -1306,22 +1306,8 @@ export default function PLTSAnalyticsSection({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-bold text-base text-slate-900 dark:text-slate-100">{trendTitle}</h3>
-                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold border ${selectedMetric === 'pr'
-                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
-                    : selectedMetric === 'peakPower'
-                      ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30'
-                      : 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/30'
-                  }`}>
-                  {selectedMetric === 'pr'
-                    ? 'audit_baseline (April 2026)'
-                    : selectedMetric === 'peakPower'
-                      ? 'telemetri_live_api'
-                      : 'ISOLAR_REPORT_IMPORT (Jan–Sep 2026)'}
-                </span>
+                <InfoHint title={activeMetricMeta.trendLabel} text={activeMetricMeta.desc} />
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {activeMetricMeta.desc}
-              </p>
             </div>
 
             {/* Interactive Controls for Multi-Plant Chart */}
@@ -1377,7 +1363,7 @@ export default function PLTSAnalyticsSection({
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                       }`}
                   >
-                    Rentang Min-Maks
+                    Terendah–tertinggi
                   </button>
                 </div>
               )}
@@ -1393,7 +1379,7 @@ export default function PLTSAnalyticsSection({
             ) : activeChosenCount === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 dark:text-slate-400 space-y-3">
                 <div className="size-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
-                  <CheckSquare size={24} />
+                  <CheckSquare size={24} aria-hidden="true" />
                 </div>
                 <div>
                   <h5 className="font-bold text-slate-700 dark:text-slate-300 text-sm">Pilih minimal satu lokasi</h5>
@@ -1406,7 +1392,7 @@ export default function PLTSAnalyticsSection({
                   onClick={handleSelectAll}
                   className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-all"
                 >
-                  Pilih Semua 38 Plant Operasional
+                  Pilih semua plant yang beroperasi
                 </button>
               </div>
             ) : selectedMetric === 'pr' ? (
@@ -1616,7 +1602,7 @@ export default function PLTSAnalyticsSection({
                 )}
               </div>
               <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                Sumber: audit_baseline April 2026 (Titik baseline audit, bukan data realtime)
+                Sumber: audit April 2026, bukan data langsung
               </span>
             </div>
           ) : (
@@ -1649,9 +1635,6 @@ export default function PLTSAnalyticsSection({
                   );
                 })()}
               </div>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                Data historis kanonik 2026 (Gorontalo dikecualikan)
-              </span>
             </div>
           )}
         </CardBox>
@@ -1702,7 +1685,7 @@ export default function PLTSAnalyticsSection({
                   onClick={handleSelectAll}
                   className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
                 >
-                  Reset (Pilih Semua)
+                  Pilih semua lagi
                 </button>
               )}
             </div>
@@ -1750,7 +1733,7 @@ export default function PLTSAnalyticsSection({
                     className={`px-2 py-1 rounded-md transition-all ${telemetryFilter === 'Peak Generation' ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-300 shadow-xs' : 'text-slate-600 dark:text-slate-400'
                       }`}
                   >
-                    Peak
+                    Produksi puncak
                   </button>
                   <button
                     type="button"
@@ -1758,7 +1741,7 @@ export default function PLTSAnalyticsSection({
                     className={`px-2 py-1 rounded-md transition-all ${telemetryFilter === 'Normal Producing' ? 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-300 shadow-xs' : 'text-slate-600 dark:text-slate-400'
                       }`}
                   >
-                    Producing
+                    Berproduksi
                   </button>
                   <button
                     type="button"
@@ -1774,7 +1757,7 @@ export default function PLTSAnalyticsSection({
                     className={`px-2 py-1 rounded-md transition-all ${telemetryFilter === 'Menunggu Data' ? 'bg-white dark:bg-slate-900 text-amber-700 dark:text-amber-300 shadow-xs' : 'text-slate-600 dark:text-slate-400'
                       }`}
                   >
-                    Menunggu Data
+                    Menunggu data
                   </button>
                   <button
                     type="button"
@@ -1817,7 +1800,7 @@ export default function PLTSAnalyticsSection({
           {/* TAB 1: TABEL DATA MATANG */}
           {activeTab === 'table' && (
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="sticky top-0 bg-slate-900 text-white text-xs uppercase z-20 shadow-xs">
+              <thead className="sticky top-0 bg-slate-900 text-white text-xs z-20 shadow-xs">
                 <tr>
                   <th
                     onClick={() => {
@@ -2094,10 +2077,10 @@ export default function PLTSAnalyticsSection({
                                 <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800">
                                   <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                                     <Layers size={13} className="text-purple-600 dark:text-purple-400" />
-                                    Rincian Sub-Plant {name} ({d.subPlants.length} Plant Fisik OpenAPI)
+                                    Rincian {name} ({d.subPlants.length} plant)
                                   </span>
-                                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                                    *Hanya rincian informatif, TIDAK dihitung terpisah di roll-up nasional
+                                  <span className="text-[10px] text-slate-600 dark:text-slate-400">
+                                    Sudah termasuk dalam total DC, tidak dihitung dua kali
                                   </span>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
@@ -2186,16 +2169,14 @@ export default function PLTSAnalyticsSection({
             <div className="p-4 space-y-4">
               {/* Header inside tab */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
-                <div>
+                <div className="flex items-center gap-2">
                   <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                    Status Pembangkit Telemetri per DC & Toko (Inverter Sungrow OpenAPI Gateway)
+                    Status inverter per lokasi
                   </h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Data inverter dilaporkan tiap 5 menit; sinkron dashboard tiap 30 menit • Menampilkan {telemetryDisplayItems.length} lokasi terdaftar
-                  </p>
+                  <InfoHint title="Status inverter per lokasi" text="Data dari iSolarCloud. Inverter mengirim data tiap 5 menit, dashboard mengambilnya tiap 10 menit." />
                 </div>
                 <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20 shrink-0">
-                  {telemetryDisplayItems.length} Lokasi Terpantau
+                  {telemetryDisplayItems.length} lokasi
                 </span>
               </div>
 
@@ -2305,7 +2286,7 @@ export default function PLTSAnalyticsSection({
 
                         <div className="flex flex-col gap-0.5 pt-2 mt-1 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-500 dark:text-slate-400">
                           <div className="flex justify-between items-center">
-                            <span>Waktu Telemetri:</span>
+                            <span>Data terakhir:</span>
                             <span className="text-slate-600 dark:text-slate-400 font-mono font-medium">{formatWibTime(st.lastUpdate)}</span>
                           </div>
                           <span className="text-[9px] text-slate-500 dark:text-slate-400 italic">
@@ -2322,7 +2303,7 @@ export default function PLTSAnalyticsSection({
               {telemetryViewMode === 'compact' && (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
-                    <thead className="bg-slate-900 text-white text-[11px] uppercase">
+                    <thead className="bg-slate-900 text-white text-[11px]">
                       <tr>
                         <th className="px-3 py-2 font-semibold">DC & Sub-Plant</th>
                         <th className="px-3 py-2 font-semibold">Status</th>

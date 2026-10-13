@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, AlertCircle, ArrowRight, ChevronDown, Database, Flame, Search, Zap } from 'lucide-react';
+import { Activity, AlertCircle, Flame, Search, Zap } from 'lucide-react';
 import {
   Area, AreaChart, Bar, CartesianGrid, Cell, ComposedChart, Line,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
@@ -106,13 +106,13 @@ function Scope2ChartTooltip({ active, payload, label }) {
         </span>
         {isPartial && (
           <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/20">
-            Parsial
+            Sebagian
           </span>
         )}
       </div>
 
       <div className="space-y-1">
-        <div className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">Energi Listrik (MWh)</div>
+        <div className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">Listrik (MWh)</div>
         <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 font-mono">
           <span className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-slate-400 shrink-0" />
@@ -129,24 +129,24 @@ function Scope2ChartTooltip({ active, payload, label }) {
         </div>
         {row?.loadMwh != null && (
           <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400 text-[11px] font-mono pt-0.5 border-t border-slate-100 dark:border-slate-800">
-            <span className="font-sans">Beban Total:</span>
+            <span className="font-sans">Total kebutuhan:</span>
             <span>{show(row.loadMwh)} MWh</span>
           </div>
         )}
       </div>
 
       <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800 space-y-1">
-        <div className="text-[10px] uppercase tracking-wider text-rose-500 dark:text-rose-400 font-semibold">Emisi Karbon (tCO₂e)</div>
+        <div className="text-[11px] text-rose-700 dark:text-rose-400 font-semibold">Emisi (tCO₂e)</div>
         <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 font-mono">
           <span className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-rose-500 shrink-0" />
-            <span className="text-slate-600 dark:text-slate-400 font-sans">Emisi Scope 2:</span>
+            <span className="text-slate-600 dark:text-slate-400 font-sans">Bulan ini:</span>
           </span>
           <strong className="text-rose-700 dark:text-rose-400">{row?.emissionTon != null ? `${show(row.emissionTon)} tCO₂e` : '—'}</strong>
         </div>
         {row?.cumulativeEmissionTon != null && (
           <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 text-[11px] font-mono">
-            <span className="text-slate-500 dark:text-slate-400 font-sans">Akumulasi YTD:</span>
+            <span className="text-slate-600 dark:text-slate-400 font-sans">Sejak Januari:</span>
             <strong className="text-rose-600 dark:text-rose-400">{show(row.cumulativeEmissionTon)} tCO₂e</strong>
           </div>
         )}
@@ -324,14 +324,14 @@ export default function Scope2AnnualLoadDashboard() {
         <div className="flex items-start gap-3">
           <AlertCircle className="size-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <h4 className="font-bold text-sm text-rose-950 dark:text-rose-200">Data Laporan Scope 2 Belum Dapat Ditampilkan</h4>
+            <h4 className="font-bold text-sm text-rose-950 dark:text-rose-200">Data Scope 2 belum bisa dimuat</h4>
             <p className="text-xs text-rose-700 dark:text-rose-300 leading-relaxed">{error}</p>
           </div>
         </div>
         <button
           type="button"
           onClick={() => setRetryCount(c => c + 1)}
-          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-rose-600 rounded-xl hover:bg-rose-700 transition shadow-xs"
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-rose-700 rounded-xl hover:bg-rose-800 transition shadow-xs"
         >
           Coba Lagi
         </button>
@@ -352,9 +352,9 @@ export default function Scope2AnnualLoadDashboard() {
   return <div className="min-w-0 space-y-6 animate-in">
     <PageHeader
       title="Scope 2: Listrik PLN"
-      subtitle="Emisi karbon dari listrik yang dibeli pada setiap distribution center."
+      info={`Emisi dari listrik PLN yang dibeli tiap DC. Rumus: listrik dari PLN × faktor emisi wilayah PLN. Sumber: laporan bulanan pemakaian listrik dan produksi PLTS. Bulan berjalan (data sampai ${data.current.partialDataThroughDate || '—'}) ditandai "sebagian" dan tidak dipakai untuk rata-rata atau proyeksi. ${summary.temporaryFactorCount ? `${summary.temporaryFactorCount} data dengan faktor emisi sementara tidak dihitung.` : ''}`}
       actions={
-        <InputDataButton label="Input Data Scope 2" icon={Zap} onClick={() => setIsInputModalOpen(true)} />
+        <InputDataButton label="Input data Scope 2" icon={Zap} onClick={() => setIsInputModalOpen(true)} />
       }
     />
 
@@ -362,45 +362,43 @@ export default function Scope2AnnualLoadDashboard() {
 
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-          <Activity size={14} className="text-blue-600 dark:text-blue-400" />
-          Indikator Kinerja Utama (KPI) Scope 2
+        <h2 className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+          <Activity size={14} className="text-blue-600 dark:text-blue-400" aria-hidden="true" />
+          Ringkasan Scope 2
         </h2>
-        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Ringkasan Eksekutif YTD</span>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 relative z-20 has-[[data-popover-open='true']]:z-40">
         <KpiCard
-          label="EMISI SCOPE 2 YTD"
+          label="Emisi Scope 2"
           value={show(summary.scope2EmissionTon)}
           unit="tCO₂e"
-          trend="Akumulasi periode terpilih"
+          trend="Total periode terpilih"
           icon={Flame}
           theme="emission"
           infoKey="scope2_emission_ytd"
         />
         <KpiCard
-          label="LISTRIK DIBELI PLN YTD"
+          label="Listrik dari PLN"
           value={show(purchasedMwh)}
           unit="MWh"
-          trend={`${summary.plantCount}/${monitoredCount} DC tercakup`}
+          trend={`${summary.plantCount} dari ${monitoredCount} DC`}
           icon={Zap}
           theme="pln"
           infoKey="scope2_purchased_mwh"
         />
         <KpiCard
-          label="INTENSITAS EMISI"
+          label="Emisi per MWh"
           value={show(intensity)}
           unit="tCO₂e/MWh"
-          trend="Berdasarkan faktor emisi resmi"
           icon={Flame}
           theme="calc"
           infoKey="scope2_emission_intensity"
         />
         <KpiCard
-          label="PROYEKSI AKHIR TAHUN"
+          label="Perkiraan akhir tahun"
           value={show(projection.baseAnnual)}
           unit="tCO₂e"
-          trend={projection.baseAnnual === null ? 'Data belum cukup' : `${show(projection.minAnnual)}–${show(projection.maxAnnual)} estimasi`}
+          trend={projection.baseAnnual === null ? 'Data belum cukup' : `Kisaran ${show(projection.minAnnual)}–${show(projection.maxAnnual)}`}
           icon={Flame}
           theme="emission"
           infoKey="scope2_annual_projection"
@@ -408,23 +406,16 @@ export default function Scope2AnnualLoadDashboard() {
       </div>
     </div>
 
-    {SHOW_TARIFF && <CardBox><p className="text-xs font-semibold text-slate-500 dark:text-slate-400">ESTIMASI BIAYA</p><p className="mt-2 text-2xl font-bold">Rp {number.format(costRupiah / 1_000_000)} juta</p></CardBox>}
+    {SHOW_TARIFF && <CardBox><p className="text-xs font-semibold text-slate-600 dark:text-slate-400">Perkiraan biaya</p><p className="mt-2 text-2xl font-bold">Rp {number.format(costRupiah / 1_000_000)} juta</p></CardBox>}
 
     <CardBox className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <ArrowRight size={18} className="text-blue-600 dark:text-blue-400" />
-              Dari beban ke emisi
-            </h2>
+            <h2 className="font-bold text-slate-900 dark:text-slate-100">Dari kebutuhan listrik ke emisi</h2>
             <MetricInfoIcon infoKey="scope2_waterfall" />
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Produksi PLTS mengurangi kebutuhan listrik dari PLN; listrik yang dibeli kemudian dikalikan faktor emisi resmi.</p>
         </div>
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0 self-start sm:self-auto">
-          Alur: (Beban − PLTS) × Faktor = Emisi
-        </span>
       </div>
       <Scope2Waterfall summary={summary} />
     </CardBox>
@@ -433,12 +424,9 @@ export default function Scope2AnnualLoadDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="font-bold text-slate-900 dark:text-slate-100 text-base">Tren emisi bulanan</h2>
+            <h2 className="font-bold text-slate-900 dark:text-slate-100 text-base">Emisi per bulan</h2>
             <MetricInfoIcon infoKey="scope2_monthly_trend" />
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Energi memakai sumbu kiri (MWh), emisi memakai sumbu kanan (tCO₂e). Bulan berjalan ditandai Parsial dan tidak digunakan sebagai bulan lengkap dalam proyeksi.
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
           <ChartPillLegend
@@ -449,8 +437,8 @@ export default function Scope2AnnualLoadDashboard() {
             ]}
           />
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-500/10 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-500/20 text-xs font-semibold shrink-0">
-            <span className="text-rose-700 dark:text-rose-300 font-medium">Faktor Rata-rata:</span>
-            <span className="font-bold font-mono">{formatFactor(summary.weightedFactorKgPerKwh || 0.87)} tCO₂e/MWh</span>
+            <span className="text-rose-700 dark:text-rose-300 font-medium">Faktor emisi rata-rata:</span>
+            <span className="font-bold font-mono">{formatFactor(summary.weightedFactorKgPerKwh)} tCO₂e/MWh</span>
           </div>
         </div>
       </div>
@@ -539,7 +527,7 @@ export default function Scope2AnnualLoadDashboard() {
                       {row.label} {row.yearMonth.slice(0, 4)}
                       {row.periodStatus === 'partial' && (
                         <span className="ml-2 rounded-full border border-amber-300 dark:border-amber-500/40 bg-amber-100 dark:bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-900 dark:text-amber-300">
-                          Parsial
+                          Sebagian
                         </span>
                       )}
                     </td>
@@ -569,10 +557,9 @@ export default function Scope2AnnualLoadDashboard() {
             <h2 className="font-bold text-slate-900 dark:text-slate-100">Emisi per DC</h2>
             <MetricInfoIcon infoKey="scope2_ranking_table" />
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Klik baris untuk melihat tren bulanan DC.</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400">Klik baris untuk melihat rincian per bulan.</p>
         </div>
         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <Search size={15} />
           {ranking.length} DC
         </div>
       </div>
@@ -581,11 +568,11 @@ export default function Scope2AnnualLoadDashboard() {
           <table className="min-w-[840px] w-full text-xs">
             <thead className="sticky top-0 z-10 bg-slate-900 dark:bg-slate-950 text-white">
               <tr>
-                <th className="p-3 text-left"><button onClick={() => updateSort('dcName')} className="font-semibold">Cabang / DC ↕</button></th>
-                <th className="p-3 text-left"><button onClick={() => updateSort('grid')} className="font-semibold">Grid ↕</button></th>
-                <th className="p-3 text-right"><button onClick={() => updateSort('emissionFactor')} className="font-semibold" title="Faktor Emisi Grid (tCO₂e/MWh) / Faktor Perkalian">Faktor Emisi ↕</button></th>
-                <th className="p-3 text-right"><button onClick={() => updateSort('electricityEnergyKwh')} className="font-semibold">Dibeli PLN (MWh) ↕</button></th>
-                <th className="p-3 text-right"><button onClick={() => updateSort('scope2EmissionTon')} className="font-semibold">Emisi YTD (tCO₂e) ↕</button></th>
+                <th className="p-3 text-left"><button onClick={() => updateSort('dcName')} className="font-semibold">DC ↕</button></th>
+                <th className="p-3 text-left"><button onClick={() => updateSort('grid')} className="font-semibold">Wilayah PLN ↕</button></th>
+                <th className="p-3 text-right"><button onClick={() => updateSort('emissionFactor')} className="font-semibold">Faktor emisi ↕</button></th>
+                <th className="p-3 text-right"><button onClick={() => updateSort('electricityEnergyKwh')} className="font-semibold">Dari PLN (MWh) ↕</button></th>
+                <th className="p-3 text-right"><button onClick={() => updateSort('scope2EmissionTon')} className="font-semibold">Emisi (tCO₂e) ↕</button></th>
               </tr>
             </thead>
             <tbody>
@@ -610,21 +597,20 @@ export default function Scope2AnnualLoadDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="font-bold text-slate-900 dark:text-slate-100 text-base">Resume akumulasi karbon YTD</h2>
+            <h2 className="font-bold text-slate-900 dark:text-slate-100 text-base">Emisi terkumpul sejak Januari</h2>
             <MetricInfoIcon infoKey="scope2_annual_projection" />
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Ringkasan hanya memakai bulan lengkap untuk rata-rata, tertinggi, dan terendah.</p>
         </div>
         <ChartPillLegend
           items={[
-            { label: 'Akumulasi Emisi YTD (tCO₂e)', color: CHART_PALETTE.emission, type: 'line' },
+            { label: 'Emisi terkumpul (tCO₂e)', color: CHART_PALETTE.emission, type: 'line' },
           ]}
         />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-xl bg-rose-50 dark:bg-rose-500/10 p-4 border border-rose-100 dark:border-rose-500/20">
-          <p className="text-xs text-rose-700 dark:text-rose-300 font-medium">Total emisi YTD</p>
+          <p className="text-xs text-rose-700 dark:text-rose-300 font-medium">Total emisi</p>
           <p className="mt-1 text-xl font-bold font-mono text-rose-900 dark:text-rose-200">{show(summary.scope2EmissionTon)} tCO₂e</p>
         </div>
         <div className="rounded-xl bg-slate-50 dark:bg-slate-800/40 p-4 border border-slate-200/60 dark:border-slate-700/60">
@@ -683,7 +669,7 @@ export default function Scope2AnnualLoadDashboard() {
                           dotColor: CHART_PALETTE.emission,
                         },
                       ]}
-                      footer={item.payload?.periodStatus === 'partial' ? 'Data parsial bulan berjalan' : null}
+                      footer={item.payload?.periodStatus === 'partial' ? 'Bulan berjalan, data belum lengkap' : null}
                     />
                   );
                 }
@@ -707,8 +693,6 @@ export default function Scope2AnnualLoadDashboard() {
         </ResponsiveContainer>
       </div>
     </CardBox>
-
-    <details className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm [&_summary::-webkit-details-marker]:hidden"><summary className="flex cursor-pointer items-center justify-between p-4"><span className="flex items-center gap-2 text-sm font-semibold"><Database size={18} className="text-blue-600 dark:text-blue-400" />Sumber dan cara membaca angka</span><ChevronDown size={17} aria-hidden="true" /></summary><div className="space-y-2 border-t dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-4 text-sm text-slate-600 dark:text-slate-400"><p><strong>Sumber:</strong> laporan Monthly load consumption (kWh), produksi bulanan, metadata koneksi, dan registry faktor emisi aplikasi.</p><p><strong>Emisi Scope 2:</strong> listrik dibeli PLN dikalikan faktor emisi grid resmi. Rumus dan faktor emisi tidak diubah oleh tampilan ini.</p><p><strong>Bulan berjalan:</strong> data sampai {data.current.partialDataThroughDate} ditandai Parsial agar tidak dibaca sebagai penurunan satu bulan penuh.</p><p><strong>Kualitas faktor:</strong> {summary.temporaryFactorCount} observasi berfaktor sementara tidak masuk perhitungan emisi.</p></div></details>
 
     <div className="flex flex-wrap gap-3"><a href={`/api/scope2/export?format=xlsx&${new URLSearchParams(Object.entries(filters).map(([key, value]) => [key, String(value)]))}`} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">Unduh Excel</a><a href={`/api/scope2/export?format=csv&${new URLSearchParams(Object.entries(filters).map(([key, value]) => [key, String(value)]))}`} className="rounded-lg border border-emerald-600 dark:border-emerald-500/40 px-4 py-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300">Unduh CSV</a></div>
     <Scope2DcDrawer plant={selectedPlant} rows={data.comparisonRows} onClose={() => setSelectedPlant(null)} />

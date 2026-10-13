@@ -116,14 +116,14 @@ export default function MetricInfoIcon({
       <button
         type="button"
         onClick={handleClick}
-        aria-label={`Informasi metrik ${info.title}`}
+        aria-label={`Penjelasan ${info.title}`}
         aria-expanded={isOpen}
-        className={`p-1 rounded-full transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+        // The 32px hit area keeps the small glyph tappable; the negative margin keeps it from pushing the title apart.
+        className={`-m-1.5 inline-flex size-8 items-center justify-center rounded-full transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
           isOpen
-            ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 shadow-xs'
+            ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300'
             : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800'
         }`}
-        title={`Klik / hover untuk melihat rumus & sumber data ${info.title}`}
       >
         <Info size={size} strokeWidth={2.2} />
       </button>
@@ -165,44 +165,52 @@ export default function MetricInfoIcon({
           </div>
 
           <div className="mt-3 space-y-3 text-xs">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
-                1. Definisi Metrik
-              </span>
-              <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-[11px]">
-                {info.definition}
-              </p>
-            </div>
-
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1 mb-1">
-                <Calculator size={11} />
-                2. Rumus Perhitungan
-              </span>
-              <div className="bg-blue-50/80 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-xl p-2 font-mono text-[11px] text-blue-900 dark:text-blue-200 leading-snug">
-                {info.formula}
+            {info.definition && (
+              <div>
+                {(info.formula || info.source || info.varianceReason) && (
+                  <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">Artinya</span>
+                )}
+                <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-xs">
+                  {info.definition}
+                </p>
               </div>
-            </div>
+            )}
 
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1 mb-1">
-                <Database size={11} />
-                3. Sumber Data
-              </span>
-              <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
-                {info.source}
-              </p>
-            </div>
-
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1 mb-1">
-                <AlertCircle size={11} />
-                4. Alasan Angka Bisa Berbeda
-              </span>
-              <div className="bg-amber-50/70 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-xl p-2 text-amber-900 dark:text-amber-200 text-[11px] leading-relaxed">
-                {info.varianceReason}
+            {info.formula && (
+              <div>
+                <span className="text-[11px] font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-1 mb-1">
+                  <Calculator size={11} aria-hidden="true" />
+                  Cara hitung
+                </span>
+                <div className="bg-blue-50/80 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-xl p-2 text-[11px] text-blue-900 dark:text-blue-200 leading-snug">
+                  {info.formula}
+                </div>
               </div>
-            </div>
+            )}
+
+            {info.source && (
+              <div>
+                <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1 mb-1">
+                  <Database size={11} aria-hidden="true" />
+                  Sumber data
+                </span>
+                <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
+                  {info.source}
+                </p>
+              </div>
+            )}
+
+            {info.varianceReason && (
+              <div>
+                <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1 mb-1">
+                  <AlertCircle size={11} aria-hidden="true" />
+                  Kenapa angkanya bisa beda
+                </span>
+                <div className="bg-amber-50/70 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-xl p-2 text-amber-900 dark:text-amber-200 text-[11px] leading-relaxed">
+                  {info.varianceReason}
+                </div>
+              </div>
+            )}
           </div>
         </div>,
         document.body,

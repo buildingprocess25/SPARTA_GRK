@@ -7,7 +7,6 @@ import PushPermissionBanner from '@/components/ui/PushPermissionBanner';
 import EmisiResumeTab from '@/components/EmisiResumeTab';
 import PengurangEmisiTab from '@/components/PengurangEmisiTab';
 import PenambahEmisiTab from '@/components/PenambahEmisiTab';
-import InputDataTab from '@/components/InputDataTab';
 import HistoryTab from '@/components/HistoryTab';
 import { SustainabilityProvider } from '@/context/SustainabilityContext';
 
@@ -81,12 +80,6 @@ export default function Home() {
                 <PenambahEmisiTab
                   activeSubScope={penambahSubScope}
                   setActiveSubScope={setPenambahSubScope}
-                />
-              )}
-              {activeTab === 'input' && (
-                <InputDataTab
-                  setActiveTab={setActiveTab}
-                  navigateTo={navigateTo}
                 />
               )}
               {activeTab === 'history' && (

@@ -5,20 +5,21 @@ import {
   CartesianGrid, Line, ComposedChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
 } from 'recharts';
 import {
-  Gauge, Thermometer, Sun, Zap, Activity, Info, RefreshCw, Layers, MapPin, TrendingDown,
+  Gauge, Thermometer, Sun, Zap, Activity, RefreshCw, Layers, MapPin, TrendingDown,
 } from 'lucide-react';
 import { TabContentSkeleton } from './PLTSDashboardSkeletons';
+import InfoHint from '@/components/ui/InfoHint';
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
 const PARAM_OPTIONS = [
-  { id: 'temp_panel', label: 'Suhu Panel (Estimasi)', unit: '°C', color: '#ef4444', domain: [20, 60], key: 'tempPanelEstimatedC' },
-  { id: 'temp_air', label: 'Suhu Udara Lingkungan (Open-Meteo)', unit: '°C', color: '#f97316', domain: [20, 40], key: 'tempAirMeanC' },
-  { id: 'ghi', label: 'Iradiasi Solar (GHI)', unit: 'kWh/m²', color: '#eab308', domain: [0, 200], key: 'irradiationKwhM2' },
-  { id: 'yield_mwh', label: 'Produksi Listrik PLTS', unit: 'MWh', color: '#10b981', domain: [0, 700], key: 'productionMwh' },
-  { id: 'capacity_factor', label: 'Capacity Factor (CF)', unit: '%', color: '#8b5cf6', domain: [0, 30], key: 'capacityFactorPercent' },
-  { id: 'specific_yield', label: 'Specific Yield', unit: 'kWh/kWp', color: '#06b6d4', domain: [0, 150], key: 'specificYield' },
-  { id: 'humidity', label: 'Kelembapan Udara', unit: '%', color: '#64748b', domain: [40, 100], key: 'humidityMean' },
+  { id: 'temp_panel', label: 'Suhu panel (perkiraan)', unit: '°C', color: '#ef4444', domain: [20, 60], key: 'tempPanelEstimatedC' },
+  { id: 'temp_air', label: 'Suhu udara', unit: '°C', color: '#f97316', domain: [20, 40], key: 'tempAirMeanC' },
+  { id: 'ghi', label: 'Sinar matahari', unit: 'kWh/m²', color: '#eab308', domain: [0, 200], key: 'irradiationKwhM2' },
+  { id: 'yield_mwh', label: 'Produksi PLTS', unit: 'MWh', color: '#10b981', domain: [0, 700], key: 'productionMwh' },
+  { id: 'capacity_factor', label: 'Faktor kapasitas', unit: '%', color: '#8b5cf6', domain: [0, 30], key: 'capacityFactorPercent' },
+  { id: 'specific_yield', label: 'Produksi per kWp', unit: 'kWh/kWp', color: '#06b6d4', domain: [0, 150], key: 'specificYield' },
+  { id: 'humidity', label: 'Kelembapan udara', unit: '%', color: '#64748b', domain: [40, 100], key: 'humidityMean' },
 ];
 
 function formatNum(value, min = 0, max = 2) {
@@ -106,13 +107,13 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
   if (error && !apiData) {
     return (
       <div className="h-[280px] rounded-2xl border border-rose-200 dark:border-rose-500/30 bg-rose-50/50 dark:bg-rose-500/10 flex flex-col items-center justify-center p-6 text-center">
-        <p className="text-sm font-bold text-rose-800 dark:text-rose-300">Gagal memuat analitik PR</p>
+        <p className="text-sm font-bold text-rose-800 dark:text-rose-300">Data kinerja panel belum bisa dimuat</p>
         <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 max-w-md">{error}</p>
         <button
           onClick={fetchPrAnalysis}
-          className="mt-4 px-4 py-2 text-xs font-bold text-white bg-rose-600 rounded-xl hover:bg-rose-700 transition"
+          className="mt-4 px-4 py-2 text-xs font-bold text-white bg-rose-700 rounded-xl hover:bg-rose-800 transition"
         >
-          Coba Lagi
+          Coba lagi
         </button>
       </div>
     );
@@ -124,13 +125,14 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
         <div className="flex items-center gap-3">
           <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 flex items-center justify-center shrink-0">
-            <Gauge size={20} />
+            <Gauge size={20} aria-hidden="true" />
           </div>
-          <div>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Performa Sistem (PR) vs Parameter Lingkungan</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Analisis korelasi rasio performa terbobot kapasitas terhadap suhu dan parameter operasional (Open-Meteo & Model Sandia)
-            </p>
+          <div className="flex items-center gap-2">
+            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Kinerja panel dibanding cuaca</h4>
+            <InfoHint
+              title="Kinerja panel (PR)"
+              text="PR (performance ratio) membandingkan listrik yang benar-benar dihasilkan dengan yang seharusnya bisa dihasilkan dari sinar matahari yang diterima. Plant yang lebih besar diberi bobot lebih besar. Plant yang masih dibangun atau tanpa data sinar matahari tidak dihitung. Target 80%, waspada di bawah 75%."
+            />
           </div>
         </div>
 
@@ -160,9 +162,9 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
             }}
             className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
           >
-            <option value="national">Nasional (39 Plant Terbobot)</option>
-            <option value="grid">Per Wilayah Grid</option>
-            <option value="dc">Per Cabang DC</option>
+            <option value="national">Semua plant</option>
+            <option value="grid">Per wilayah PLN</option>
+            <option value="dc">Per DC</option>
           </select>
 
           {/* Target ID Selector if grid or dc */}
@@ -172,7 +174,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
               onChange={(e) => setSelectedTargetId(e.target.value)}
               className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
             >
-              <option value="ALL">Semua Grid</option>
+              <option value="ALL">Semua wilayah</option>
               {(apiData?.meta?.availableGrids || []).map(g => (
                 <option key={g} value={g}>{g}</option>
               ))}
@@ -196,6 +198,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
           <select
             value={selectedParamId}
             onChange={(e) => setSelectedParamId(e.target.value)}
+            aria-label="Bandingkan dengan"
             className="text-xs font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-2xs"
           >
             {PARAM_OPTIONS.map(opt => (
@@ -211,48 +214,48 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
       {summaryMetrics && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">PR Aktual (Terbobot)</span>
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block">Kinerja panel (PR)</span>
             <div className="flex items-baseline gap-1 mt-1">
               <span className="text-xl font-black text-blue-700 dark:text-blue-300 font-mono">{summaryMetrics.avgPr}%</span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">perkiraan</span>
+              
             </div>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
-              Rata-rata Jan-Sep ({summaryMetrics.avgPlants}/{summaryMetrics.totalPlants} plant dihitung)
+              Rata-rata bulan yang sudah tutup, {summaryMetrics.avgPlants} dari {summaryMetrics.totalPlants} plant
             </p>
           </div>
 
           <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">PR Terkoreksi Suhu (STC)</span>
+            <span className="flex items-center gap-1 text-[10px] font-bold text-slate-600 dark:text-slate-400">
+              PR jika panel tidak panas
+              <InfoHint size={12} title="PR jika panel tidak panas" text="Panel surya bekerja kurang efisien saat panas. Angka ini memperkirakan PR jika suhu panel 25°C. Suhu panel dihitung dari data cuaca (model King/Sandia), bukan diukur sensor, jadi bisa meleset beberapa derajat." />
+            </span>
             <div className="flex items-baseline gap-1 mt-1">
               <span className="text-xl font-black text-emerald-700 dark:text-emerald-300 font-mono">{summaryMetrics.avgPrCorr}%</span>
-              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">baseline 25°C</span>
+              <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">pada 25°C</span>
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
-              Estimasi model termal King/Sandia, bukan hasil ukur sensor
-            </p>
           </div>
 
           <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Rata-rata {activeParam.label}</span>
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block">Rata-rata {activeParam.label.toLowerCase()}</span>
             <div className="flex items-baseline gap-1 mt-1">
               <span className="text-xl font-black text-red-600 dark:text-red-400 font-mono">{summaryMetrics.avgParam}</span>
               <span className="text-[11px] font-bold text-red-700 dark:text-red-300">{activeParam.unit}</span>
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
-              Data cuaca Open-Meteo & model termal King
-            </p>
           </div>
 
           <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Korelasi Pearson (r)</span>
+            <span className="flex items-center gap-1 text-[10px] font-bold text-slate-600 dark:text-slate-400">
+              Hubungan dengan PR
+              <InfoHint size={12} title="Hubungan dengan PR" text="Angka -1 sampai +1 (korelasi Pearson). Mendekati -1: makin tinggi nilainya, makin turun PR. Mendekati +1: keduanya naik bersama. Dekat 0: tidak ada hubungan jelas." />
+            </span>
             <div className="flex items-baseline gap-1 mt-1">
               <span className={`text-xl font-black font-mono ${correlation?.r < 0 ? 'text-amber-700 dark:text-amber-400' : 'text-blue-700 dark:text-blue-300'}`}>
                 {correlation?.r !== null ? (correlation.r > 0 ? `+${correlation.r.toFixed(2)}` : correlation.r.toFixed(2)) : '—'}
               </span>
               <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">({correlation?.strength || '—'})</span>
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
-              {correlation?.count ? `${correlation.count} bulan penuh dievaluasi (Okt dikeluarkan)` : 'Data tidak cukup'}
+            <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-1">
+              {correlation?.count ? `Dari ${correlation.count} bulan yang sudah tutup` : 'Data belum cukup'}
             </p>
           </div>
         </div>
@@ -263,20 +266,17 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
           <div className="flex items-center gap-2">
             <span className="text-xs font-black text-slate-900 dark:text-slate-100">
-              Grafik PR Ratio (%) vs {activeParam.label} ({selectedYear})
-            </span>
-            <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold px-2 py-0.5 rounded-full">
-              Sumbu Ganda
+              PR vs {activeParam.label.toLowerCase()} ({selectedYear})
             </span>
           </div>
           <div className="flex items-center gap-4 text-[11px] font-semibold">
             <div className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300">
               <span className="w-3 h-1 bg-blue-600 rounded-full" />
-              <span>PR Terbobot (%)</span>
+              <span>PR (%)</span>
             </div>
             <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
               <span className="w-3 h-0.5 border-t-2 border-dashed border-emerald-500" />
-              <span>Target PR (80%)</span>
+              <span>Target 80%</span>
             </div>
             <div className="flex items-center gap-1.5" style={{ color: activeParam.color }}>
               <span className="w-3 h-1 rounded-full" style={{ backgroundColor: activeParam.color }} />
@@ -321,28 +321,28 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
                         <span>Bulan: {label} {selectedYear}</span>
                         {item.isPartial && (
                           <span className="text-[9px] bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded font-bold">
-                            Parsial (Berjalan)
+                            Bulan berjalan
                           </span>
                         )}
                       </div>
                       <div className="flex items-center justify-between gap-4 text-blue-700 dark:text-blue-300 font-bold">
-                        <span>PR Aktual Terbobot:</span>
-                        <span>{item.isPartial ? 'Menunggu Akhir Bulan' : (item.prPercent != null ? `${formatNum(item.prPercent, 1, 1)}%` : '—')}</span>
+                        <span>PR:</span>
+                        <span>{item.isPartial ? 'Dihitung setelah bulan tutup' : (item.prPercent != null ? `${formatNum(item.prPercent, 1, 1)}%` : '—')}</span>
                       </div>
                       <div className="flex items-center justify-between gap-4 text-emerald-700 dark:text-emerald-300 font-medium">
-                        <span>PR Terkoreksi (25°C):</span>
-                        <span>{item.isPartial ? 'Menunggu Akhir Bulan' : (item.prCorrectedPercent != null ? `${formatNum(item.prCorrectedPercent, 1, 1)}%` : '—')}</span>
+                        <span>PR pada 25°C:</span>
+                        <span>{item.isPartial ? 'Dihitung setelah bulan tutup' : (item.prCorrectedPercent != null ? `${formatNum(item.prCorrectedPercent, 1, 1)}%` : '—')}</span>
                       </div>
                       <div className="flex items-center justify-between gap-4 font-bold" style={{ color: activeParam.color }}>
                         <span>{activeParam.label}:</span>
                         <span>{formatNum(item.paramValue, 1, 2)} {activeParam.unit}</span>
                       </div>
                       <div className="flex items-center justify-between gap-4 text-slate-500 dark:text-slate-400 text-[10px] pt-1 border-t border-slate-100 dark:border-slate-800">
-                        <span>Cakupan Plant:</span>
+                        <span>Plant dihitung:</span>
                         <span>{item.includedPlantCount} dari {item.totalPlantCount} plant</span>
                       </div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                        Sumber Radiasi: {item.sensorPlantsCount > 0 ? 'Sensor iSolar + Open-Meteo' : 'Estimasi Open-Meteo GHI'}
+                        Data sinar matahari: {item.sensorPlantsCount > 0 ? 'sensor iSolar dan Open-Meteo' : 'perkiraan Open-Meteo'}
                       </div>
                     </div>
                   );
@@ -357,7 +357,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
                 yAxisId="left"
                 type="monotone"
                 dataKey="prPercent"
-                name="Performance Ratio"
+                name="PR"
                 stroke="#0284c7"
                 strokeWidth={3}
                 dot={{ r: 4, fill: '#0284c7', stroke: '#fff', strokeWidth: 2 }}
@@ -378,23 +378,6 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
               />
             </ComposedChart>
           </ResponsiveContainer>
-        </div>
-
-        {/* Footnote on Temperature Derating & Methodology */}
-        <div className="p-3 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-slate-200/60 dark:border-slate-700/60 text-[11px] text-slate-600 dark:text-slate-400 space-y-1">
-          <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200">
-            <Info size={14} className="text-blue-600 dark:text-blue-400 shrink-0" />
-            <span>Catatan Metodologi & Koefisien Suhu Silikon:</span>
-          </div>
-          <p className="text-[10.5px] leading-relaxed">
-            1. <strong>Formula PR Terbobot:</strong> <code className="bg-slate-200/60 dark:bg-slate-700/60 px-1 py-0.2 rounded font-mono">PR = Σ E_i / Σ (kWp_i × H_i)</code>. Plant tanpa iradiasi atau berstatus dalam pembangunan (Gorontalo) dikeluarkan dari pembilang dan penyebut.
-          </p>
-          <p className="text-[10.5px] leading-relaxed">
-            2. <strong>Karakteristik Termal Panel Surya:</strong> Modul fotovoltaik silikon kristalin memiliki koefisien temperatur daya sebesar <strong>-0,40 s.d. -0,45%/°C</strong> terhadap suhu referensi STC (25°C). Pada siang hari dengan radiasi tinggi, suhu permukaan panel mencapai 40–50°C yang secara termodinamika menurunkan efisiensi konversi sel surya.
-          </p>
-          <p className="text-[10.5px] leading-relaxed">
-            3. <strong>Model Suhu Panel (King Sandia):</strong> <code className="bg-slate-200/60 dark:bg-slate-700/60 px-1 py-0.2 rounded font-mono">T_panel = T_udara_siang + (G_siang / 800) × (NOCT - 20)</code> dengan NOCT nominal 45°C. Data cuaca bersumber dari reanalisis Open-Meteo (suhu udara 2m, model grid koordinat per lokasi) dan merupakan estimasi model termal dengan rentang ketidakpastian beberapa derajat Celcius, bukan hasil ukur sensor langsung di modul fisik.
-          </p>
         </div>
       </div>
     </div>

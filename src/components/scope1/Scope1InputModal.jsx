@@ -245,7 +245,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
       window.open('/api/templates?category=GENSET', '_blank');
       setStatusMessage({
         type: 'success',
-        text: 'Mengunduh Template Excel Resmi Scope 1 (Genset)...'
+        text: 'Mengunduh template Excel Scope 1...'
       });
     } catch (err) {
       console.error(err);
@@ -312,7 +312,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
     if (previewResult.errorCount > 0 && !allowPartialImport) {
       setStatusMessage({
         type: 'error',
-        text: 'Terdapat baris data error. Aktifkan "Izinkan Impor Parsial" untuk melanjutkan.'
+        text: 'Ada baris yang salah. Perbaiki file, atau centang "Simpan baris yang benar saja".'
       });
       return;
     }
@@ -419,12 +419,11 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
     <BaseModal
       open={isOpen}
       onClose={handleCloseRequest}
-      title={category === 'VEHICLE' ? 'Input Data Scope 1: Kendaraan' : 'Input Data Scope 1: Genset'}
+      title={category === 'VEHICLE' ? 'Input data kendaraan' : 'Input data genset'}
       subtitle={category === 'VEHICLE'
-        ? 'Pencatatan konsumsi BBM kendaraan operasional (mobile combustion).'
-        : 'Pencatatan konsumsi BBM genset cadangan operasional DC & fasilitas.'}
+        ? 'Catat BBM yang dipakai kendaraan operasional.'
+        : 'Catat solar yang dipakai genset cadangan.'}
       icon={category === 'VEHICLE' ? <Car size={20} className="text-rose-600 dark:text-rose-400" /> : <Fuel size={20} className="text-rose-600 dark:text-rose-400" />}
-      badge={category === 'VEHICLE' ? 'BBM Mobile' : 'BBM Stasioner'}
       size="md"
       loading={isSubmitting || isProcessingExcel}
     >
@@ -454,7 +453,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
               }`}
             >
               <FileSpreadsheet size={14} className={activeTab === 'excel' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'} />
-              <span>Upload Excel (.xlsx / .csv)</span>
+              <span>Upload Excel/CSV</span>
             </button>
           </div>
         </div>
@@ -481,8 +480,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
             <form id="scope1-manual-form" onSubmit={handleManualSubmit} className="space-y-4">
               {/* Bagian 0: Kategori Input */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                  Kategori Input <span className="text-rose-500 dark:text-rose-400">*</span>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Jenis <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -497,7 +496,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                     <Fuel size={16} className={category === 'GENSET' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'} />
                     <div>
                       <div className="font-bold text-xs text-slate-900 dark:text-slate-100">Genset</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">Genset cadangan Toko & DC</div>
+                      <div className="text-[11px] text-slate-600 dark:text-slate-400">Genset cadangan toko dan DC</div>
                     </div>
                   </button>
                   <button
@@ -512,7 +511,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                     <Car size={16} className={category === 'VEHICLE' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'} />
                     <div>
                       <div className="font-bold text-xs text-slate-900 dark:text-slate-100">Kendaraan</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">BBM kendaraan operasional</div>
+                      <div className="text-[11px] text-slate-600 dark:text-slate-400">Kendaraan operasional</div>
                     </div>
                   </button>
                 </div>
@@ -521,8 +520,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
               {/* Bagian 1: Lokasi / Fasilitas Operasional */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label htmlFor="modal-dc-select" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                    Lokasi / Fasilitas Operasional <span className="text-rose-500 dark:text-rose-400">*</span>
+                  <label htmlFor="modal-dc-select" className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Lokasi <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
                   </label>
                   <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                     {selectedDC.region} • Grid: <strong className="text-slate-800 dark:text-slate-200">{selectedDC.grid || selectedDC.gridRegion || 'JAMALI'}</strong>
@@ -627,8 +626,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
               {/* Bagian 3: Jenis BBM & Jumlah Konsumsi */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                    Jenis BBM & Jumlah <span className="text-rose-500 dark:text-rose-400">*</span>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Jenis dan jumlah BBM <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
                   </label>
                   <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
                     <button
@@ -723,7 +722,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                     </div>
                     <div>
                       <div className="text-[11px] text-blue-700 dark:text-blue-400 font-mono font-semibold">2.2868 kgCO₂e/L</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Status: Pending Validasi</div>
+                      <div className="text-[11px] text-slate-600 dark:text-slate-400 leading-tight">Faktor belum divalidasi</div>
                     </div>
                   </button>
                 </div>
@@ -896,8 +895,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
 
               {/* Bagian 5: Bukti Transaksi */}
               <div className="space-y-1">
-                <label htmlFor="modal-proof-ref" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                  Nomor Bukti Transaksi / Invoice (Opsional)
+                <label htmlFor="modal-proof-ref" className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Nomor bukti atau invoice (opsional)
                 </label>
                 <input
                   id="modal-proof-ref"
@@ -914,8 +913,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                 <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                   <div className="flex items-center gap-2">
                     <Calculator size={14} className="text-rose-400" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-200">
-                      Kalkulasi Emisi Scope 1 Terhitung
+                    <span className="text-[11px] font-bold text-slate-200">
+                      Emisi dari input ini
                     </span>
                   </div>
                   <span className="text-xs font-mono font-extrabold text-rose-400 bg-rose-950/60 border border-rose-800/80 px-2.5 py-0.5 rounded-full">
@@ -962,10 +961,10 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
                     <FileSpreadsheet size={15} className="text-emerald-600 dark:text-emerald-400" />
-                    <span>Template Resmi Excel Scope 1 (Genset)</span>
+                    <span>Template Excel Scope 1</span>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Gunakan template standar agar format kolom dan kode fasilitas langsung valid.
+                    Pakai template ini supaya kolomnya langsung terbaca.
                   </p>
                 </div>
                 <button
@@ -1019,7 +1018,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                         : 'Klik atau Tarik File Excel (.xlsx / .csv) ke Sini'}
                     </h4>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Format didukung: SPARTA Template Genset v2026.1 atau rekapan logbook BBM DC
+                      Bisa memakai template di atas atau rekap logbook BBM DC.
                     </p>
                   </div>
                 </label>
@@ -1071,7 +1070,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                           onChange={(e) => setAllowPartialImport(e.target.checked)}
                           className="rounded text-rose-600 focus:ring-rose-500"
                         />
-                        <span>Izinkan impor parsial (hanya simpan {previewResult.validCount} baris yang valid)</span>
+                        <span>Simpan baris yang benar saja ({previewResult.validCount} baris)</span>
                       </label>
                     </div>
                   )}
@@ -1107,7 +1106,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
               ) : (
                 <>
                   <Check size={14} className="text-rose-400" />
-                  <span>Simpan Data Scope 1</span>
+                  <span>Simpan</span>
                 </>
               )}
             </button>
@@ -1121,13 +1120,13 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
               {isSubmitting ? (
                 <>
                   <RefreshCw size={14} className="animate-spin text-rose-400" />
-                  <span>Mengimpor ke Database...</span>
+                  <span>Menyimpan...</span>
                 </>
               ) : (
                 <>
                   <Database size={14} className="text-rose-400" />
                   <span>
-                    Simpan Batch ({allowPartialImport ? previewResult?.validCount || 0 : previewResult?.totalRows || 0} Data)
+                    Simpan ({allowPartialImport ? previewResult?.validCount || 0 : previewResult?.totalRows || 0} baris)
                   </span>
                 </>
               )}

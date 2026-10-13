@@ -112,16 +112,21 @@ function buildPeriodOptions(availableMonths, partialMonths = new Set()) {
 
 function mergeDailyFallback(monthlyYields, dailyYields, currentYearMonth) {
   const rows = monthlyYields.map(item => ({ ...item, yearMonth: compactYearMonth(item.yearMonth) }));
-  const occupied = new Set(rows.map(item => `${item.yearMonth}:${Number(item.psId)}`));
+  const currentByPlant = new Map(rows.filter(item => item.yearMonth === currentYearMonth).map(item => [Number(item.psId), item]));
   const dailyByPlant = new Map();
   for (const item of dailyYields) {
+    if (item.yieldKwh == null) continue;
     const psId = Number(item.psId);
-    const key = `${currentYearMonth}:${psId}`;
-    if (occupied.has(key) || item.yieldKwh == null) continue;
     dailyByPlant.set(psId, (dailyByPlant.get(psId) || 0) + Number(item.yieldKwh));
   }
+  // Same rule as the PLTS page: a non-final current month takes the larger month-to-date total.
   for (const [psId, energyKwh] of dailyByPlant) {
-    rows.push({ yearMonth: currentYearMonth, psId, energyKwh, source: 'daily_history', qualityStatus: 'PARTIAL' });
+    const existing = currentByPlant.get(psId);
+    if (!existing) {
+      rows.push({ yearMonth: currentYearMonth, psId, energyKwh, source: 'daily_history', qualityStatus: 'PARTIAL' });
+    } else if (existing.qualityStatus !== 'FINAL' && energyKwh > Number(existing.energyKwh)) {
+      Object.assign(existing, { energyKwh, source: 'daily_history', qualityStatus: 'PARTIAL' });
+    }
   }
   return rows;
 }

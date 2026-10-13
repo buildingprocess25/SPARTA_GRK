@@ -147,9 +147,9 @@ export default function BaseModal({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 id={titleId} className="text-lg font-bold leading-tight text-slate-900 dark:text-slate-100">{title}</h2>
-                {badge && <span className="rounded-full border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-blue-700 dark:text-blue-300">{badge}</span>}
+                {badge && <span className="rounded-full border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:text-blue-300">{badge}</span>}
               </div>
-              {subtitle && <p id={descriptionId} className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{subtitle}</p>}
+              {subtitle && <p id={descriptionId} className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">{subtitle}</p>}
             </div>
           </div>
           <button

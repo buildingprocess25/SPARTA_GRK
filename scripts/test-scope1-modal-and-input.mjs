@@ -12,7 +12,7 @@ test('Scope 1 Modal & Input Data Component Verification', async (t) => {
     const content = fs.readFileSync(filePath, 'utf-8');
 
     // 1. Check title & modal container
-    assert.ok(content.includes('Input Data Scope 1 — Solar Genset'), 'Has modal title');
+    assert.ok(content.includes('Input data genset'), 'Has modal title');
     assert.ok(content.includes('BaseModal') || content.includes('fixed inset-0'), 'Renders as overlay dialog above page');
 
     // 2. Check tab options: Manual & Excel
@@ -65,10 +65,5 @@ test('Scope 1 Modal & Input Data Component Verification', async (t) => {
     // 2000 * 2.6685 / 1000 = 5.337 tCO2e
     assert.equal(result.emissionTon, 5.337);
     assert.equal(result.costEstimateJuta, 30.0); // 2000 * 15,000 = 30,000,000
-  });
-
-  await t.test('Existing input menu InputDataTab.jsx is preserved untouched', () => {
-    const filePath = path.resolve('src/components/InputDataTab.jsx');
-    assert.ok(fs.existsSync(filePath), 'InputDataTab.jsx must be preserved');
   });
 });

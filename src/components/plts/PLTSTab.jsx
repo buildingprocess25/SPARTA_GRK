@@ -37,6 +37,9 @@ import { getGridFactor } from '@/lib/emission-factors';
 import { isFeatureEnabled, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
 import { buildCacheKey } from '@/lib/solar/cacheKey';
 import { SummaryCardsSkeleton, ChartSkeleton, TabContentSkeleton, TableSkeleton } from '@/components/plts/PLTSDashboardSkeletons';
+import IsolarReportUploadCard from '@/components/plts/IsolarReportUploadCard';
+import InfoHint from '@/components/ui/InfoHint';
+import { getYearToDateMonths } from '@/lib/reportingMonths';
 import InputDataButton from '@/components/ui/InputDataButton';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import PLTSInputModal from '@/components/plts/PLTSInputModal';
@@ -83,9 +86,9 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
   if (statusNum === 401 || errStr.includes('token') || errStr.includes('unauthorized') || codeStr.includes('AUTH') || codeStr.includes('TOKEN')) {
     return {
       category: 'AUTH',
-      badge: 'Otentikasi / Token',
-      message: `Gagal otentikasi ke iSolarCloud. Menampilkan data terakhir ${timeLabel}. Mencoba lagi otomatis.`,
-      advice: 'Token akses iSolarCloud kedaluwarsa atau ditolak vendor. Sistem melakukan refresh token otomatis di background.',
+      badge: 'Izin akses',
+      message: `Aplikasi tidak bisa masuk ke iSolarCloud. Yang tampil adalah data terakhir (${timeLabel}). Sistem mencoba lagi otomatis.`,
+      advice: 'Izin akses ke iSolarCloud habis masa berlakunya atau ditolak. Sistem memperbaruinya sendiri.',
     };
   }
 
@@ -93,9 +96,9 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
   if (statusNum === 429 || errStr.includes('kuota') || errStr.includes('quota') || errStr.includes('hard limit') || codeStr.includes('QUOTA')) {
     return {
       category: 'QUOTA',
-      badge: 'Batas Kuota',
-      message: `Batas kuota panggilan API iSolarCloud tercapai. Menampilkan data terakhir ${timeLabel}. Mencoba lagi otomatis.`,
-      advice: 'Batas kuota panggilan jam ini (2.000 call) atau bulan ini (100.000 call) telah tercapai. Sinkron otomatis akan dilanjutkan pada periode jam berikutnya.',
+      badge: 'Batas permintaan',
+      message: `Batas permintaan data ke iSolarCloud sudah tercapai. Yang tampil adalah data terakhir (${timeLabel}). Sistem mencoba lagi otomatis.`,
+      advice: 'Batasnya 2.000 permintaan per jam dan 100.000 per bulan. Pengambilan data lanjut lagi di jam berikutnya.',
     };
   }
 
@@ -103,9 +106,9 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
   if (statusNum === 408 || errStr.includes('timeout') || errStr.includes('network') || errStr.includes('terputus') || codeStr.includes('TIMEOUT') || codeStr.includes('NETWORK')) {
     return {
       category: 'NETWORK',
-      badge: 'Jaringan / Timeout',
-      message: `Koneksi ke gateway iSolarCloud terputus atau batas waktu habis. Menampilkan data terakhir ${timeLabel}. Mencoba lagi otomatis.`,
-      advice: 'Koneksi jaringan internasional ke gateway iSolarCloud sedang lambat. Sistem akan mencoba kembali pada jadwal 15 menit berikutnya.',
+      badge: 'Koneksi',
+      message: `Koneksi ke iSolarCloud terputus. Yang tampil adalah data terakhir (${timeLabel}). Sistem mencoba lagi otomatis.`,
+      advice: 'Koneksi ke server iSolarCloud sedang lambat. Sistem mencoba lagi dalam 10 menit.',
     };
   }
 
@@ -113,9 +116,9 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
   if (codeStr.includes('DATABASE') || codeStr.includes('POOL') || errStr.includes('database') || errStr.includes('antrian')) {
     return {
       category: 'DATABASE',
-      badge: 'Database Sibuk',
-      message: `Koneksi database sedang padat. Menampilkan data tersimpan terakhir ${timeLabel}. Mencoba lagi otomatis.`,
-      advice: 'Koneksi database sedang melayani antrian request. Data pemantauan tetap aman dan sistem akan menyinkronkan ulang secara bertahap.',
+      badge: 'Database sibuk',
+      message: `Database sedang sibuk. Yang tampil adalah data tersimpan terakhir (${timeLabel}). Sistem mencoba lagi otomatis.`,
+      advice: 'Data yang sudah tersimpan tetap aman. Sistem memuat ulang secara bertahap.',
     };
   }
 
@@ -123,9 +126,9 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
   if (statusNum === 403 || codeStr === 'MUTATIONS_DISABLED' || errStr.includes('hanya-baca') || errStr.includes('read-only')) {
     return {
       category: 'READ_ONLY',
-      badge: 'Mode Hanya-Baca',
-      message: `Mode hanya-baca aktif. Menampilkan data snapshot terakhir ${timeLabel}. Sinkronisasi berjalan otomatis via scheduler.`,
-      advice: 'Mutasi manual dinonaktifkan di domain publik untuk perlindungan kuota dan keamanan. Scheduler server memperbarui data otomatis tiap 15 menit.',
+      badge: 'Hanya baca',
+      message: `Server ini hanya bisa membaca data. Yang tampil adalah data terakhir (${timeLabel}). Data tetap diperbarui otomatis.`,
+      advice: 'Tombol perbarui manual dimatikan di server ini. Data tetap diperbarui otomatis setiap 10 menit.',
     };
   }
 
@@ -133,17 +136,17 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
   if (statusNum === 503 || statusNum === 502 || statusNum === 504 || errStr.includes('503') || errStr.includes('502') || codeStr.includes('GATEWAY') || codeStr.includes('SERVER')) {
     return {
       category: 'SERVER',
-      badge: 'Server iSolar / Gateway',
-      message: `Gagal terhubung ke iSolarCloud. Menampilkan data terakhir ${timeLabel}. Mencoba lagi otomatis.`,
-      advice: 'Server iSolarCloud sedang sibuk, dalam pemeliharaan, atau akses vendor terbatas. Snapshot lokal tetap aman ditampilkan.',
+      badge: 'Server iSolarCloud',
+      message: `Server iSolarCloud tidak merespons. Yang tampil adalah data terakhir (${timeLabel}). Sistem mencoba lagi otomatis.`,
+      advice: 'Server iSolarCloud sedang sibuk atau dalam perbaikan. Data terakhir tetap ditampilkan.',
     };
   }
 
   return {
     category: 'GENERAL',
-    badge: 'Koneksi Gateway',
-    message: `Gagal menyinkronkan data dengan iSolarCloud. Menampilkan data terakhir ${timeLabel}. Mencoba lagi otomatis.`,
-    advice: 'Layanan iSolarCloud sementara tidak merespons dengan normal. Data pemantauan terakhir tetap tersimpan di database.',
+    badge: 'Koneksi',
+    message: `Data dari iSolarCloud gagal diambil. Yang tampil adalah data terakhir (${timeLabel}). Sistem mencoba lagi otomatis.`,
+    advice: 'iSolarCloud sedang tidak merespons dengan normal. Data terakhir tetap tersimpan.',
   };
 }
 
@@ -423,7 +426,7 @@ export default function PLTSTab() {
         setRefreshError(null);
         setSyncErrorDetails(null);
         if (force) {
-          notify.success('Sinkronisasi Berhasil', 'Data telemetri PLTS iSolarCloud berhasil diperbarui.');
+          notify.success('Berhasil diperbarui', 'Data PLTS dari iSolarCloud sudah diperbarui.');
           await refreshDashboardSummaryAfterSync();
         }
       } else if (res && res.success && res.mode === 'mock') {
@@ -671,11 +674,17 @@ export default function PLTSTab() {
     return Math.ceil((maxVal * 1.1) / 200) * 200 || 1600;
   }, [chartData]);
 
+  // The period toggle covers closed months only; the running month is still partial.
+  const reportingMonths = getYearToDateMonths();
+  const lastClosedMonth = reportingMonths.at(-2) || reportingMonths[0];
+  const reportingYear = lastClosedMonth.yearMonth.slice(0, 4);
+  const lastClosedNumber = Number(lastClosedMonth.yearMonth.slice(5, 7));
+
   return (
     <div className="space-y-6 animate-in">
       <PageHeader
         title="PLTS Atap"
-        subtitle="Produksi energi dan kinerja plant PLTS."
+        info="Listrik dari panel surya di atap DC: berapa yang dihasilkan, berapa yang dipakai sendiri, dan berapa emisi yang tidak jadi keluar."
         badge={
           <>
             <span>{totalPlants} plant DC</span>
@@ -704,10 +713,10 @@ export default function PLTSTab() {
                 },
                 {
                   value: 'isolar-api',
-                  label: 'Live iSolarCloud API',
+                  label: 'Pantauan langsung',
                   icon: Radio,
-                  activeIconClassName: 'text-emerald-500 animate-pulse',
-                  inactiveIconClassName: 'text-emerald-500 animate-pulse',
+                  activeIconClassName: 'text-emerald-500',
+                  inactiveIconClassName: 'text-emerald-500',
                 },
               ]}
             />
@@ -724,17 +733,17 @@ export default function PLTSTab() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">
                 <div className="size-11 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-400 flex items-center justify-center shrink-0">
-                  <Radio size={20} className="animate-pulse" />
+                  <Radio size={20} aria-hidden="true" />
                 </div>
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <h3 className="font-bold text-base text-white">
-                    iSolarCloud Sungrow OpenAPI Gateway
+                    Koneksi ke iSolarCloud
                   </h3>
 
                   {/* SATU Status Pill Utama */}
                   {isolarLiveState?.success === false ? (
                     <span className="rounded-full bg-rose-500/20 px-3 py-0.5 text-xs text-rose-300 font-semibold border border-rose-500/30 flex items-center gap-1.5">
-                      ⛔ Error Gateway
+                      Gagal terhubung
                     </span>
                   ) : isolarLiveState?.mode === 'mock' ? (
                     <span role="status" className="rounded-full bg-blue-500/20 px-3 py-0.5 text-xs text-blue-200 font-semibold border border-blue-500/30 flex items-center gap-1.5">
@@ -742,11 +751,11 @@ export default function PLTSTab() {
                     </span>
                   ) : isolarLiveState?.freshnessStatus === 'VENDOR_UNAVAILABLE' ? (
                     <span role="status" className="rounded-full bg-amber-500/20 px-3 py-0.5 text-xs text-amber-200 font-semibold border border-amber-500/30 flex items-center gap-1.5">
-                      ⚠ Vendor tidak tersedia · cache {isolarLiveState?.dataAgeMinutes ?? '?'} mnt
+                      iSolarCloud tidak tersedia · data {isolarLiveState?.dataAgeMinutes ?? '—'} menit lalu
                     </span>
                   ) : isolarLiveState?.freshnessStatus === 'STALE' ? (
                     <span role="status" className="rounded-full bg-amber-500/20 px-3 py-0.5 text-xs text-amber-200 font-semibold border border-amber-500/30 flex items-center gap-1.5">
-                      ⚠ Data lama · {isolarLiveState?.dataAgeMinutes ?? '?'} mnt
+                      Data lama · {isolarLiveState?.dataAgeMinutes ?? '—'} menit lalu
                     </span>
                   ) : isolarLiveState?.freshnessStatus === 'NO_DATA' ? (
                     <span role="status" className="rounded-full bg-slate-700/80 px-3 py-0.5 text-xs text-slate-300 font-semibold border border-slate-600 flex items-center gap-1.5">
@@ -754,19 +763,19 @@ export default function PLTSTab() {
                     </span>
                   ) : isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED' ? (
                     <span className="rounded-full bg-rose-500/20 px-3 py-0.5 text-xs text-rose-300 font-semibold border border-rose-500/30 flex items-center gap-1.5">
-                      ⛔ Hard Limit Kuota (Snapshot)
+                      Batas permintaan habis
                     </span>
                   ) : isolarLiveState?.quota?.guardStatus === 'SOFT_LIMIT_WARNING' ? (
                     <span className="rounded-full bg-amber-500/20 px-3 py-0.5 text-xs text-amber-300 font-semibold border border-amber-500/30 flex items-center gap-1.5">
-                      ⚠️ Peringatan Kuota (15m)
+                      Batas permintaan hampir habis
                     </span>
                   ) : isolarLiveState?.quota?.isProductionHours === false || (isolarLiveState?.source && isolarLiveState.source.includes('Di luar jam produksi')) ? (
                     <span className="rounded-full bg-slate-700/80 px-3 py-0.5 text-xs text-slate-300 font-semibold border border-slate-600 flex items-center gap-1.5">
-                      🌙 Di luar jam produksi (data {isolarLiveState?.lastSyncTime || ''})
+                      Di luar jam produksi matahari (data {isolarLiveState?.lastSyncTime || ''})
                     </span>
                   ) : (
                     <span className="rounded-full bg-emerald-500/20 px-3 py-0.5 text-xs text-emerald-300 font-semibold border border-emerald-500/30 flex items-center gap-1.5">
-                      <span className="size-2 rounded-full bg-emerald-400 animate-ping" /> Live Online
+                      <span className="size-2 rounded-full bg-emerald-400" aria-hidden="true" /> Terhubung
                     </span>
                   )}
                 </div>
@@ -779,19 +788,19 @@ export default function PLTSTab() {
                 disabled={isRefreshing || cooldownRemaining > 0 || isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'}
                 title={
                   cooldownRemaining > 0
-                    ? `Cooldown aktif: tunggu ${cooldownRemaining}s`
+                    ? `Tunggu ${cooldownRemaining} detik`
                     : isolarLiveState?.quota?.guardStatus === 'HARD_LIMIT_EXCEEDED'
-                      ? 'Refresh dinonaktifkan (Hard Quota Guard)'
-                      : 'Refresh Telemetri'
+                      ? 'Batas permintaan habis, coba lagi jam berikutnya'
+                      : 'Ambil data terbaru'
                 }
               >
                 <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
                 <span>
                   {isRefreshing
-                    ? 'Menyinkronkan...'
+                    ? 'Memperbarui...'
                     : cooldownRemaining > 0
-                      ? `Tunggu ${cooldownRemaining}s`
-                      : 'Refresh Sekarang'}
+                      ? `Tunggu ${cooldownRemaining} detik`
+                      : 'Perbarui sekarang'}
                 </span>
               </button>
             </div>
@@ -799,70 +808,52 @@ export default function PLTSTab() {
             {/* Baris 2: Grid 4 Stat Kecil */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-4 border-t border-slate-800/80">
               <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/40">
-                <span className="text-[11px] uppercase font-semibold text-slate-400 block">Terakhir Sinkron</span>
+                <span className="text-xs font-semibold text-slate-300 block">Terakhir diperbarui</span>
                 <span className="text-sm font-bold font-mono text-emerald-300 truncate block mt-0.5">
                   {isolarLiveState?.lastSyncTime || 'Memuat...'}
                 </span>
               </div>
 
               <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/40">
-                <span className="text-[11px] uppercase font-semibold text-slate-400 block">Sinkron Berikutnya</span>
+                <span className="text-xs font-semibold text-slate-300 block">Pembaruan berikutnya</span>
                 <span className="text-sm font-bold font-mono text-blue-300 truncate block mt-0.5">
-                  {isolarLiveState?.nextSyncLabel || isolarLiveState?.quota?.nextSyncLabel || 'Tiap 15 menit'}
+                  {isolarLiveState?.nextSyncLabel || isolarLiveState?.quota?.nextSyncLabel || 'Setiap 10 menit'}
                 </span>
               </div>
 
               <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/40">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] uppercase font-semibold text-slate-400">Kuota Jam Ini</span>
+                  <span className="text-xs font-semibold text-slate-300">Permintaan jam ini</span>
                   <span className="text-[11px] font-mono text-amber-300 font-semibold">
-                    {isolarLiveState?.quota?.callsThisHour ?? 1} / {formatNum(isolarLiveState?.quota?.hourlyLimit ?? 2000, 0)}
+                    {isolarLiveState?.quota?.callsThisHour ?? '—'} / {formatNum(isolarLiveState?.quota?.hourlyLimit ?? 2000, 0)}
                   </span>
                 </div>
                 <div className="w-full bg-slate-700 rounded-full h-1.5 mt-2 overflow-hidden">
                   <div
                     className="bg-amber-400 h-full rounded-full transition-all"
-                    style={{ width: `${Math.min(100, (((isolarLiveState?.quota?.callsThisHour ?? 1) / (isolarLiveState?.quota?.hourlyLimit ?? 2000)) * 100))}%` }}
+                    style={{ width: `${Math.min(100, (((isolarLiveState?.quota?.callsThisHour ?? 0) / (isolarLiveState?.quota?.hourlyLimit ?? 2000)) * 100))}%` }}
                   />
                 </div>
               </div>
 
               <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/40">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] uppercase font-semibold text-slate-400">Kuota Bulan Ini</span>
+                  <span className="text-xs font-semibold text-slate-300">Permintaan bulan ini</span>
                   <span className="text-[11px] font-mono text-indigo-300 font-semibold">
-                    {isolarLiveState?.quota?.callsThisMonth ?? 3} / {formatNum(isolarLiveState?.quota?.monthlyLimit ?? 100000, 0)}
+                    {isolarLiveState?.quota?.callsThisMonth ?? '—'} / {formatNum(isolarLiveState?.quota?.monthlyLimit ?? 100000, 0)}
                   </span>
                 </div>
                 <div className="w-full bg-slate-700 rounded-full h-1.5 mt-2 overflow-hidden">
                   <div
                     className="bg-indigo-400 h-full rounded-full transition-all"
-                    style={{ width: `${Math.min(100, (((isolarLiveState?.quota?.callsThisMonth ?? 3) / (isolarLiveState?.quota?.monthlyLimit ?? 100000)) * 100))}%` }}
+                    style={{ width: `${Math.min(100, (((isolarLiveState?.quota?.callsThisMonth ?? 0) / (isolarLiveState?.quota?.monthlyLimit ?? 100000)) * 100))}%` }}
                   />
                 </div>
                 <span className="text-[10px] text-slate-400 mt-1 block truncate">
-                  Proyeksi: <strong className="text-teal-300">{isolarLiveState?.quota?.projection?.displayProjection || 'Belum cukup data'}</strong>
+                  Perkiraan akhir bulan: <strong className="text-teal-300">{isolarLiveState?.quota?.projection?.displayProjection || 'Belum cukup data'}</strong>
                 </span>
               </div>
             </div>
-
-            {/* Baris Kecil Abu-abu di Bawah */}
-            <p className="text-xs text-slate-400 mt-3 pt-2 border-t border-slate-800/50 flex flex-wrap items-center gap-x-4 gap-y-1">
-              <span>Host: <strong className="text-slate-300">{isolarLiveState?.gatewayUrl || 'gateway.isolarcloud.com.hk'}</strong></span>
-              <span>Token: <strong className={
-                isolarLiveState?.tokenStatus === 'refreshing'
-                  ? 'text-amber-400'
-                  : isolarLiveState?.tokenStatus === 'expired'
-                    ? 'text-rose-400'
-                    : 'text-emerald-400'
-              }>
-                {isolarLiveState?.tokenExpiresLabel || (isolarLiveState?.tokenStatus === 'expired' ? 'Kedaluwarsa' : 'Memuat...')}
-              </strong></span>
-              <span>Zona Kuota: <strong className="text-slate-300">{isolarLiveState?.quota?.bucketLabel || 'UTC Reset'}</strong></span>
-              {isolarLiveState?.quota?.previousMonthSummary && (
-                <span>Histori: <strong className="text-slate-300">{isolarLiveState.quota.previousMonthSummary}</strong></span>
-              )}
-            </p>
           </div>
 
           {(syncErrorDetails || refreshError) && (
@@ -874,7 +865,7 @@ export default function PLTSTab() {
                   </div>
                   <div className="min-w-0 space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-bold uppercase tracking-wider text-amber-850 dark:text-amber-200 bg-amber-200/70 dark:bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-300 dark:border-amber-500/40">
+                      <span className="text-xs font-bold text-amber-900 dark:text-amber-200 bg-amber-200/70 dark:bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-300 dark:border-amber-500/40">
                         {syncErrorDetails?.badge || 'Koneksi Gateway'}
                       </span>
                       {syncErrorDetails?.timestampWib && (
@@ -888,7 +879,7 @@ export default function PLTSTab() {
                     </p>
                     {syncErrorDetails?.advice && (
                       <p className="text-xs text-amber-900/90 dark:text-amber-200 leading-relaxed">
-                        💡 <strong>Saran:</strong> {syncErrorDetails.advice}
+                        <strong>Saran:</strong> {syncErrorDetails.advice}
                       </p>
                     )}
                   </div>
@@ -899,8 +890,8 @@ export default function PLTSTab() {
                     setSyncErrorDetails(null);
                     setRefreshError(null);
                   }}
-                  className="p-1 rounded-lg text-amber-700 dark:text-amber-300 hover:text-amber-950 dark:hover:text-amber-100 hover:bg-amber-200/60 shrink-0 transition-colors"
-                  title="Tutup banner"
+                  className="inline-flex size-9 items-center justify-center rounded-lg text-amber-700 dark:text-amber-300 hover:text-amber-950 dark:hover:text-amber-100 hover:bg-amber-200/60 shrink-0 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600"
+                  aria-label="Tutup pesan"
                 >
                   <X size={16} />
                 </button>
@@ -969,54 +960,54 @@ export default function PLTSTab() {
             if (offlineCount > 0) statusDetails.push(`${offlineCount} Offline`);
 
             const statusText = isLoading
-              ? 'Memuat data telemetri...'
+              ? 'Memuat data...'
               : isError
                 ? 'Data gagal dimuat'
                 : isNightOrOff
-                  ? 'Di luar jam produksi (06:00–18:00 WIB)'
+                  ? 'Di luar jam produksi matahari (06.00 sampai 18.00 WIB)'
                   : statusDetails.join(' • ') || `${onlineCount} Online • ${offlineCount} Offline`;
 
             return (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
                 <StatCard
-                  title="DAYA REALTIME (OUTPUT)"
+                  title="Daya saat ini"
                   value={isLoading ? '—' : isNightOrOff ? '0' : formatNum(isolarLiveState?.summaryNationwide?.currentRealtimePowerKw || 0, 1)}
-                  unit={isNightOrOff ? 'kW (Malam)' : 'kW'}
+                  unit={isNightOrOff ? 'kW (malam)' : 'kW'}
                   trendText={statusText}
                   icon={Zap}
                   theme="warning"
                   sourceBadge="api_live"
-                  tooltip="Total daya output realtime dari seluruh inverter PLTS yang sedang beroperasi aktif"
+                  tooltip="Total daya yang sedang dihasilkan semua panel surya saat ini."
                 />
                 <StatCard
-                  title="PRODUKSI HARI INI"
+                  title="Produksi hari ini"
                   value={isLoading ? '—' : formatNum(isolarLiveState?.summaryNationwide?.todayGeneratedKwh || 0, 1)}
                   unit="kWh"
-                  trendText={isLoading ? 'Memuat...' : isolarLiveState?.isNightBeforeDawn ? 'Nilai hari kemarin (reset 06:00 WIB)' : `Total produksi 36 lokasi (39 plant)`}
+                  trendText={isLoading ? 'Memuat...' : isolarLiveState?.isNightBeforeDawn ? 'Angka kemarin, mulai dihitung ulang pukul 06.00 WIB' : `Dari ${isolarLiveState?.stationList?.length ?? '—'} lokasi`}
                   icon={Sun}
                   theme="default"
                   sourceBadge="api_live"
-                  tooltip="Akumulasi energi listrik bersih yang diproduksi hari ini (06:00 - 18:00 WIB)"
+                  tooltip="Listrik yang sudah dihasilkan panel surya sejak pagi ini."
                 />
                 <StatCard
-                  title="TOTAL BULAN BERJALAN"
-                  value={monthAcc?.isAccumulated ? formatNum(monthAcc.monthToDateMwh, 2) : (monthAcc?.displayLabel || 'Mulai terkumpul 29 Sep 2026')}
+                  title="Produksi bulan ini"
+                  value={monthAcc?.isAccumulated ? formatNum(monthAcc.monthToDateMwh, 2) : (monthAcc?.displayLabel || '—')}
                   unit={monthAcc?.isAccumulated ? 'MWh' : ''}
-                  trendText={monthAcc?.isAccumulated ? monthAcc.displayLabel : 'Akumulasi snapshot live harian'}
+                  trendText={monthAcc?.isAccumulated ? monthAcc.displayLabel : 'Belum ada data bulan ini'}
                   icon={BarChart3}
                   theme="success"
                   sourceBadge="api_live (akumulasi snapshot)"
-                  tooltip="Dihitung dari selisih total_energy kumulatif runtime terhadap snapshot awal bulan di .data/"
+                  tooltip="Listrik yang dihasilkan panel surya sejak tanggal 1 bulan ini, dihitung dari data harian."
                 />
                 <StatCard
-                  title="EMISI TERHINDAR HARI INI"
+                  title="Emisi terhindar hari ini"
                   value={formatNum(todayCo2Ton, 2)}
                   unit="tCO₂e"
-                  trendText={`setara serapan tahunan ~${formatNum(treeCount, 0)} pohon`}
+                  trendText={`Setara serapan setahun sekitar ${formatNum(treeCount, 0)} pohon`}
                   icon={Trees}
                   theme="success"
                   sourceBadge="api_live"
-                  tooltip="Dihitung: Emisi Terhindar (kgCO₂e) / 21,77 kgCO₂e/pohon/tahun (asumsi standar serapan pohon dewasa per tahun)"
+                  tooltip="Emisi yang tidak jadi keluar karena listrik datang dari panel surya, bukan dari PLN. Angka pohon memakai asumsi satu pohon dewasa menyerap 21,77 kg CO₂ per tahun."
                 />
               </div>
             );
@@ -1029,6 +1020,10 @@ export default function PLTSTab() {
             lastSyncTime={isolarLiveState?.lastSyncTime || 'Baru saja'}
             quotaStatus={isolarLiveState?.quota?.guardStatus}
           />
+
+          <IsolarReportUploadCard
+            onImported={() => Promise.allSettled([refreshDashboardSummaryAfterSync(), loadActualEmissions(selectedPeriod)])}
+          />
         </div>
       )}
 
@@ -1039,41 +1034,39 @@ export default function PLTSTab() {
           {/* Header Controls: Mode Toggle (YTD vs Bulan Ini) */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Cakupan Periode:</span>
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Periode</span>
               <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedPeriod('2026-01_2026-09');
-                    setDashboardFilters(prev => ({ ...prev, period: '2026-01_2026-09', mode: 'YTD', month: 9, throughMonth: 9 }));
+                    const period = `${reportingYear}-01_${lastClosedMonth.yearMonth}`;
+                    setSelectedPeriod(period);
+                    setDashboardFilters(prev => ({ ...prev, period, mode: 'YTD', month: lastClosedNumber, throughMonth: lastClosedNumber }));
                   }}
                   className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.mode === 'YTD'
                     ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs ring-1 ring-slate-200/60 dark:ring-slate-700'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                     }`}
                 >
-                  Akumulasi Jan-Sep (YTD)
+                  Jan s.d. {lastClosedMonth.label} {reportingYear}
                 </button>
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedPeriod('2026-09_2026-09');
-                    setDashboardFilters(prev => ({ ...prev, period: '2026-09_2026-09', mode: 'MONTH', month: 9, throughMonth: 9 }));
+                    const period = `${lastClosedMonth.yearMonth}_${lastClosedMonth.yearMonth}`;
+                    setSelectedPeriod(period);
+                    setDashboardFilters(prev => ({ ...prev, period, mode: 'MONTH', month: lastClosedNumber, throughMonth: lastClosedNumber }));
                   }}
                   className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.mode === 'MONTH'
                     ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs ring-1 ring-slate-200/60 dark:ring-slate-700'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                     }`}
                 >
-                  Bulan Ini Saja (Sep 2026)
+                  {lastClosedMonth.label} {reportingYear} saja
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Database Terintegrasi (37 Lokasi DC Canonical)</span>
-            </div>
           </div>
 
           {/* Status alarm iSolar & operasional */}
@@ -1090,11 +1083,11 @@ export default function PLTSTab() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status alarm iSolar</p>
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Status alarm</p>
                   <span
                     className={`size-2 rounded-full ${
                       pltsAlarms.faultCount > 0
-                        ? 'bg-red-500 animate-ping'
+                        ? 'bg-red-500'
                         : pltsAlarms.alertCount > 0
                           ? 'bg-amber-500'
                           : 'bg-emerald-500'
@@ -1103,15 +1096,15 @@ export default function PLTSTab() {
                 </div>
                 <div className="mt-1.5 flex flex-wrap items-center gap-2">
                   {pltsAlarms.faultCount > 0 && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 text-white font-bold text-xs px-3 py-1 shadow-xs animate-pulse">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 text-white font-bold text-xs px-3 py-1">
                       <AlertOctagon size={14} />
-                      <span>🔴 {pltsAlarms.faultCount} Fault</span>
+                      <span>{pltsAlarms.faultCount} gangguan (fault)</span>
                     </span>
                   )}
                   {pltsAlarms.alertCount > 0 && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500 text-white font-bold text-xs px-3 py-1 shadow-xs">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-700 text-white font-bold text-xs px-3 py-1">
                       <AlertTriangle size={14} />
-                      <span>🟠 {pltsAlarms.alertCount} Alert</span>
+                      <span>{pltsAlarms.alertCount} peringatan</span>
                     </span>
                   )}
                   {pltsAlarms.faultCount === 0 && pltsAlarms.alertCount === 0 && (
@@ -1123,7 +1116,7 @@ export default function PLTSTab() {
                 </div>
                 {dashboardData?.summary?.status?.offlineCount > 0 && (
                   <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                    Telemetri offline: <strong>{dashboardData.summary.status.offlineCount} plant</strong>
+                    Tidak mengirim data: <strong>{dashboardData.summary.status.offlineCount} plant</strong>
                     {dashboardData.summary.status.offlinePlants?.length > 0 && (
                       <span> ({dashboardData.summary.status.offlinePlants.map(p => p.name).join(', ')})</span>
                     )}
@@ -1145,7 +1138,7 @@ export default function PLTSTab() {
                 {dashboardData.summary.status.offlinePlants.map((plant) => (
                   <div key={plant.psId} className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-3 py-2 text-xs text-rose-800 dark:text-rose-300">
                     <strong>{plant.name}</strong>
-                    <span className="ml-2">Offline: {plant.reason}</span>
+                    <span className="ml-2">Tidak mengirim data: {plant.reason}</span>
                   </div>
                 ))}
               </div>
@@ -1165,22 +1158,22 @@ export default function PLTSTab() {
                 onClick={() => refreshDashboardSummaryAfterSync()}
                 className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-rose-600 text-white text-xs font-bold hover:bg-rose-700 transition"
               >
-                <RefreshCw size={14} /> Coba Lagi
+                <RefreshCw size={14} aria-hidden="true" /> Coba lagi
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
               <KpiCard
-                label="KAPASITAS PLTS"
+                label="Kapasitas PLTS"
                 value={dashboardData?.summary?.capacityKwp != null ? formatNum(dashboardData.summary.capacityKwp, 2, 2) : '—'}
                 unit="kWp"
-                trend={`${dashboardData?.summary?.plantCount ?? 39} plant · ${dashboardData?.summary?.capacityKwp != null ? formatNum(dashboardData.summary.capacityKwp, 2, 2) + ' kWp terpasang' : '—'} · ${dashboardData?.summary?.operationalCapacityKwp != null ? formatNum(dashboardData.summary.operationalCapacityKwp, 2, 2) + ' kWp operasional' : '—'}`}
+                trend={dashboardData?.summary?.plantCount != null ? `${dashboardData.summary.plantCount} lokasi · ${dashboardData?.summary?.operationalCapacityKwp != null ? formatNum(dashboardData.summary.operationalCapacityKwp, 2, 2) + ' kWp sudah beroperasi' : '—'}` : '—'}
                 icon={Sun}
                 theme="plts"
                 infoKey="plts_capacity"
               />
               <KpiCard
-                label="PRODUKSI PLTS"
+                label="Produksi PLTS"
                 value={dashboardData?.summary?.productionKwh != null ? formatNum(dashboardData.summary.productionKwh, 1, 1) : '—'}
                 unit="kWh"
                 trend={
@@ -1188,13 +1181,14 @@ export default function PLTSTab() {
                     <div className="flex items-center gap-1.5 flex-wrap text-xs">
                       <span>{dashboardData?.summary?.achievementPct != null ? `${dashboardData.summary.achievementPct.toFixed(1)}% dari target` : (dashboardData?.summary?.energyBalance?.target?.achievementPct != null ? `${dashboardData.summary.energyBalance.target.achievementPct.toFixed(1)}% dari target` : '—')}</span>
                       {dashboardData?.summary?.pr?.valuePct != null && (
-                        <span title="Proxy PR dihitung dari iradiasi dan kapasitas efektif (perkiraan)" className="inline-flex items-center rounded-md bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 cursor-help">
-                          PR: {dashboardData.summary.pr.valuePct.toFixed(1)}% (perkiraan)
+                        <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
+                          Kinerja {dashboardData.summary.pr.valuePct.toFixed(1)}%
+                          <InfoHint title="Kinerja panel (PR)" text="Perkiraan seberapa baik panel mengubah sinar matahari jadi listrik, dibanding kondisi ideal. Di atas 75% tergolong baik." size={11} />
                         </span>
                       )}
                     </div>
                     <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                      Ekspor {formatNum(dashboardData?.summary?.feedInMwh ?? dashboardData?.summary?.energyBalance?.feedInMwh, 2, 2)} MWh &middot; PLTS {formatNum(dashboardData?.summary?.selfConsumptionMwh ?? dashboardData?.summary?.energyBalance?.selfConsumptionMwh, 2, 2)} MWh
+                      Dipakai sendiri {formatNum(dashboardData?.summary?.selfConsumptionMwh ?? dashboardData?.summary?.energyBalance?.selfConsumptionMwh, 2, 2)} MWh &middot; dikirim ke PLN {formatNum(dashboardData?.summary?.feedInMwh ?? dashboardData?.summary?.energyBalance?.feedInMwh, 2, 2)} MWh
                     </div>
                   </div>
                 }
@@ -1203,17 +1197,14 @@ export default function PLTSTab() {
                 infoKey="plts_production"
               />
               <KpiCard
-                label="PENGHEMATAN ENERGI"
+                label="Listrik PLN yang dihemat"
                 value={dashboardData?.summary?.savingsKwh != null ? formatNum(dashboardData.summary.savingsKwh, 1, 1) : '—'}
                 unit="kWh"
                 trend={
-                  <div className="space-y-0.5" title="Estimasi, asumsi tarif Rp 1.400/kWh belum dikonfirmasi">
-                    <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
-                      {dashboardData?.summary?.plantCount ?? 37} dari {dashboardData?.summary?.plantCount ?? 37} DC
-                    </div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Porsi PLTS {formatNum(dashboardData?.summary?.energyBalance?.coverage?.selfConsumptionSharePct ?? 98.1, 1, 1)}% dari produksi
-                    </div>
+                  <div className="text-[11px] text-slate-600 dark:text-slate-400">
+                    {dashboardData?.summary?.energyBalance?.coverage?.selfConsumptionSharePct != null
+                      ? `${formatNum(dashboardData.summary.energyBalance.coverage.selfConsumptionSharePct, 1, 1)}% produksi PLTS dipakai sendiri`
+                      : '—'}
                   </div>
                 }
                 icon={BatteryCharging}
@@ -1221,29 +1212,24 @@ export default function PLTSTab() {
                 infoKey="plts_savings"
               />
               <KpiCard
-                label="EMISI TERHINDAR"
+                label="Emisi terhindar"
                 value={dashboardData?.summary?.emission?.emissionTon != null ? formatNum(dashboardData.summary.emission.emissionTon, 2, 2) : '—'}
                 unit="tCO₂e"
                 trend={
-                  <div className="space-y-1.5 whitespace-normal">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold" title={`Emisi Terhindar = Energi PLTS dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
-                      <span className="text-emerald-700 dark:text-emerald-300 font-medium">Faktor Emisi:</span>
-                      <span className="font-mono text-emerald-900">1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂</span>
+                  <div className="space-y-1 whitespace-normal">
+                    <div className="text-[11px] text-slate-600 dark:text-slate-400 font-medium leading-tight">
+                      Target RKAP: <span className="font-semibold text-slate-700 dark:text-slate-300">{dashboardData?.summary?.emission?.targetReferenceTon != null ? `${formatNum(dashboardData.summary.emission.targetReferenceTon, 2, 2)} tCO₂e` : '—'}</span>
                     </div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight" title="Target korporat (referensi): faktor 0,997294 tCO2e/MWh">
-                      Target (referensi RKAP): <span className="font-semibold text-slate-700 dark:text-slate-300">{dashboardData?.summary?.emission?.targetReferenceTon != null ? `${formatNum(dashboardData.summary.emission.targetReferenceTon, 2, 2)} tCO₂e` : '—'}</span>
-                    </div>
-                    <div className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold pt-0.5" title="Estimasi: 21,77 kgCO2e/pohon/tahun dan 0,400 ton/MWh SFC PLTU">
+                    <div className="text-[11px] text-emerald-800 dark:text-emerald-300 font-semibold">
                       {dashboardData?.summary?.emission?.coalAvoidedTon != null && dashboardData?.summary?.emission?.treeCount != null
-                        ? <>~{formatNum(dashboardData.summary.emission.coalAvoidedTon, 1, 1)} Ton Batubara &middot; ~{formatNum(dashboardData.summary.emission.treeCount, 0, 0)} Pohon (estimasi)</>
-                        : 'Batubara & pohon setara: —'}
+                        ? <>Setara sekitar {formatNum(dashboardData.summary.emission.coalAvoidedTon, 1, 1)} ton batubara atau {formatNum(dashboardData.summary.emission.treeCount, 0, 0)} pohon</>
+                        : 'Setara batubara dan pohon: —'}
                     </div>
                   </div>
                 }
                 icon={TrendingUp}
                 theme="savings"
                 infoKey="plts_avoided_emission"
-                tooltip={`Konstanta faktor emisi: 1 kWh = ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂. Dihitung dari produksi PLTS (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000.`}
               />
             </div>
           )}
@@ -1261,13 +1247,10 @@ export default function PLTSTab() {
                     <div>
                       <div className="flex items-center gap-2">
                         <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                          Produksi PLTS vs Konsumsi PLN (Bulanan)
+                          Listrik PLTS dan PLN per bulan
                         </h3>
                         <MetricInfoIcon infoKey="plts_monthly_comparison" />
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        Perbandingan konsumsi listrik PLN, output PLTS (MWh - sumbu kiri), dan Emisi Terhindar (tCO₂e - sumbu kanan)
-                      </p>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2.5">
@@ -1275,15 +1258,11 @@ export default function PLTSTab() {
                       items={[
                         { label: 'Konsumsi PLN', color: CHART_PALETTE.pln },
                         { label: 'PLTS', color: CHART_PALETTE.plts },
-                        { label: 'Ekspor', color: CHART_PALETTE.feedIn },
-                        { label: 'Emisi Terhindar', color: CHART_PALETTE.savings },
+                        { label: 'Dikirim ke PLN', color: CHART_PALETTE.feedIn },
+                        { label: 'Emisi terhindar', color: CHART_PALETTE.savings },
                         { label: 'Target PLTS', color: CHART_PALETTE.target, type: 'line' },
                       ]}
                     />
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 text-xs font-semibold shrink-0" title={`Perhitungan Emisi Terhindar: Produksi PLTS (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
-                      <span className="text-emerald-700 dark:text-emerald-300 font-medium">Faktor Emisi:</span>
-                      <span className="font-bold font-mono">1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂</span>
-                    </div>
                   </div>
                 </div>
 
@@ -1291,7 +1270,7 @@ export default function PLTSTab() {
                   <ChartSkeleton height="h-72 lg:h-[300px]" />
                 ) : (!chartData || chartData.length === 0) ? (
                   <div className="flex h-72 lg:h-[300px] items-center justify-center rounded-xl border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 text-xs font-medium text-slate-500 dark:text-slate-400">
-                    Data belum tersedia
+                    Belum ada data produksi untuk periode ini.
                   </div>
                 ) : (
                   <div className="w-full h-72 lg:h-[300px] pt-2">
@@ -1328,7 +1307,7 @@ export default function PLTSTab() {
                                     <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {label}</span>
                                     {isPartial && (
                                       <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
-                                        Parsial
+                                        Sebagian
                                       </span>
                                     )}
                                   </div>
@@ -1411,8 +1390,7 @@ export default function PLTSTab() {
                       <BatteryCharging size={20} />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Komposisi Energi DC</h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Porsi bauran energi operasional</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Asal listrik DC</h3>
                     </div>
                   </div>
                   <MetricInfoIcon infoKey="plts_energy_composition" />
@@ -1455,11 +1433,11 @@ export default function PLTSTab() {
 
               {/* Sub-card TARGET 2027 */}
               <div className="rounded-xl bg-amber-50/80 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 p-4 mt-auto text-xs space-y-1">
-                <div className="font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider text-[11px]">
-                  TARGET 2027
+                <div className="font-bold text-amber-800 dark:text-amber-300 text-[11px]">
+                  Target 2027
                 </div>
                 <div className="text-amber-900 font-bold text-sm">
-                  PLTS ≥ 20% dari Total Konsumsi DC
+                  PLTS memenuhi minimal 20% kebutuhan listrik DC
                 </div>
                 <div className="text-amber-700 dark:text-amber-300 text-[11px] pt-0.5">
                   *Penambahan kapasitas PLTS di 3 DC baru (Medan, Semarang, Banjarmasin)
@@ -1505,17 +1483,14 @@ export default function PLTSTab() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                      Kalkulasi Emisi Aktual per Distribution Center
+                      Emisi per DC
                     </h3>
                     <MetricInfoIcon infoKey="plts_multi_dc_analytics" />
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Monitoring operasional dan penghematan PLTS per cabang (Scope 2)
-                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Periode:</span>
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Periode</span>
                 <select
                   className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
                   value={selectedPeriod}
@@ -1531,7 +1506,7 @@ export default function PLTSTab() {
             {/* Filter Toolbar */}
             <div className="flex flex-col md:flex-row gap-3 bg-slate-50/50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
               <div className="flex-1 space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Wilayah Grid</label>
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1">Wilayah PLN</label>
                 <div className="relative">
                   <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" size={14} />
                   <select
@@ -1542,7 +1517,7 @@ export default function PLTSTab() {
                       if (selectedDcFilter !== 'ALL') setSelectedDcFilter('ALL');
                     }}
                   >
-                    <option value="ALL">Semua Sistem Grid</option>
+                    <option value="ALL">Semua wilayah</option>
                     <option value="JAMALI">JAMALI (Jawa-Madura-Bali)</option>
                     <option value="SUMATERA">Sumatera</option>
                     <option value="KALBAR">Kalimantan Barat</option>
@@ -1556,7 +1531,7 @@ export default function PLTSTab() {
                 </div>
               </div>
               <div className="flex-1 space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Cabang / DC</label>
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1">Cabang / DC</label>
                 <div className="relative">
                   <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" size={14} />
                   <select
@@ -1564,7 +1539,7 @@ export default function PLTSTab() {
                     value={selectedDcFilter}
                     onChange={(e) => setSelectedDcFilter(e.target.value)}
                   >
-                    <option value="ALL">Semua Cabang / DC</option>
+                    <option value="ALL">Semua cabang / DC</option>
                     {validDcs.filter(dc => selectedGridFilter === 'ALL' || dc.grid === selectedGridFilter || dc.gridRegion === selectedGridFilter).map(dc => (
                       <option key={dc.id} value={dc.id}>{dc.name}</option>
                     ))}
@@ -1573,7 +1548,7 @@ export default function PLTSTab() {
                 </div>
               </div>
               <div className="flex-1 space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Pencarian</label>
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1">Cari</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" size={14} />
                   <input
@@ -1622,15 +1597,15 @@ export default function PLTSTab() {
             {/* Data Table */}
             <div className="relative max-h-[70vh] sm:max-h-[560px] overflow-auto overscroll-contain [scrollbar-width:thin] rounded-2xl border border-slate-100 dark:border-slate-800 mt-2 shadow-[inset_0_-10px_10px_-10px_rgba(0,0,0,0.02)]">
               <table className="min-w-[1100px] w-full text-left text-xs border-separate border-spacing-0">
-                <thead className="text-white text-[11px] uppercase tracking-wide">
+                <thead className="text-white text-xs">
                   <tr>
                     <th className="sticky top-0 left-0 z-30 bg-slate-900 px-4 py-3 font-semibold border-b border-slate-700">Cabang / DC</th>
-                    <th className="sticky top-0 z-20 bg-slate-900 px-4 py-3 font-semibold border-b border-slate-700">Wilayah Grid</th>
-                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold border-b border-slate-700">Konsumsi PLN<br /><span className="text-slate-400 font-normal normal-case">(MWh)</span></th>
-                    <th className="sticky top-0 z-20 bg-slate-900 text-center px-4 py-3 font-semibold border-b border-slate-700">Faktor<br /><span className="text-slate-400 font-normal normal-case">(kg/kWh)</span></th>
+                    <th className="sticky top-0 z-20 bg-slate-900 px-4 py-3 font-semibold border-b border-slate-700">Wilayah PLN</th>
+                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold border-b border-slate-700">Listrik dari PLN<br /><span className="text-slate-400 font-normal normal-case">(MWh)</span></th>
+                    <th className="sticky top-0 z-20 bg-slate-900 text-center px-4 py-3 font-semibold border-b border-slate-700">Faktor emisi<br /><span className="text-slate-300 font-normal normal-case">(kg/kWh)</span></th>
                     <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold text-amber-300 border-b border-slate-700">Emisi Scope 2<br /><span className="font-normal normal-case text-white/70">(tCO₂e)</span></th>
                     <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold border-b border-slate-700">Produksi PLTS<br /><span className="text-slate-400 font-normal normal-case">(MWh)</span></th>
-                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold text-emerald-400 border-b border-slate-700">Emisi Terhindar<br /><span className="font-normal normal-case text-white/70">(tCO₂e · 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂)</span></th>
+                    <th className="sticky top-0 z-20 bg-slate-900 text-right px-4 py-3 font-semibold text-emerald-400 border-b border-slate-700">Emisi terhindar<br /><span className="font-normal normal-case text-white/80">(tCO₂e)</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -1699,7 +1674,7 @@ export default function PLTSTab() {
                 {dcTableData.length > 0 && (
                   <tfoot className="bg-slate-100 dark:bg-slate-800 font-bold">
                     <tr>
-                      <td colSpan={2} className="sticky bottom-0 left-0 z-30 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3 text-slate-900 dark:text-slate-100 text-right shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">TOTAL CAKUPAN TERPILIH</td>
+                      <td colSpan={2} className="sticky bottom-0 left-0 z-30 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3 text-slate-900 dark:text-slate-100 text-right shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">Total</td>
                       <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">
                         {hasAnyPln ? formatNum(totalPlnMWh) : <span className="text-slate-300 dark:text-slate-600">—</span>}
                       </td>
@@ -1715,13 +1690,6 @@ export default function PLTSTab() {
               </table>
             </div>
 
-            {/* Methodology Note */}
-            <div className="mt-4 text-[10px] text-slate-500 dark:text-slate-400 space-y-1 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
-              <p><strong className="text-slate-700 dark:text-slate-300">Faktor Emisi PLTS:</strong> 1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂ (konstanta konfigurasi tunggal: <code>PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH</code>).</p>
-              <p><strong className="text-slate-700 dark:text-slate-300">Rumus Scope 2:</strong> <code>Emisi (tCO₂e) = Konsumsi PLN (MWh) × CM Ex-Post</code></p>
-              <p><strong className="text-slate-700 dark:text-slate-300">Rumus Emisi Terhindar:</strong> <code>Emisi Terhindar (tCO₂e) = Produksi PLTS (kWh) × {PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000</code></p>
-              <p>Catatan: Penghematan emisi (Avoided Emissions) dari PLTS tidak dikurangi lagi dari Scope 2 karena Scope 2 sudah dihitung murni dari listrik yang dibeli (Purchased Electricity).</p>
-            </div>
 
           </CardBox>
         </div>
