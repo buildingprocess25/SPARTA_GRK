@@ -19,7 +19,8 @@ if (fs.existsSync(envLocalPath)) {
 }
 
 import { getValidToken } from '../apiClient.js';
-import { readStore } from '../storage.js';
+import { getQuotaSnapshot } from '../sync.js';
+import prisma from '../../prisma.js';
 
 async function runStep3a() {
   const results = {
@@ -36,7 +37,7 @@ async function runStep3a() {
   results.callsMade++;
   try {
     const loginRes = await getValidToken({ isLive: true });
-    const store = readStore();
+    const store = { quota: await getQuotaSnapshot() };
 
     results.loginResponse = {
       status: 'SUCCESS',
@@ -48,7 +49,8 @@ async function runStep3a() {
       source: loginRes.source
     };
 
-    results.storageVerified = Boolean(store.token?.accessToken && store.token.accessToken === loginRes.token);
+    const storedToken = await prisma.apiToken.findUnique({ where: { id: 1 } });
+    results.storageVerified = Boolean(storedToken?.token && storedToken.token === loginRes.token);
     results.quotaStatus = {
       callsThisHour: store.quota.callsThisHour,
       hourlyLimit: store.quota.hourlyLimit,
@@ -59,7 +61,7 @@ async function runStep3a() {
     };
 
   } catch (err) {
-    const store = readStore();
+    const store = { quota: await getQuotaSnapshot() };
     results.loginResponse = {
       status: 'FAILED',
       name: err.name,

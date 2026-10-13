@@ -32,6 +32,7 @@ import {
   MONTH_NAMES_SHORT,
   formatNum
 } from '@/data/sustainabilityData';
+import { getYearToDateMonths } from '@/lib/reportingMonths';
 
 export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveSubScope }) {
   const [isInputModalOpen, setIsInputModalOpen] = useState(false);
@@ -41,6 +42,8 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
   const [selectedFacility, setSelectedFacility] = useState('all'); // 'all' | 'office' | 'warehouse' | 'toko'
   const [selectedWarehouseSub, setSelectedWarehouseSub] = useState('all'); // 'all' | 'wh' | 'bulky' | 'depo' | 'storeHub'
   const [selectedPeriod, setSelectedPeriod] = useState('ytd'); // 'ytd' or '0'..'11'
+  const ytdMonths = getYearToDateMonths();
+  const ytdLabel = `YTD (Januari s.d. ${MONTH_NAMES_FULL[ytdMonths.length - 1]} ${ytdMonths[0].yearMonth.slice(0, 4)})`;
 
   // Scope 1 real-data state (FuelActivity: Genset stasioner + Kendaraan operasional)
   const [scope1Period, setScope1Period] = useState('');
@@ -210,7 +213,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 onChange={(e) => setSelectedPeriod(e.target.value)}
                 className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="ytd">YTD (Januari - Agustus 2026)</option>
+                <option value="ytd">{ytdLabel}</option>
                 {MONTH_NAMES_FULL.map((m, idx) => (
                   <option key={idx} value={idx.toString()}>{m} 2026</option>
                 ))}

@@ -153,7 +153,7 @@ async function generateReport() {
     'src/lib/solar/dashboardService.js (Database-backed dashboard service, multi-year query)',
     'src/app/api/plts/dashboard/route.js (GET endpoint with validated JSON envelopes, no vendor calls)',
     'src/lib/solar/rkapTargets.js (RKAP target rows builder & factor stability checker)',
-    'src/lib/rkap-factors.js (Official RKAP factor constants derived from owner matrix)',
+    'src/lib/solar/rkapTargets.js (Official RKAP factors derived from owner matrix via deriveRkapFactors)',
     'src/lib/emission-factors.js (Official vs Sementara factor status tagging & reconciliation)',
     'src/lib/importers/isolarMonthlyImport.js (Source-preserving observation importer)',
     'src/lib/importers/rkapTargetImport.js (Idempotent RKAP targets importer)',

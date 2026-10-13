@@ -2,11 +2,11 @@
  * Single Source of Truth untuk Perhitungan Kanonik Emisi PLTS (Satuan Ton tCO2e)
  *
  * Rumus Kanonik:
- * emisi_tCO2e = Σ_plant (energi_pakai_sendiri_kWh * faktor_ESDM_kgCO2_per_kWh_grid_plant) / 1000
+ * emisi_tCO2e = Σ_plant (energi_pakai_sendiri_kWh * 0,997 kgCO2/kWh) / 1000
  *
  * Di mana:
  * - energi_pakai_sendiri_kWh = Math.max(0, produksi_kWh - feed_in_kWh)
- * - faktor_ESDM_kgCO2_per_kWh = getGridFactor(plant.grid).cmPlts (khusus status: 'resmi')
+ * - cmPlts bernilai 0,997 di semua grid; status grid 'resmi' tetap jadi syarat kelayakan
  * - Plant berfaktor 'sementara' atau UNDER_CONSTRUCTION dikecualikan dari perhitungan resmi.
  */
 

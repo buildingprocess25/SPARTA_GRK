@@ -65,7 +65,6 @@ export const CARBON_FACTORS = {
     CO2_AVOIDED_TON_PER_MWH: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH, // 0.997 Ton CO2 / MWh = 0.997 kgCO2 / kWh
     STANDARD_COAL_TON_PER_MWH: 0.404, // 0.404 Ton Standard Coal / MWh
     TREE_EQUIVALENT_PER_MWH: 54, // 0.054 * 1000 = 54 Trees / MWh
-    CM_BASELINE_PLTS: 0.83, // CDM Baseline Grid Margin factor (kgCO2e / kWh)
     sourceDoc: 'Monitor PLTS 2026 (1).xlsx (Sheet Resume / Corporate Target)'
   },
 

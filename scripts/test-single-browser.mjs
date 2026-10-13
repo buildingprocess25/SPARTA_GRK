@@ -1,4 +1,8 @@
 import puppeteer from 'puppeteer';
+import fs from 'fs';
+
+// Screenshots stay out of public/, which ships to production.
+fs.mkdirSync('docs/evidence/screenshots', { recursive: true });
 
 (async () => {
   console.log('Launching Puppeteer browser...');
@@ -42,8 +46,8 @@ import puppeteer from 'puppeteer';
   await new Promise(r => setTimeout(r, 2000));
 
   // Screenshot 1: PLTS Overview Top with 4 StatCards
-  await page.screenshot({ path: 'public/screenshot_plts_overview_top.png' });
-  console.log('Captured public/screenshot_plts_overview_top.png');
+  await page.screenshot({ path: 'docs/evidence/screenshots/screenshot_plts_overview_top.png' });
+  console.log('Captured docs/evidence/screenshots/screenshot_plts_overview_top.png');
 
   // Test Mode Toggle: Month mode
   await page.evaluate(() => {
@@ -52,8 +56,8 @@ import puppeteer from 'puppeteer';
     if (monthBtn) monthBtn.click();
   });
   await new Promise(r => setTimeout(r, 1500));
-  await page.screenshot({ path: 'public/screenshot_plts_mode_month.png' });
-  console.log('Captured public/screenshot_plts_mode_month.png');
+  await page.screenshot({ path: 'docs/evidence/screenshots/screenshot_plts_mode_month.png' });
+  console.log('Captured docs/evidence/screenshots/screenshot_plts_mode_month.png');
 
   // Switch back to YTD
   await page.evaluate(() => {
@@ -77,8 +81,8 @@ import puppeteer from 'puppeteer';
     if (b) b.click();
   });
   await new Promise(r => setTimeout(r, 1000));
-  await page.screenshot({ path: 'public/screenshot_tab1_produksi.png' });
-  console.log('Captured public/screenshot_tab1_produksi.png');
+  await page.screenshot({ path: 'docs/evidence/screenshots/screenshot_tab1_produksi.png' });
+  console.log('Captured docs/evidence/screenshots/screenshot_tab1_produksi.png');
 
   // Click Sub-Tab 2: Performa Sistem (PR)
   await page.evaluate(() => {
@@ -87,8 +91,8 @@ import puppeteer from 'puppeteer';
     if (b) b.click();
   });
   await new Promise(r => setTimeout(r, 1000));
-  await page.screenshot({ path: 'public/screenshot_tab2_pr.png' });
-  console.log('Captured public/screenshot_tab2_pr.png');
+  await page.screenshot({ path: 'docs/evidence/screenshots/screenshot_tab2_pr.png' });
+  console.log('Captured docs/evidence/screenshots/screenshot_tab2_pr.png');
 
   // Click Sub-Tab 3: Parameter Pendukung
   await page.evaluate(() => {
@@ -97,8 +101,8 @@ import puppeteer from 'puppeteer';
     if (b) b.click();
   });
   await new Promise(r => setTimeout(r, 1000));
-  await page.screenshot({ path: 'public/screenshot_tab3_support.png' });
-  console.log('Captured public/screenshot_tab3_support.png');
+  await page.screenshot({ path: 'docs/evidence/screenshots/screenshot_tab3_support.png' });
+  console.log('Captured docs/evidence/screenshots/screenshot_tab3_support.png');
 
   // Click Sub-Tab 4: Beban vs PLTS
   await page.evaluate(() => {
@@ -107,8 +111,8 @@ import puppeteer from 'puppeteer';
     if (b) b.click();
   });
   await new Promise(r => setTimeout(r, 1000));
-  await page.screenshot({ path: 'public/screenshot_tab4_load.png' });
-  console.log('Captured public/screenshot_tab4_load.png');
+  await page.screenshot({ path: 'docs/evidence/screenshots/screenshot_tab4_load.png' });
+  console.log('Captured docs/evidence/screenshots/screenshot_tab4_load.png');
 
   // Test Sub-Tab 4 view mode: Perbandingan per Cabang DC
   await page.evaluate(() => {
@@ -117,8 +121,8 @@ import puppeteer from 'puppeteer';
     if (b) b.click();
   });
   await new Promise(r => setTimeout(r, 1000));
-  await page.screenshot({ path: 'public/screenshot_tab4_load_branch.png' });
-  console.log('Captured public/screenshot_tab4_load_branch.png');
+  await page.screenshot({ path: 'docs/evidence/screenshots/screenshot_tab4_load_branch.png' });
+  console.log('Captured docs/evidence/screenshots/screenshot_tab4_load_branch.png');
 
   await browser.close();
   console.log('Total JS Errors detected:', jsErrors.length);

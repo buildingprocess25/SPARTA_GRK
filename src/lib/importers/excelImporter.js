@@ -228,8 +228,8 @@ export async function seedEmissionFactorRegistry() {
       factorValue: 0.83,
       unit: 'kgCO2e/kWh',
       sourceDoc: 'Clean Development Mechanism (CDM) Java-Bali baseline',
-      status: 'ACTIVE',
-      conflictNotes: 'Used for daily marginal operations reporting.'
+      status: 'INACTIVE',
+      conflictNotes: 'Tidak dipakai. Emisi terhindar PLTS memakai faktor tunggal 0.997 (PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH).'
     },
     {
       category: 'WATER',

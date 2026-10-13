@@ -41,6 +41,8 @@ src/generated/prisma/
 .backup/
 backups/
 scratch/
+sesi-ini.patch
+prompt_*.txt
 
 # Raw operational evidence embedded for local backfill only
 scripts/populate-fault-history-from-evidence.mjs

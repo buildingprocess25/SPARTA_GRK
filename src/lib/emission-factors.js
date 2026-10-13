@@ -3,12 +3,14 @@
  * Digunakan secara konsisten oleh seluruh halaman & modul:
  * - Scope 1 (BBM: Solar, Pertalite, Pertamax)
  * - Scope 2 (Listrik Grid PLN: Jamali, Sumatera, Kalbar, Kalselteng, Sulselrabar, Batam, Lombok, Sulutgo)
- * - Pengurang Emisi (PLTS Atap: Faktor Regional ESDM)
+ * - Pengurang Emisi (PLTS Atap: faktor tunggal dari conversionConfig.js)
  *
  * Sumber Resmi:
  * 1. SK Dirjen Ketenagalistrikan Kementerian ESDM No. 414.K/TL.04/DJL.4/2024 / No. 379.K/TL.04/DJL.4/2021
  * 2. Pedoman Penyelenggaraan Inventarisasi GRK Nasional Kementerian ESDM
  */
+
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './solar/conversionConfig.js';
 
 export const GRID_EMISSION_FACTORS = [
   { 
@@ -22,7 +24,7 @@ export const GRID_EMISSION_FACTORS = [
     year: '2024',
     cmExPost: 0.87,  // Faktor emisi grid Scope 2 eks-post
     cmExAnte: 0.87,
-    cmPlts: 0.83,    // Faktor emisi PLTS terhindar regional ESDM
+    cmPlts: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH, // Satu faktor nasional untuk semua grid
   },
   { 
     grid: 'SUMATERA',
@@ -35,7 +37,7 @@ export const GRID_EMISSION_FACTORS = [
     year: '2024',
     cmExPost: 0.761,
     cmExAnte: 0.761,
-    cmPlts: 0.75,
+    cmPlts: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
   },
   { 
     grid: 'KALBAR',
@@ -48,7 +50,7 @@ export const GRID_EMISSION_FACTORS = [
     year: '2024',
     cmExPost: 0.95,
     cmExAnte: 0.95,
-    cmPlts: 0.84,
+    cmPlts: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
   },
   { 
     grid: 'KALSELTENG',
@@ -61,7 +63,7 @@ export const GRID_EMISSION_FACTORS = [
     year: '2024',
     cmExPost: 1.20,
     cmExAnte: 1.20,
-    cmPlts: 0.84,
+    cmPlts: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
   },
   { 
     grid: 'SULSELRABAR',
@@ -74,7 +76,7 @@ export const GRID_EMISSION_FACTORS = [
     year: '2024',
     cmExPost: 0.75,
     cmExAnte: 0.75,
-    cmPlts: 0.72,
+    cmPlts: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
   },
   { 
     grid: 'BATAM',
@@ -87,7 +89,7 @@ export const GRID_EMISSION_FACTORS = [
     year: '2024',
     cmExPost: 0.76,
     cmExAnte: 0.76,
-    cmPlts: 0.76,
+    cmPlts: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
   },
   { 
     grid: 'NTB_LOMBOK',
@@ -100,7 +102,7 @@ export const GRID_EMISSION_FACTORS = [
     year: '2024',
     cmExPost: 0.87,
     cmExAnte: 0.87,
-    cmPlts: 0.83,
+    cmPlts: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
   },
   { 
     grid: 'SULUTGO',
@@ -113,7 +115,7 @@ export const GRID_EMISSION_FACTORS = [
     year: '2024',
     cmExPost: 0.60,
     cmExAnte: 0.60,
-    cmPlts: 0.60,
+    cmPlts: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
   }
 ];
 

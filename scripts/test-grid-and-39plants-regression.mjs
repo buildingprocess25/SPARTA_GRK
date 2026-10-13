@@ -105,10 +105,10 @@ describe('Regression Tests: Grid Filtering & 39 Independent Plants', () => {
     assert.equal(getGridFactor('SULUTGO')?.cmExPost, 0.60);
     assert.equal(getGridFactor('BATAM')?.cmExPost, 0.76);
 
-    // Effective baseline factor for PLTS (0.83 for JAMALI & LOMBOK, 0.75 for SUMATERA)
-    assert.equal(getGridFactor('JAMALI')?.cmPlts, 0.83);
-    assert.equal(getGridFactor('NTB_LOMBOK')?.cmPlts, 0.83);
-    assert.equal(getGridFactor('SUMATERA')?.cmPlts, 0.75);
+    // PLTS avoided emission uses one national factor on every grid.
+    assert.equal(getGridFactor('JAMALI')?.cmPlts, 0.997);
+    assert.equal(getGridFactor('NTB_LOMBOK')?.cmPlts, 0.997);
+    assert.equal(getGridFactor('SUMATERA')?.cmPlts, 0.997);
   });
 
   test('5. Specific yield calculation is independent per plant', () => {

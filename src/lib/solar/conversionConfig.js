@@ -25,7 +25,7 @@ export const CONVERSION_CONFIG = {
     source: 'Faktor emisi PLTS dashboard 2026',
     year: '2026',
     status: 'resmi',
-    description: `Emisi terhindar dihitung dari energi PLTS yang dipakai sendiri dikali ${PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH} kgCOâ‚‚/kWh.`
+    description: `Emisi terhindar dihitung dari energi PLTS yang dipakai sendiri dikali ${PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH} kgCO₂/kWh.`
   },
 
 

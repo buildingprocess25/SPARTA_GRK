@@ -88,8 +88,9 @@ test('Identity 5: Jumlah 9 Bulan Lengkap == Total YTD (Jan-Sep 2026)', async () 
   assert.ok(Math.abs(sumYieldMwh - ytd.yieldMwh) < 0.01, 'Yield sum mismatch');
   assert.ok(Math.abs(sumSelfMwh - ytd.selfConsumptionMwh) < 0.01, 'Self consumption sum mismatch');
   assert.ok(Math.abs(sumPurchasedMwh - ytd.purchasedMwh) < 0.01, 'Purchased PLN sum mismatch');
-  assert.equal(Number(sumAvoidedTon.toFixed(2)), ytd.avoidedEmissionTon, 'Avoided emission sum mismatch');
-  assert.equal(ytd.avoidedEmissionTon, 3591.95, 'Canonical avoided emission must be exactly 3591.95 tCO2e');
+  // Monthly values are rounded individually, so their sum may drift from the rounded YTD by 0.01.
+  assert.ok(Math.abs(sumAvoidedTon - ytd.avoidedEmissionTon) <= 0.0101, 'Avoided emission sum mismatch');
+  assert.equal(ytd.avoidedEmissionTon, 4434.27, 'Canonical avoided emission (0.997 factor) must be 4434.27 tCO2e');
 });
 
 test('Identity 6: Kumulatif Chart Bulan N == Jumlah Tabel Jan..N', async () => {
@@ -97,12 +98,14 @@ test('Identity 6: Kumulatif Chart Bulan N == Jumlah Tabel Jan..N', async () => {
 
   let runningCum = 0;
   for (let m = 0; m < 9; m++) {
-    runningCum = Number((runningCum + monthly[m].avoidedEmissionTon).toFixed(2));
-    assert.equal(monthly[m].cumAvoidedEmissionTon, runningCum, `Cumulative mismatch at month ${m + 1}`);
+    runningCum += monthly[m].avoidedEmissionTon;
+    assert.ok(
+      Math.abs(monthly[m].cumAvoidedEmissionTon - runningCum) <= 0.0101,
+      `Cumulative mismatch at month ${m + 1}`
+    );
   }
 
-  // Specifically check April (Month 4) cumulative == 1.551,45 tCO2e
-  assert.equal(monthly[3].cumAvoidedEmissionTon, 1551.45, 'April cumulative must be exactly 1551.45 tCO2e');
+  assert.equal(monthly[3].cumAvoidedEmissionTon, 1917.04, 'April cumulative (0.997 factor) must be 1917.04 tCO2e');
 });
 
 test('Cross-Page Test: PLTS Pakai Sendiri di Halaman PLTS == di Halaman Scope 2', async () => {

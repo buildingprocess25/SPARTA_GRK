@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { executeIsolarRequest } from '../src/lib/solar/apiClient.js';
-import { readStore } from '../src/lib/solar/storage.js';
+import { getQuotaSnapshot } from '../src/lib/solar/sync.js';
 
 const MAX_CALLS = 14;
 let calls = 0;
@@ -15,7 +15,7 @@ const rowsOf = value => {
   return data.pageList || data.data || data.device_list || (Array.isArray(data) ? data : []);
 };
 const keywords = /purchased|import|\bbuy\b|from grid|feed[- _]?in|export|\bsell\b|to grid|consumption|\bload\b|self[- _]?use|forward|reverse energy/i;
-const quotaBefore = readStore().quota;
+const quotaBefore = await getQuotaSnapshot();
 
 const vendorQuotaBefore = await call('/openapi/getOpenApiCallInfo', {}, 'Diagnostics');
 const stationResponse = await call('/openapi/getPowerStationList', { curPage: 1, size: 100 }, 'Monitoring');
@@ -54,7 +54,7 @@ for (const deviceType of ['11', '5', '3']) {
 }
 
 const vendorQuotaAfter = await call('/openapi/getOpenApiCallInfo', {}, 'Diagnostics');
-const quotaAfter = readStore().quota;
+const quotaAfter = await getQuotaSnapshot();
 const stationById = new Map(stations.map(row => [Number(row.ps_id), row]));
 const perPlant = new Map(stations.map(row => [Number(row.ps_id), {
   ps_id: Number(row.ps_id), ps_name: row.ps_name || row.station_name || row.name || '',

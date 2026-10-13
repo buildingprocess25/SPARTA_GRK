@@ -1055,7 +1055,7 @@ export function buildPltsDashboardFromRows({
         includedPlantCount: emission.includedPlantCount,
         excludedPlantCount: emission.excludedPlantCount,
         excludedEnergyMwh: emission.excludedEnergyMwh,
-        disclaimer: `${emission.includedPlantCount} dari ${plantRows.length} plant dihitung dengan faktor ${PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH} kgCOâ‚‚/kWh`,
+        disclaimer: `${emission.includedPlantCount} dari ${plantRows.length} plant dihitung dengan faktor ${PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH} kgCO₂/kWh`,
       },
       rkap: {
         factorKgPerKwh: round(rkapFactor, 9),

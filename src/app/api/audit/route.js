@@ -1,6 +1,5 @@
 import prisma from '@/lib/prisma.js';
 import { CANONICAL_DC_ENTITIES } from '@/lib/solar/plantMap';
-import { pltsData } from '@/data/sustainabilityData';
 
 export async function GET() {
   const sample = await prisma.monthlyYield.findMany({ take: 10 });

@@ -189,7 +189,7 @@ async function runTests() {
   console.log('  ✔ [PASS] parsePowerKw: null untuk input offline / "--"');
   console.log('  ✔ [PASS] parseEnergyKwh: 0 untuk input non-numerik');
   console.log('  ✔ [PASS] parseTotalEnergyMwh: tepat mengkonversi kWh/MWh/GWh');
-  console.log('  ✔ [PASS] CO2 Factor 0.83 kgCO2e/kWh diterapkan konsisten');
+  console.log('  ✔ [PASS] CO2 Factor 0.997 kgCO2e/kWh diterapkan konsisten');
 
   console.log('\n================================================================================');
   console.log('SEMUA 5 TEST SUITE BERHASIL (0 FAILED)');

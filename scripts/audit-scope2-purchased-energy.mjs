@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { executeIsolarRequest } from '../src/lib/solar/apiClient.js';
-import { readStore } from '../src/lib/solar/storage.js';
+import { getQuotaSnapshot } from '../src/lib/solar/sync.js';
 
 const MAX_CALLS = 8;
 let calls = 0;
@@ -28,12 +28,12 @@ const quotaView = response => {
 
 const priorPath = path.resolve('docs/evidence/scope2-vendor-discovery-2026-10-07.json');
 const prior = JSON.parse(fs.readFileSync(priorPath, 'utf8'));
-const localBefore = readStore().quota;
+const localBefore = await getQuotaSnapshot();
 const vendorBefore = await call('/openapi/getOpenApiCallInfo', {}, 'Diagnostics');
 const stationResponse = await call('/openapi/getPowerStationList', { curPage: 1, size: 100 }, 'Monitoring');
 const stations = rows(stationResponse);
 const vendorAfter = await call('/openapi/getOpenApiCallInfo', {}, 'Diagnostics');
-const localAfter = readStore().quota;
+const localAfter = await getQuotaSnapshot();
 
 const distribution = {};
 for (const station of stations) {

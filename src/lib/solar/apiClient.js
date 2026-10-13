@@ -5,15 +5,8 @@ import {
   PROHIBITED_ENDPOINT_PATTERNS,
   QUOTA_CONFIG
 } from './endpoints.js';
-import {
-  readStore,
-  writeStore,
-  incrementQuota,
-  acquireLock,
-  releaseLock,
-  recordLoginResult,
-  touchTokenValidity
-} from './storage.js';
+// Same quota_counter rows as runSync, so scripts and the in-app sync share one budget.
+import { getQuotaCounts, incrementQuota } from './sync.js';
 
 export class SecurityViolationError extends Error {
   constructor(message) {
@@ -99,12 +92,14 @@ export function validateEndpointGuard(endpointPath) {
 /**
  * Check quota threshold for both Hourly and Monthly limits
  */
-export function checkQuotaGuard() {
-  const store = readStore();
-  const callsThisHour = store.quota.callsThisHour || 0;
-  const hourlyLimit = store.quota.hourlyLimit || QUOTA_CONFIG.HOURLY_LIMIT;
-  const callsThisMonth = store.quota.callsThisMonth || 0;
-  const monthlyLimit = store.quota.monthlyLimit || QUOTA_CONFIG.MONTHLY_LIMIT;
+export async function checkQuotaGuard(now = new Date()) {
+  const counts = await getQuotaCounts(now);
+  return evaluateQuota({ callsThisHour: counts.hourly, callsThisMonth: counts.monthly });
+}
+
+export function evaluateQuota({ callsThisHour = 0, callsThisMonth = 0 }) {
+  const hourlyLimit = QUOTA_CONFIG.HOURLY_LIMIT;
+  const monthlyLimit = QUOTA_CONFIG.MONTHLY_LIMIT;
 
   const hourlyRatio = hourlyLimit > 0 ? callsThisHour / hourlyLimit : 0;
   const monthlyRatio = monthlyLimit > 0 ? callsThisMonth / monthlyLimit : 0;
@@ -149,11 +144,10 @@ export async function getValidToken(options = {}) {
  */
 export async function executeIsolarRequest(endpointPath, bodyPayload = {}, options = {}) {
   const isLive = options.isLive ?? (options.dryRun === false || process.env.ISOLAR_MODE === 'live');
-  const category = options.category || 'Live Data';
 
   validateEndpointGuard(endpointPath);
 
-  const quotaStatus = checkQuotaGuard();
+  const quotaStatus = await checkQuotaGuard();
   if (!quotaStatus.allowLiveCall && (isLive || options.dryRun === false)) {
     throw new QuotaExceededError(quotaStatus.message, quotaStatus);
   }
@@ -173,7 +167,7 @@ export async function executeIsolarRequest(endpointPath, bodyPayload = {}, optio
   const secretKey = process.env.ISOLAR_SECRET_KEY;
   const baseUrl = process.env.ISOLAR_BASE_URL || 'https://gateway.isolarcloud.com.hk';
 
-  incrementQuota(category, 1);
+  await incrementQuota(new Date(), 1);
 
   // Retries on token error / HTTP 401.
   const targetUrl = `${baseUrl}${endpointPath}`;
@@ -238,11 +232,6 @@ export async function executeIsolarRequest(endpointPath, bodyPayload = {}, optio
 
   if (!response.ok) {
     throw new Error(`Upstream OpenAPI HTTP ${response.status}: ${response.statusText}`);
-  }
-
-  // Extend token validity upon successful call
-  if (responseData && (responseData.result_code === '1' || responseData.result_code === 1)) {
-    touchTokenValidity();
   }
 
   return {

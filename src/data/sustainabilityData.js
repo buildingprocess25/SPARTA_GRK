@@ -1,4 +1,5 @@
 import { MASTER_FACILITIES, BRANCH_LIST, FACILITY_TYPES, getFilteredFacilities, findFacilityById } from '@/lib/master/facilityMaster';
+import { getYearToDateMonths } from '@/lib/reportingMonths';
 
 export { MASTER_FACILITIES, BRANCH_LIST, FACILITY_TYPES, getFilteredFacilities, findFacilityById };
 
@@ -22,28 +23,18 @@ export const dcLocations = MASTER_FACILITIES.map(fac => ({
 export const masterFacilities = MASTER_FACILITIES;
 
 
-// Scope 1: emisi langsung dari solar genset cadangan
+// Scope 1: emisi langsung dari solar genset cadangan.
+// Angka mulai dari nol dan diisi dari /api/sustainability.
 export const scope1Data = {
   summary: {
     category: 'Scope 1A (Pembakaran Statis)',
     source: 'Konsumsi solar unit Genset cadangan di DC & Toko',
     formula: 'Liter Solar × 2.6685 kgCO₂e/L',
-    totalFuelLitersYTD: 118400,
-    totalEmissionCO2e: 315.95,
-    fuelCostTotalJuta: 1776.0,
-    activeGensetUnits: 48,
-    avgRunHoursPerMonth: 41.6,
+    totalFuelLitersYTD: 0,
+    totalEmissionCO2e: 0,
+    fuelCostTotalJuta: 0,
   },
-  monthlyTrend: [
-    { month: 'Jan', fuelLiters: 14200, emissionTon: 37.89, runHours: 330 },
-    { month: 'Feb', fuelLiters: 13800, emissionTon: 36.83, runHours: 315 },
-    { month: 'Mar', fuelLiters: 15100, emissionTon: 40.29, runHours: 350 },
-    { month: 'Apr', fuelLiters: 14600, emissionTon: 38.96, runHours: 340 },
-    { month: 'Mei', fuelLiters: 14900, emissionTon: 39.76, runHours: 345 },
-    { month: 'Jun', fuelLiters: 15200, emissionTon: 40.56, runHours: 352 },
-    { month: 'Jul', fuelLiters: 15000, emissionTon: 40.03, runHours: 348 },
-    { month: 'Ags', fuelLiters: 15600, emissionTon: 41.63, runHours: 362 },
-  ],
+  monthlyTrend: [],
 };
 
 // Scope 2: emisi tidak langsung dari listrik grid PLN
@@ -52,104 +43,33 @@ export const scope2Data = {
     category: 'Scope 2 (Energi Tidak Langsung)',
     source: 'Konsumsi Energi Listrik DC & Toko dari Jaringan PLN',
     formula: 'kWh PLN × Grid Emission Factor (ESDM)',
-    totalPlnKwhYTD: 17800000,
-    totalEmissionCO2e: 14774.0,
-    totalCostJuta: 24920.0,
+    totalPlnKwhYTD: 0,
+    totalEmissionCO2e: 0,
+    totalCostJuta: 0,
   },
-  monthlyTrend: [
-    { month: 'Jan', plnKwh: 2280000, emissionTon: 1892.4 },
-    { month: 'Feb', plnKwh: 2150000, emissionTon: 1784.5 },
-    { month: 'Mar', plnKwh: 2320000, emissionTon: 1925.6 },
-    { month: 'Apr', plnKwh: 2310000, emissionTon: 1917.3 },
-    { month: 'Mei', plnKwh: 2280000, emissionTon: 1892.4 },
-    { month: 'Jun', plnKwh: 2260000, emissionTon: 1875.8 },
-    { month: 'Jul', plnKwh: 2240000, emissionTon: 1859.2 },
-    { month: 'Ags', plnKwh: 2200000, emissionTon: 1826.0 },
-  ],
+  monthlyTrend: [],
 };
 
 // Pengurang emisi: PLTS dan water recycle
 export const waterRecycleData = {
   summary: {
-    totalCapacity: 890,
-    totalRecycled: 505,
-    activeSites: 5,
-    plannedSites: 3,
-    waterSavedYTD: 146450,
-    costSavedYTD: 1171.6,
-    co2Avoided: 49.8,
+    totalRecycledYTD: 0,
+    waterSavedYTD: 0,
+    costSavedYTD: 0,
+    co2Avoided: 0,
   },
-  monthlyTrend: [
-    { month: 'Jan', recycled: 14200, freshWater: 22800, target: 15000 },
-    { month: 'Feb', recycled: 13500, freshWater: 21500, target: 15000 },
-    { month: 'Mar', recycled: 16800, freshWater: 23200, target: 16000 },
-    { month: 'Apr', recycled: 18200, freshWater: 22100, target: 16000 },
-    { month: 'Mei', recycled: 19500, freshWater: 21000, target: 18000 },
-    { month: 'Jun', recycled: 20100, freshWater: 20800, target: 18000 },
-    { month: 'Jul', recycled: 21350, freshWater: 20200, target: 20000 },
-    { month: 'Ags', recycled: 22800, freshWater: 19500, target: 20000 },
-  ],
-  sources: [
-    { name: 'Grey Water (Cuci Kontainer)', percentage: 45, volume: 227 },
-    { name: 'Air Kondensasi AC Chiller', percentage: 25, volume: 126 },
-    { name: 'Rainwater Harvesting', percentage: 18, volume: 91 },
-    { name: 'Reverse Osmosis Reject', percentage: 12, volume: 61 },
-  ],
-  usage: [
-    { name: 'Flushing Toilet & Sanitasi', percentage: 35 },
-    { name: 'Penyiraman Landscape', percentage: 25 },
-    { name: 'Pencucian Armada Logistik', percentage: 22 },
-    { name: 'Cooling Tower Make-up', percentage: 18 },
-  ],
+  monthlyTrend: [],
 };
 
 export const pltsData = {
   summary: {
-    totalCapacity: 1860,
-    totalMonthlyGen: 221000,
-    activeSites: 7,
-    plannedSites: 1,
-    energyGeneratedYTD: 1768000,
-    costSavedYTD: 2475.2,
-    co2Avoided: 1467.4,
+    totalKwhYTD: 0,
+    totalProdMwhYTD: 0,
+    energyGeneratedYTD: 0,
+    costSavedYTD: 0,
+    co2Avoided: 0,
   },
-  monthlyTrend: [
-    { month: 'Jan', pltsGen: 195000, plnConsumption: 2280000, target: 200000 },
-    { month: 'Feb', pltsGen: 185000, plnConsumption: 2150000, target: 200000 },
-    { month: 'Mar', pltsGen: 210000, plnConsumption: 2320000, target: 210000 },
-    { month: 'Apr', pltsGen: 225000, plnConsumption: 2310000, target: 210000 },
-    { month: 'Mei', pltsGen: 230000, plnConsumption: 2280000, target: 220000 },
-    { month: 'Jun', pltsGen: 218000, plnConsumption: 2260000, target: 220000 },
-    { month: 'Jul', pltsGen: 240000, plnConsumption: 2240000, target: 230000 },
-    { month: 'Ags', pltsGen: 265000, plnConsumption: 2200000, target: 230000 },
-  ],
-  gridEmissionFactors: [
-    { grid: 'Jamali (Jawa-Madura-Bali)', provinces: 'Banten, DKI, Jabar, Jateng, DIY, Jatim, Bali', powerPlants: 302, om: 0.80, bm: 0.94, cmExPost: 0.87, cmExAnte: 0.87, cmPlts: 0.83 },
-    { grid: 'Sumatera', provinces: 'Aceh, Sumut, Sumbar, Riau, Jambi, Sumsel, Bengkulu, Lampung, Babel, Kepri', powerPlants: 145, om: 0.74, bm: 0.82, cmExPost: 0.78, cmExAnte: 0.78, cmPlts: 0.75 },
-    { grid: 'Kalimantan', provinces: 'Kalbar, Kalteng, Kalsel, Kaltim, Kaltara', powerPlants: 88, om: 0.85, bm: 0.92, cmExPost: 0.89, cmExAnte: 0.89, cmPlts: 0.84 },
-    { grid: 'Sulselrabar (Sulawesi)', provinces: 'Sulsel, Sulbar, Sultra, Sulteng, Sulut', powerPlants: 64, om: 0.71, bm: 0.79, cmExPost: 0.75, cmExAnte: 0.75, cmPlts: 0.72 },
-  ],
-  energyBreakdown: {
-    plnPercentage: 88.1,
-    pltsPercentage: 11.9,
-    totalDCConsumption: 2465000,
-  },
-};
-
-// Resume emisi bersih (indikator utama)
-export const emissionResumeKPI = {
-  grossEmissionTon: 15091.3,
-  avoidedEmissionTon: 1517.2,
-  netEmissionTon: 13574.1,
-  netReductionPct: '10.1%',
-  totalCostSavingJuta: 3646.8,
-};
-
-export const overviewKPI = {
-  waterRecycled: { value: 146450, unit: 'm³', trend: '+12.3%', label: 'Air Terolah YTD' },
-  solarGenerated: { value: 1768, unit: 'MWh', trend: '+15.8%', label: 'Energi PLTS YTD' },
-  totalCostSaved: { value: 3646.8, unit: 'Juta Rp', trend: '+14.1%', label: 'Total Penghematan YTD' },
-  co2Avoided: { value: 1.52, unit: 'ktCO₂e', trend: '-10.1%', label: 'Pengurang Emisi YTD' },
+  monthlyTrend: [],
 };
 
 // Hierarki cabang: branch → office & warehouse + toko.
@@ -625,8 +545,8 @@ export function getHierarchyElectricityStats({
   let summarySolarAvoidedTon = 0;
 
   if (selectedMonth === 'ytd') {
-    // Sum 8 months (Jan - Ags) as YTD
-    for (let i = 0; i < 8; i++) {
+    const ytdMonthCount = getYearToDateMonths().length;
+    for (let i = 0; i < ytdMonthCount; i++) {
       summaryKwh += monthlyData[i].plnKwh;
       summaryEmissionTon += monthlyData[i].emissionTon;
       summaryCostJuta += monthlyData[i].costJuta;

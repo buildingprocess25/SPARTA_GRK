@@ -17,6 +17,7 @@ import path from 'node:path';
 import prisma from './prisma.js';
 import { CANONICAL_DC_ENTITIES, isDcLocation, normalizeName } from './solar/plantMap.js';
 import { getGridFactor, GRID_EMISSION_FACTORS } from './emission-factors.js';
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './solar/conversionConfig.js';
 import { parseIsolarMonthlyReportFile } from './importers/isolarMonthlyReport.js';
 
 const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -175,7 +176,7 @@ export async function getCanonicalEnergyRows({
     const grid = entity?.grid || raw.grid || 'JAMALI';
     const factorObj = getGridFactor(grid);
     const gridFactorKgPerKwh = factorObj?.cmExPost ?? 0.87;
-    const pltsFactorKgPerKwh = factorObj?.cmPlts ?? 0.83;
+    const pltsFactorKgPerKwh = factorObj?.cmPlts ?? PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH;
     const factorStatus = factorObj?.status ?? 'sementara';
     const isEligibleEmission = factorStatus === 'resmi';
 

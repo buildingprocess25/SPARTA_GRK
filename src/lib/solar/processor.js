@@ -9,7 +9,7 @@ import { CANONICAL_DC_ENTITIES, isDcLocation, lookupPlantMetadata, PLANT_REGISTR
 import { CONVERSION_CONFIG } from './conversionConfig.js';
 
 export const SOLAR_CONSTANTS = {
-  CO2_FACTOR_PLTS: CONVERSION_CONFIG.emission.factorKgPerKwh, // 0.77644 kgCO2e/kWh (Single source of truth)
+  CO2_FACTOR_PLTS: CONVERSION_CONFIG.emission.factorKgPerKwh, // 0.997 kgCO2e/kWh
   MAX_PEAK_SUN_HOURS_PER_DAY: 6.5, // Physical upper limit: 6.5 kWh/kWp/day in Indonesia
   DEFAULT_DAILY_PSH: 4.2, // Reference Daily Peak Sun Hours (kWh/m²/day) in Indonesia
   DEFAULT_MONTHLY_PSH: 4.2 * 30, // 126 kWh/kWp for a 30-day month

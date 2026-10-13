@@ -23,6 +23,7 @@ import {
 import { useSustainability } from '@/context/SustainabilityContext';
 import { formatNum } from '@/data/sustainabilityData';
 import { CARBON_FACTORS } from '@/lib/carbon/carbonEngine';
+import { getYearToDateMonths } from '@/lib/reportingMonths';
 import PageHeader from '@/components/ui/PageHeader';
 import KpiCard from '@/components/ui/KpiCard';
 import InputDataButton from '@/components/ui/InputDataButton';
@@ -161,22 +162,25 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
     }
   };
 
-  // Kompilasi bulanan penambahan vs pengurangan emisi (tCO2e),
-  // memakai faktor ESDM & IPCC dari carbonEngine.
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags'];
+  // Kompilasi bulanan penambahan vs pengurangan emisi (tCO2e), Januari s.d. bulan berjalan.
+  const months = getYearToDateMonths().map(m => m.label);
   const totalMonths = months.length;
 
   const { monthlyComparisonData, avgPenambahan, avgPengurangan, avgNet, avgOffsetRatio } = useMemo(() => {
-    const list = months.map((month, idx) => {
+    const forMonth = (trend, month) => (trend || []).find(m => m.month === month);
+    const list = months.map((month) => {
       // Penambahan: Scope 1 (genset) + Scope 2 (PLN)
-      const s1Ton = scope1.monthlyTrend[idx]?.emissionTon || 0;
-      const s2Ton = scope2.monthlyTrend[idx]?.emissionTon || 0;
+      const s1Ton = forMonth(scope1.monthlyTrend, month)?.emissionTon || 0;
+      const s2Ton = forMonth(scope2.monthlyTrend, month)?.emissionTon || 0;
       const penambahanTon = Number((s1Ton + s2Ton).toFixed(1));
 
       // Pengurangan: PLTS + water recycle avoided
-      const pltsKwh = pltsData.monthlyTrend[idx]?.pltsGen || 0;
-      const pltsAvoided = (pltsKwh * CARBON_FACTORS.PLTS_PORTFOLIO.CM_BASELINE_PLTS) / 1000;
-      const waterM3 = waterData.monthlyTrend[idx]?.recycled || 0;
+      const pltsMonth = forMonth(pltsData.monthlyTrend, month);
+      const pltsKwh = pltsMonth?.pltsGen || 0;
+      // Same 0.997 factor and basis as /api/sustainability, so both pages agree.
+      const pltsAvoided = pltsMonth?.avoidedCo2Ton
+        ?? (pltsKwh * CARBON_FACTORS.PLTS_PORTFOLIO.CO2_AVOIDED_TON_PER_MWH) / 1000;
+      const waterM3 = forMonth(waterData.monthlyTrend, month)?.recycled || 0;
       const waterAvoided = (waterM3 * CARBON_FACTORS.WATER.FACTOR_KG_PER_M3) / 1000;
       const penguranganTon = Number((pltsAvoided + waterAvoided).toFixed(1));
 

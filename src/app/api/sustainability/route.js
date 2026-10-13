@@ -10,6 +10,10 @@ import {
   calculateWaterRecycleImpact,
   getGridEmissionFactor
 } from '@/lib/carbon/carbonEngine';
+import { getYearToDateMonths } from '@/lib/reportingMonths';
+
+// Flat Jamali factor; per-grid Scope 2 is computed in /api/emissions.
+const SCOPE2_GRID_FACTOR_KG_PER_KWH = 0.87;
 
 // Micro-cache (10 seconds) for performance
 let cachedPayload = null;
@@ -52,9 +56,9 @@ export async function GET(request) {
       orderBy: [{ canonicalName: 'asc' }]
     });
 
-    // Monthly PLTS trend (8 months)
-    const monthKeys = ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08'];
-    const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags'];
+    const reportingMonths = getYearToDateMonths(new Date(now));
+    const monthKeys = reportingMonths.map(m => m.yearMonth);
+    const monthLabels = reportingMonths.map(m => m.label);
 
     const pltsMonthlyTrend = monthKeys.map((ym, idx) => {
       const monthMeasurements = energyRecords.filter(r => r.yearMonth === ym && !r.isAggregateRow);
@@ -102,9 +106,31 @@ export async function GET(request) {
     const totalPltsCostSavedJuta = (pltsMonthlyTrend.reduce((acc, m) => acc + m.pltsGen, 0) * CARBON_FACTORS.TARIFFS.ELECTRICITY_PLN_PER_KWH) / 1_000_000;
     const totalWaterCostSavedJuta = waterMonthlyTrend.reduce((acc, m) => acc + m.costSavedJuta, 0);
 
-    // Sum purchased electricity for Scope 2 (purchased MWh converted to kWh * Grid factor)
     const totalPurchasedKwh = energyRecords.filter(r => !r.isAggregateRow).reduce((acc, r) => acc + r.purchasedKwh, 0);
-    const scope2TotalEmissionTon = Number(((totalPurchasedKwh * 0.87) / 1000).toFixed(2));
+    const scope2TotalEmissionTon = Number(((totalPurchasedKwh * SCOPE2_GRID_FACTOR_KG_PER_KWH) / 1000).toFixed(2));
+
+    const scope1MonthlyTrend = monthKeys.map((ym, idx) => {
+      const monthFuel = fuelRecords.filter(r => r.yearMonth === ym);
+      return {
+        month: monthLabels[idx],
+        yearMonth: ym,
+        fuelLiters: Number(monthFuel.reduce((acc, r) => acc + (r.liters || 0), 0).toFixed(2)),
+        emissionTon: Number(monthFuel.reduce((acc, r) => acc + (r.emissionTon || 0), 0).toFixed(3)),
+        runHours: monthFuel.reduce((acc, r) => acc + (Number(r.metadata?.runHours) || 0), 0),
+      };
+    });
+
+    const scope2MonthlyTrend = monthKeys.map((ym, idx) => {
+      const plnKwh = energyRecords
+        .filter(r => r.yearMonth === ym && !r.isAggregateRow)
+        .reduce((acc, r) => acc + r.purchasedKwh, 0);
+      return {
+        month: monthLabels[idx],
+        yearMonth: ym,
+        plnKwh: Number(plnKwh.toFixed(1)),
+        emissionTon: Number(((plnKwh * SCOPE2_GRID_FACTOR_KG_PER_KWH) / 1000).toFixed(3)),
+      };
+    });
 
     // Fuel Scope 1 from fuelRecords strictly
     const fuelScope1Ton = fuelRecords.reduce((acc, r) => acc + r.emissionTon, 0);
@@ -155,7 +181,13 @@ export async function GET(request) {
         totalLitersYtd: Number(fuelRecords.reduce((acc, r) => acc + r.liters, 0).toFixed(2)),
         totalEmissionTonYtd: Number(fuelScope1Ton.toFixed(3)),
         totalCostJutaYtd: Number((fuelRecords.reduce((acc, r) => acc + (r.costRupiah || 0), 0) / 1_000_000).toFixed(2)),
+        monthlyTrend: scope1MonthlyTrend,
         detailActivities: fuelRecords
+      },
+      scope2: {
+        totalPlnKwh: Number(totalPurchasedKwh.toFixed(1)),
+        totalEmissionTon: scope2TotalEmissionTon,
+        monthlyTrend: scope2MonthlyTrend,
       },
       targets: targetRecords,
       plants: plantMasters,

@@ -8,7 +8,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const read = (relative) => fs.readFileSync(path.resolve(here, relative), 'utf8');
 
 test('project Docker image builds and runs the Next.js standalone server', () => {
-  const dockerfile = read('../Dockerfile');
+  const dockerfile = read('../../../Dockerfile');
   const nextConfig = read('../../../next.config.mjs');
   assert.match(nextConfig, /process\.env\.NEXT_OUTPUT_MODE === ['"]standalone['"]/);
   assert.match(dockerfile, /ENV NEXT_OUTPUT_MODE=standalone/);
@@ -19,21 +19,22 @@ test('project Docker image builds and runs the Next.js standalone server', () =>
 });
 
 test('Docker defaults to configurable port 3001 and exposes the same port', () => {
-  const dockerfile = read('../Dockerfile');
+  const dockerfile = read('../../../Dockerfile');
   assert.match(dockerfile, /ARG APP_PORT=3001/);
   assert.match(dockerfile, /ENV PORT=\$\{APP_PORT\}/);
   assert.match(dockerfile, /EXPOSE \$\{APP_PORT\}/);
   assert.match(dockerfile, /HEALTHCHECK[^\n]*\\\r?\n\s*CMD node -e/);
 });
 
-test('Docker enables foreground alarm notifications without configuring Web Push', () => {
-  const dockerfile = read('../Dockerfile');
+test('Docker enables alarm notifications and only bakes the public VAPID key', () => {
+  const dockerfile = read('../../../Dockerfile');
   assert.match(dockerfile, /ARG NEXT_PUBLIC_NOTIFICATIONS_ENABLED=true/);
-  assert.doesNotMatch(dockerfile, /WEB_PUSH|VAPID/);
+  assert.match(dockerfile, /ARG NEXT_PUBLIC_VAPID_PUBLIC_KEY=/);
+  assert.doesNotMatch(dockerfile, /^(?:ARG|ENV) VAPID_PRIVATE_KEY=/m);
 });
 
 test('Docker image does not bake runtime credentials or obsolete placeholders', () => {
-  const dockerfile = read('../Dockerfile');
+  const dockerfile = read('../../../Dockerfile');
   for (const name of [
     'ISOLAR_ACCESS_TOKEN',
     'ISOLAR_SECRET_KEY',

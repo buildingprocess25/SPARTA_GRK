@@ -19,7 +19,6 @@ import {
   PROHIBITED_ENDPOINT_PATTERNS,
   QUOTA_CONFIG
 } from './endpoints.js';
-import { getWibHour } from './apiClient.js';
 import { parseEnergyKwh, parsePowerKw, parseTotalEnergyMwh } from './processor.js';
 import { parseFreshnessThreshold, resolveTelemetryFreshness } from './freshness.js';
 import { classifyVendorPlantStatus } from './status.js';
@@ -150,7 +149,7 @@ export { LOCK_DURATION_MS };
 
 // Quota management
 
-async function getQuotaCounts(now = new Date()) {
+export async function getQuotaCounts(now = new Date()) {
   const { hourBucket, monthBucket } = getWibTimeInfo(now);
   
   const hourly = await prisma.quotaCounter.findUnique({ where: { kind_bucketKey: { kind: 'hourly', bucketKey: hourBucket } } });
@@ -164,7 +163,18 @@ async function getQuotaCounts(now = new Date()) {
   };
 }
 
-async function incrementQuota(now = new Date(), count = 1) {
+/** Quota counts in the field names the old .data/solar_store.json used, for diagnostic scripts. */
+export async function getQuotaSnapshot(now = new Date()) {
+  const { hourly, monthly } = await getQuotaCounts(now);
+  return {
+    callsThisHour: hourly,
+    hourlyLimit: QUOTA_CONFIG.HOURLY_LIMIT,
+    callsThisMonth: monthly,
+    monthlyLimit: QUOTA_CONFIG.MONTHLY_LIMIT,
+  };
+}
+
+export async function incrementQuota(now = new Date(), count = 1) {
   const { hourBucket, monthBucket } = getWibTimeInfo(now);
   
   await Promise.all([

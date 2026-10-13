@@ -54,7 +54,7 @@ Sesuai spesifikasi resmi Sungrow OpenAPI:
 ## 4. Emisi Karbon & Penghasilan (Income)
 
 - **Faktor Emisi Implisit Vendor**: Vendor menggunakan faktor implisit $0{,}997\text{ kg CO}_2\text{/kWh}$ (dihitung dari `co2_reduce / yield`).
-- **Faktor Emisi Dashboard Proyek**: Proyek secara konsisten menggunakan standar faktor emisi jaringan listrik nasional sebesar **$0{,}83\text{ kg CO}_2\text{e/kWh}$**.
+- **Faktor Emisi Dashboard Proyek**: Emisi terhindar PLTS dihitung dengan faktor yang sama, **$0{,}997\text{ kg CO}_2\text{/kWh}$**, di semua grid dan semua halaman. Nilainya didefinisikan sekali di `src/lib/solar/conversionConfig.js` (`PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH`). Faktor grid ESDM per wilayah hanya dipakai untuk Scope 2 (listrik PLN).
 - **Mata Uang `today_income`**: Nilai `today_income` yang dikembalikan oleh API Sungrow menggunakan mata uang **INR (Indian Rupee)**, bukan Rupiah (IDR). Field ini **tidak digunakan** di dashboard sustainability.
 
 ---

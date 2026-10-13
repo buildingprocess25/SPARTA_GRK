@@ -7,9 +7,8 @@ import {
   pltsData as initialPltsData,
   scope1Data as initialScope1Data,
   scope2Data as initialScope2Data,
-  emissionResumeKPI as initialResumeKPI,
-  overviewKPI as initialKPI
 } from '@/data/sustainabilityData';
+import { getYearToDateMonths, MONTH_LABELS_SHORT } from '@/lib/reportingMonths';
 import {
   CARBON_FACTORS,
   calculateScope1FuelEmission,
@@ -21,7 +20,8 @@ import {
 
 const SustainabilityContext = createContext(null);
 
-const STORAGE_KEY = 'alfamart_sustainability_sparta_v3';
+// v4 drops browsers' cached v3 state, which still holds the old demo numbers and sample history.
+const STORAGE_KEY = 'alfamart_sustainability_sparta_v4';
 
 export function SustainabilityProvider({ children }) {
   const [dcLocations, setDcLocations] = useState(initialDCLocations);
@@ -29,32 +29,7 @@ export function SustainabilityProvider({ children }) {
   const [pltsData, setPltsData] = useState(initialPltsData);
   const [scope1, setScope1] = useState(initialScope1Data);
   const [scope2, setScope2] = useState(initialScope2Data);
-  const [inputHistory, setInputHistory] = useState([
-    {
-      id: 'init-1',
-      date: '2026-08-31',
-      dcName: 'DC Cikarang',
-      module: 'plts',
-      details: 'Produksi PLTS: 54,000 kWh • Emisi avoided: ~44.8 tCO2e',
-      recordedAt: '31/08/2026 17:00'
-    },
-    {
-      id: 'init-2',
-      date: '2026-08-31',
-      dcName: 'DC Balaraja',
-      module: 'genset',
-      details: 'Konsumsi Solar Genset: 1,850 Liter • Emisi: 4.94 tCO2e',
-      recordedAt: '31/08/2026 16:30'
-    },
-    {
-      id: 'init-3',
-      date: '2026-08-31',
-      dcName: 'DC Cikokol',
-      module: 'water',
-      details: 'Air Terolah: 2,850 m³ • Hemat biaya: Rp 22.8 Juta',
-      recordedAt: '31/08/2026 15:45'
-    }
-  ]);
+  const [inputHistory, setInputHistory] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [backendMeta, setBackendMeta] = useState(null);
   const [mutationsAllowed, setMutationsAllowed] = useState(true);
@@ -79,6 +54,7 @@ export function SustainabilityProvider({ children }) {
             summary: {
               ...prev.summary,
               totalKwhYTD: Number((data.plts.totalProdMwhYtd * 1000).toFixed(1)),
+              energyGeneratedYTD: Number((data.plts.totalProdMwhYtd * 1000).toFixed(1)),
               totalProdMwhYTD: data.plts.totalProdMwhYtd,
               co2Avoided: data.plts.totalAvoidedCo2TonYtd,
               costSavedYTD: data.plts.totalCostSavedJuta,
@@ -93,10 +69,36 @@ export function SustainabilityProvider({ children }) {
             summary: {
               ...prev.summary,
               totalRecycledYTD: data.water.totalVolumeM3Ytd,
+              waterSavedYTD: data.water.totalVolumeM3Ytd,
               co2Avoided: data.water.totalAvoidedCo2TonYtd,
               costSavedYTD: data.water.totalCostSavedJuta,
             },
             monthlyTrend: data.water.monthlyTrend
+          }));
+        }
+
+        if (Array.isArray(data.fuel?.monthlyTrend)) {
+          setScope1(prev => ({
+            ...prev,
+            summary: {
+              ...prev.summary,
+              totalFuelLitersYTD: data.fuel.totalLitersYtd,
+              totalEmissionCO2e: data.fuel.totalEmissionTonYtd,
+              fuelCostTotalJuta: data.fuel.totalCostJutaYtd,
+            },
+            monthlyTrend: data.fuel.monthlyTrend
+          }));
+        }
+
+        if (Array.isArray(data.scope2?.monthlyTrend)) {
+          setScope2(prev => ({
+            ...prev,
+            summary: {
+              ...prev.summary,
+              totalPlnKwhYTD: data.scope2.totalPlnKwh,
+              totalEmissionCO2e: data.scope2.totalEmissionTon,
+            },
+            monthlyTrend: data.scope2.monthlyTrend
           }));
         }
 
@@ -213,10 +215,10 @@ export function SustainabilityProvider({ children }) {
       historyDetails = `${calc.label}: ${calc.liters.toLocaleString()} L • Emisi Scope 1: +${calc.emissionTon.toFixed(2)} tCO2e`;
 
       setScope1(prev => {
-        const monthMap = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
-        const ym = entry.yearMonth || (entry.date ? entry.date.slice(0, 7) : '2026-08');
+        const currentMonth = getYearToDateMonths().at(-1);
+        const ym = entry.yearMonth || (entry.date ? entry.date.slice(0, 7) : currentMonth.yearMonth);
         const monthNum = parseInt(ym.slice(5, 7), 10);
-        const targetMonth = monthMap[monthNum - 1] || 'Ags';
+        const targetMonth = MONTH_LABELS_SHORT[monthNum - 1] || currentMonth.label;
 
         let trendUpdated = false;
         const newTrend = (prev.monthlyTrend || []).map(m => {
@@ -416,12 +418,6 @@ export function SustainabilityProvider({ children }) {
       scope2,
       resumeKPI,
       carbonBalance,
-      overviewKPI: {
-        waterRecycled: { value: waterData.summary.waterSavedYTD, unit: 'm³', trend: '+12.3%', label: 'Air Terolah YTD' },
-        solarGenerated: { value: Math.round(pltsData.summary.energyGeneratedYTD / 1000), unit: 'MWh', trend: '+15.8%', label: 'Energi PLTS YTD' },
-        totalCostSaved: { value: Number((waterData.summary.costSavedYTD + pltsData.summary.costSavedYTD).toFixed(1)), unit: 'Juta Rp', trend: '+14.1%', label: 'Total Penghematan YTD' },
-        co2Avoided: { value: Number((carbonBalance.totalOffsetTon / 1000).toFixed(2)), unit: 'ktCO₂e', trend: '-10.1%', label: 'Pengurang Emisi YTD' },
-      },
       inputHistory,
       addDataEntry,
       importBatchData,

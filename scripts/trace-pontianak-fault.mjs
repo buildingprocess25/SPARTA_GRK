@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { executeIsolarRequest } from '../src/lib/solar/apiClient.js';
-import { readStore } from '../src/lib/solar/storage.js';
+import prisma from '../src/lib/prisma.js';
 
 async function main() {
   console.log('======================================================================');
@@ -91,40 +91,24 @@ async function main() {
     });
   }
 
-  // --- 2c. PlantLatest / Station Info ---
-  console.log('\n--- 2c. Raw ps_status, ps_fault_status, fault_count, alarm_count from latest sync/store ---');
-  const store = readStore();
-  const station = (store.latestTelemetry?.stationList || []).find(s => Number(s.ps_id || s.psId) === 1223413);
-  console.log('Plant Record for Pontianak (1223413):');
-  console.log(`  ps_status       : ${station?.ps_status ?? station?.psStatus ?? 'null'}`);
-  console.log(`  ps_fault_status : ${station?.ps_fault_status ?? station?.psFaultStatus ?? 'null'}`);
-  console.log(`  fault_count     : ${station?.fault_count ?? station?.faultCount ?? '0'}`);
-  console.log(`  alarm_count     : ${station?.alarm_count ?? station?.alarmCount ?? '0'}`);
-  console.log(`  curr_power      : ${station?.curr_power ?? station?.currPower ?? '—'} kW`);
-  console.log(`  today_energy    : ${station?.today_energy ?? station?.todayEnergy ?? '—'} kWh`);
-  console.log(`  fetch_time      : ${store.latestTelemetry?.lastSyncTime || store.updatedAt || '—'}`);
+  // --- 2c/2d. PlantLatest rows written by the in-app sync ---
+  const printPlant = (label, row) => {
+    console.log(label);
+    console.log(`  ps_status       : ${row?.psStatus ?? 'null'}`);
+    console.log(`  ps_fault_status : ${row?.psFaultStatus ?? 'null'}`);
+    console.log(`  fault_count     : ${row?.faultCount ?? '0'}`);
+    console.log(`  alarm_count     : ${row?.alarmCount ?? '0'}`);
+    console.log(`  curr_power      : ${row?.currPowerKw ?? '—'} kW`);
+    console.log(`  today_energy    : ${row?.todayEnergyKwh ?? '—'} kWh`);
+    console.log(`  waktu_update    : ${row?.vendorUpdateTime?.toISOString() || row?.updatedAt?.toISOString() || '—'}`);
+  };
+
+  console.log('\n--- 2c. Raw ps_status, ps_fault_status, fault_count, alarm_count from plant_latest ---');
+  printPlant('Plant Record for Pontianak (1223413):', await prisma.plantLatest.findUnique({ where: { psId: 1223413 } }));
 
   console.log('\n--- 2d. Offline Plants Check (Kotabumi & Bogor) ---');
-  const kotabumi = (store.latestTelemetry?.stationList || []).find(s => Number(s.ps_id || s.psId) === 1247367);
-  const bogor = (store.latestTelemetry?.stationList || []).find(s => Number(s.ps_id || s.psId) === 1162742);
-  
-  console.log('Alfamart DC Kotabumi (1247367):');
-  console.log(`  ps_status       : ${kotabumi?.ps_status ?? kotabumi?.psStatus ?? 'null'}`);
-  console.log(`  curr_power      : ${kotabumi?.curr_power ?? kotabumi?.currPower ?? '—'} kW`);
-  console.log(`  today_energy    : ${kotabumi?.today_energy ?? kotabumi?.todayEnergy ?? '—'} kWh`);
-  console.log(`  ps_fault_status : ${kotabumi?.ps_fault_status ?? kotabumi?.psFaultStatus ?? 'null'}`);
-  console.log(`  alarm_count     : ${kotabumi?.alarm_count ?? kotabumi?.alarmCount ?? '0'}`);
-  console.log(`  fault_count     : ${kotabumi?.fault_count ?? kotabumi?.faultCount ?? '0'}`);
-  console.log(`  waktu_update    : ${kotabumi?.curr_time || kotabumi?.update_time || store.latestTelemetry?.lastSyncTime || '—'}`);
-
-  console.log('\nAlfamart DC Bogor (1162742):');
-  console.log(`  ps_status       : ${bogor?.ps_status ?? bogor?.psStatus ?? 'null'}`);
-  console.log(`  curr_power      : ${bogor?.curr_power ?? bogor?.currPower ?? '—'} kW`);
-  console.log(`  today_energy    : ${bogor?.today_energy ?? bogor?.todayEnergy ?? '—'} kWh`);
-  console.log(`  ps_fault_status : ${bogor?.ps_fault_status ?? bogor?.psFaultStatus ?? 'null'}`);
-  console.log(`  alarm_count     : ${bogor?.alarm_count ?? bogor?.alarmCount ?? '0'}`);
-  console.log(`  fault_count     : ${bogor?.fault_count ?? bogor?.faultCount ?? '0'}`);
-  console.log(`  waktu_update    : ${bogor?.curr_time || bogor?.update_time || store.latestTelemetry?.lastSyncTime || '—'}`);
+  printPlant('Alfamart DC Kotabumi (1247367):', await prisma.plantLatest.findUnique({ where: { psId: 1247367 } }));
+  printPlant('\nAlfamart DC Bogor (1162742):', await prisma.plantLatest.findUnique({ where: { psId: 1162742 } }));
 
   console.log('\n======================================================================');
 }

@@ -13,6 +13,7 @@ import BaseModal from '@/components/ui/BaseModal';
 import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { notify } from '@/components/ui/ToastProvider';
 import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
+import { getYearToDateMonths } from '@/lib/reportingMonths';
 
 export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = [] }) {
   const { addDataEntry, refreshData } = useSustainability();
@@ -354,7 +355,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
           .filter(r => r.isValid)
           .forEach(r => {
             onSuccess({
-              yearMonth: r.period || '2026-08',
+              yearMonth: r.period || getYearToDateMonths().at(-1).yearMonth,
               dcId: r.facilityCode,
               dcName: r.facilityName || r.facilityCode,
               grid: r.gridRegion || 'JAMALI',

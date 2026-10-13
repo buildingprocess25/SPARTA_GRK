@@ -268,7 +268,7 @@ test('For every plant, calculated emission / energy never exceeds official grid 
   for (const entity of CANONICAL_DC_ENTITIES) {
     const factorObj = getGridFactor(entity.grid);
     const gridFactor = factorObj?.cmPlts ?? 0;
-    assert.ok(gridFactor <= 0.84, `PLTS Grid factor for ${entity.grid} (${gridFactor}) must not exceed 0.84 kgCO2e/kWh`);
+    assert.equal(gridFactor, 0.997, `PLTS factor for ${entity.grid} (${gridFactor}) must be the single 0.997 kgCO2e/kWh factor`);
 
     // Test across various energy levels (100 kWh to 100,000 kWh)
     for (const energyKwh of [100, 2500, 15000, 50000, 100000]) {
@@ -279,8 +279,8 @@ test('For every plant, calculated emission / energy never exceeds official grid 
         `Effective factor ${effectiveFactor} exceeds grid factor ${gridFactor} for ${entity.dcId}`
       );
       assert.ok(
-        effectiveFactor <= 0.840001,
-        `Effective factor ${effectiveFactor} exceeds national maximum 0.84 for ${entity.dcId}`
+        effectiveFactor <= 0.997001,
+        `Effective factor ${effectiveFactor} exceeds the 0.997 PLTS factor for ${entity.dcId}`
       );
     }
   }

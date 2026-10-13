@@ -1,4 +1,8 @@
 import puppeteer from 'puppeteer';
+import fs from 'fs';
+
+// Screenshots stay out of public/, which ships to production.
+fs.mkdirSync('docs/evidence/screenshots', { recursive: true });
 
 (async () => {
   const browser = await puppeteer.launch({ headless: 'new' });
@@ -22,8 +26,8 @@ import puppeteer from 'puppeteer';
   await new Promise(r => setTimeout(r, 2000));
 
   // 1. Screenshot of Top 4 KPI Cards
-  await page.screenshot({ path: 'public/clean_kpi_cards.png' });
-  console.log('Saved public/clean_kpi_cards.png');
+  await page.screenshot({ path: 'docs/evidence/screenshots/clean_kpi_cards.png' });
+  console.log('Saved docs/evidence/screenshots/clean_kpi_cards.png');
 
   // Find the Analisis Kinerja PLTS container
   const getAnalysisEl = async () => page.$('[data-plts-performance-analysis="true"]');
@@ -36,8 +40,8 @@ import puppeteer from 'puppeteer';
   });
   await new Promise(r => setTimeout(r, 1000));
   let el = await getAnalysisEl();
-  if (el) await el.screenshot({ path: 'public/tab1_produksi_element.png' });
-  console.log('Saved public/tab1_produksi_element.png');
+  if (el) await el.screenshot({ path: 'docs/evidence/screenshots/tab1_produksi_element.png' });
+  console.log('Saved docs/evidence/screenshots/tab1_produksi_element.png');
 
   // Click Tab 2: Performa Sistem (PR)
   await page.evaluate(() => {
@@ -47,8 +51,8 @@ import puppeteer from 'puppeteer';
   });
   await new Promise(r => setTimeout(r, 1000));
   el = await getAnalysisEl();
-  if (el) await el.screenshot({ path: 'public/tab2_pr_element.png' });
-  console.log('Saved public/tab2_pr_element.png');
+  if (el) await el.screenshot({ path: 'docs/evidence/screenshots/tab2_pr_element.png' });
+  console.log('Saved docs/evidence/screenshots/tab2_pr_element.png');
 
   // Click Tab 3: Parameter Pendukung
   await page.evaluate(() => {
@@ -58,8 +62,8 @@ import puppeteer from 'puppeteer';
   });
   await new Promise(r => setTimeout(r, 1000));
   el = await getAnalysisEl();
-  if (el) await el.screenshot({ path: 'public/tab3_support_element.png' });
-  console.log('Saved public/tab3_support_element.png');
+  if (el) await el.screenshot({ path: 'docs/evidence/screenshots/tab3_support_element.png' });
+  console.log('Saved docs/evidence/screenshots/tab3_support_element.png');
 
   // Click Tab 4: Beban vs PLTS
   await page.evaluate(() => {
@@ -69,8 +73,8 @@ import puppeteer from 'puppeteer';
   });
   await new Promise(r => setTimeout(r, 1000));
   el = await getAnalysisEl();
-  if (el) await el.screenshot({ path: 'public/tab4_load_element.png' });
-  console.log('Saved public/tab4_load_element.png');
+  if (el) await el.screenshot({ path: 'docs/evidence/screenshots/tab4_load_element.png' });
+  console.log('Saved docs/evidence/screenshots/tab4_load_element.png');
 
   // Click Tab 4 by-branch view
   await page.evaluate(() => {
@@ -89,8 +93,8 @@ import puppeteer from 'puppeteer';
     window.scrollTo(0, document.body.scrollHeight / 2);
   });
   await new Promise(r => setTimeout(r, 1000));
-  await page.screenshot({ path: 'public/monthly_matrix_table.png' });
-  console.log('Saved public/monthly_matrix_table.png');
+  await page.screenshot({ path: 'docs/evidence/screenshots/monthly_matrix_table.png' });
+  console.log('Saved docs/evidence/screenshots/monthly_matrix_table.png');
 
   await browser.close();
   console.log('Console errors count:', consoleErrors.length);

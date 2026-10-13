@@ -19,7 +19,7 @@ if (fs.existsSync(envLocalPath)) {
 }
 
 import { getValidToken, executeIsolarRequest } from '../apiClient.js';
-import { readStore } from '../storage.js';
+import { getQuotaSnapshot } from '../sync.js';
 import { QUOTA_CONFIG } from '../endpoints.js';
 
 async function runStep3b() {
@@ -59,7 +59,7 @@ async function runStep3b() {
 
     const httpStatus = response.status;
     const json = await response.json();
-    const store = readStore();
+    const store = { quota: await getQuotaSnapshot() };
 
     const rawData = json.result_data || {};
     const pageList = rawData.pageList || rawData.data_list || rawData.list || [];

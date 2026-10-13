@@ -2,6 +2,8 @@
 
 Dokumen ini memetakan, membuktikan dengan data riil, dan mencatat perbaikan menyeluruh atas ketidaksesuaian angka antara halaman **Kelistrikan PLTS Atap** (`PLTSTab.jsx`) dan **Scope 2: Listrik PLN** (`Scope2AnnualLoadDashboard.jsx`) di Dashboard ESG Alfamart.
 
+> Catatan Oktober 2026: emisi terhindar PLTS sekarang memakai faktor tunggal 0,997 kgCO₂/kWh di semua grid, bukan faktor regional ESDM. Angka emisi PLTS di dokumen ini adalah nilai pada saat audit. Angka terbaru ada di `EMISSION_CALCULATION_CANONICAL.md`.
+
 ---
 
 ## 1. Petakan Sumber (Traceability Table)
