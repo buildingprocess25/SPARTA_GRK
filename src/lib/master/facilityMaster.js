@@ -67,7 +67,7 @@ export const BRANCH_LIST = [
  * Database (facility_master table) is the authoritative source for all runtime operations.
  */
 export const MASTER_FACILITIES = [
-  // ─── 1. HEAD OFFICE ────────────────────────────────────────────────────────
+  // Head office
   {
     id: 'FAC-HO-ALFATOWER',
     code: 'HO-01',
@@ -90,7 +90,7 @@ export const MASTER_FACILITIES = [
     linkedPlantDcId: null
   },
 
-  // ─── 2. KANTOR CABANG UTAMA (VERIFIED BRANCH OFFICES) ──────────────────────
+  // Kantor cabang utama (terverifikasi)
   {
     id: 'FAC-BR-TGR1',
     code: 'BR-TGR1-OFFICE',
@@ -152,7 +152,7 @@ export const MASTER_FACILITIES = [
     hasPlts: false
   },
 
-  // ─── 3. TOKO / STORE PILOT WITH ROOFTOP PLTS (VERIFIED) ────────────────────
+  // Toko pilot dengan PLTS atap (terverifikasi)
   {
     id: 'FAC-STR-DEMANSION',
     code: 'STR-DTR-DEM',
@@ -196,7 +196,7 @@ export const MASTER_FACILITIES = [
     linkedPlantDcId: 'Tk. Drive Thru GS'
   },
 
-  // ─── 4. PHYSICAL DISTRIBUTION CENTERS (VERIFIED FROM MONITOR PLTS) ─────────
+  // Distribution center fisik (terverifikasi dari Monitor PLTS)
   {
     id: 'FAC-DC-BALARAJA',
     code: 'DC-BLR',

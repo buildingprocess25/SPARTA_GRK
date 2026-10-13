@@ -52,7 +52,6 @@ export async function POST(request) {
   try {
     const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '127.0.0.1';
 
-    // 1. Rate Limiting Check
     if (!checkRateLimit(clientIp)) {
       return NextResponse.json({
         success: false,
@@ -64,7 +63,6 @@ export async function POST(request) {
       });
     }
 
-    // 2. Security Token Verification
     const expectedSecret = process.env.REVALIDATE_SECRET_TOKEN || process.env.CRON_SECRET || 'plts_internal_secret_key_2026';
     const providedToken = extractToken(request);
 
@@ -82,7 +80,6 @@ export async function POST(request) {
     const url = new URL(request.url);
     const tag = url.searchParams.get('tag') || PLTS_CACHE_TAG;
 
-    // 3. Invalidate in-memory server cache and trigger background pre-warm
     revalidatePltsDashboardCache({ backgroundPreWarm: true });
 
     return NextResponse.json({

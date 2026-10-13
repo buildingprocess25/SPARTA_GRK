@@ -58,14 +58,12 @@ export async function summarizePlts({ period, grid, dc, compareYears, comparison
 }
 
 async function computeSummarizePlts({ period, grid, dc, compareYears, comparisonThroughMonth } = {}) {
-  // 1. Fetch SyncRun for freshness & status
   const lastSync = await prisma.syncRun.findFirst({
     where: { status: 'success' },
     orderBy: { finishedAt: 'desc' },
   });
   const fetchedAt = lastSync ? lastSync.finishedAt : new Date();
 
-  // 2. Discover available months in DB
   const monthGroups = await prisma.monthlyYield.groupBy({
     by: ['yearMonth'],
     _count: { psId: true },
@@ -118,7 +116,7 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
     });
   }
 
-  // 3. Resolve active period bounds
+  // Active period bounds
   let startYearMonth = firstMonth;
   let endYearMonth = lastFullMonth;
 
@@ -151,7 +149,6 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
     ? (isCurrentMonthPartial ? `${formatMonthLabel(startYearMonth)} (sebagian)` : `${MONTH_NAMES_ID[parseInt(startYearMonth.slice(4, 6), 10) - 1]} ${startYearMonth.slice(0, 4)}`)
     : `${formatMonthLabel(startYearMonth)} - ${formatMonthLabel(endYearMonth)} (YTD)`;
 
-  // 4. Fetch production yields for the active period
   const yields = await prisma.monthlyYield.findMany({
     where: {
       yearMonth: {
@@ -238,7 +235,7 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
   }
   const isFresh = lastSync && lastSync.status === 'success' && ageMinutes < 90;
 
-  // 5. Build entity map and aggregate
+  // Build entity map and aggregate
   const resultsMap = new Map();
   const dcEntities = CANONICAL_DC_ENTITIES.filter(isDcLocation);
 
@@ -407,7 +404,7 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
     }
   });
 
-  // 6. Calculate KPIs and format location list
+  // KPIs and location list
   const rawLocations = [];
   let kpiTotalKwp = 0;
   let kpiTotalMwh = 0;

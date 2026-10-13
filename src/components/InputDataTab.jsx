@@ -515,7 +515,7 @@ export default function InputDataTab({ setActiveTab }) {
         payload.efficiencyHasBaseline = inputValues.efficiencyHasBaseline;
       }
 
-      // 1. Post to backend API for database persistence and server-side recalculation
+      // Server persists and recalculates.
       const res = await fetch('/api/sustainability', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -528,7 +528,7 @@ export default function InputDataTab({ setActiveTab }) {
         throw new Error(resData.message || 'Gagal menyimpan ke server database');
       }
 
-      // 2. Also update local Context if needed (only for final transaction)
+      // Local context is updated only for final (non-draft) entries.
       if (!isDraft) {
         addDataEntry({
           ...payload,
@@ -718,7 +718,6 @@ export default function InputDataTab({ setActiveTab }) {
         </div>
       )}
 
-      {/* 1. HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center gap-3">
           {inputMode === 'manual' && currentStep > 1 && (

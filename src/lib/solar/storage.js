@@ -98,14 +98,12 @@ export function readStore() {
     const timeInfo = getWIBTimeInfo();
     let isDirty = false;
 
-    // 1. Reset Hourly Counter
     if (state.quota.hourWIB !== timeInfo.hourWIB) {
       state.quota.hourWIB = timeInfo.hourWIB;
       state.quota.callsThisHour = 0;
       isDirty = true;
     }
 
-    // 2. Reset Daily Counter
     if (state.quota.dateWIB !== timeInfo.dateWIB) {
       state.quota.dateWIB = timeInfo.dateWIB;
       state.quota.callsToday = 0;
@@ -113,7 +111,6 @@ export function readStore() {
       isDirty = true;
     }
 
-    // 3. Reset Monthly Counter
     if (state.quota.monthWIB !== timeInfo.monthWIB) {
       state.quota.monthWIB = timeInfo.monthWIB;
       state.quota.callsThisMonth = 0;
@@ -135,7 +132,7 @@ export function readStore() {
 
 
 
-    // 4. Auto-unblock login if credentials have changed in .env.local
+    // Unblock login once the credentials in .env.local change.
     const currentHash = computeCredentialHash();
     if (state.loginSecurity.isBlocked && state.loginSecurity.lastCredentialHash !== currentHash) {
       state.loginSecurity.isBlocked = false;

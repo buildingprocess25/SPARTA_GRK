@@ -303,7 +303,7 @@ async function executeWithTiming(cachePrefix, rawQuery, builderFn, options = {})
     const entry = serverMemoryCache.get(cacheKey);
     const ageMs = nowMs - entry.timestamp;
 
-    // 1. Fresh Cache HIT (< PLTS_SERVER_CACHE_FRESH_MS e.g. 5 min)
+    // Fresh hit (under PLTS_SERVER_CACHE_FRESH_MS, ~5 min)
     if (ageMs < PLTS_SERVER_CACHE_FRESH_MS) {
       return {
         data: entry.data,
@@ -311,7 +311,7 @@ async function executeWithTiming(cachePrefix, rawQuery, builderFn, options = {})
       };
     }
 
-    // 2. Stale-While-Revalidate Cache HIT (between 5 min and 30 min)
+    // Stale-while-revalidate hit (5-30 min)
     if (ageMs < PLTS_SERVER_CACHE_TTL_MS) {
       // Trigger non-blocking asynchronous background refresh via single-flight
       executeWithTiming(cachePrefix, rawQuery, builderFn, { ...options, skipCache: true })

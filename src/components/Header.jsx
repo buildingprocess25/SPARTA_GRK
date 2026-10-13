@@ -228,7 +228,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
             )}
 
             <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
-              {/* 1. INFORMASI AKUN & IDENTITAS */}
+              {/* Informasi akun */}
               <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase">
@@ -258,7 +258,7 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                 </div>
               </div>
 
-              {/* 2. RESET PASSWORD */}
+              {/* Reset password */}
               <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase">

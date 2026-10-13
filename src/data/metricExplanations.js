@@ -9,9 +9,7 @@
  */
 
 export const METRIC_EXPLANATIONS = {
-  // =========================================================================
-  // KELISTRIKAN PLTS ATAP — STAT CARDS UTAMA
-  // =========================================================================
+  // PLTS atap: stat card utama
   plts_capacity: {
     title: 'Kapasitas PLTS',
     badge: 'kWp',
@@ -48,9 +46,7 @@ export const METRIC_EXPLANATIONS = {
     varianceReason: 'Listrik yang diekspor ke PLN tidak dihitung sebagai penghematan emisi DC. Angka juga bisa berbeda bila dibandingkan dengan faktor emisi grid regional ESDM (0,87 kgCO₂/kWh).',
   },
 
-  // =========================================================================
-  // KELISTRIKAN PLTS ATAP — GRAFIK & KOMPOSISI
-  // =========================================================================
+  // PLTS atap: grafik & komposisi
   plts_monthly_comparison: {
     title: 'Produksi PLTS vs Konsumsi PLN (Bulanan)',
     badge: 'Tren Bulanan',
@@ -69,9 +65,7 @@ export const METRIC_EXPLANATIONS = {
     varianceReason: 'Bauran energi bervariasi musiman (musim kemarau vs hujan) serta luas atap dan kapasitas PLTS yang berbeda pada masing-masing DC.',
   },
 
-  // =========================================================================
-  // KELISTRIKAN PLTS ATAP — SUMMARY CARD & DC TABLE
-  // =========================================================================
+  // PLTS atap: summary card & tabel DC
   plts_summary_capacity: {
     title: 'Kapasitas Terpasang (Ringkasan)',
     badge: 'kWp',
@@ -135,9 +129,7 @@ export const METRIC_EXPLANATIONS = {
     varianceReason: 'Plant dalam pembangunan (DC Gorontalo) dikecualikan dari perangkingan dan rata-rata nasional.',
   },
 
-  // =========================================================================
-  // SCOPE 2: LISTRIK PLN — STAT CARDS UTAMA
-  // =========================================================================
+  // Scope 2 listrik PLN: stat card utama
   scope2_emission_ytd: {
     title: 'Emisi Scope 2 YTD',
     badge: 'tCO₂e',
@@ -174,9 +166,7 @@ export const METRIC_EXPLANATIONS = {
     varianceReason: 'Bulan berjalan yang belum tuntas (parsial) tidak dimasukkan dalam pembagi agar proyeksi tidak meleset ke bawah.',
   },
 
-  // =========================================================================
-  // SCOPE 2: LISTRIK PLN — WATERFALL, GRAFIK & TABEL
-  // =========================================================================
+  // Scope 2 listrik PLN: waterfall, grafik & tabel
   scope2_waterfall: {
     title: 'Dari Beban ke Emisi (Waterfall)',
     badge: 'Neraca Energi',

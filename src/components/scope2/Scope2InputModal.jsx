@@ -187,7 +187,6 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
     };
 
     try {
-      // 1. Post to API backend
       const response = await fetch('/api/sustainability', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -196,13 +195,12 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
       const result = await response.json().catch(() => null);
       if (!response.ok) throw new Error(result?.message || result?.error || 'Server menolak data Scope 2.');
 
-      // 2. Add to Local Sustainability Context
       addDataEntry({
         ...payload,
         date: dateStr
       });
 
-      // 3. Callback to parent dashboard to update state instantly
+      // Lets the parent dashboard update without a refetch.
       if (onSuccess) {
         onSuccess({
           yearMonth,

@@ -161,31 +161,27 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
     }
   };
 
-  // ============================================================
-  // KOMPILASI DATA BULANAN: PENAMBAHAN VS PENGURANGAN EMISI (tCO2e)
-  // Reconciled using ESDM & IPCC factors from carbonEngine
-  // ============================================================
+  // Kompilasi bulanan penambahan vs pengurangan emisi (tCO2e),
+  // memakai faktor ESDM & IPCC dari carbonEngine.
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags'];
   const totalMonths = months.length;
 
   const { monthlyComparisonData, avgPenambahan, avgPengurangan, avgNet, avgOffsetRatio } = useMemo(() => {
     const list = months.map((month, idx) => {
-      // 1. Penambahan Emisi: Scope 1 (Genset) + Scope 2 (PLN)
+      // Penambahan: Scope 1 (genset) + Scope 2 (PLN)
       const s1Ton = scope1.monthlyTrend[idx]?.emissionTon || 0;
       const s2Ton = scope2.monthlyTrend[idx]?.emissionTon || 0;
       const penambahanTon = Number((s1Ton + s2Ton).toFixed(1));
 
-      // 2. Pengurangan Emisi: PLTS avoided + Water avoided
+      // Pengurangan: PLTS + water recycle avoided
       const pltsKwh = pltsData.monthlyTrend[idx]?.pltsGen || 0;
       const pltsAvoided = (pltsKwh * CARBON_FACTORS.PLTS_PORTFOLIO.CM_BASELINE_PLTS) / 1000;
       const waterM3 = waterData.monthlyTrend[idx]?.recycled || 0;
       const waterAvoided = (waterM3 * CARBON_FACTORS.WATER.FACTOR_KG_PER_M3) / 1000;
       const penguranganTon = Number((pltsAvoided + waterAvoided).toFixed(1));
 
-      // 3. Emisi Bersih (Net Emission)
       const netTon = Number((penambahanTon - penguranganTon).toFixed(1));
 
-      // 4. Rasio Offset / Efektivitas (%)
       const offsetRatioPct = penambahanTon > 0
         ? Number(((penguranganTon / penambahanTon) * 100).toFixed(2))
         : 0;
@@ -228,7 +224,6 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
 
   return (
     <div className="space-y-6 animate-in">
-      {/* 1. Header & Actions */}
       <PageHeader
         title="Dashboard Emisi Karbon"
         subtitle="Pemantauan konsolidasi emisi operasional DC Alfamart."
@@ -254,7 +249,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         </div>
       )}
 
-      {/* 2. Ringkasan Metrik (High Priority First Sight) */}
+      {/* Ringkasan metrik */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
         {/* Metric 1: Net Emission */}
         <KpiCard
@@ -297,7 +292,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         />
       </div>
 
-      {/* 2b. Card Ringkas & Panel Accordion: Kalkulator Emisi GRK (Lazy-loaded) */}
+      {/* Kalkulator emisi GRK (lazy-loaded accordion) */}
       <div ref={calculatorRef} className="scroll-mt-6">
         <CardBox className="border-blue-100/90 dark:border-blue-500/20 bg-gradient-to-r from-blue-50/40 via-white to-slate-50/50 dark:from-blue-500/10 dark:via-slate-900 dark:to-slate-800/60 shadow-sm transition-all">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -376,10 +371,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         </CardBox>
       </div>
 
-      {/* ============================================================
-          2. GRAFIK TREN BULANAN: PENAMBAHAN VS PENGURANGAN EMISI
-          Lengkap dengan Rata-rata & Analisis Perbandingan Rasio
-          ============================================================ */}
+      {/* Grafik tren bulanan penambahan vs pengurangan emisi, dengan rata-rata dan rasio offset */}
       <CardBox className="space-y-6">
         <div className="flex flex-wrap items-start justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
@@ -703,7 +695,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         )}
       </CardBox>
 
-      {/* 6. COLLAPSIBLE DETAILED PROTOCOL MAPPING */}
+      {/* Pemetaan protokol (collapsible) */}
       <CardBox className="p-5 lg:p-6">
         <button
           type="button"

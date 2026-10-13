@@ -165,7 +165,6 @@ export default function MetricInfoIcon({
           </div>
 
           <div className="mt-3 space-y-3 text-xs">
-            {/* 1. Definisi */}
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                 1. Definisi Metrik
@@ -175,7 +174,6 @@ export default function MetricInfoIcon({
               </p>
             </div>
 
-            {/* 2. Rumus Perhitungan */}
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1 mb-1">
                 <Calculator size={11} />
@@ -186,7 +184,6 @@ export default function MetricInfoIcon({
               </div>
             </div>
 
-            {/* 3. Sumber Data */}
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1 mb-1">
                 <Database size={11} />
@@ -197,7 +194,6 @@ export default function MetricInfoIcon({
               </p>
             </div>
 
-            {/* 4. Kenapa Angka Bisa Berbeda? */}
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1 mb-1">
                 <AlertCircle size={11} />

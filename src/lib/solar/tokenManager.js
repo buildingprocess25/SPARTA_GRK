@@ -211,7 +211,6 @@ export async function getValidToken({ isLive = false, forceRefresh = false } = {
 
   const now = Date.now();
 
-  // 1. Check PostgreSQL Database if not forcing refresh
   if (!forceRefresh) {
     try {
       const existing = await prisma.apiToken.findUnique({ where: { id: 1 } });
@@ -246,7 +245,7 @@ export async function getValidToken({ isLive = false, forceRefresh = false } = {
     }
   }
 
-  // 2. In-Process Single-Flight Lock
+  // In-process single-flight lock
   if (inFlightTokenPromise) {
     return inFlightTokenPromise;
   }
@@ -254,7 +253,7 @@ export async function getValidToken({ isLive = false, forceRefresh = false } = {
   inFlightTokenPromise = (async () => {
     let dbLockAcquired = false;
     try {
-      // 3. Multi-Instance DB Lock
+      // Multi-instance DB lock
       dbLockAcquired = await acquireTokenDbLock(TOKEN_LOCK_DURATION_MS);
       if (!dbLockAcquired) {
         // Wait 1.5s for the other instance to finish login
@@ -272,7 +271,7 @@ export async function getValidToken({ isLive = false, forceRefresh = false } = {
         } catch (_) {}
       }
 
-      // 4. Double-check DB in case token was saved right before lock
+      // Another instance may have saved a token while we waited for the lock.
       if (!forceRefresh) {
         try {
           const doubleCheck = await prisma.apiToken.findUnique({ where: { id: 1 } });
@@ -287,7 +286,6 @@ export async function getValidToken({ isLive = false, forceRefresh = false } = {
         } catch (_) {}
       }
 
-      // 5. Execute Login
       const result = await performVendorLogin();
       return result;
     } finally {

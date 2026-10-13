@@ -28,35 +28,31 @@ export async function GET(request) {
       });
     }
 
-    // 1. Fetch Real Energy Measurements from DB (Only Verified/Active, exclude DRAFT from actuals)
+    // Actuals only: DRAFT rows are excluded.
     const energyRecords = await prisma.energyMeasurement.findMany({
       where: { qualityStatus: { not: 'DRAFT' } },
       orderBy: [{ yearMonth: 'asc' }, { dcId: 'asc' }]
     });
 
-    // 2. Fetch Real Water Activity Records from DB (Exclude DRAFT from actuals)
     const waterRecords = await prisma.waterActivity.findMany({
       where: { qualityStatus: { not: 'DRAFT' } },
       orderBy: [{ yearMonth: 'asc' }, { branchName: 'asc' }]
     });
 
-    // 3. Fetch Fuel Activity Records from DB (Exclude DRAFT from actuals)
     const fuelRecords = await prisma.fuelActivity.findMany({
       where: { status: { in: ['ACTIVE', 'APPROVED', 'VERIFIED'] } },
       orderBy: [{ date: 'desc' }]
     });
 
-    // 4. Fetch Targets from DB
     const targetRecords = await prisma.productionTarget.findMany({
       orderBy: [{ yearMonth: 'asc' }]
     });
 
-    // 5. Fetch Canonical Plant Masters
     const plantMasters = await prisma.plantMaster.findMany({
       orderBy: [{ canonicalName: 'asc' }]
     });
 
-    // 6. Aggregate Monthly Trends for PLTS Energy (8 months)
+    // Monthly PLTS trend (8 months)
     const monthKeys = ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08'];
     const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags'];
 
@@ -83,7 +79,7 @@ export async function GET(request) {
       };
     });
 
-    // 7. Aggregate Monthly Trends for Water Recycle
+    // Monthly water recycle trend
     const waterMonthlyTrend = monthKeys.map((ym, idx) => {
       const monthWater = waterRecords.filter(r => r.yearMonth === ym);
       const totalVolumeM3 = monthWater.reduce((acc, r) => acc + r.volumeM3, 0);
@@ -100,7 +96,7 @@ export async function GET(request) {
       };
     });
 
-    // 8. Aggregate Scope 1 & Scope 2 (Strictly Actual)
+    // Scope 1 and 2, actuals only
     const totalPltsAvoidedTon = pltsMonthlyTrend.reduce((acc, m) => acc + m.avoidedCo2Ton, 0);
     const totalWaterAvoidedTon = waterMonthlyTrend.reduce((acc, m) => acc + m.avoidedCo2Ton, 0);
     const totalPltsCostSavedJuta = (pltsMonthlyTrend.reduce((acc, m) => acc + m.pltsGen, 0) * CARBON_FACTORS.TARIFFS.ELECTRICITY_PLN_PER_KWH) / 1_000_000;

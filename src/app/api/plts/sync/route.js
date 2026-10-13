@@ -28,7 +28,7 @@ export async function POST(request) {
 
     const now = Date.now();
 
-    // 1. In-flight Concurrency Guard (cegah sync ganda bersamaan)
+    // Prevent concurrent syncs.
     if (syncState.inFlightSyncPromise) {
       return NextResponse.json({
         success: false,
@@ -38,7 +38,7 @@ export async function POST(request) {
       }, { status: 409 });
     }
 
-    // 2. Cooldown / Rate Limit Check (30-60 detik)
+    // Cooldown (30-60 s)
     const timeSinceLastSync = now - syncState.lastSyncTime;
     if (timeSinceLastSync < SYNC_COOLDOWN_MS) {
       const remainingSec = Math.ceil((SYNC_COOLDOWN_MS - timeSinceLastSync) / 1000);
@@ -52,7 +52,6 @@ export async function POST(request) {
       }, { status: 429 });
     }
 
-    // 3. Execute sync with Mutex Promise
     const syncExecution = (async () => {
       try {
         const syncResult = await runSync({ trigger: 'manual' });

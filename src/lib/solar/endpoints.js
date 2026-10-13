@@ -15,7 +15,7 @@
  */
 
 export const ISOLAR_ENDPOINTS_META = {
-  // --- AUTHORIZATION ---
+  // Authorization
   LOGIN: {
     path: '/openapi/login',
     category: 'Authorization',
@@ -24,7 +24,7 @@ export const ISOLAR_ENDPOINTS_META = {
     description: 'Server-side login to acquire token'
   },
 
-  // --- MONITORING & MASTER DATA ---
+  // Monitoring & master data
   GET_POWER_STATION_LIST: {
     path: '/openapi/getPowerStationList',
     category: 'Monitoring',
@@ -54,7 +54,7 @@ export const ISOLAR_ENDPOINTS_META = {
     description: 'Query vendor rate limits and quota residue'
   },
 
-  // --- TELEMETRY & REALTIME DATA ---
+  // Telemetry & realtime data
   GET_PV_INVERTER_REALTIME_DATA: {
     path: '/openapi/getPVInverterRealTimeData',
     category: 'Live Inverter Telemetry',
@@ -77,7 +77,7 @@ export const ISOLAR_ENDPOINTS_META = {
     description: 'Active fault and alarm records across all stations'
   },
 
-  // --- HISTORICAL AGGREGATION ---
+  // Historical aggregation
   GET_DEVICE_POINTS_DAY_MONTH_YEAR_DATA_LIST: {
     path: '/openapi/getDevicePointsDayMonthYearDataList',
     category: 'Historical Telemetry',
@@ -86,7 +86,7 @@ export const ISOLAR_ENDPOINTS_META = {
     description: 'Daily/monthly historical generation per inverter/plant point'
   },
 
-  // --- PROHIBITED / DILARANG ---
+  // Prohibited
   PARAM_SETTING: {
     path: '/openapi/paramSetting',
     category: 'Device Configuration',

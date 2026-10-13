@@ -183,7 +183,7 @@ export async function buildInverterTempXlsx({
 
   const dailyRecords = await fetchDailyInverterTempDetails({ year, db });
 
-  // 1. Sheet 1: Ringkasan Bulanan
+  // Sheet 1: ringkasan bulanan
   const sheet1Data = [
     [
       'Bulan (YYYY-MM)',
@@ -209,7 +209,7 @@ export async function buildInverterTempXlsx({
     ]),
   ];
 
-  // 2. Sheet 2: Rincian Harian
+  // Sheet 2: rincian harian
   const sheet2Data = [
     [
       'Tanggal (WIB)',
@@ -247,7 +247,7 @@ export async function buildInverterTempXlsx({
       : [['Belum ada data rekaman harian inverter temperature', '', '', '', '', '', '', '', '', '', '', '', '', '']]),
   ];
 
-  // 3. Sheet 3: Metadata & Kualitas
+  // Sheet 3: metadata & kualitas
   const meta = performanceData.metadata;
   const sheet3Data = [
     ['Parameter Metadata', 'Nilai / Keterangan'],

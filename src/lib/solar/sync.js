@@ -26,15 +26,12 @@ import { classifyVendorPlantStatus } from './status.js';
 import { isDcLocation, CANONICAL_DC_ENTITIES } from './plantMap.js';
 import { getValidToken } from './tokenManager.js';
 
-// ─── Constants ───────────────────────────────────────────────────────────────
 const SYNC_WINDOW = { start: 5, end: 18, startMinute: 30, endMinute: 30 };
 // 05:30 - 18:30 WIB
 const LOCK_DURATION_MS = 120_000; // 2 minutes
 const MANUAL_COOLDOWN_MS = 60_000; // 60 seconds
 const MIN_PLANT_COUNT_FIRST = 30;
 const MIN_PLANT_RATIO = 0.9;
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Get WIB time info for quota buckets */
 export function getWibTimeInfo(date = new Date()) {
@@ -107,7 +104,7 @@ function normalizeTotalEnergyKwh(metricObj) {
   return val; // default kWh
 }
 
-// ─── Lock Management ─────────────────────────────────────────────────────────
+// Lock management
 // Single shared lock (sync_lock row id=1) used by BOTH the in-app scheduler
 // (runSync below) and the standalone scripts/sync-isolar.mjs job. They must
 // share one implementation/duration so a run by either side is recognized
@@ -151,7 +148,7 @@ export async function releaseLock() {
 
 export { LOCK_DURATION_MS };
 
-// ─── Quota Management ────────────────────────────────────────────────────────
+// Quota management
 
 async function getQuotaCounts(now = new Date()) {
   const { hourBucket, monthBucket } = getWibTimeInfo(now);
@@ -197,14 +194,12 @@ function checkQuotaGuardFromCounts(hourly, monthly) {
   return { status: 'NORMAL', allow: true, hourly, monthly, hourlyRatio, monthlyRatio };
 }
 
-// ─── Token Management ────────────────────────────────────────────────────────
+// Token management
 
 async function getOrRefreshToken({ force = false } = {}) {
   const tokenObj = await getValidToken({ isLive: true, forceRefresh: force });
   return tokenObj.token;
 }
-
-// ─── Main Sync Function ─────────────────────────────────────────────────────
 
 /**
  * @param {{ trigger: 'cron'|'manual'|'fallback' }} options
@@ -221,7 +216,7 @@ export async function runSync({ trigger = 'cron' } = {}) {
   });
   
   try {
-    // 1. Window check (manual bypasses)
+    // Manual triggers bypass the sync window.
     if (trigger !== 'manual' && !isInSyncWindow(now)) {
       await prisma.syncRun.update({
         where: { id: syncRun.id },
@@ -230,7 +225,6 @@ export async function runSync({ trigger = 'cron' } = {}) {
       return { syncRun: { ...syncRun, status: 'skipped' }, plantCount: 0, httpCalls: 0 };
     }
     
-    // 2. Lock
     const gotLock = await acquireLock();
     if (!gotLock) {
       await prisma.syncRun.update({
@@ -241,7 +235,6 @@ export async function runSync({ trigger = 'cron' } = {}) {
     }
     
     try {
-      // 3. Quota guard
       const quotaCounts = await getQuotaCounts(now);
       const guard = checkQuotaGuardFromCounts(quotaCounts.hourly, quotaCounts.monthly);
       if (!guard.allow) {
@@ -252,10 +245,10 @@ export async function runSync({ trigger = 'cron' } = {}) {
         return { syncRun: { ...syncRun, status: 'skipped' }, plantCount: 0, httpCalls: 0 };
       }
       
-      // 4. Token (checks DB, auto-refreshes if remaining life < 5 minutes)
+      // Refreshes the token when under 5 minutes of life remain.
       let token = await getOrRefreshToken({ force: false });
       
-      // 5. Fetch plant list (1 call) with retry on token error / 401
+      // Plant list: one call, retried on token error / 401.
       const baseUrl = process.env.ISOLAR_BASE_URL || 'https://gateway.isolarcloud.com.hk';
       const appKey = process.env.ISOLAR_APP_KEY;
       const secretKey = process.env.ISOLAR_SECRET_KEY;
@@ -357,7 +350,7 @@ export async function runSync({ trigger = 'cron' } = {}) {
         throw new Error(lastFetchError ? `Gagal mengambil data plant setelah 3x percobaan: ${lastFetchError.message}` : 'Data iSolar kosong setelah retry');
       }
       
-      // 7. Validate before write
+      // Validate before write
       const lastSuccess = await prisma.syncRun.findFirst({
         where: { status: 'success' },
         orderBy: { startedAt: 'desc' },
@@ -377,7 +370,7 @@ export async function runSync({ trigger = 'cron' } = {}) {
         throw new Error(`Validasi gagal: ps_id tidak unik (${uniqueIds.size} unik dari ${rawPlants.length})`);
       }
       
-      // 8. Atomic write (only DC locations persisted)
+      // Atomic write; only DC locations are persisted.
       const dcPlants = rawPlants.filter(p => isDcLocation(p));
       const dcPsIds = dcPlants.map(p => Number(p.ps_id));
       const { dateWib, hour: localHour } = getWibTimeInfo(now);
@@ -580,7 +573,7 @@ export async function runSync({ trigger = 'cron' } = {}) {
         }
       }
 
-      // ─── Sub-component 2: Faults & Alarms (getFaultAlarmInfo 24h) ───────────
+      // Faults & alarms (getFaultAlarmInfo, 24h)
       try {
         let curPage = 1;
         let totalPages = 1;
@@ -654,7 +647,7 @@ export async function runSync({ trigger = 'cron' } = {}) {
             const processStatus = String(f.process_status || '8');
 
             if (processStatus === '8') {
-              // 1. Write to FaultActive table
+              // FaultActive
               activeFaultsCount++;
               await prisma.faultActive.upsert({
                 where: { faultCode },
@@ -665,7 +658,7 @@ export async function runSync({ trigger = 'cron' } = {}) {
                 newlyAppearedFaults.push({ psId, faultName, faultType, faultLevel, psName: f.ps_name || null });
               }
             } else if (processStatus === '9') {
-              // 2. Write to FaultHistory table (idempotent per fault_code)
+              // FaultHistory is idempotent per fault_code.
               historyFaultsCount++;
               try {
                 await prisma.$executeRaw`
@@ -721,7 +714,7 @@ export async function runSync({ trigger = 'cron' } = {}) {
         console.warn('[SYNC] Sub-component getFaultAlarmInfo gagal:', faultErr.message);
       }
 
-      // ─── Sub-component 3: Plant PR (getDeviceRealTimeData - Point 83023) ─────
+      // Plant PR (getDeviceRealTimeData, point 83023)
       try {
         const plantPsKeys = rawPlants.map(p => `${p.ps_id}_11_0_0`);
         await incrementQuota(now, 1);
@@ -769,7 +762,7 @@ export async function runSync({ trigger = 'cron' } = {}) {
         console.warn('[SYNC] Sub-component Plant PR gagal:', prErr.message);
       }
 
-      // ─── Sub-component 4: Inverter Telemetry (getPVInverterRealTimeData) ─────
+      // Inverter telemetry (getPVInverterRealTimeData)
       try {
         const dbDevices = await prisma.device.findMany();
         const snList = dbDevices.map(d => d.deviceSn).filter(Boolean);
@@ -860,7 +853,7 @@ export async function runSync({ trigger = 'cron' } = {}) {
   }
 }
 
-// ─── Read Functions (for API routes) ─────────────────────────────────────────
+// Read functions for API routes
 
 /**
  * Read all plant data from DB and build the payload for the dashboard

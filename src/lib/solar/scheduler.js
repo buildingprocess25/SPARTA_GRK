@@ -11,8 +11,6 @@ import { runSync, isInSyncWindow, getWibTimeInfo, formatWibTime } from './sync.j
 import { captureSnapshot30m, get30mSlotInfo, getSnapshotStatusReport } from './snapshot.js';
 import prisma from '../prisma.js';
 
-// ─── Single Scheduler Cycle ──────────────────────────────────────────────────
-
 /**
  * Execute a coordinated scheduler cycle
  * 1. Executes 5-min polling if within sync window or forced
@@ -42,7 +40,7 @@ export async function runSchedulerCycle({
     snapshotResult: null
   };
 
-  // 1. Step 1: Execute 5-Minute Telemetry Sync (Polling)
+  // 5-minute telemetry sync
   if (((inWindow && trigger !== 'test') || forceSync || trigger === 'manual') && trigger !== 'test') {
     try {
       cycleReport.syncResult = await runSync({ trigger });
@@ -54,7 +52,6 @@ export async function runSchedulerCycle({
     cycleReport.syncResult = { status: 'skipped', reason: trigger === 'test' ? 'Test mode' : 'Outside 05:30-18:30 WIB window' };
   }
 
-  // 2. Step 2: Check 30-Minute Snapshot Requirement
   // Check if snapshot for current slot already exists
   let snapshotAlreadyExists = false;
   try {
@@ -96,8 +93,6 @@ export async function runSchedulerCycle({
 
   return cycleReport;
 }
-
-// ─── Continuous Server Daemon ────────────────────────────────────────────────
 
 let daemonTimer = null;
 let isDaemonRunning = false;

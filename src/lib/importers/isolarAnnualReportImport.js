@@ -21,7 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import prisma from '../prisma.js';
 
-// ──────────────────────────── PLANT NAME → psId RESOLVER ────────────────────
+// Plant name → psId resolver
 
 /**
  * Build a case-insensitive lookup from CSV plant name → PlantMaster entry.
@@ -70,7 +70,7 @@ export function resolvePlantByName(rawName, nameIndex) {
   return null;
 }
 
-// ──────────────────────────── FILE TYPE DETECTION ────────────────────────────
+// File type detection
 
 const FILE_TYPE_PATTERNS = [
   { pattern: /radiasi|irradiation/i, type: 'RADIATION' },
@@ -104,7 +104,7 @@ export function detectFileType(filename, headerColumn) {
   return null;
 }
 
-// ──────────────────────────── CSV PARSER ─────────────────────────────────────
+// CSV parser
 
 /**
  * Parse a CSV file from iSolarCloud annual report.
@@ -155,7 +155,7 @@ export function parseIsolarCsv(filePath) {
   return { title, type: fileType, rows, filename: path.basename(filePath) };
 }
 
-// ──────────────────────────── UNIT CONVERSION ───────────────────────────────
+// Unit conversion
 
 /**
  * Convert radiation from Wh/m² (as returned by iSolarCloud) to kWh/m².
@@ -166,7 +166,7 @@ export function whM2ToKwhM2(whM2) {
   return Number((whM2 / 1000).toFixed(6));
 }
 
-// ──────────────────────────── DATABASE IMPORTERS ────────────────────────────
+// Database importers
 
 const SOURCE_TAG = 'ISOLAR_ANNUAL_REPORT';
 

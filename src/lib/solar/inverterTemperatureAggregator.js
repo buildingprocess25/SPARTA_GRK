@@ -96,7 +96,7 @@ export async function aggregateDailyInverterTemp({
   const targetDateStr = formatDateWib(dateWib);
   const currentWibStr = formatDateWib(now);
 
-  // 1. Guard: Reject current running day or future days
+  // Only completed WIB days are aggregated.
   if (targetDateStr >= currentWibStr) {
     throw new InverterTempAggregationError(
       'CURRENT_OR_FUTURE_DAY_FORBIDDEN',
@@ -109,7 +109,7 @@ export async function aggregateDailyInverterTemp({
   const effectiveVersion = methodVersion || getActiveInverterTempMethodVersion() || effectiveMethodVersion;
   const ratedPowerIndex = buildRatedPowerIndex(registry);
 
-  // 2. Start Aggregation Run in Audit Table
+  // Record the run in the audit table
   let runId = null;
   if (!dryRun) {
     const run = await db.inverterTempAggregationRun.create({
@@ -127,7 +127,6 @@ export async function aggregateDailyInverterTemp({
   }
 
   try {
-    // 3. Query all raw samples for this WIB date
     const samples = await db.inverterTempSample.findMany({
       where: {
         OR: [
@@ -141,7 +140,6 @@ export async function aggregateDailyInverterTemp({
       orderBy: { fetchedAt: 'asc' },
     });
 
-    // 4. Query plant definitions & latest inverters
     const plantMap = new Map();
     for (const dc of CANONICAL_DC_ENTITIES) {
       for (const psId of dc.sungrowPsIds || []) {

@@ -348,7 +348,7 @@ export function getDCBadges(dc, selectedMetric) {
   const isPrInvalid = isAuditBaselineEnabled && selectedMetric === 'pr' && !dc.isValidPr && statusKey === 'normal';
   const isHighYield = statusKey !== 'construction' && (dc.todaySpecificYield || 0) > 6.0;
 
-  // 0. Fault (Highest Operational Priority)
+  // Fault (highest operational priority)
   if (statusKey === 'fault') {
     badges.push({
       id: 'fault',
@@ -358,7 +358,7 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-  // 1. Project Status: Under Construction
+  // Under construction
   if (statusKey === 'construction') {
     badges.push({
       id: 'under_construction',
@@ -368,7 +368,7 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-  // 2. Dimension 1: Vendor Status (Offline)
+  // Vendor status: offline
   if (statusKey === 'offline') {
     badges.push({
       id: 'offline',
@@ -378,7 +378,7 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-  // 3. Dimension 1: Vendor Status (Alarm)
+  // Vendor status: alarm
   if (statusKey === 'alarm') {
     badges.push({
       id: 'alarm',
@@ -388,7 +388,7 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-  // 4. Dimension 1: Vendor Status (Menunggu Data)
+  // Vendor status: menunggu data
   if (statusKey === 'pending') {
     badges.push({
       id: 'waiting',
@@ -398,7 +398,7 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-  // 4b. Device-level issue (same category as classifyLocationStatus's
+  // Device-level issue (same category as classifyLocationStatus's
   // DEVICE_OFFLINE, used by the Resume Emisi GRK page) - plant itself is
   // online/producing but one or more inverters are reporting a fault. Only
   // shown when the station isn't already flagged Fault/Offline/Alarm above,
@@ -414,7 +414,7 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-  // 4. Dimension 2: Freshness (Usang >30 min)
+  // Freshness: usang >30 min
   if (isStale) {
     badges.push({
       id: 'stale',
@@ -424,7 +424,7 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-  // 5. Dimension 3: Baseline Capacity Discrepancy (+X%)
+  // Baseline capacity discrepancy (+X%)
   if (isUnreliable) {
     const sign = (dc.capacityDiffPct > 0 ? '+' : '');
     badges.push({
@@ -435,7 +435,7 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-  // 6. Multi-plant sub
+  // Multi-plant sub
   if (dc.isMultiPlant) {
     badges.push({
       id: 'multi',
@@ -445,7 +445,7 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-  // 7. High Yield Warning
+  // High yield warning
   if (isHighYield) {
     badges.push({
       id: 'high_yield',
@@ -455,7 +455,7 @@ export function getDCBadges(dc, selectedMetric) {
     });
   }
 
-  // 8. PR Invalid
+  // PR invalid
   if (isPrInvalid) {
     badges.push({
       id: 'invalid_pr',
@@ -1065,7 +1065,7 @@ export default function PLTSAnalyticsSection({
 
   return (
     <div className="space-y-6 animate-in">
-      {/* 1. MASTER CONTROL & SCOPE FILTER BAR */}
+      {/* Control & scope filter bar */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-5 space-y-4">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -1167,7 +1167,7 @@ export default function PLTSAnalyticsSection({
         </div>
       </div>
 
-      {/* 2. GRID MASTER-DETAIL (KIRI: CHECKBOX LIST & RANKING, KANAN: TREND CHART) */}
+      {/* Master-detail: checkbox list & ranking (kiri), trend chart (kanan) */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
         {/* KIRI: CHECKBOX LIST & RANKING CARD */}
         <CardBox className="xl:col-span-5 flex flex-col xl:h-[580px] p-4">
@@ -1657,7 +1657,7 @@ export default function PLTSAnalyticsSection({
         </CardBox>
       </div>
 
-      {/* 3. CARD BERTAB: DETAIL PER DC (TABEL DATA MATANG & TELEMETRI) */}
+      {/* Detail per DC (data matang & telemetri) */}
       <CardBox className="p-5 space-y-4">
         {/* Tab Switcher Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">

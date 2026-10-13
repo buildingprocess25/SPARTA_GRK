@@ -132,7 +132,7 @@ export async function getInverterTemperaturePerformance({
   const { registry } = loadRatedPowerRegistry();
   const ratedPowerIndex = buildRatedPowerIndex(registry);
 
-  // 1. Resolve Scope & Target Entities
+  // Resolve scope and target DCs
   let targetDcs = CANONICAL_DC_ENTITIES;
   if (scope === 'dc' && targetId && targetId !== 'ALL') {
     targetDcs = CANONICAL_DC_ENTITIES.filter(
@@ -153,7 +153,6 @@ export async function getInverterTemperaturePerformance({
   const targetPsIds = targetDcs.flatMap(d => d.sungrowPsIds || []);
   const totalInstalledKwp = targetDcs.reduce((sum, d) => sum + (d.baselineInstalledKwp || 0), 0);
 
-  // 2. Query Monthly Performance Ratio Data
   // Monthly yield observations for the target year
   const monthlyObservations = await db.monthlyYieldObservation.findMany({
     where: {
@@ -171,7 +170,7 @@ export async function getInverterTemperaturePerformance({
     },
   });
 
-  // 3. Query Open-Meteo Weather Data (Parallel Reference Series)
+  // Open-Meteo weather as a parallel reference series
   const weatherDailies = await db.weatherDaily.findMany({
     where: {
       date: { startsWith: `${numericYear}-` },
@@ -198,7 +197,7 @@ export async function getInverterTemperaturePerformance({
     }
   }
 
-  // 4. Query & Aggregate Monthly Inverter Temperatures (12 months)
+  // Monthly inverter temperatures, 12 months
   const monthlyAggregates = [];
   const allExcludedDays = [];
 
@@ -222,7 +221,7 @@ export async function getInverterTemperaturePerformance({
     }
   }
 
-  // 5. Build 12-Month Series Array
+  // 12-month series
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   const series = [];
 
@@ -297,7 +296,7 @@ export async function getInverterTemperaturePerformance({
     });
   }
 
-  // 6. Compute Pearson Correlations
+  // Pearson correlations
   const prValues = series.map(s => s.prWeightedPct);
   const invTempValues = series.map(s => s.inverterTempC);
   const ambTempValues = series.map(s => s.ambientTempC);
@@ -305,7 +304,7 @@ export async function getInverterTemperaturePerformance({
   const correlationInverter = computePearsonCorrelation(invTempValues, prValues);
   const correlationAmbient = computePearsonCorrelation(ambTempValues, prValues);
 
-  // 7. Last Successful Run & Stale Check
+  // Last successful run and stale check
   const lastSamplingRun = db?.inverterTempSamplingRun
     ? await db.inverterTempSamplingRun.findFirst({
         where: { status: 'success' },

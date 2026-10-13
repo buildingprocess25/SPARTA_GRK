@@ -82,7 +82,6 @@ export default function WaterRecycleTab() {
 
   return (
     <div className="space-y-6 animate-in">
-      {/* 1. Header Section */}
       <PageHeader
         title="Water Recycle"
         subtitle="Volume air daur ulang dan manfaat yang dihitung."
@@ -112,7 +111,7 @@ export default function WaterRecycleTab() {
         }
       />
 
-      {/* 2. Baris 4 KPI */}
+      {/* 4 KPI */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
         <KpiCard
           label="FASILITAS TERCATAT"
@@ -148,7 +147,7 @@ export default function WaterRecycleTab() {
         />
       </div>
 
-      {/* 3. Chart Bulanan */}
+      {/* Chart bulanan */}
       <CardBox className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
@@ -202,7 +201,7 @@ export default function WaterRecycleTab() {
         </div>
       </CardBox>
 
-      {/* 4. Tabel per Fasilitas */}
+      {/* Tabel per fasilitas */}
       <CardBox className="space-y-4">
         <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -300,7 +299,7 @@ export default function WaterRecycleTab() {
         </div>
       </CardBox>
 
-      {/* 5. Formula */}
+      {/* Formula */}
       <CardBox className="space-y-3">
         <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="size-9 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">

@@ -14,7 +14,7 @@ export const EMISSION_CONSTANTS = {
 };
 
 export const CONVERSION_CONFIG = {
-  // 1. Emisi Karbon Terhindar (tCO2e)
+  // Emisi karbon terhindar (tCO2e)
   emission: {
     // Faktor tunggal untuk emisi terhindar pada tab Kelistrikan PLTS Atap.
     factorKgPerKwh: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
@@ -29,7 +29,7 @@ export const CONVERSION_CONFIG = {
   },
 
 
-  // 2. Batubara Terhindar (Ton)
+  // Batubara terhindar (ton)
   coal: {
     // 0,400 kg batubara/kWh (0,400 Ton/MWh) berdasarkan Specific Fuel Consumption (SFC) PLTU sub-kritis
     factorKgPerKwh: 0.400,
@@ -42,7 +42,7 @@ export const CONVERSION_CONFIG = {
     description: 'Konsumsi batubara spesifik yang terhindarkan dari setiap kWh energi hijau PLTS.'
   },
 
-  // 3. Pohon Setara (Pohon)
+  // Pohon setara
   tree: {
     // 21,77 kg CO2 / pohon / tahun (daya serap rata-rata pohon dewasa tropis per tahun)
     factorKgPerTreePerYear: 21.77,
@@ -55,7 +55,7 @@ export const CONVERSION_CONFIG = {
     description: 'Ekuivalensi pohon dewasa yang dibutuhkan untuk menyerap jumlah CO₂ yang sama dalam satu tahun.'
   },
 
-  // 4. Threshold & Ambang Evaluasi Kinerja
+  // Ambang evaluasi kinerja
   thresholds: {
     achievement: {
       optimal: 100, // >= 100% : Hijau (Sesuai / Melampaui RKAP)
@@ -69,7 +69,7 @@ export const CONVERSION_CONFIG = {
     }
   },
 
-  // 5. Data Source Precedence & Rules (Single Source of Truth per Plant-Month)
+  // Source precedence: one source of truth per plant-month
   sources: {
     ISOLAR_REPORT: 'ISOLAR_REPORT_IMPORT',
     ISOLAR_ANNUAL_REPORT: 'ISOLAR_ANNUAL_REPORT',
@@ -83,7 +83,6 @@ export const CONVERSION_CONFIG = {
     { rank: 3, source: 'api_live_partial', type: 'PARTIAL', description: 'Akumulasi harian API live berjalan (Diganti saat laporan resmi diimpor)' },
   ],
 
-  // 6. Feature Flags
   features: {
     auditBaseline: process.env.NEXT_PUBLIC_FEATURE_AUDIT_BASELINE === 'true',
   }

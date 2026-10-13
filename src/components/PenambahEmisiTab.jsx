@@ -125,7 +125,6 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
 
   return (
     <div className="space-y-6 animate-in">
-      {/* 1. Header Halaman */}
       <PageHeader
         title={activeSubScope === 'scope1' ? 'Scope 1: BBM' : 'Scope 2: Listrik'}
         subtitle={
@@ -140,7 +139,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
         }
       />
 
-      {/* 2. Metode & Sumber Info */}
+      {/* Metode & sumber */}
       <details className="group border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 shadow-sm [&_summary::-webkit-details-marker]:hidden">
         <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-4 text-slate-900 dark:text-slate-100">
           <div className="flex items-center gap-2">
@@ -354,7 +353,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
         </CardBox>
       )}
 
-      {/* 3. Baris 4 KPI */}
+      {/* 4 KPI */}
       {activeSubScope === 'scope1' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
           {scope1Category === 'genset' ? (
@@ -466,7 +465,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
         </div>
       )}
 
-      {/* 4. Card Chart: Tren Bulanan */}
+      {/* Tren bulanan */}
       <CardBox className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div>
@@ -611,7 +610,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
         </div>
       </CardBox>
 
-      {/* 5. Card Tabel: Rincian Operasional */}
+      {/* Rincian operasional */}
       <CardBox className="space-y-4">
         <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>

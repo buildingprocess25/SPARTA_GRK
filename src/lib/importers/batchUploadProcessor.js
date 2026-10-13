@@ -207,14 +207,14 @@ export async function parseAndValidateUpload(fileBuffer, { categoryHint = 'AUTO'
       return undefined;
     };
 
-    // 1. Check if example row marked for skipping anywhere in the row
+    // Template example rows are marked "CONTOH".
     const isSampleRow = row.some(cell => cell && String(cell).toUpperCase().includes('CONTOH'));
     if (isSampleRow) {
       exampleRowsSkipped++;
       continue; // Ignore template sample rows safely
     }
 
-    // 2. Extract common fields
+    // Common fields
     const facCodeRaw = getVal('KODE_FASILITAS', 'KODE_DC', 'KODE_FASILITAS_ATAU_PLANT', 'KODE', 'FACILITY_CODE');
     const periodRaw = getVal('PERIODE_BULAN', 'TANGGAL_PENGISIAN', 'PERIODE', 'TANGGAL', 'DATE');
     const explicitProof = getVal('NOMOR_BUKTI_INVOICE', 'NOMOR_BUKTI_STRUK', 'NOMOR_FAKTUR_TAGIHAN', 'NOMOR_BUKTI_GATEWAY', 'NOMOR_LOGBOOK_AIR', 'NOMOR_BUKTI', 'PROOF_REF');
@@ -246,7 +246,7 @@ export async function parseAndValidateUpload(fileBuffer, { categoryHint = 'AUTO'
     let calculatedResult = null;
     let qualityStatus = 'VERIFIED';
 
-    // 3. Category-specific Parsing & Validation
+    // Category-specific parsing and validation
     if (detectedCategory === 'GENSET') {
       const fuelTypeRaw = String(getVal('JENIS_BBM', 'FUEL_TYPE') || 'SOLAR').trim().toUpperCase();
       const inputMode = String(getVal('MODE_INPUT', 'INPUT_MODE') || 'LITER').trim().toUpperCase();
@@ -439,7 +439,7 @@ export async function parseAndValidateUpload(fileBuffer, { categoryHint = 'AUTO'
       };
     }
 
-    // 4. Duplicate Check within the same file batch
+    // Duplicates within the same file
     const uniqueKey = `${detectedCategory}_${facCode}_${yearMonth}_${proofRef}`;
     if (seenRecordKeys.has(uniqueKey)) {
       duplicateCount++;
@@ -485,7 +485,7 @@ export async function parseAndValidateUpload(fileBuffer, { categoryHint = 'AUTO'
     });
   }
 
-  // 5. Check against Database for Conflict / No-Op (UNCHANGED)
+  // Compare against the DB to flag conflicts and unchanged rows
   if (parsedRecords.length > 0) {
     const uniqueYearMonths = [...new Set(parsedRecords.map(r => r.yearMonth))].filter(Boolean);
     const uniqueDcIds = [...new Set(parsedRecords.map(r => r.facilityCode))].filter(Boolean);

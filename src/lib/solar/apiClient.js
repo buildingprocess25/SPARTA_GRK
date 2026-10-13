@@ -151,16 +151,13 @@ export async function executeIsolarRequest(endpointPath, bodyPayload = {}, optio
   const isLive = options.isLive ?? (options.dryRun === false || process.env.ISOLAR_MODE === 'live');
   const category = options.category || 'Live Data';
 
-  // 1. Enforce Allowlist Guard
   validateEndpointGuard(endpointPath);
 
-  // 2. Enforce Quota Guard
   const quotaStatus = checkQuotaGuard();
   if (!quotaStatus.allowLiveCall && (isLive || options.dryRun === false)) {
     throw new QuotaExceededError(quotaStatus.message, quotaStatus);
   }
 
-  // 3. Mock mode handling
   if (!isLive) {
     return {
       success: true,
@@ -170,16 +167,15 @@ export async function executeIsolarRequest(endpointPath, bodyPayload = {}, optio
     };
   }
 
-  // 4. Resolve Token (checks DB, auto-refreshes if remaining life < 5 minutes)
+  // Refreshes the token when under 5 minutes of life remain.
   let tokenObj = await getValidToken({ isLive: true, forceRefresh: false });
   const appKey = process.env.ISOLAR_APP_KEY;
   const secretKey = process.env.ISOLAR_SECRET_KEY;
   const baseUrl = process.env.ISOLAR_BASE_URL || 'https://gateway.isolarcloud.com.hk';
 
-  // 5. Increment Quota Counter
   incrementQuota(category, 1);
 
-  // 6. Upstream Request with Retry on Token Error / HTTP 401
+  // Retries on token error / HTTP 401.
   const targetUrl = `${baseUrl}${endpointPath}`;
 
   const sendRequest = async (activeToken) => {

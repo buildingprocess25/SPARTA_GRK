@@ -8,9 +8,7 @@
 
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../solar/conversionConfig.js';
 
-// ============================================================
-// 1. OFFICIAL EMISSION FACTORS & REFERENCE CONSTANTS
-// ============================================================
+// Emission factors and reference constants
 
 export const CARBON_FACTORS = {
   // Fuel / BBM (Scope 1) in kgCO2e / Liter (Source: ESDM Pedoman Penyelenggaraan Inventarisasi GRK)
@@ -417,9 +415,7 @@ export function getGridEmissionFactorDetails(locationName) {
   };
 }
 
-// ============================================================
-// 2. SCOPE 1 (DIRECT EMISSIONS) CALCULATIONS
-// ============================================================
+// Scope 1 (direct emissions)
 
 /**
  * Calculates Scope 1 emissions from fuel consumption (Solar / Pertalite / Pertamax).
@@ -457,9 +453,7 @@ export function calculateScope1FuelEmission({
   };
 }
 
-// ============================================================
-// 3. SCOPE 2 (INDIRECT GRID ELECTRICITY) CALCULATIONS
-// ============================================================
+// Scope 2 (indirect grid electricity)
 
 /**
  * Calculates Scope 2 emissions from grid electricity consumption.
@@ -489,9 +483,7 @@ export function calculateScope2ElectricityEmission({
   };
 }
 
-// ============================================================
-// 4. PLTS AVOIDED EMISSIONS & SUSTAINABILITY EQUIVALENTS
-// ============================================================
+// PLTS avoided emissions and equivalents
 
 /**
  * Calculates PLTS avoided emissions and environmental equivalents.
@@ -532,9 +524,7 @@ export function calculatePLTSAvoidedEmissions({
   };
 }
 
-// ============================================================
-// 5. WATER RECYCLING CALCULATIONS
-// ============================================================
+// Water recycling
 
 /**
  * Calculates water recycling avoided emissions and cost savings.
@@ -565,9 +555,7 @@ export function calculateWaterRecycleImpact({
   };
 }
 
-// ============================================================
-// 6. COMPREHENSIVE CARBON ACCOUNTING RECONCILIATION
-// ============================================================
+// Carbon balance reconciliation
 
 /**
  * Computes consolidated Gross, Offset, Net Emissions, Offset Ratio, and Total Cost Savings.

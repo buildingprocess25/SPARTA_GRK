@@ -415,12 +415,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
     let rows = [...historyDashboardRows];
 
-    // 1. Fuzzy Search Filter
     if (searchQuery.trim()) {
       rows = rows.filter(loc => matchesFuzzy(loc, searchQuery));
     }
 
-    // 2. Chip Filter (Semua | Top 5 | Bottom 5 | Perlu Perhatian | Fault | Alarm)
+    // Chips: Semua | Top 5 | Bottom 5 | Perlu Perhatian | Fault | Alarm
     if (activeChip === 'top5') {
       rows.sort((a, b) => (b.productionMwh || 0) - (a.productionMwh || 0));
       rows = rows.slice(0, 5);
@@ -435,7 +434,6 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       rows = rows.filter(loc => normalizePlantStatus(loc) === 'alarm');
     }
 
-    // 3. User Column Sorting
     rows.sort((a, b) => {
       let valA = a[sortKey];
       let valB = b[sortKey];
@@ -449,7 +447,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       return sortDir === 'asc' ? valA - valB : valB - valA;
     });
 
-    // 4. Compute Dynamic Footer Totals strictly from currently displayed rows
+    // Footer totals cover only the rows currently displayed.
     let sumKwp = 0;
     let sumMwh = 0;
     let sumPrevMwh = 0;
@@ -670,7 +668,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
   return (
     <div className="space-y-4">
-      {/* 1. HEADER CARD WITH CASCADE SELECTION FILTER: Periode → Wilayah Grid → Cabang/DC */}
+      {/* Cascade filter: periode → wilayah grid → cabang/DC */}
       <CardBox className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
@@ -746,7 +744,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
         {/* CASCADE SELECTION TOOLBAR: Periode → Wilayah Grid → Cabang/DC */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50/70 dark:bg-slate-800/40 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700">
-          {/* 1. Wilayah Grid */}
+          {/* Wilayah grid */}
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-1">
               <Globe size={11} className="text-blue-600 dark:text-blue-400" />
@@ -766,7 +764,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             </div>
           </div>
 
-          {/* 2. Cabang / DC / Fasilitas */}
+          {/* Cabang / DC / fasilitas */}
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-1">
               <Building2 size={11} className="text-amber-600 dark:text-amber-400" />
@@ -789,7 +787,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             </div>
           </div>
 
-          {/* 3. Status Filter & Reset */}
+          {/* Status filter & reset */}
           <div className="space-y-1 flex flex-col justify-between">
             <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-1">
               <Filter size={11} className="text-emerald-600 dark:text-emerald-400" />
@@ -837,7 +835,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           </div>
         )}
 
-        {/* 2. METRIC CARDS (DYNAMIC TO SHARED FILTER) */}
+        {/* Metric cards follow the shared filter */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 pt-1 relative z-20 has-[[data-popover-open='true']]:z-40">
           {/* Card 1: Kapasitas */}
           <KpiCard
@@ -1042,7 +1040,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         )}
       </CardBox>
 
-      {/* 3. TOOLBAR: CHIPS & SEARCH */}
+      {/* Chips & search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs">
         {/* Quick Analytical Chips */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 [scrollbar-width:none]">
@@ -1198,7 +1196,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       </div>
     </div>
 
-      {/* 4. TABEL 36 LOKASI (FIXED CONTAINER MAX-H 460PX, STICKY HEAD & FOOT) */}
+      {/* Tabel 36 lokasi, head & foot sticky */}
       <div
         data-plts-table-container="true"
         style={{ maxHeight: '460px' }}
@@ -1480,7 +1478,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
             )}
           </tbody>
 
-          {/* 5. FOOTER STICKY (TOTAL / SUBTOTAL DARI BARIS YANG TAMPIL) */}
+          {/* Total dari baris yang tampil */}
           <tfoot className="sticky bottom-0 bg-slate-100 dark:bg-slate-800 font-bold z-20 shadow-[0_-2px_0_0_#cbd5e1] text-xs">
             <tr className="border-t-2 border-slate-300 dark:border-slate-600">
               <td className="px-4 py-3 sticky left-0 bg-slate-100 dark:bg-slate-800 z-30 border-r border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-black">

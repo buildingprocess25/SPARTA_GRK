@@ -118,7 +118,7 @@ export const CO_LOCATED_RADIATION_MAP = {
 
 export function resolvePlantClimate(plant, yearMonth, climateList = []) {
   const psIds = plant.sungrowPsIds || plant.psIds || [];
-  // 1. Direct match
+  // Direct match on psId and month
   const direct = climateList.find((item) => psIds.includes(Number(item.psId)) && item.yearMonth === yearMonth);
   if (direct && finiteOrNull(direct.radiationKwhM2) !== null && direct.radiationKwhM2 > 0) {
     return {
@@ -134,7 +134,7 @@ export function resolvePlantClimate(plant, yearMonth, climateList = []) {
     };
   }
 
-  // 2. Co-located borrowed match
+  // Fall back to a co-located plant's climate data
   for (const psId of psIds) {
     const borrowConfig = CO_LOCATED_RADIATION_MAP[Number(psId)];
     if (borrowConfig) {

@@ -16,7 +16,7 @@ export async function GET() {
   const startTime = Date.now();
   const now = new Date();
 
-  // 1. Database Connectivity Check
+  // Database connectivity
   let dbStatus = 'disconnected';
   let dbLatencyMs = null;
   let dbError = null;
@@ -50,7 +50,7 @@ export async function GET() {
     );
   }
 
-  // 2. Telemetry & Sync Health Inspection
+  // Telemetry and sync health
   let lastSync = null;
   let lastSuccess = null;
   let plantCount = 0;

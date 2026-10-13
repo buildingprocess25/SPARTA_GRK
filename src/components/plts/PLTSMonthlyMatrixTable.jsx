@@ -464,10 +464,8 @@ export default function PLTSMonthlyMatrixTable({
           </thead>
 
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-            {/* ============================================================
-                BARIS 1: ENERGI LISTRIK (Target, Aktual, % Capai)
-                ============================================================ */}
-            {/* 1.1 Target */}
+            {/* Energi listrik: target, aktual, % capai */}
+            {/* Target */}
             <tr className="hover:bg-slate-50/60 dark:hover:bg-slate-800 transition-colors">
               <td
                 rowSpan={3}
@@ -519,7 +517,7 @@ export default function PLTSMonthlyMatrixTable({
               </td>
             </tr>
 
-            {/* 1.2 Realisasi Aktual */}
+            {/* Realisasi aktual */}
             <tr className="hover:bg-slate-50/60 dark:hover:bg-slate-800 transition-colors">
               <td className="sticky left-[140px] bg-white dark:bg-slate-900 font-bold text-emerald-800 dark:text-emerald-300 px-3 py-2.5 z-10 border-r border-slate-200 dark:border-slate-700">
                 Realisasi Aktual
@@ -548,7 +546,7 @@ export default function PLTSMonthlyMatrixTable({
               </td>
             </tr>
 
-            {/* 1.3 % Pencapaian */}
+            {/* % pencapaian */}
             <tr className="hover:bg-slate-50/60 dark:hover:bg-slate-800 transition-colors">
               <td className="sticky left-[140px] bg-white dark:bg-slate-900 font-bold text-slate-800 dark:text-slate-200 px-3 py-2.5 z-10 border-r border-slate-200 dark:border-slate-700">
                 % Pencapaian
@@ -576,9 +574,7 @@ export default function PLTSMonthlyMatrixTable({
               </td>
             </tr>
 
-            {/* ============================================================
-                BARIS 2: PERFORMANCE RATIO (PR)
-                ============================================================ */}
+            {/* Performance ratio (PR) */}
             <tr className="hover:bg-slate-50/60 dark:hover:bg-slate-800 transition-colors">
               <td
                 rowSpan={2}
@@ -650,9 +646,7 @@ export default function PLTSMonthlyMatrixTable({
               </td>
             </tr>
 
-            {/* ============================================================
-                BARIS 3: KAPASITAS TERPASANG (kWp)
-                ============================================================ */}
+            {/* Kapasitas terpasang (kWp) */}
             <tr className="hover:bg-slate-50/60 dark:hover:bg-slate-800 transition-colors">
               <td className="sticky left-0 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-3.5 py-3 z-10 border-r border-slate-200 dark:border-slate-700 align-middle shadow-xs">
                 <div className="flex items-center gap-1.5">
@@ -694,9 +688,7 @@ export default function PLTSMonthlyMatrixTable({
               </td>
             </tr>
 
-            {/* ============================================================
-                BARIS 4: EMISI TERHINDAR (tCO2e)
-                ============================================================ */}
+            {/* Emisi terhindar (tCO2e) */}
             <tr className="hover:bg-slate-50/60 dark:hover:bg-slate-800 transition-colors">
               <td className="sticky left-0 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-3.5 py-3 z-10 border-r border-slate-200 dark:border-slate-700 align-middle shadow-xs">
                 <div className="flex items-center gap-1.5">
@@ -738,9 +730,7 @@ export default function PLTSMonthlyMatrixTable({
               </td>
             </tr>
 
-            {/* ============================================================
-                BARIS 5: BATUBARA TERHINDAR (Ton)
-                ============================================================ */}
+            {/* Batubara terhindar (ton) */}
             <tr className="hover:bg-slate-50/60 dark:hover:bg-slate-800 transition-colors">
               <td className="sticky left-0 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-3.5 py-3 z-10 border-r border-slate-200 dark:border-slate-700 align-middle shadow-xs">
                 <div className="flex items-center gap-1.5">
@@ -782,9 +772,7 @@ export default function PLTSMonthlyMatrixTable({
               </td>
             </tr>
 
-            {/* ============================================================
-                BARIS 6: POHON SETARA (Pohon)
-                ============================================================ */}
+            {/* Pohon setara */}
             <tr className="hover:bg-slate-50/60 dark:hover:bg-slate-800 transition-colors">
               <td className="sticky left-0 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-3.5 py-3 z-10 border-r border-slate-200 dark:border-slate-700 align-middle shadow-xs">
                 <div className="flex items-center gap-1.5">

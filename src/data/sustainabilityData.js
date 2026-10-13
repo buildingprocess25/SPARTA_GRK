@@ -22,7 +22,7 @@ export const dcLocations = MASTER_FACILITIES.map(fac => ({
 export const masterFacilities = MASTER_FACILITIES;
 
 
-// SCOPE 1: EMISI LANGSUNG - SOLAR GENSET CADANGAN
+// Scope 1: emisi langsung dari solar genset cadangan
 export const scope1Data = {
   summary: {
     category: 'Scope 1A (Pembakaran Statis)',
@@ -46,7 +46,7 @@ export const scope1Data = {
   ],
 };
 
-// SCOPE 2: EMISI TIDAK LANGSUNG - KONSUMSI LISTRIK GRID PLN
+// Scope 2: emisi tidak langsung dari listrik grid PLN
 export const scope2Data = {
   summary: {
     category: 'Scope 2 (Energi Tidak Langsung)',
@@ -68,7 +68,7 @@ export const scope2Data = {
   ],
 };
 
-// PENGURANG EMISI: PLTS (ENERGI TERBARUKAN) & WATER RECYCLE (KONSERVASI)
+// Pengurang emisi: PLTS dan water recycle
 export const waterRecycleData = {
   summary: {
     totalCapacity: 890,
@@ -136,7 +136,7 @@ export const pltsData = {
   },
 };
 
-// NET EMISSION RESUME (SUMMARY INDIKATOR UTAMA)
+// Resume emisi bersih (indikator utama)
 export const emissionResumeKPI = {
   grossEmissionTon: 15091.3,
   avoidedEmissionTon: 1517.2,
@@ -152,10 +152,8 @@ export const overviewKPI = {
   co2Avoided: { value: 1.52, unit: 'ktCO₂e', trend: '-10.1%', label: 'Pengurang Emisi YTD' },
 };
 
-// ============================================================
-// HIERARKI CABANG & FASILITAS (BRANCH → OFFICE & WAREHOUSE + TOKO)
-// WAREHOUSE → WH, BULKY, DEPO, STORE HUB
-// ============================================================
+// Hierarki cabang: branch → office & warehouse + toko.
+// Warehouse mencakup WH, bulky, depo, dan store hub.
 
 export const MONTH_NAMES_FULL = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -564,7 +562,7 @@ export function getHierarchyElectricityStats({
     selectedBranches.forEach(branch => {
       const ef = branch.emissionFactor;
 
-      // 1. Office
+      // Office
       if (facilityType === 'all' || facilityType === 'office') {
         const kwh = branch.office.plnMonthlyKwh[monthIdx] || 0;
         const solarMwh = branch.office.pltsMonthlyMwh[monthIdx] || 0;
@@ -575,7 +573,7 @@ export function getHierarchyElectricityStats({
         solarAvoidedTon += (solarMwh * 1000 * ef) / 1000;
       }
 
-      // 2. Warehouse
+      // Warehouse
       if (facilityType === 'all' || facilityType === 'warehouse') {
         const subs = branch.warehouse.subTypes;
         const subKeys = warehouseSubType === 'all' 
@@ -595,7 +593,7 @@ export function getHierarchyElectricityStats({
         });
       }
 
-      // 3. Toko
+      // Toko
       if (facilityType === 'all' || facilityType === 'toko') {
         const kwh = branch.toko.plnMonthlyKwh[monthIdx] || 0;
         const solarMwh = branch.toko.pltsMonthlyMwh[monthIdx] || 0;
@@ -662,7 +660,7 @@ export function getHierarchyElectricityStats({
   };
 }
 
-// ISOLARCLOUD REAL DC PLTS PERFORMANCE DATA
+// Data performa PLTS per DC dari iSolarCloud
 export const isolarDCBranches = [
   {
     branch: 'KARAWANG',
@@ -834,7 +832,7 @@ export const isolarDCBranches = [
   }
 ];
 
-// TARGET VS PENCAPAIAN MONITORING BULANAN
+// Target vs pencapaian bulanan
 export const pltsTargetMatrix = {
   months: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
   energyMwh: {

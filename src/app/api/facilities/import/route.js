@@ -35,14 +35,13 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Records array must not be empty' }, { status: 400 });
     }
 
-    // 1. Fetch existing facilities to check duplicates
     const existingFacilities = await prisma.facilityMaster.findMany({
       select: { id: true, code: true, name: true, verificationStatus: true }
     });
     const existingCodes = new Set(existingFacilities.map(f => f.code.toUpperCase()));
     const existingIds = new Set(existingFacilities.map(f => f.id));
 
-    // 2. Validate and categorize incoming records
+    // Validate and categorize incoming records
     const validationResults = [];
     const validToImport = [];
     let duplicateCount = 0;

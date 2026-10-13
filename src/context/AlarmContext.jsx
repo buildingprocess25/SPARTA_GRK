@@ -250,14 +250,14 @@ export function AlarmProvider({ children }) {
         if (toNotify.length > 0) {
           const notif = summarizeNotification(toNotify);
           if (notif) {
-            // 1. Toast in-app (selalu muncul)
+            // In-app toast always shows.
             if (notif.variant === 'error') {
               toast.error({ title: notif.title, description: notif.message });
             } else {
               toast.warning({ title: notif.title, description: notif.message });
             }
 
-            // 2. Browser Web Notification API (hanya jika diizinkan)
+            // Browser notification only when permission is granted.
             if (
               typeof window !== 'undefined' &&
               ALARMS_BROWSER_NOTIFICATIONS_ENABLED &&

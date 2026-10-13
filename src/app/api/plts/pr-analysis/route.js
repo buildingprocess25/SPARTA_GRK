@@ -28,7 +28,6 @@ export async function GET(request) {
     const minYm = `${Math.min(...years)}01`;
     const maxYm = `${Math.max(...years)}12`;
 
-    // 1. Fetch plants metadata
     const plants = await prisma.plantMaster.findMany({
       select: {
         dcId: true,
@@ -43,7 +42,6 @@ export async function GET(request) {
       orderBy: { canonicalName: 'asc' },
     });
 
-    // 2. Fetch observations
     const observations = await prisma.monthlyYieldObservation.findMany({
       where: {
         yearMonth: { gte: minYm, lte: maxYm },
@@ -58,7 +56,7 @@ export async function GET(request) {
       orderBy: [{ yearMonth: 'asc' }, { psId: 'asc' }],
     });
 
-    // 3. Fetch daily weather from Open-Meteo
+    // Daily weather (Open-Meteo)
     const weatherRows = await prisma.weatherDaily.findMany({
       where: {
         date: { gte: `${Math.min(...years)}-01-01`, lte: `${Math.max(...years)}-12-31` },
@@ -76,7 +74,7 @@ export async function GET(request) {
       orderBy: [{ date: 'asc' }, { locationKey: 'asc' }],
     });
 
-    // 4. Fetch sensor climate if any
+    // Sensor climate, if any
     const climateSensors = await prisma.climateMonthly.findMany({
       where: {
         yearMonth: { gte: minYm, lte: maxYm },
@@ -167,7 +165,7 @@ export async function GET(request) {
           const isOperational = p.operationalStatus !== 'UNDER_CONSTRUCTION';
           const cap = p.apiInstalledKwp || 0;
 
-          // 1. Resolve monthly energy
+          // Monthly energy
           let energyKwh = 0;
           let hasEnergy = false;
           for (const psId of p.sungrowPsIds || []) {
@@ -184,7 +182,7 @@ export async function GET(request) {
             }
           }
 
-          // 2. Resolve irradiation & weather
+          // Irradiation and weather
           const sensorEntry = sensorMap.get(`${ym}:${(p.sungrowPsIds || [])[0]}`);
           const weatherKey = dcToWeatherKey.get(p.dcId) || p.dcId;
           const wEntry = weatherMonthlyMap.get(`${weatherKey}:${ym}`);
@@ -298,7 +296,7 @@ export async function GET(request) {
       yearlySeries[y] = series;
     }
 
-    // 5. Calculate Pearson Correlation for Primary Year (strictly excluding partial/future months)
+    // Pearson correlation for the primary year, excluding partial and future months
     const primarySeries = yearlySeries[years[0]] || [];
     const paramKeyMap = {
       temp_panel: 'tempPanelEstimatedC',

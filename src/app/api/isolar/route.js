@@ -35,7 +35,7 @@ export async function buildFullDashboardPayload(now = new Date()) {
   const isLive = process.env.ISOLAR_MODE === 'live';
   const auditBaselineData = await loadAuditBaseline();
 
-  // ─── MOCK MODE ──────────────────────────────────────────────────────
+  // Mock mode
   if (!isLive) {
     const canonicalStations = aggregateRawApiIntoCanonicalDCs([], auditBaselineData);
     const summaryNationwide = calculateNationwideSummary(canonicalStations);
@@ -51,7 +51,7 @@ export async function buildFullDashboardPayload(now = new Date()) {
     };
   }
 
-  // ─── LIVE MODE: Read from Database ──────────────────────────────────
+  // Live mode: read from database
   const data = await readDashboardPayload();
   
   // Build raw plant list from DB records
@@ -82,7 +82,7 @@ export async function buildFullDashboardPayload(now = new Date()) {
   canonicalStations.forEach(dc => {
     const psIds = (dc.sungrowPsIds || []).map(Number);
 
-    // 1. Inverter Telemetry & Temperature
+    // Inverter telemetry and temperature
     const matchingInverters = invertersList.filter(i => psIds.includes(Number(i.psId)));
     const temps = matchingInverters.map(i => i.temp).filter(t => t !== null && !isNaN(t));
     const maxTemp = temps.length > 0 ? Math.max(...temps) : null;
@@ -104,7 +104,7 @@ export async function buildFullDashboardPayload(now = new Date()) {
       })),
     };
 
-    // 2. Active Faults & Alarms
+    // Active faults and alarms
     const matchingFaults = faultsList.filter(f => psIds.includes(Number(f.psId)));
     const problemInverters = matchingInverters.filter(i => i.devFaultStatus !== 4 && i.devFaultStatus !== null);
     dc.faultStats = {
@@ -119,7 +119,7 @@ export async function buildFullDashboardPayload(now = new Date()) {
       })),
     };
 
-    // 3. Official Plant PR (Point 83023)
+    // Plant PR (point 83023)
     const matchingPr = plantPrsList.find(p => psIds.includes(Number(p.psId)));
     if (matchingPr && matchingPr.prPercent !== null) {
       dc.officialPlantPr = {
@@ -135,7 +135,7 @@ export async function buildFullDashboardPayload(now = new Date()) {
       dc.officialPlantPr = null;
     }
 
-    // 4. Monthly History (Jan - Sep 2026)
+    // Monthly history (Jan-Sep 2026)
     const dcMonthly = monthlyYieldsList.filter(m => psIds.includes(Number(m.psId)));
     const months = [
       { ym: '202601', days: 31 },
@@ -185,7 +185,7 @@ export async function buildFullDashboardPayload(now = new Date()) {
 
     dc.monthlyHistory = monthlyData;
 
-    // 5. Portal PR Manual Reference
+    // Manual portal PR reference
     const ref = psIds.map(id => portalPrMap.get(Number(id))).find(Boolean);
     if (ref) {
       const prVal = Number(ref.prPercent ?? ref.pr_percent ?? ref.prpercent ?? 0);
@@ -321,7 +321,7 @@ export async function buildFullDashboardPayload(now = new Date()) {
 export async function GET(request) {
   const now = new Date();
 
-  // ─── LIVE MODE: Check Micro-Cache ──────────────────────────────────
+  // Live mode: check micro-cache
   if (cachedResponse && (now.getTime() - cachedResponseTime < CACHE_TTL_MS)) {
     return NextResponse.json(cachedResponse, {
       headers: {

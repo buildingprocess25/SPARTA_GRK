@@ -21,8 +21,6 @@ import prisma from '../prisma.js';
 import { getWibTimeInfo, formatWibTime, isInSyncWindow } from './sync.js';
 import { CANONICAL_DC_ENTITIES } from './plantMap.js';
 
-// ─── Slot Calculation ────────────────────────────────────────────────────────
-
 /**
  * Compute the canonical 30-minute boundary for a given timestamp
  * @param {Date} date 
@@ -69,8 +67,6 @@ export function get30mSlotInfo(date = new Date()) {
   };
 }
 
-// ─── Snapshot Capture Engine ────────────────────────────────────────────────
-
 /**
  * Capture 30-Minute Snapshot of all plants from DB Latest Telemetry
  * Idempotent: Uses composite unique constraint (ps_id + slot_at)
@@ -93,7 +89,6 @@ export async function captureSnapshot30m({ trigger = 'cron', forceSlot = null } 
   let errorMessage = null;
 
   try {
-    // 1. Fetch latest plant telemetry from database
     const latestPlants = await prisma.plantLatest.findMany({
       orderBy: { psId: 'asc' }
     });
@@ -126,7 +121,6 @@ export async function captureSnapshot30m({ trigger = 'cron', forceSlot = null } 
       };
     }
 
-    // 2. Build dcId lookup map from canonical definitions
     const dcMap = new Map();
     CANONICAL_DC_ENTITIES.forEach(dc => {
       (dc.sungrowPsIds || []).forEach(id => {
@@ -134,7 +128,7 @@ export async function captureSnapshot30m({ trigger = 'cron', forceSlot = null } 
       });
     });
 
-    // 3. Process and write each plant snapshot idempotently (sequential loop to prevent DB connection pool exhaustion)
+    // Sequential, not parallel, to avoid exhausting the DB connection pool.
     for (const plant of latestPlants) {
       const psId = Number(plant.psId);
       const dcInfo = dcMap.get(psId);
@@ -218,7 +212,6 @@ export async function captureSnapshot30m({ trigger = 'cron', forceSlot = null } 
       status = 'PARTIAL';
     }
 
-    // 4. Log the snapshot cycle
     const durationMs = Date.now() - startTime;
     await logSnapshotRun({
       slotAt,
@@ -312,7 +305,7 @@ async function logSnapshotRun(runData) {
   }
 }
 
-// ─── Query & Inspection APIs ────────────────────────────────────────────────
+// Query & inspection
 
 /**
  * Get snapshot audit history for a given slot or date range

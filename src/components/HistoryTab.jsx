@@ -26,7 +26,6 @@ export default function HistoryTab({ setActiveTab }) {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* 1. Header Section */}
       <PageHeader
         title="Riwayat Input & Audit Emisi"
         subtitle="Daftar seluruh aktivitas pencatatan emisi Scope 1, Scope 2, PLTS, dan Water Recycle di Distribution Center Alfamart."
@@ -47,7 +46,6 @@ export default function HistoryTab({ setActiveTab }) {
         }
       />
 
-      {/* 2. Main Content Card */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-5 lg:p-6 space-y-4">
         {inputHistory.length === 0 ? (
           <div className="py-16 text-center space-y-3">

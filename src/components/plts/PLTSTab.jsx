@@ -79,7 +79,7 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
   const statusNum = Number(status) || 0;
   const timeLabel = lastSyncTime ? `(${lastSyncTime})` : '';
 
-  // 1. Token / Otentikasi
+  // Token / otentikasi
   if (statusNum === 401 || errStr.includes('token') || errStr.includes('unauthorized') || codeStr.includes('AUTH') || codeStr.includes('TOKEN')) {
     return {
       category: 'AUTH',
@@ -89,7 +89,7 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
     };
   }
 
-  // 2. Kuota Habis
+  // Kuota habis
   if (statusNum === 429 || errStr.includes('kuota') || errStr.includes('quota') || errStr.includes('hard limit') || codeStr.includes('QUOTA')) {
     return {
       category: 'QUOTA',
@@ -99,7 +99,7 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
     };
   }
 
-  // 3. Jaringan / Timeout
+  // Jaringan / timeout
   if (statusNum === 408 || errStr.includes('timeout') || errStr.includes('network') || errStr.includes('terputus') || codeStr.includes('TIMEOUT') || codeStr.includes('NETWORK')) {
     return {
       category: 'NETWORK',
@@ -109,7 +109,7 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
     };
   }
 
-  // 3.5 Database Sibuk / Pool Timeout
+  // Database sibuk / pool timeout
   if (codeStr.includes('DATABASE') || codeStr.includes('POOL') || errStr.includes('database') || errStr.includes('antrian')) {
     return {
       category: 'DATABASE',
@@ -119,7 +119,7 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
     };
   }
 
-  // 3.8 Mode Hanya-Baca / MUTATIONS_DISABLED
+  // Mode hanya-baca (MUTATIONS_DISABLED)
   if (statusNum === 403 || codeStr === 'MUTATIONS_DISABLED' || errStr.includes('hanya-baca') || errStr.includes('read-only')) {
     return {
       category: 'READ_ONLY',
@@ -129,7 +129,7 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
     };
   }
 
-  // 4. Server iSolar Down / 503 / 502 / 504
+  // Server iSolar down (502/503/504)
   if (statusNum === 503 || statusNum === 502 || statusNum === 504 || errStr.includes('503') || errStr.includes('502') || codeStr.includes('GATEWAY') || codeStr.includes('SERVER')) {
     return {
       category: 'SERVER',
@@ -139,7 +139,6 @@ function classifySyncError({ error, status, code, lastSyncTime }) {
     };
   }
 
-  // 5. Default / Lainnya
   return {
     category: 'GENERAL',
     badge: 'Koneksi Gateway',
@@ -674,7 +673,6 @@ export default function PLTSTab() {
 
   return (
     <div className="space-y-6 animate-in">
-      {/* 1. Header Section */}
       <PageHeader
         title="PLTS Atap"
         subtitle="Produksi energi dan kinerja plant PLTS."
@@ -1024,10 +1022,7 @@ export default function PLTSTab() {
             );
           })()}
 
-          {/* ============================================================
-              UNIFIED MASTER-DETAIL ANALITIK & STATUS TELEMETRI
-              Tinggi terkontrol h-[560px] di tab Detail per DC
-              ============================================================ */}
+          {/* Master-detail analitik & status telemetri */}
           <PLTSAnalyticsSection
             stations={isolarLiveState?.stationList || []}
             historicalPlants={dashboardData?.plants || []}
@@ -1157,7 +1152,7 @@ export default function PLTSTab() {
             )}
           </div>
 
-          {/* 3. Baris 4 KPI Dinamis */}
+          {/* 4 KPI */}
           {dashboardLoading && !dashboardData ? (
             <SummaryCardsSkeleton />
           ) : dashboardError && !dashboardData ? (
@@ -1251,7 +1246,7 @@ export default function PLTSTab() {
             </div>
           )}
 
-          {/* 4. Baris 2 Card: Chart Bulanan + Komposisi Energi */}
+          {/* Chart bulanan + komposisi energi */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
             {/* Kiri: Produksi PLTS vs PLN (xl:col-span-2) */}
             <CardBox className="xl:col-span-2 flex flex-col justify-between">
@@ -1471,7 +1466,7 @@ export default function PLTSTab() {
             </CardBox>
           </div>
 
-          {/* 5. Tabel Rekap Data Pemantauan PLTS per Branch DC */}
+          {/* Rekap pemantauan PLTS per DC */}
           <PLTSSummaryCard
             sharedFilters={dashboardFilters}
             onSharedFiltersChange={setDashboardFilters}

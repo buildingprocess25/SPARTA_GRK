@@ -480,7 +480,7 @@ export function lookupPlantMetadata(raw) {
   const rawName = String(raw.plantName || raw.psName || raw.ps_name || raw.name || raw.branch || '').trim();
   const normRawName = normalizeName(rawName);
 
-  // 1. Match by exact sungrowPsId
+  // Match by exact sungrowPsId
   if (rawId > 0) {
     const bySungrowId = CANONICAL_DC_ENTITIES.find(dc => dc.sungrowPsIds.includes(rawId));
     if (bySungrowId) {
@@ -492,7 +492,7 @@ export function lookupPlantMetadata(raw) {
     }
   }
 
-  // 2. Match by dcId string
+  // Match by dcId
   if (rawIdStr && rawIdStr !== 'SG-UNKNOWN') {
     const byDcId = CANONICAL_DC_ENTITIES.find(dc => dc.dcId === rawIdStr || dc.canonicalName.toUpperCase() === rawIdStr.toUpperCase());
     if (byDcId) {
@@ -504,7 +504,7 @@ export function lookupPlantMetadata(raw) {
     }
   }
 
-  // 3. Match by normalized name / aliases
+  // Match by normalized name or alias
   if (normRawName) {
     const byName = CANONICAL_DC_ENTITIES.find(dc => {
       if (normalizeName(dc.canonicalName) === normRawName) return true;

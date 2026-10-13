@@ -344,7 +344,7 @@ export function classifyLocationStatus({
   hasAbnormalMonth = false,
   abnormalMonthTooltip = null,
 } = {}) {
-  // 1. Status Operasional (Vendor Telemetry)
+  // Status operasional (telemetri vendor)
   // Check sub-plants to determine worst status if compound
   let subPlantFaultCount = 0;
   let subPlantAlarmCount = 0;
@@ -404,7 +404,7 @@ export function classifyLocationStatus({
     operationalNote = `${offlineDeviceCount} inverter offline, perangkat lain tetap berproduksi`;
   }
 
-  // 2. Kualitas Data
+  // Kualitas data
   let dataQualityKey = 'COMPLETE';
   let dataQualityLabel = 'Lengkap';
   let dataQualityBadgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
@@ -427,7 +427,7 @@ export function classifyLocationStatus({
     dataQualityNote = `Telemetri terakhir diterima ${ageMinutes} menit yang lalu`;
   }
 
-  // 3. Analisis Performa
+  // Analisis performa
   let performanceKey = 'NORMAL';
   let performanceLabel = 'Normal';
   let isLowYield = false;
