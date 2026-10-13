@@ -1226,15 +1226,17 @@ export default function PLTSTab() {
                 unit="tCO₂e"
                 trend={
                   <div className="space-y-1.5 whitespace-normal">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold" title={`Emisi Terhindar = Produksi PLTS (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
+                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold" title={`Emisi Terhindar = Energi PLTS dipakai sendiri (kWh) × ${PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh ÷ 1.000`}>
                       <span className="text-emerald-700 dark:text-emerald-300 font-medium">Faktor Emisi:</span>
                       <span className="font-mono text-emerald-900">1 kWh = {PLTS_EMISSION_FACTOR_LABEL} kgCO₂</span>
                     </div>
                     <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight" title="Target korporat (referensi): faktor 0,997294 tCO2e/MWh">
-                      Target (referensi RKAP): <span className="font-semibold text-slate-700 dark:text-slate-300">{formatNum(dashboardData?.summary?.emission?.targetReferenceTon ?? 4791.34, 2, 2)} tCO₂e</span>
+                      Target (referensi RKAP): <span className="font-semibold text-slate-700 dark:text-slate-300">{dashboardData?.summary?.emission?.targetReferenceTon != null ? `${formatNum(dashboardData.summary.emission.targetReferenceTon, 2, 2)} tCO₂e` : '—'}</span>
                     </div>
                     <div className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold pt-0.5" title="Estimasi: 21,77 kgCO2e/pohon/tahun dan 0,400 ton/MWh SFC PLTU">
-                      ~{formatNum(dashboardData?.summary?.emission?.coalAvoidedTon ?? 1809.8, 1, 1)} Ton Batubara &middot; ~{formatNum(dashboardData?.summary?.emission?.treeCount ?? 167931, 0, 0)} Pohon (estimasi)
+                      {dashboardData?.summary?.emission?.coalAvoidedTon != null && dashboardData?.summary?.emission?.treeCount != null
+                        ? <>~{formatNum(dashboardData.summary.emission.coalAvoidedTon, 1, 1)} Ton Batubara &middot; ~{formatNum(dashboardData.summary.emission.treeCount, 0, 0)} Pohon (estimasi)</>
+                        : 'Batubara & pohon setara: —'}
                     </div>
                   </div>
                 }

@@ -2,6 +2,7 @@ import prisma from '../prisma.js';
 import { CANONICAL_DC_ENTITIES, isDcLocation } from './plantMap.js';
 import { getGridFactor } from '../emission-factors.js';
 import { classifyLocationStatus } from './status.js';
+import { isPlantUnderConstruction } from './dashboard.js';
 import { createPrismaHistoryRepository, getPltsHistory } from './history.js';
 
 const MONTH_NAMES_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -416,8 +417,8 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
 
   Array.from(resultsMap.values()).forEach(loc => {
     const factorObj = getGridFactor(loc.grid);
-    const isOfficial = factorObj && factorObj.status === 'resmi';
-    const factor = isOfficial ? factorObj.cmPlts : null;
+    // cmPlts is the single 0.997 factor on every grid, so only plants under construction are excluded.
+    const factor = factorObj && !isPlantUnderConstruction(loc) ? factorObj.cmPlts : null;
     const productionMwh = Number((loc.totalProductionKwh / 1000).toFixed(2));
 
     let co2Ton = null;
@@ -558,7 +559,7 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
       treeEquivalent,
       unmappedGridCount,
       unmappedGridMwh: Number(unmappedGridMwh.toFixed(2)),
-      unmappedDisclaimer: `${unmappedGridCount} lokasi (${unmappedGridMwh.toFixed(1)} MWh) tanpa faktor resmi tidak dihitung`
+      unmappedDisclaimer: `${unmappedGridCount} lokasi dalam konstruksi (${unmappedGridMwh.toFixed(1)} MWh) tidak dihitung`
     },
     locations: filteredLocations,
     allLocations: rawLocations,

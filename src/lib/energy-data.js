@@ -8,8 +8,8 @@
  *     Produksi = Pakai Sendiri + Ekspor (Feed-in)
  *     Beban Total = Listrik Dibeli PLN + PLTS Pakai Sendiri
  * - Emisi Scope 2 = Listrik Dibeli PLN (kWh) * Faktor Grid (kgCO2e/kWh) / 1.000
- * - Emisi Terhindar = PLTS Pakai Sendiri (kWh) * Faktor Regional ESDM (kgCO2e/kWh) / 1.000
- * - 35 DC berfaktor resmi ESDM, 2 DC (Gorontalo & Manado di Sulutgo) berfaktor sementara
+ * - Emisi Terhindar = PLTS Pakai Sendiri (kWh) * 0,997 kgCO2/kWh / 1.000, semua DC kecuali yang masih konstruksi
+ * - Scope 2 hanya dihitung untuk grid berfaktor resmi; Sulutgo (Gorontalo & Manado) masih sementara
  */
 
 import fs from 'node:fs';
@@ -18,6 +18,7 @@ import prisma from './prisma.js';
 import { CANONICAL_DC_ENTITIES, isDcLocation, normalizeName } from './solar/plantMap.js';
 import { getGridFactor, GRID_EMISSION_FACTORS } from './emission-factors.js';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './solar/conversionConfig.js';
+import { isPlantUnderConstruction } from './solar/dashboard.js';
 import { parseIsolarMonthlyReportFile } from './importers/isolarMonthlyReport.js';
 
 const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -178,10 +179,12 @@ export async function getCanonicalEnergyRows({
     const gridFactorKgPerKwh = factorObj?.cmExPost ?? 0.87;
     const pltsFactorKgPerKwh = factorObj?.cmPlts ?? PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH;
     const factorStatus = factorObj?.status ?? 'sementara';
+    // Scope 2 needs an official grid factor; PLTS uses the single 0.997 factor, so only construction excludes it.
     const isEligibleEmission = factorStatus === 'resmi';
+    const isEligibleAvoided = !isPlantUnderConstruction(entity);
 
     // Emisi dihitung presisi penuh, pembulatan saat tampil
-    const avoidedEmissionTonRaw = isEligibleEmission ? (selfConsumptionKwh * pltsFactorKgPerKwh) / 1000 : null;
+    const avoidedEmissionTonRaw = isEligibleAvoided ? (selfConsumptionKwh * pltsFactorKgPerKwh) / 1000 : null;
     const scope2EmissionTonRaw = isEligibleEmission ? (purchasedKwh * gridFactorKgPerKwh) / 1000 : null;
 
     rows.push({
@@ -213,6 +216,7 @@ export async function getCanonicalEnergyRows({
       pltsFactorKgPerKwh,
       factorStatus,
       isEligibleEmission,
+      isEligibleAvoided,
       avoidedEmissionTon: avoidedEmissionTonRaw !== null ? round(avoidedEmissionTonRaw, 4) : null,
       scope2EmissionTon: scope2EmissionTonRaw !== null ? round(scope2EmissionTonRaw, 4) : null,
       avoidedEmissionTonRaw,
@@ -255,7 +259,7 @@ export async function getCanonicalMonthlySummary({
     const loadKwh = mRows.reduce((s, r) => s + r.loadKwh, 0);
 
     const eligibleRows = mRows.filter(r => r.isEligibleEmission);
-    const avoidedEmissionTon = eligibleRows.reduce((s, r) => s + (r.avoidedEmissionTonRaw || 0), 0);
+    const avoidedEmissionTon = mRows.reduce((s, r) => s + (r.avoidedEmissionTonRaw || 0), 0);
     const scope2EmissionTon = eligibleRows.reduce((s, r) => s + (r.scope2EmissionTonRaw || 0), 0);
 
     if (!isPartial) {
@@ -311,7 +315,7 @@ export async function getCanonicalYtdSummary({
   const loadKwh = ytdRows.reduce((s, r) => s + r.loadKwh, 0);
 
   const eligibleRows = ytdRows.filter(r => r.isEligibleEmission);
-  const avoidedEmissionTon = eligibleRows.reduce((s, r) => s + (r.avoidedEmissionTonRaw || 0), 0);
+  const avoidedEmissionTon = ytdRows.reduce((s, r) => s + (r.avoidedEmissionTonRaw || 0), 0);
   const scope2EmissionTon = eligibleRows.reduce((s, r) => s + (r.scope2EmissionTonRaw || 0), 0);
 
   const distinctPlants = new Set(ytdRows.map(r => r.dcId));

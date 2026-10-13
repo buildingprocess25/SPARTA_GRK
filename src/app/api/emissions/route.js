@@ -3,6 +3,8 @@ import { createPrismaHistoryRepository, getPltsHistory } from '@/lib/solar/histo
 import { fetchRawEnergyFlows } from '@/lib/energy-data.js';
 import { factorForGrid } from '@/lib/scope2/dashboardService.js';
 import { CANONICAL_DC_ENTITIES, isDcLocation } from '@/lib/solar/plantMap.js';
+import { isPlantUnderConstruction } from '@/lib/solar/dashboard.js';
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig.js';
 
 function round(value, digits = 3) {
   if (value === null || value === undefined || !Number.isFinite(Number(value))) return null;
@@ -10,18 +12,20 @@ function round(value, digits = 3) {
 }
 
 /**
- * Sums purchased_kwh (energy_flow_monthly, same table Scope 2's dashboard
- * already trusts) per DC across the requested period, so the "Konsumsi PLN"
- * column reflects real reported consumption instead of a hardcoded null.
+ * Sums purchased and self-consumed kWh (energy_flow_monthly, same table Scope 2's
+ * dashboard already trusts) per DC across the requested period.
  */
-async function buildPlnConsumptionByDc({ year, startYearMonth, endYearMonth }) {
+async function buildEnergyByDc({ year, startYearMonth, endYearMonth }) {
   const flows = await fetchRawEnergyFlows({ year, rootDir: process.cwd() });
   const purchasedByDc = new Map();
+  const selfConsumedByDc = new Map();
   for (const flow of flows) {
     if (!flow.dcId || flow.storageYearMonth < startYearMonth || flow.storageYearMonth > endYearMonth) continue;
     purchasedByDc.set(flow.dcId, (purchasedByDc.get(flow.dcId) || 0) + flow.purchasedKwh);
+    const selfKwh = Math.max(0, flow.yieldKwh - flow.feedInKwh);
+    selfConsumedByDc.set(flow.dcId, (selfConsumedByDc.get(flow.dcId) || 0) + selfKwh);
   }
-  return purchasedByDc;
+  return { purchasedByDc, selfConsumedByDc };
 }
 
 /**
@@ -91,8 +95,8 @@ export async function GET(req) {
       repository: createPrismaHistoryRepository(prisma),
       period: rawPeriod,
     });
-    const [purchasedByDc, monthlyScope2Trend] = await Promise.all([
-      buildPlnConsumptionByDc({
+    const [{ purchasedByDc, selfConsumedByDc }, monthlyScope2Trend] = await Promise.all([
+      buildEnergyByDc({
         year: history.activePeriod.year,
         startYearMonth: history.activePeriod.startYearMonth,
         endYearMonth: history.activePeriod.endYearMonth,
@@ -114,6 +118,11 @@ export async function GET(req) {
       const scope2EmissionTon = purchasedKwh !== null && gridFactor.status === 'official' && gridFactor.value !== null
         ? round((purchasedKwh * gridFactor.value) / 1000)
         : null;
+      // Self-consumption basis, same as the PLTS page's Emisi Terhindar card.
+      const selfConsumedKwh = selfConsumedByDc.get(location.dcId);
+      const avoidedEmissionTon = selfConsumedKwh !== undefined && !isPlantUnderConstruction(location)
+        ? round((selfConsumedKwh * PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH) / 1000, 6)
+        : null;
       return {
         id: location.dcId,
         name: location.canonicalName,
@@ -123,11 +132,11 @@ export async function GET(req) {
         pltsProdMWh: location.productionMwh,
         factor: gridFactor.value,
         factorStatus: gridFactor.status,
-        factorPlts: location.emissionFactor?.value ?? null,
+        factorPlts: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
         factorVersion: location.emissionFactor?.version ?? history.emissionFactorVersion,
-        factorMethod: location.emissionFactor?.method ?? 'cmPlts',
+        factorMethod: 'self_consumption',
         scope2EmissionTon,
-        avoidedEmissionTon: location.avoidedEmissionTon,
+        avoidedEmissionTon,
         historyAvailable: !location.hasIncompleteHistory,
         quality: location.quality,
       };

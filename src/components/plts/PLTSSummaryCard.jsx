@@ -652,12 +652,16 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
     unmappedDisclaimer: ''
   };
 
+  const totalCo2ReducedTon = totalFooter.totalCo2 > 0
+    ? totalFooter.totalCo2
+    : (data?.kpi?.totalCo2ReducedTon || dashboardData?.summary?.emission?.emissionTon || null);
+
   const kpi = {
     ...legacyKpi,
-    totalKwp: totalFooter.totalKwp > 0 ? totalFooter.totalKwp : (data?.kpi?.totalKwp || dashboardData?.summary?.capacityKwp || 5778.8),
-    totalProductionMwh: totalFooter.totalMwh > 0 ? totalFooter.totalMwh : (data?.kpi?.totalProductionMwh || dashboardData?.summary?.productionMwh || 4573.65),
-    totalCo2ReducedTon: totalFooter.totalCo2 > 0 ? totalFooter.totalCo2 : (data?.kpi?.totalCo2ReducedTon || dashboardData?.summary?.emission?.emissionTon || 3545.22),
-    treeEquivalent: Math.round(((totalFooter.totalCo2 > 0 ? totalFooter.totalCo2 : (data?.kpi?.totalCo2ReducedTon || dashboardData?.summary?.emission?.emissionTon || 3545.22)) * 1000) / 21.77),
+    totalKwp: totalFooter.totalKwp > 0 ? totalFooter.totalKwp : (data?.kpi?.totalKwp || dashboardData?.summary?.capacityKwp || null),
+    totalProductionMwh: totalFooter.totalMwh > 0 ? totalFooter.totalMwh : (data?.kpi?.totalProductionMwh || dashboardData?.summary?.productionMwh || null),
+    totalCo2ReducedTon: totalCo2ReducedTon,
+    treeEquivalent: totalCo2ReducedTon != null ? Math.round((totalCo2ReducedTon * 1000) / 21.77) : null,
     normalCount: statusBreakdown.normalCount,
     attentionCount: statusBreakdown.attentionCount,
   };
@@ -840,7 +844,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           {/* Card 1: Kapasitas */}
           <KpiCard
             label="Kapasitas Terpasang"
-            value={formatNum(kpi.totalKwp, 1, 2)}
+            value={kpi.totalKwp != null ? formatNum(kpi.totalKwp, 1, 2) : '—'}
             unit="kWp"
             subtitle={`${filteredRows.length} plant fisik aktif`}
             icon={Zap}
@@ -896,11 +900,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           {/* Card 4: Reduksi Emisi */}
           <KpiCard
             label="Emisi Terhindar"
-            value={formatNum(kpi.totalCo2ReducedTon, 2, 2)}
+            value={kpi.totalCo2ReducedTon != null ? formatNum(kpi.totalCo2ReducedTon, 2, 2) : '—'}
             unit="tCO₂e"
             subtitle={
               <div className="space-y-1">
-                <span>Setara {formatNum(kpi.treeEquivalent, 0, 0)} pohon</span>
+                <span>Setara {kpi.treeEquivalent != null ? formatNum(kpi.treeEquivalent, 0, 0) : '—'} pohon</span>
                 <div className="border-t border-slate-100 dark:border-slate-800 pt-1 text-[10px] text-slate-500 dark:text-slate-400" title="Energi PLTS dikali faktor emisi tunggal dashboard">
                   Faktor emisi: {PLTS_EMISSION_FACTOR_LABEL} kgCO₂/kWh
                 </div>

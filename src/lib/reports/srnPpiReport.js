@@ -1,4 +1,5 @@
 import { buildCombinedMonthlyTrend, monthLabel } from './reportDataService.js';
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../solar/conversionConfig.js';
 
 /**
  * Builds the SRN-PPI (SIGN - Kementerian LHK, Permen LHK/BPLH No. 7/202x)
@@ -70,10 +71,11 @@ export function buildSrnPpiWorkbookData(reportData) {
     { Sumber: 'Grid Sumatera', Nilai: 0.761, Satuan: 'kgCO2e/kWh', Status: 'Resmi', 'Sumber Dokumen': 'SK Dirjen Ketenagalistrikan ESDM (Grid Sumatera)' },
     { Sumber: 'Grid Kalimantan Barat', Nilai: 0.95, Satuan: 'kgCO2e/kWh', Status: 'Resmi', 'Sumber Dokumen': 'SK Dirjen Ketenagalistrikan ESDM (Grid Kalbar)' },
     { Sumber: 'Grid Kalimantan Selatan & Tengah', Nilai: 1.20, Satuan: 'kgCO2e/kWh', Status: 'Resmi', 'Sumber Dokumen': 'SK Dirjen Ketenagalistrikan ESDM (Grid Kalselteng)' },
-    { Sumber: 'Grid Sulselrabar', Nilai: 0.75, Satuan: 'kgCO2e/kWh', Status: 'Resmi', 'Sumber Dokumen': 'SK Dirjen Ketenagalistrikan ESDM (Grid Sulselrabar)' },
+    { Sumber: 'Grid Sulselrabar', Nilai: 0.73, Satuan: 'kgCO2e/kWh', Status: 'Resmi', 'Sumber Dokumen': 'SK Dirjen Ketenagalistrikan ESDM (Grid Sulselrabar)' },
     { Sumber: 'Grid Batam-Bintan', Nilai: 0.76, Satuan: 'kgCO2e/kWh', Status: 'Resmi', 'Sumber Dokumen': 'SK Dirjen Ketenagalistrikan ESDM (Sistem Batam)' },
     { Sumber: 'Grid Lombok (NTB)', Nilai: 0.87, Satuan: 'kgCO2e/kWh', Status: 'Resmi', 'Sumber Dokumen': 'SK Dirjen Ketenagalistrikan ESDM (Sistem Lombok)' },
     { Sumber: 'Grid Sulutgo', Nilai: 0.60, Satuan: 'kgCO2e/kWh', Status: 'Sementara', 'Sumber Dokumen': 'Estimasi internal, menunggu SK resmi spesifik' },
+    { Sumber: 'PLTS (emisi terhindar, semua grid)', Nilai: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH, Satuan: 'kgCO2e/kWh', Status: 'Resmi', 'Sumber Dokumen': 'Faktor emisi PLTS dashboard 2026, dikali energi PLTS dipakai sendiri' },
     { Sumber: 'Daur Ulang Air (emisi terhindar)', Nilai: 0.344, Satuan: 'kgCO2e/m3', Status: 'Metode Internal', 'Sumber Dokumen': 'perhitungan emisi karbon.xlsx (belum diverifikasi independen)' },
   ];
 

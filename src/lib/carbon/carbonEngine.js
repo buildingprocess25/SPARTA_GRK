@@ -169,7 +169,7 @@ export const FACTOR_REGISTRY_PROVENANCE = [
   {
     factorKey: 'GRID_SULSELRABAR',
     category: 'Scope 2 (Listrik PLN)',
-    factorValue: 0.75,
+    factorValue: 0.73,
     unit: 'kgCO2e / kWh',
     sourceDocument: 'SK Dirjen Ketenagalistrikan ESDM (Grid Sulselrabar)',
     year: '2024',

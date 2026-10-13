@@ -18,58 +18,48 @@ $$\text{Emisi Terhindar (tCO}_2\text{e)} = \sum_{\text{plant eligible}} \frac{\t
 
 ---
 
-## 2. Kelayakan Plant per Grid
+## 2. Kelayakan Plant
 
-Faktor emisinya sama di semua grid. Status grid hanya menentukan apakah plant ikut dihitung.
+Faktor emisi PLTS sama di semua grid, jadi status grid tidak menentukan kelayakan. Satu-satunya pengecualian adalah plant yang masih dalam konstruksi (`isPlantUnderConstruction()` di `src/lib/solar/dashboard.js`), yaitu DC Gorontalo.
 
-| Sistem Grid | Status Grid | Jumlah Plant | Plant Terkait |
-| :--- | :---: | :---: | :--- |
-| **JAMALI** | RESMI | 24 | DC Balaraja, Cikokol, Parung, Bogor, Bekasi, Karawang, Plumbon, Bandung, Cilacap 1/2/3, Semarang, Klaten, Madiun, Malang, Sidoarjo, Jember, Bali, dll. |
-| **SUMATERA** | RESMI | 6 | DC Medan, Pekanbaru, Jambi, Palembang, Lampung, Kotabumi |
-| **KALBAR** | RESMI | 1 | DC Pontianak |
-| **KALSELTENG** | RESMI | 1 | DC Banjarmasin |
-| **SULSELRABAR** | RESMI | 3 | DC Makassar, Maros, Luwu |
-| **BATAM** | RESMI | 1 | DC Batam |
-| **NTB (Lombok)** | RESMI | 2 | DC Lombok A, DC Lombok B |
-| **SULUTGO** | SEMENTARA, **DIKECUALIKAN** | 2 | DC Gorontalo, DC Manado |
+DC Manado (grid Sulutgo) ikut dihitung. Status grid Sulutgo yang masih sementara hanya berpengaruh ke Scope 2, karena Scope 2 memakai faktor grid per wilayah.
 
-> [!IMPORTANT]
-> **Pengecualian Sulutgo**:
-> Grid Sulutgo (Gorontalo & Manado) masih berstatus sementara karena belum ada surat keputusan ESDM yang spesifik. Kedua DC ini **dikecualikan dari total emisi resmi**. Pada data Januari s.d. September 2026, yang dihitung adalah 35 dari 37 DC.
+Aturan ini dipakai bersama oleh halaman PLTS, Resume Emisi GRK, `/api/emissions` (kartu KPI dan ekspor laporan), dan `/api/sustainability`.
 
 ---
 
 ## 3. Rekonsiliasi Angka YTD (Januari s.d. September 2026)
 
-Angka di bagian 3 dan 4 diambil dari `getCanonicalEnergyRows()` di `src/lib/energy-data.js` pada 13 Oktober 2026. Fungsi yang sama dipakai oleh `tests/reconciliation-identities.test.mjs`.
+Angka di bagian 3 sampai 5 diambil dari `getCanonicalEnergyRows()` di `src/lib/energy-data.js` pada 13 Oktober 2026, dari tabel `energy_flow_monthly`. Isi tabel itu sudah dicocokkan per plant per bulan dengan CSV laporan iSolarCloud dan tidak ada selisih. Fungsi yang sama dipakai oleh `tests/reconciliation-identities.test.mjs`.
 
 | Metrik | Nilai Aktual | Keterangan |
 | :--- | :---: | :--- |
-| **Total Produksi 37 DC** | `4.727,35 MWh` | Seluruh DC dengan PLTS operasional |
+| **Total Produksi 37 DC** | `4.727,35 MWh` | Seluruh DC dengan PLTS |
 | **Total Ekspor (Feed-in) 37 DC** | `92,18 MWh` | Terkirim ke jaringan PLN |
 | **Total Pakai Sendiri 37 DC** | `4.635,16 MWh` | Produksi dikurangi ekspor |
-| **Produksi 35 DC Eligible** | `4.538,99 MWh` | Tanpa Gorontalo & Manado (grid Sulutgo sementara) |
-| **Pakai Sendiri 35 DC Eligible** | `4.447,61 MWh` | Basis kanonik kartu Emisi Terhindar |
-| **Emisi Terhindar Kanonik (35 DC)** | **`4.434,27 tCO₂e`** | Pakai sendiri × 0,997, **angka tunggal sah dashboard** |
-| *Emisi Basis Produksi (Metode Lama)* | `4.525,38 tCO₂e` | Produksi eligible × 0,997, hanya sebagai catatan (tidak ditampilkan di UI) |
-| *Target RKAP (Referensi Korporat)* | `4.791,34 tCO₂e` | Dihitung dari faktor target RKAP $0,997294\text{ t/MWh}$ |
+| **Produksi 36 DC Eligible** | `4.722,81 MWh` | Tanpa Gorontalo (konstruksi, 4,53 MWh) |
+| **Pakai Sendiri 36 DC Eligible** | `4.630,63 MWh` | Basis kanonik kartu Emisi Terhindar |
+| **Emisi Terhindar Kanonik (36 DC)** | **`4.616,74 tCO₂e`** | Pakai sendiri × 0,997, **angka tunggal sah dashboard** |
+| *Emisi Basis Produksi (Metode Lama)* | `4.708,64 tCO₂e` | Produksi eligible × 0,997, hanya sebagai catatan (tidak ditampilkan di UI) |
+
+> Halaman PLTS yang dibuka tanpa filter menampilkan YTD termasuk bulan berjalan yang datanya masih parsial dari telemetri live. Untuk mencocokkan dengan tabel ini, pilih periode Januari s.d. September.
 
 ---
 
 ## 4. Rincian Bulanan Januari s.d. September 2026
 
-| Bulan | Produksi 35 DC (MWh) | Pakai Sendiri 35 DC (MWh) | Emisi Terhindar ($\text{tCO}_2\text{e}$) | Kumulatif YTD ($\text{tCO}_2\text{e}$) |
+| Bulan | Produksi 36 DC (MWh) | Pakai Sendiri 36 DC (MWh) | Emisi Terhindar ($\text{tCO}_2\text{e}$) | Kumulatif YTD ($\text{tCO}_2\text{e}$) |
 | :---: | :---: | :---: | :---: | :---: |
-| **Jan 2026** | 444,47 | 438,09 | **436,78** | 436,78 |
-| **Feb 2026** | 425,06 | 419,16 | **417,90** | 854,68 |
-| **Mar 2026** | 542,39 | 529,61 | **528,02** | 1.382,70 |
-| **Apr 2026** | 544,70 | 535,95 | **534,34** | 1.917,04 |
-| **Mei 2026** | 494,18 | 484,68 | **483,23** | 2.400,27 |
-| **Jun 2026** | 497,16 | 490,09 | **488,62** | 2.888,89 |
-| **Jul 2026** | 509,31 | 500,58 | **499,07** | 3.387,97 |
-| **Agu 2026** | 531,20 | 517,21 | **515,66** | 3.903,63 |
-| **Sep 2026** | 550,54 | 532,24 | **530,64** | **4.434,27** |
-| **TOTAL YTD**| **4.538,99** | **4.447,61** | **4.434,27** | **4.434,27** |
+| **Jan 2026** | 464,66 | 458,16 | **456,78** | 456,78 |
+| **Feb 2026** | 441,51 | 435,53 | **434,23** | 891,01 |
+| **Mar 2026** | 561,11 | 548,25 | **546,60** | 1.437,61 |
+| **Apr 2026** | 564,48 | 555,65 | **553,98** | 1.991,59 |
+| **Mei 2026** | 512,60 | 503,02 | **501,51** | 2.493,11 |
+| **Jun 2026** | 517,66 | 510,51 | **508,98** | 3.002,08 |
+| **Jul 2026** | 530,88 | 522,07 | **520,50** | 3.522,58 |
+| **Agu 2026** | 555,37 | 541,30 | **539,67** | 4.062,25 |
+| **Sep 2026** | 574,54 | 556,16 | **554,49** | **4.616,74** |
+| **TOTAL YTD**| **4.722,81** | **4.630,63** | **4.616,74** | **4.616,74** |
 
 > **Pembulatan**: total YTD dan kumulatif dihitung dari nilai presisi penuh, lalu dibulatkan. Jumlah sembilan angka bulanan yang sudah dibulatkan bisa berbeda paling banyak 0,01 tCO₂e dari total tersebut.
 
@@ -80,10 +70,10 @@ Angka di bagian 3 dan 4 diambil dari `getCanonicalEnergyRows()` di `src/lib/ener
 Seluruh konversi turunan diberi label **"estimasi"** dengan metodologi yang transparan:
 
 1. **Setara Penyerapan Pohon**:
-   $$\text{Jumlah Pohon} = \frac{\text{Emisi Terhindar (tCO}_2\text{e)} \times 1.000}{21,77\text{ kgCO}_2\text{e/pohon/tahun}} = \frac{4.434,27 \times 1.000}{21,77} \approx \mathbf{203.687\text{ Pohon}}$$
+   $$\text{Jumlah Pohon} = \frac{\text{Emisi Terhindar (tCO}_2\text{e)} \times 1.000}{21,77\text{ kgCO}_2\text{e/pohon/tahun}} = \frac{4.616,74 \times 1.000}{21,77} \approx \mathbf{212.069\text{ Pohon}}$$
    - Faktor: $21,77\text{ kgCO}_2\text{e/pohon/tahun}$ (rata-rata pohon dewasa tropis).
 2. **Batubara Terhindar**:
-   $$\text{Batubara Terhindar (Ton)} = \text{Pakai Sendiri (MWh)} \times 0,400\text{ ton/MWh} = 4.447,61 \times 0,400 \approx \mathbf{1.779,0\text{ Ton Batubara}}$$
+   $$\text{Batubara Terhindar (Ton)} = \text{Pakai Sendiri (MWh)} \times 0,400\text{ ton/MWh} = 4.630,63 \times 0,400 \approx \mathbf{1.852,3\text{ Ton Batubara}}$$
    - Faktor: $0,400\text{ ton/MWh}$ ($0,40\text{ kg batubara/kWh}$ Specific Fuel Consumption PLTU rata-rata).
    - Faktor RKAP lama ($54\text{ pohon/MWh}$ dan $0,404\text{ t/MWh}$) dihapus penuh dari perhitungan hasil aktual.
 

@@ -6,8 +6,8 @@
  *
  * Di mana:
  * - energi_pakai_sendiri_kWh = Math.max(0, produksi_kWh - feed_in_kWh)
- * - cmPlts bernilai 0,997 di semua grid; status grid 'resmi' tetap jadi syarat kelayakan
- * - Plant berfaktor 'sementara' atau UNDER_CONSTRUCTION dikecualikan dari perhitungan resmi.
+ * - cmPlts bernilai 0,997 di semua grid, termasuk grid berstatus 'sementara' seperti Sulutgo
+ * - Hanya plant UNDER_CONSTRUCTION yang dikecualikan.
  */
 
 import { getGridFactor } from '../emission-factors.js';
@@ -30,7 +30,7 @@ export function calculatePlantCanonicalEmission({
   const factorObj = getGridFactor(grid);
   const factor = factorObj?.cmPlts ?? null;
   const factorStatus = factorObj?.status ?? 'tidak_resmi';
-  const isEligible = !isUnderConstruction && factorStatus === 'resmi' && factor !== null && Number.isFinite(factor);
+  const isEligible = !isUnderConstruction && factor !== null && Number.isFinite(factor);
 
   const prodKwh = typeof productionKwh === 'number' && Number.isFinite(productionKwh) && productionKwh >= 0 ? productionKwh : 0;
   const exportKwh = typeof feedInKwh === 'number' && Number.isFinite(feedInKwh) && feedInKwh >= 0 ? feedInKwh : 0;

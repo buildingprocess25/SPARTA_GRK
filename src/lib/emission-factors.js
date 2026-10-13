@@ -74,8 +74,8 @@ export const GRID_EMISSION_FACTORS = [
     unit: 'kgCO₂e/kWh',
     sourceDocument: 'SK Dirjen Ketenagalistrikan ESDM (Grid Sulselrabar)',
     year: '2024',
-    cmExPost: 0.75,
-    cmExAnte: 0.75,
+    cmExPost: 0.73,
+    cmExAnte: 0.73,
     cmPlts: PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH,
   },
   { 

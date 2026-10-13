@@ -11,9 +11,8 @@ import {
   getGridEmissionFactor
 } from '@/lib/carbon/carbonEngine';
 import { getYearToDateMonths } from '@/lib/reportingMonths';
-
-// Flat Jamali factor; per-grid Scope 2 is computed in /api/emissions.
-const SCOPE2_GRID_FACTOR_KG_PER_KWH = 0.87;
+import { getCanonicalEnergyRows, getCanonicalMonthlySummary } from '@/lib/energy-data.js';
+import { buildScope2CanonicalDashboard } from '@/lib/scope2/dashboardService.js';
 
 // Micro-cache (10 seconds) for performance
 let cachedPayload = null;
@@ -32,11 +31,17 @@ export async function GET(request) {
       });
     }
 
-    // Actuals only: DRAFT rows are excluded.
-    const energyRecords = await prisma.energyMeasurement.findMany({
-      where: { qualityStatus: { not: 'DRAFT' } },
-      orderBy: [{ yearMonth: 'asc' }, { dcId: 'asc' }]
-    });
+    const reportingMonths = getYearToDateMonths(new Date(now));
+    const reportingYear = Number(reportingMonths[0].yearMonth.slice(0, 4));
+    const monthKeys = reportingMonths.map(m => m.yearMonth);
+    const monthLabels = reportingMonths.map(m => m.label);
+
+    // PLTS and Scope 2 read energy_flow_monthly through the same modules as the PLTS and Scope 2 pages.
+    const [energyRows, pltsMonthly, scope2Dashboard] = await Promise.all([
+      getCanonicalEnergyRows({ year: reportingYear, throughMonth: reportingMonths.length }),
+      getCanonicalMonthlySummary({ year: reportingYear, throughMonth: reportingMonths.length }),
+      buildScope2CanonicalDashboard({ year: reportingYear }),
+    ]);
 
     const waterRecords = await prisma.waterActivity.findMany({
       where: { qualityStatus: { not: 'DRAFT' } },
@@ -56,30 +61,22 @@ export async function GET(request) {
       orderBy: [{ canonicalName: 'asc' }]
     });
 
-    const reportingMonths = getYearToDateMonths(new Date(now));
-    const monthKeys = reportingMonths.map(m => m.yearMonth);
-    const monthLabels = reportingMonths.map(m => m.label);
-
+    const pltsByMonth = new Map(pltsMonthly.map(m => [m.yearMonth, m]));
     const pltsMonthlyTrend = monthKeys.map((ym, idx) => {
-      const monthMeasurements = energyRecords.filter(r => r.yearMonth === ym && !r.isAggregateRow);
-      const totalYieldMwh = monthMeasurements.reduce((acc, r) => acc + r.yieldMwh, 0);
-      const totalPurchasedMwh = monthMeasurements.reduce((acc, r) => acc + r.purchasedMwh, 0);
-      const totalFeedInMwh = monthMeasurements.reduce((acc, r) => acc + r.feedInMwh, 0);
-      const totalLoadMwh = monthMeasurements.reduce((acc, r) => acc + r.loadMwh, 0);
-      const totalProdMwh = monthMeasurements.reduce((acc, r) => acc + r.totalProdMwh, 0);
-      const avoidedCo2Ton = totalProdMwh * CARBON_FACTORS.PLTS_PORTFOLIO.CO2_AVOIDED_TON_PER_MWH;
-
+      const m = pltsByMonth.get(ym);
+      const yieldMwh = m ? m.yieldMwh : 0;
       return {
         month: monthLabels[idx],
         yearMonth: ym,
-        pltsGen: Number((totalYieldMwh * 1000).toFixed(1)), // in kWh for chart
-        pltsGenMwh: Number(totalYieldMwh.toFixed(5)),
-        purchasedMwh: Number(totalPurchasedMwh.toFixed(5)),
-        feedInMwh: Number(totalFeedInMwh.toFixed(5)),
-        loadMwh: Number(totalLoadMwh.toFixed(5)),
-        totalProdMwh: Number(totalProdMwh.toFixed(5)),
-        avoidedCo2Ton: Number(avoidedCo2Ton.toFixed(3)),
-        plantCount: monthMeasurements.length
+        pltsGen: Number((yieldMwh * 1000).toFixed(1)), // in kWh for chart
+        pltsGenMwh: Number(yieldMwh.toFixed(5)),
+        purchasedMwh: Number((m?.purchasedMwh || 0).toFixed(5)),
+        feedInMwh: Number((m?.feedInMwh || 0).toFixed(5)),
+        selfConsumptionMwh: Number((m?.selfConsumptionMwh || 0).toFixed(5)),
+        loadMwh: Number((m?.loadMwh || 0).toFixed(5)),
+        totalProdMwh: Number(yieldMwh.toFixed(5)),
+        avoidedCo2Ton: Number((m?.avoidedEmissionTon || 0).toFixed(3)),
+        plantCount: m?.plantCount || 0
       };
     });
 
@@ -103,11 +100,9 @@ export async function GET(request) {
     // Scope 1 and 2, actuals only
     const totalPltsAvoidedTon = pltsMonthlyTrend.reduce((acc, m) => acc + m.avoidedCo2Ton, 0);
     const totalWaterAvoidedTon = waterMonthlyTrend.reduce((acc, m) => acc + m.avoidedCo2Ton, 0);
-    const totalPltsCostSavedJuta = (pltsMonthlyTrend.reduce((acc, m) => acc + m.pltsGen, 0) * CARBON_FACTORS.TARIFFS.ELECTRICITY_PLN_PER_KWH) / 1_000_000;
+    // Savings use self-consumed energy, the same basis as the PLTS page's savings card.
+    const totalPltsCostSavedJuta = (pltsMonthlyTrend.reduce((acc, m) => acc + m.selfConsumptionMwh * 1000, 0) * CARBON_FACTORS.TARIFFS.ELECTRICITY_PLN_PER_KWH) / 1_000_000;
     const totalWaterCostSavedJuta = waterMonthlyTrend.reduce((acc, m) => acc + m.costSavedJuta, 0);
-
-    const totalPurchasedKwh = energyRecords.filter(r => !r.isAggregateRow).reduce((acc, r) => acc + r.purchasedKwh, 0);
-    const scope2TotalEmissionTon = Number(((totalPurchasedKwh * SCOPE2_GRID_FACTOR_KG_PER_KWH) / 1000).toFixed(2));
 
     const scope1MonthlyTrend = monthKeys.map((ym, idx) => {
       const monthFuel = fuelRecords.filter(r => r.yearMonth === ym);
@@ -120,17 +115,30 @@ export async function GET(request) {
       };
     });
 
+    const scope2ByMonth = new Map((scope2Dashboard.monthly || []).map(m => [m.yearMonth, m]));
     const scope2MonthlyTrend = monthKeys.map((ym, idx) => {
-      const plnKwh = energyRecords
-        .filter(r => r.yearMonth === ym && !r.isAggregateRow)
-        .reduce((acc, r) => acc + r.purchasedKwh, 0);
+      const m = scope2ByMonth.get(ym);
       return {
         month: monthLabels[idx],
         yearMonth: ym,
-        plnKwh: Number(plnKwh.toFixed(1)),
-        emissionTon: Number(((plnKwh * SCOPE2_GRID_FACTOR_KG_PER_KWH) / 1000).toFixed(3)),
+        plnKwh: Number((m?.totalPurchasedKwh || 0).toFixed(1)),
+        emissionTon: Number((m?.scope2EmissionTon || 0).toFixed(3)),
       };
     });
+    const totalPurchasedKwh = scope2MonthlyTrend.reduce((acc, m) => acc + m.plnKwh, 0);
+    const scope2TotalEmissionTon = Number(scope2MonthlyTrend.reduce((acc, m) => acc + m.emissionTon, 0).toFixed(2));
+
+    // Per DC-month, so multi-plant DCs (Cilacap, Lombok) return their combined yield.
+    const detailByDcMonth = new Map();
+    for (const row of energyRows) {
+      const key = `${row.dcId}|${row.yearMonth}`;
+      const acc = detailByDcMonth.get(key) || { dcId: row.dcId, plantNameRaw: row.dcName, yearMonth: row.yearMonth, yieldKwh: 0, feedInKwh: 0, purchasedKwh: 0 };
+      acc.yieldKwh += row.yieldKwh;
+      acc.feedInKwh += row.feedInKwh;
+      acc.purchasedKwh += row.purchasedKwh;
+      detailByDcMonth.set(key, acc);
+    }
+    const detailMeasurements = [...detailByDcMonth.values()];
 
     // Fuel Scope 1 from fuelRecords strictly
     const fuelScope1Ton = fuelRecords.reduce((acc, r) => acc + r.emissionTon, 0);
@@ -151,7 +159,7 @@ export async function GET(request) {
       source: 'DATABASE_POSTGRESQL_VERIFIED_TRANSACTIONS',
       counts: {
         plants: plantMasters.length,
-        energyMeasurements: energyRecords.length,
+        energyFlowRows: energyRows.length,
         waterActivities: waterRecords.length,
         fuelActivities: fuelRecords.length,
         targets: targetRecords.length
@@ -168,7 +176,7 @@ export async function GET(request) {
         totalAvoidedCo2TonYtd: Number(totalPltsAvoidedTon.toFixed(3)),
         totalCostSavedJuta: Number(totalPltsCostSavedJuta.toFixed(2)),
         monthlyTrend: pltsMonthlyTrend,
-        detailMeasurements: energyRecords
+        detailMeasurements
       },
       water: {
         totalVolumeM3Ytd: Number(waterMonthlyTrend.reduce((acc, m) => acc + m.recycled, 0).toFixed(2)),

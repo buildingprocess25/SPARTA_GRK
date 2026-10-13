@@ -90,7 +90,7 @@ test('Identity 5: Jumlah 9 Bulan Lengkap == Total YTD (Jan-Sep 2026)', async () 
   assert.ok(Math.abs(sumPurchasedMwh - ytd.purchasedMwh) < 0.01, 'Purchased PLN sum mismatch');
   // Monthly values are rounded individually, so their sum may drift from the rounded YTD by 0.01.
   assert.ok(Math.abs(sumAvoidedTon - ytd.avoidedEmissionTon) <= 0.0101, 'Avoided emission sum mismatch');
-  assert.equal(ytd.avoidedEmissionTon, 4434.27, 'Canonical avoided emission (0.997 factor) must be 4434.27 tCO2e');
+  assert.equal(ytd.avoidedEmissionTon, 4616.74, 'Canonical avoided emission (0.997 factor, Manado included) must be 4616.74 tCO2e');
 });
 
 test('Identity 6: Kumulatif Chart Bulan N == Jumlah Tabel Jan..N', async () => {
@@ -105,7 +105,7 @@ test('Identity 6: Kumulatif Chart Bulan N == Jumlah Tabel Jan..N', async () => {
     );
   }
 
-  assert.equal(monthly[3].cumAvoidedEmissionTon, 1917.04, 'April cumulative (0.997 factor) must be 1917.04 tCO2e');
+  assert.equal(monthly[3].cumAvoidedEmissionTon, 1991.59, 'April cumulative (0.997 factor, Manado included) must be 1991.59 tCO2e');
 });
 
 test('Cross-Page Test: PLTS Pakai Sendiri di Halaman PLTS == di Halaman Scope 2', async () => {

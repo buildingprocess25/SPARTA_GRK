@@ -1,6 +1,6 @@
 import { getGridFactor } from '../emission-factors.js';
 import { CANONICAL_DC_ENTITIES, isDcLocation } from './plantMap.js';
-import { resolveMonthly } from './dashboard.js';
+import { resolveMonthly, isPlantUnderConstruction } from './dashboard.js';
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 export const EMISSION_FACTOR_VERSION = 'INTERNAL_CONFIG_VERIFICATION_PENDING';
@@ -172,8 +172,8 @@ export function aggregateMonthlyHistory({
       ? round(available.reduce((sum, item) => sum + item.energyKwh, 0))
       : null;
     const factorObj = getGridFactor(entity.grid);
-    const isOfficial = factorObj && factorObj.status === 'resmi';
-    const factor = isOfficial ? factorObj.cmPlts : null;
+    // cmPlts is the single 0.997 factor on every grid, so only plants under construction are excluded.
+    const factor = factorObj && !isPlantUnderConstruction(entity) ? factorObj.cmPlts : null;
     const installedKwp = entity.apiInstalledKwp || entity.installedKwp || entity.capacityKwp || 0;
     const co2Ton = factor !== null && productionKwh != null ? round((productionKwh / 1000) * factor, 2) : null;
     return {
