@@ -32,10 +32,10 @@ export default function MainScope1Bridge({ onNavigate }) {
   return <CardBox className="space-y-4 border-rose-200 dark:border-rose-500/30 bg-gradient-to-br from-white to-rose-50/40 dark:from-slate-900 dark:to-rose-950/30">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-2">
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Emisi Scope 1: Genset dan Kendaraan</h2>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Emisi Langsung (Scope 1)</h2>
         <InfoHint
-          title="Emisi Scope 1"
-          text="Emisi dari BBM yang dibakar langsung oleh Alfamart: solar untuk genset cadangan dan BBM kendaraan operasional. Angkanya sama dengan halaman Scope 1."
+          title="Emisi Langsung (Scope 1)"
+          text="Emisi langsung dari pembakaran bahan bakar genset cadangan dan kendaraan operasional Alfamart. Angka ini identik dengan data pada halaman Scope 1."
         />
       </div>
       <button onClick={() => onNavigate?.('penambah', 'scope1')} className="rounded-lg border border-rose-200 dark:border-rose-500/30 bg-white dark:bg-slate-800 px-3 py-2 min-h-10 text-xs font-semibold text-rose-700 dark:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500">Buka Scope 1</button>

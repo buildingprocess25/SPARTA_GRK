@@ -8,7 +8,7 @@ import InfoHint from '@/components/ui/InfoHint';
 
 const number = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 });
 
-export default function MainScope2Bridge({ scope1Ton = 0, onNavigate }) {
+export default function MainScope2Bridge({ onNavigate }) {
   const [state, setState] = useState({ loading: true, data: null, error: '' });
   useEffect(() => {
     const controller = new AbortController();
@@ -25,7 +25,7 @@ export default function MainScope2Bridge({ scope1Ton = 0, onNavigate }) {
   if (state.error) return <div className="rounded-xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300"><AlertCircle className="mr-2 inline" size={16} aria-hidden="true" />Emisi listrik PLN belum bisa dimuat: {state.error}</div>;
 
   const scope2Bridge = state.data.scope2Bridge;
-  const inventoryTon = Number(scope1Ton || 0) + scope2Bridge.scope2InventoryTon;
+  const scope2Ton = scope2Bridge.scope2InventoryTon;
   const card = 'rounded-xl p-4';
   const label = 'text-xs text-slate-600 dark:text-slate-400';
   const value = 'text-slate-900 dark:text-slate-100';
@@ -33,10 +33,10 @@ export default function MainScope2Bridge({ scope1Ton = 0, onNavigate }) {
   return <CardBox className="space-y-4 border-blue-200 dark:border-blue-500/30 bg-gradient-to-br from-white to-blue-50/40 dark:from-slate-900 dark:to-blue-950/30">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-2">
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Emisi Scope 2: Listrik PLN</h2>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Emisi Tidak Langsung (Scope 2)</h2>
         <InfoHint
-          title="Emisi Scope 2"
-          text="Emisi dari listrik yang dibeli dari PLN. Listrik dari PLTS atap yang dipakai sendiri tidak menghasilkan emisi, jadi bagian itu dikurangkan satu kali. Angkanya sama dengan halaman Scope 2."
+          title="Emisi Tidak Langsung (Scope 2)"
+          text="Emisi tidak langsung dari konsumsi listrik PLN yang dibeli tiap DC. Penggunaan listrik dari PLTS atap yang dipakai sendiri tidak menghasilkan emisi sehingga dikurangkan satu kali. Angka ini identik dengan data pada halaman Scope 2."
         />
       </div>
       <div className="flex gap-2">
@@ -63,8 +63,8 @@ export default function MainScope2Bridge({ scope1Ton = 0, onNavigate }) {
         <strong className={value}>{number.format(scope2Bridge.afterPltsTon)} tCO₂e</strong>
       </div>
       <div className={`${card} bg-slate-900 dark:bg-black/40 text-white`}>
-        <p className="text-xs text-slate-300">Total Scope 1 + 2</p>
-        <strong>{number.format(inventoryTon)} tCO₂e</strong>
+        <p className="text-xs text-slate-300">Total Scope 2</p>
+        <strong>{number.format(scope2Ton)} tCO₂e</strong>
       </div>
     </div>
   </CardBox>;

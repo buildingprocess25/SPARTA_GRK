@@ -244,7 +244,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       <MainScope1Bridge onNavigate={handleNav} />
 
       {/* scope2Bridge: canonical connection to Scope 2 and PLTS without double counting */}
-      <MainScope2Bridge scope1Ton={realKpiState.data?.scope1Ton ?? 0} onNavigate={handleNav} />
+      <MainScope2Bridge onNavigate={handleNav} />
 
       {realKpiState.error && (
         <div className="flex items-center gap-2 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-4 py-3 text-xs font-semibold text-rose-800 dark:text-rose-300">
