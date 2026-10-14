@@ -25,7 +25,6 @@ import { formatNum } from '@/data/sustainabilityData';
 import { CARBON_FACTORS } from '@/lib/carbon/carbonEngine';
 import { getYearToDateMonths } from '@/lib/reportingMonths';
 import PageHeader from '@/components/ui/PageHeader';
-import KpiCard from '@/components/ui/KpiCard';
 import CardBox from '@/components/ui/CardBox';
 import InfoHint from '@/components/ui/InfoHint';
 import MainScope2Bridge from '@/components/scope2/MainScope2Bridge';
@@ -62,7 +61,6 @@ function CalculatorLoadingSkeleton() {
 
 export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCalculator = false }) {
   const { scope1, scope2, pltsData, waterData, inputHistory } = useSustainability();
-  const [showDetailedMapping, setShowDetailedMapping] = useState(false);
   const [chartMetricView, setChartMetricView] = useState('net'); // 'net' | 'all' | 'penambahan' | 'pengurangan'
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(initialOpenCalculator);
   const calculatorRef = useRef(null);
@@ -78,33 +76,63 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([
-      fetchAnnualReportData(),
-      fetch('/api/plts/dashboard/summary').then((r) => r.json()),
-    ])
-      .then(([reportData, pltsSummaryRes]) => {
-        if (cancelled) return;
+    fetchAnnualReportData()
+      .then((reportData) => {
+        if (cancelled) return null;
+        const pltsUrl = `/api/plts/dashboard/summary?mode=YTD&throughMonth=${reportData.throughMonth}`;
+        return Promise.all([
+          Promise.resolve(reportData),
+          fetch(pltsUrl).then((r) => r.json()),
+        ]);
+      })
+      .then((results) => {
+        if (cancelled || !results) return;
+        const [reportData, pltsSummaryRes] = results;
         if (!pltsSummaryRes.success) throw new Error(pltsSummaryRes.error || 'Gagal memuat ringkasan PLTS');
-        const scope1Ton = reportData.scope1.genset.summary.totalEmissionTon + reportData.scope1.vehicle.summary.totalEmissionTon;
+
+        const scope1GensetLiters = reportData.scope1.genset?.summary?.totalLiters || 0;
+        const scope1VehicleLiters = reportData.scope1.vehicle?.summary?.totalLiters || 0;
+        const scope1FuelLiters = scope1GensetLiters + scope1VehicleLiters;
+        const scope1Ton = (reportData.scope1.genset?.summary?.totalEmissionTon || 0) + (reportData.scope1.vehicle?.summary?.totalEmissionTon || 0);
+
+        const scope2PlnMwh = reportData.emissions.data.reduce((sum, d) => sum + (d.plnConsumptionMWh || 0), 0);
         const scope2Ton = reportData.emissions.data.reduce((sum, d) => sum + (d.scope2EmissionTon || 0), 0);
+
         const grossEmissionTon = scope1Ton + scope2Ton;
         const pltsAvoidedTon = reportData.emissions.data.reduce((sum, d) => sum + (d.avoidedEmissionTon || 0), 0);
-        const waterAvoidedTon = reportData.water.summary.totalEmissionAvoidedTon;
+        const waterAvoidedTon = reportData.water.summary?.totalEmissionAvoidedTon || 0;
         const avoidedEmissionTon = pltsAvoidedTon + waterAvoidedTon;
         const netEmissionTon = grossEmissionTon - avoidedEmissionTon;
+
         const netReductionPct = grossEmissionTon > 0 ? `${((avoidedEmissionTon / grossEmissionTon) * 100).toFixed(1)}%` : '0%';
         const scope1SharePct = grossEmissionTon > 0 ? ((scope1Ton / grossEmissionTon) * 100).toFixed(1) : '0';
         const scope2SharePct = grossEmissionTon > 0 ? ((scope2Ton / grossEmissionTon) * 100).toFixed(1) : '0';
+
         const pltsProdMwh = reportData.emissions.data.reduce((sum, d) => sum + (d.pltsProdMWh || 0), 0);
         const pltsCostSavingJuta = (pltsSummaryRes.data?.summary?.costSavings?.totalIdr || 0) / 1_000_000;
-        const waterCostSavingJuta = reportData.water.summary.totalCostSavedJuta;
+        const waterCostSavingJuta = reportData.water.summary?.totalCostSavedJuta || 0;
+
         setRealKpiState({
           loading: false,
           error: null,
           data: {
-            scope1Ton, scope2Ton, grossEmissionTon, pltsAvoidedTon, waterAvoidedTon, avoidedEmissionTon,
-            netEmissionTon, netReductionPct, scope1SharePct, scope2SharePct, pltsProdMwh,
-            waterVolumeM3: reportData.water.summary.totalVolumeM3,
+            periodLabel: reportData.periodLabel,
+            scope1FuelLiters,
+            scope1Ton,
+            scope2PlnMwh,
+            scope2Ton,
+            grossEmissionTon,
+            pltsAvoidedTon,
+            waterAvoidedTon,
+            avoidedEmissionTon,
+            netEmissionTon,
+            netReductionPct,
+            scope1SharePct,
+            scope2SharePct,
+            pltsProdMwh,
+            waterVolumeM3: reportData.water.summary?.totalVolumeM3 || 0,
+            pltsCostSavingJuta,
+            waterCostSavingJuta,
             totalCostSavingJuta: pltsCostSavingJuta + waterCostSavingJuta,
           },
         });
@@ -116,8 +144,24 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
   }, []);
 
   const resumeKPI = realKpiState.data || {
-    netEmissionTon: 0, grossEmissionTon: 0, avoidedEmissionTon: 0, netReductionPct: '0%', totalCostSavingJuta: 0,
-    scope1SharePct: '0', scope2SharePct: '0', pltsProdMwh: 0, waterVolumeM3: 0,
+    periodLabel: '',
+    scope1FuelLiters: 0,
+    scope1Ton: 0,
+    scope2PlnMwh: 0,
+    scope2Ton: 0,
+    netEmissionTon: 0,
+    grossEmissionTon: 0,
+    pltsAvoidedTon: 0,
+    waterAvoidedTon: 0,
+    avoidedEmissionTon: 0,
+    netReductionPct: '0%',
+    pltsCostSavingJuta: 0,
+    waterCostSavingJuta: 0,
+    totalCostSavingJuta: 0,
+    scope1SharePct: '0',
+    scope2SharePct: '0',
+    pltsProdMwh: 0,
+    waterVolumeM3: 0,
   };
 
   const handleExportSrnPpi = async () => {
@@ -240,12 +284,6 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         info="Ringkasan emisi karbon semua DC Alfamart: yang menambah emisi (BBM dan listrik PLN) dan yang mengurangi (PLTS dan air daur ulang)."
       />
 
-      {/* scope1Bridge: canonical connection to Scope 1 (Genset + Kendaraan) */}
-      <MainScope1Bridge onNavigate={handleNav} />
-
-      {/* scope2Bridge: canonical connection to Scope 2 and PLTS without double counting */}
-      <MainScope2Bridge onNavigate={handleNav} />
-
       {realKpiState.error && (
         <div className="flex items-center gap-2 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-4 py-3 text-xs font-semibold text-rose-800 dark:text-rose-300">
           <AlertCircle size={16} className="shrink-0" />
@@ -253,48 +291,181 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         </div>
       )}
 
-      {/* Ringkasan metrik */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
-        {/* Metric 1: Net Emission */}
-        <KpiCard
-          label="Emisi bersih"
-          value={realKpiState.loading ? '—' : formatNum(resumeKPI.netEmissionTon, 1)}
-          unit="tCO₂e"
-          trend={realKpiState.loading ? 'Memuat...' : `Turun ${resumeKPI.netReductionPct} berkat PLTS dan air daur ulang`}
-          icon={Award}
-          theme="emission"
-        />
+      {/* Overview Awal: 4 Kartu Ringkasan & Rincian Sumber Emisi */}
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <BarChart3 size={18} className="text-emerald-500 shrink-0" aria-hidden="true" />
+              <span>Rincian & Ikhtisar Sumber Emisi</span>
+              {resumeKPI.periodLabel && (
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                  {resumeKPI.periodLabel}
+                </span>
+              )}
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Overview menyeluruh emisi operasional, mitigasi terpasang, dan efisiensi biaya di seluruh Distribution Center (DC) Alfamart.
+            </p>
+          </div>
+        </div>
 
-        {/* Metric 2: Gross Emission (Scope 1 + 2) */}
-        <KpiCard
-          label="Total emisi (Scope 1 + 2)"
-          value={realKpiState.loading ? '—' : formatNum(resumeKPI.grossEmissionTon, 1)}
-          unit="tCO₂e"
-          trend={realKpiState.loading ? 'Memuat...' : `Listrik PLN ${resumeKPI.scope2SharePct}% · BBM ${resumeKPI.scope1SharePct}%`}
-          icon={TrendingUp}
-          theme="emission"
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+          {/* Card 1: Emisi Bersih */}
+          <CardBox className="border-slate-200 dark:border-slate-800 hover:border-purple-300 dark:hover:border-purple-500/40 transition-colors shadow-sm">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                    <Award size={18} aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                      Emisi Bersih
+                    </h3>
+                    <span className="text-[10px] font-semibold text-purple-600 dark:text-purple-400">
+                      Net Operational
+                    </span>
+                  </div>
+                </div>
+                <InfoHint
+                  title="Emisi Bersih Alfamart"
+                  text="Total emisi gas rumah kaca riil yang menjadi beban akhir perusahaan setelah memperhitungkan seluruh mitigasi hijau (PLTS atap dan air daur ulang). Rumus: Total Emisi Bruto (Scope 1 + 2) dikurangi Total Pengurangan."
+                />
+              </div>
 
-        {/* Metric 3: Avoided Carbon (Offset) */}
-        <KpiCard
-          label="Total pengurangan"
-          value={realKpiState.loading ? '—' : formatNum(resumeKPI.avoidedEmissionTon, 1)}
-          unit="tCO₂e"
-          trend={realKpiState.loading ? 'Memuat...' : `Dari ${formatNum(resumeKPI.pltsProdMwh)} MWh PLTS dan ${formatNum(resumeKPI.waterVolumeM3)} m³ air daur ulang`}
-          icon={Sun}
-          theme="savings"
-        />
+              <div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                    {realKpiState.loading ? '...' : formatNum(resumeKPI.netEmissionTon, 1)}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">tCO₂e</span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Turun {resumeKPI.netReductionPct} berkat PLTS dan air daur ulang
+                </p>
+              </div>
+            </div>
+          </CardBox>
 
-        {/* Metric 4: Cost Saving */}
-        <KpiCard
-          label="Penghematan biaya"
-          value={realKpiState.loading ? '—' : `Rp ${formatNum(resumeKPI.totalCostSavingJuta, 1)}`}
-          unit="Juta"
-          trend={realKpiState.loading ? 'Memuat...' : 'Tagihan listrik dan air yang dihemat'}
-          icon={Calculator}
-          theme="savings"
-        />
+          {/* Card 2: Menambah Emisi (Scope 1 & 2) */}
+          <CardBox className="border-slate-200 dark:border-slate-800 hover:border-red-300 dark:hover:border-red-500/40 transition-colors shadow-sm">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-9 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
+                    <TrendingUp size={18} aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                      Menambah Emisi
+                    </h3>
+                    <span className="text-[10px] font-semibold text-red-600 dark:text-red-400">
+                      Scope 1 & 2 Bruto
+                    </span>
+                  </div>
+                </div>
+                <InfoHint
+                  title="Menambah Emisi (Emisi Bruto)"
+                  text="Total emisi gas rumah kaca yang dihasilkan dari operasional Distribution Center Alfamart sebelum mitigasi. Terdiri atas Scope 1 (pembakaran BBM genset & kendaraan operasional) dan Scope 2 (konsumsi listrik dari jaringan PLN)."
+                />
+              </div>
+
+              <div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                    {realKpiState.loading ? '...' : formatNum(resumeKPI.grossEmissionTon, 1)}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">tCO₂e</span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Listrik PLN {resumeKPI.scope2SharePct}% · BBM {resumeKPI.scope1SharePct}%
+                </p>
+              </div>
+            </div>
+          </CardBox>
+
+          {/* Card 3: Mengurangi Emisi (PLTS & Air) */}
+          <CardBox className="border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-500/40 transition-colors shadow-sm">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <TrendingDown size={18} aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                      Mengurangi Emisi
+                    </h3>
+                    <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400">
+                      Inisiatif Hijau
+                    </span>
+                  </div>
+                </div>
+                <InfoHint
+                  title="Mengurangi Emisi (Mitigasi Karbon)"
+                  text="Jumlah emisi gas rumah kaca yang berhasil dicegah lepas ke atmosfer (avoided emissions) melalui pemanfaatan energi surya atap (PLTS) dan daur ulang air limbah di Distribution Center Alfamart."
+                />
+              </div>
+
+              <div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                    {realKpiState.loading ? '...' : formatNum(resumeKPI.avoidedEmissionTon, 1)}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">tCO₂e</span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Dari {formatNum(resumeKPI.pltsProdMwh, 0)} MWh PLTS dan {formatNum(resumeKPI.waterVolumeM3, 0)} m³ air daur ulang
+                </p>
+              </div>
+            </div>
+          </CardBox>
+
+          {/* Card 4: Penghematan Biaya (Financial Impact) */}
+          <CardBox className="border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-500/40 transition-colors shadow-sm">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <Calculator size={18} aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                      Penghematan Biaya
+                    </h3>
+                    <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      Efisiensi Finansial
+                    </span>
+                  </div>
+                </div>
+                <InfoHint
+                  title="Penghematan Biaya Utilitas"
+                  text="Total pengeluaran biaya operasional yang berhasil dihemat perusahaan berkat swasembada listrik dari PLTS atap dan pengolahan air daur ulang dibandingkan membeli sepenuhnya dari PLN dan PDAM/air bersih."
+                />
+              </div>
+
+              <div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                    {realKpiState.loading ? '...' : `Rp ${formatNum(resumeKPI.totalCostSavingJuta, 1)}`}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Juta</span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Tagihan listrik dan air yang dihemat
+                </p>
+              </div>
+            </div>
+          </CardBox>
+        </div>
       </div>
+
+      {/* scope1Bridge: canonical connection to Scope 1 (Genset + Kendaraan) */}
+      <MainScope1Bridge onNavigate={handleNav} />
+
+      {/* scope2Bridge: canonical connection to Scope 2 and PLTS without double counting */}
+      <MainScope2Bridge onNavigate={handleNav} />
 
       {/* Hidden unless NEXT_PUBLIC_FEATURE_EMISSION_CALCULATOR=true; the calculator code stays in place. */}
       {isEmissionCalculatorEnabled && (
@@ -713,112 +884,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         )}
       </CardBox>
 
-      {/* Rincian sumber emisi (collapsible) */}
-      <CardBox className="p-5 lg:p-6">
-        <button
-          type="button"
-          aria-expanded={showDetailedMapping}
-          className="w-full flex items-center justify-between text-left cursor-pointer rounded-lg min-h-11 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-          onClick={() => setShowDetailedMapping(!showDetailedMapping)}
-        >
-          <div className="flex items-center gap-3">
-            <div className="size-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-              <BarChart3 size={18} aria-hidden="true" />
-            </div>
-            <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">Rincian sumber emisi</h4>
-          </div>
-          <div className="size-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center shrink-0" aria-hidden="true">
-            {showDetailedMapping ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </div>
-        </button>
 
-        {showDetailedMapping && (
-          <div className="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800 space-y-6 animate-in">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Pengurang emisi */}
-              <div className="space-y-3 rounded-2xl border border-blue-100 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/10 p-5">
-                <h5 className="flex items-center gap-2 text-sm font-bold text-blue-800 dark:text-blue-200">
-                  <TrendingDown size={16} aria-hidden="true" />
-                  Mengurangi emisi
-                </h5>
-                <ul className="space-y-2 text-xs">
-                  <li>
-                    <button type="button" onClick={() => handleNav('pengurang', 'plts')} className="w-full text-left p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-500/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
-                      <span className="block font-bold text-slate-900 dark:text-slate-100">PLTS atap</span>
-                      <span className="block text-blue-700 dark:text-blue-300 font-semibold mt-1">
-                        {formatNum(pltsData.summary.energyGeneratedYTD / 1000)} MWh tahun ini · mengurangi {formatNum(pltsData.summary.co2Avoided)} tCO₂e
-                      </span>
-                    </button>
-                  </li>
-                  <li>
-                    <button type="button" onClick={() => handleNav('pengurang', 'water')} className="w-full text-left p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-cyan-200 dark:hover:border-cyan-500/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500">
-                      <span className="block font-bold text-slate-900 dark:text-slate-100">Air daur ulang</span>
-                      <span className="block text-cyan-700 dark:text-cyan-300 font-semibold mt-1">
-                        {formatNum(waterData.summary.waterSavedYTD)} m³ tahun ini · mengurangi {waterData.summary.co2Avoided} tCO₂e
-                      </span>
-                    </button>
-                  </li>
-                </ul>
-                <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20">
-                  <span className="block text-xs font-semibold text-blue-800 dark:text-blue-300">Total pengurangan tahun ini</span>
-                  <span className="block text-2xl font-bold text-blue-900 dark:text-blue-200 mt-1">
-                    {formatNum(resumeKPI.avoidedEmissionTon, 1)} tCO₂e
-                  </span>
-                  <span className="block text-xs text-blue-700 dark:text-blue-400 mt-1">{resumeKPI.netReductionPct} dari total emisi</span>
-                </div>
-              </div>
-
-              {/* Penambah emisi */}
-              <div className="space-y-3 rounded-2xl border border-red-100 dark:border-red-500/20 bg-red-50/30 dark:bg-red-500/10 p-5">
-                <h5 className="flex items-center gap-2 text-sm font-bold text-red-800 dark:text-red-200">
-                  <TrendingUp size={16} aria-hidden="true" />
-                  Menambah emisi
-                </h5>
-                <ul className="space-y-2 text-xs">
-                  <li>
-                    <button type="button" onClick={() => handleNav('penambah', 'scope1')} className="w-full text-left p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-red-200 dark:hover:border-red-500/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
-                      <span className="block font-bold text-slate-900 dark:text-slate-100">Scope 1: BBM genset dan kendaraan</span>
-                      <span className="block text-red-700 dark:text-red-300 font-semibold mt-1">
-                        {formatNum(scope1.summary.totalFuelLitersYTD)} liter · {formatNum(scope1.summary.totalEmissionCO2e, 1)} tCO₂e
-                      </span>
-                    </button>
-                  </li>
-                  <li>
-                    <button type="button" onClick={() => handleNav('penambah', 'scope2')} className="w-full text-left p-3 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
-                      <span className="block font-bold text-slate-900 dark:text-slate-100">Scope 2: listrik PLN</span>
-                      <span className="block text-amber-800 dark:text-amber-200 font-semibold mt-1">
-                        {formatNum(scope2.summary.totalPlnKwhYTD / 1000, 1)} MWh · {formatNum(scope2.summary.totalEmissionCO2e, 1)} tCO₂e
-                      </span>
-                    </button>
-                  </li>
-                </ul>
-                <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20">
-                  <span className="block text-xs font-semibold text-red-800 dark:text-red-300">Total emisi tahun ini</span>
-                  <span className="block text-2xl font-bold text-red-900 dark:text-red-200 mt-1">
-                    {formatNum(resumeKPI.grossEmissionTon, 1)} tCO₂e
-                  </span>
-                  <span className="block text-xs text-red-700 dark:text-red-400 mt-1">Sebelum dikurangi PLTS dan air daur ulang</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-slate-900 dark:bg-slate-950 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-base font-bold text-white">Emisi bersih Alfamart</h3>
-                <p className="text-xs text-slate-300 mt-0.5">Total emisi dikurangi total pengurangan</p>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-black text-white">
-                  {formatNum(resumeKPI.netEmissionTon, 1)} <span className="text-sm font-medium text-slate-300">tCO₂e</span>
-                </div>
-                <div className="text-xs text-emerald-300 font-semibold mt-0.5">
-                  Hemat Rp {formatNum(resumeKPI.totalCostSavingJuta, 1)} juta
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </CardBox>
     </div>
   );
 }

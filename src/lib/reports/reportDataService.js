@@ -5,10 +5,23 @@
  * /api/emissions) rather than any mock context data, so a regulator-facing
  * export never diverges from what the dashboard actually shows.
  */
+const MONTH_NAMES = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+const WIB_OFFSET_MS = 7 * 3600_000;
+
+function getWibDate(date = new Date()) {
+  return new Date(date.getTime() + WIB_OFFSET_MS);
+}
+
 export async function fetchAnnualReportData({ year } = {}) {
-  const now = new Date();
-  const targetYear = year || now.getFullYear();
-  const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+  const wib = getWibDate();
+  const currentWibYear = wib.getUTCFullYear();
+  const currentWibMonth = wib.getUTCMonth() + 1;
+
+  const targetYear = year || currentWibYear;
+  const endMonth = targetYear === currentWibYear
+    ? currentWibMonth
+    : (targetYear < currentWibYear ? 12 : currentWibMonth);
+  const currentMonth = String(endMonth).padStart(2, '0');
   const period = `${targetYear}-01_${targetYear}-${currentMonth}`;
 
   const [scope1Res, waterRes, emissionsRes] = await Promise.all([
@@ -21,10 +34,18 @@ export async function fetchAnnualReportData({ year } = {}) {
   if (!waterRes.success) throw new Error(`Gagal memuat data Water Recycle: ${waterRes.error}`);
   if (!emissionsRes.success) throw new Error(`Gagal memuat data Scope 2 & PLTS: ${emissionsRes.error}`);
 
-  return { year: targetYear, period, scope1: scope1Res, water: waterRes, emissions: emissionsRes };
-}
+  const periodLabel = `Januari - ${MONTH_NAMES[endMonth - 1]} ${targetYear}`;
 
-const MONTH_NAMES = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  return {
+    year: targetYear,
+    throughMonth: endMonth,
+    period,
+    periodLabel,
+    scope1: scope1Res,
+    water: waterRes,
+    emissions: emissionsRes,
+  };
+}
 
 export function monthLabel(yearMonth) {
   const [, m] = yearMonth.split('-');
