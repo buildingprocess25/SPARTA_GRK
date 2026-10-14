@@ -41,7 +41,7 @@ export default function HistoryTab({ setActiveTab }) {
     <div className="space-y-6 animate-in fade-in duration-300">
       <PageHeader
         title="Riwayat Audit"
-        info="File Excel yang pernah di-upload untuk Scope 1, Scope 2, PLTS, dan daur ulang air. Upload yang salah atau berisi data contoh bisa dihapus di sini."
+        info="File Excel yang pernah di-upload untuk Scope 1 (emisi langsung), Scope 2 (emisi tidak langsung), PLTS, dan daur ulang air. Upload yang salah atau berisi data contoh bisa dihapus di sini."
         actions={inputHistory.length > 0 && (
           <button
             type="button"

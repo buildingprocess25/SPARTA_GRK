@@ -1,9 +1,9 @@
 import { Building2, Bus, Car, Factory, HandCoins, Leaf, Plane, ReceiptText, Sun, Zap } from 'lucide-react';
 
 export const CALCULATOR_CATEGORIES = [
-  { id: 'scope1a', kind: 'addition', title: 'Scope 1A: Emisi Mesin Bakar Statis', description: 'Emisi dari genset, pemanas air, kompor, dan mesin tidak bergerak.', icon: Factory },
-  { id: 'scope1b', kind: 'addition', title: 'Scope 1B: Emisi Mesin Bakar Bergerak', description: 'Emisi dari pemakaian BBM atau jarak tempuh kendaraan.', icon: Bus },
-  { id: 'scope2', kind: 'addition', title: 'Scope 2: Pemakaian Listrik dari PLN', description: 'Emisi dari listrik yang dibeli dari jaringan PLN.', icon: Zap },
+  { id: 'scope1a', kind: 'addition', title: 'Scope 1A: Emisi Mesin Bakar Statis', description: 'Emisi langsung dari genset cadangan, pemanas air, dan mesin tidak bergerak.', icon: Factory },
+  { id: 'scope1b', kind: 'addition', title: 'Scope 1B: Emisi Mesin Bakar Bergerak', description: 'Emisi langsung dari pemakaian BBM armada kendaraan operasional.', icon: Bus },
+  { id: 'scope2', kind: 'addition', title: 'Scope 2: Pemakaian Listrik PLN', description: 'Emisi tidak langsung dari listrik yang dibeli dari jaringan PLN.', icon: Zap },
   { id: 'travel', kind: 'addition', title: 'Scope 3: Perjalanan Dinas', description: 'Emisi perjalanan pesawat, kereta api, dan akomodasi hotel.', icon: Plane },
   { id: 'financed', kind: 'addition', title: 'Scope 3: Emisi yang Dibiayai', description: 'Emisi dari portofolio investasi dan pinjaman lembaga keuangan.', icon: HandCoins, optional: true },
   { id: 'offset', kind: 'reduction', title: 'Carbon Offset', description: 'Pengurangan melalui sertifikat atau instrumen carbon offset.', icon: ReceiptText },

@@ -129,11 +129,11 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
   return (
     <div className="space-y-6 animate-in">
       <PageHeader
-        title={activeSubScope === 'scope1' ? 'Scope 1: BBM' : 'Scope 2: Listrik'}
+        title={activeSubScope === 'scope1' ? 'Scope 1: Emisi Langsung' : 'Scope 2: Emisi Tidak Langsung'}
         info={
           activeSubScope === 'scope1'
-            ? 'Emisi dari BBM yang dibakar sendiri: solar untuk genset cadangan toko dan DC, serta bensin untuk kendaraan operasional. Rumus: liter BBM × faktor emisi. Acuan: GHG Protocol dan pedoman KLHK/ESDM.'
-            : 'Emisi dari listrik PLN yang dibeli. Rumus: kWh listrik PLN × faktor emisi wilayah PLN. Acuan: GHG Protocol dan pedoman KLHK/ESDM.'
+            ? 'Emisi langsung dari pembakaran bahan bakar yang dikendalikan oleh perusahaan. Mencakup bahan bakar genset (solar cadangan saat pemadaman listrik) dan kendaraan operasional (mobil logistik dan dinas Alfamart). Dihitung dari liter BBM dikalikan faktor emisi resmi GHG Protocol dan pedoman KLHK/ESDM.'
+            : 'Emisi tidak langsung dari pembangkitan listrik yang dibeli dari jaringan PLN untuk seluruh Distribution Center (DC) Alfamart. Dihitung dari konsumsi listrik (kWh) dikalikan faktor emisi jaringan listrik regional PLN (KLHK/ESDM).'
         }
         actions={
           activeSubScope === 'scope1' ? (

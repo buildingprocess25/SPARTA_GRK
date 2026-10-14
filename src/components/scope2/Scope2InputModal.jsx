@@ -414,8 +414,8 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
     <BaseModal
       open={isOpen}
       onClose={handleCloseRequest}
-      title="Input data listrik PLN"
-      subtitle="Catat listrik yang dibeli dari PLN untuk satu DC."
+      title="Input Data Scope 2 · Listrik PLN"
+      subtitle="Catat emisi tidak langsung dari listrik yang dibeli dari jaringan PLN untuk Distribution Center."
       icon={<Zap size={20} className="text-amber-600 dark:text-amber-400" />}
       size="md"
       loading={isSubmitting || isProcessingExcel}

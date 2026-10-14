@@ -33,10 +33,10 @@ export default function MainScope2Bridge({ onNavigate }) {
   return <CardBox className="space-y-4 border-blue-200 dark:border-blue-500/30 bg-gradient-to-br from-white to-blue-50/40 dark:from-slate-900 dark:to-blue-950/30">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-2">
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Emisi Tidak Langsung (Scope 2)</h2>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Scope 2: Emisi Tidak Langsung</h2>
         <InfoHint
-          title="Emisi Tidak Langsung (Scope 2)"
-          text="Emisi tidak langsung dari konsumsi listrik PLN yang dibeli tiap DC. Penggunaan listrik dari PLTS atap yang dipakai sendiri tidak menghasilkan emisi sehingga dikurangkan satu kali. Angka ini identik dengan data pada halaman Scope 2."
+          title="Scope 2: Emisi Tidak Langsung"
+          text="Emisi tidak langsung dari pembangkitan listrik yang dibeli dari jaringan PLN untuk seluruh Distribution Center. Penggunaan listrik dari PLTS atap yang dipakai sendiri tidak menghasilkan emisi sehingga mengurangi kebutuhan total."
         />
       </div>
       <div className="flex gap-2">

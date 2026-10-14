@@ -351,8 +351,8 @@ export default function Scope2AnnualLoadDashboard() {
 
   return <div className="min-w-0 space-y-6 animate-in">
     <PageHeader
-      title="Scope 2: Listrik PLN"
-      info={`Emisi dari listrik PLN yang dibeli tiap DC. Rumus: listrik dari PLN × faktor emisi wilayah PLN. Sumber: laporan bulanan pemakaian listrik dan produksi PLTS. Bulan berjalan (data sampai ${data.current.partialDataThroughDate || '—'}) ditandai "sebagian" dan tidak dipakai untuk rata-rata atau proyeksi. ${summary.temporaryFactorCount ? `${summary.temporaryFactorCount} data dengan faktor emisi sementara tidak dihitung.` : ''}`}
+      title="Scope 2: Emisi Tidak Langsung"
+      info={`Emisi tidak langsung dari pembangkitan listrik yang dibeli dari jaringan PLN untuk operasional seluruh Distribution Center (DC) Alfamart. Dihitung dari pemakaian listrik PLN (kWh) dikalikan faktor emisi jaringan regional PLN berdasarkan pedoman KLHK/ESDM. Bulan berjalan (data sampai ${data.current.partialDataThroughDate || '-'}) ditandai "sebagian" dan tidak dipakai untuk rata-rata atau proyeksi.${summary.temporaryFactorCount ? ` ${summary.temporaryFactorCount} data dengan faktor emisi sementara tidak dihitung.` : ''}`}
       actions={
         <InputDataButton label="Input data Scope 2" icon={Zap} onClick={() => setIsInputModalOpen(true)} />
       }

@@ -366,8 +366,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                   </div>
                 </div>
                 <InfoHint
-                  title="Menambah Emisi (Emisi Bruto)"
-                  text="Total emisi gas rumah kaca yang dihasilkan dari operasional Distribution Center Alfamart sebelum mitigasi. Terdiri atas Scope 1 (pembakaran BBM genset & kendaraan operasional) dan Scope 2 (konsumsi listrik dari jaringan PLN)."
+                  title="Menambah Emisi (Scope 1 & 2)"
+                  text="Total emisi operasional Alfamart sebelum mitigasi. Terdiri atas Scope 1: Emisi Langsung (pembakaran BBM solar genset cadangan & bensin kendaraan dinas) dan Scope 2: Emisi Tidak Langsung (konsumsi listrik dari jaringan PLN)."
                 />
               </div>
 
@@ -379,7 +379,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">tCO₂e</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Listrik PLN {resumeKPI.scope2SharePct}% · BBM {resumeKPI.scope1SharePct}%
+                  Scope 2 (Listrik PLN) {resumeKPI.scope2SharePct}% · Scope 1 (BBM) {resumeKPI.scope1SharePct}%
                 </p>
               </div>
             </div>

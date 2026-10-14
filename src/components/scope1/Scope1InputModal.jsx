@@ -418,10 +418,10 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
     <BaseModal
       open={isOpen}
       onClose={handleCloseRequest}
-      title={category === 'VEHICLE' ? 'Input data kendaraan' : 'Input data genset'}
+      title={category === 'VEHICLE' ? 'Input Data Scope 1 · Kendaraan' : 'Input Data Scope 1 · Genset'}
       subtitle={category === 'VEHICLE'
-        ? 'Catat BBM yang dipakai kendaraan operasional.'
-        : 'Catat solar yang dipakai genset cadangan.'}
+        ? 'Catat emisi langsung dari pemakaian BBM kendaraan operasional logistik.'
+        : 'Catat emisi langsung dari konsumsi solar genset cadangan.'}
       icon={category === 'VEHICLE' ? <Car size={20} className="text-rose-600 dark:text-rose-400" /> : <Fuel size={20} className="text-rose-600 dark:text-rose-400" />}
       size="md"
       loading={isSubmitting || isProcessingExcel}

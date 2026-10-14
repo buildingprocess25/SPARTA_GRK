@@ -11,9 +11,9 @@ import { useSustainability } from '@/context/SustainabilityContext';
 const LIST_LIMIT = 50;
 
 const MODULE_LABELS = {
-  GENSET: 'Scope 1 · Genset',
-  VEHICLE: 'Scope 1 · Kendaraan',
-  PLN: 'Scope 2 · Listrik PLN',
+  GENSET: 'Scope 1 · Genset (Emisi Langsung)',
+  VEHICLE: 'Scope 1 · Kendaraan (Emisi Langsung)',
+  PLN: 'Scope 2 · Listrik PLN (Emisi Tidak Langsung)',
   PLTS: 'PLTS',
   WATER: 'Daur ulang air',
   PLTS_ENERGY: 'PLTS',
