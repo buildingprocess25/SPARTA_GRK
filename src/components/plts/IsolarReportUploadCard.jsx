@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { UploadCloud, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { UploadCloud, RefreshCw, CheckCircle2, AlertCircle, X } from 'lucide-react';
 import CardBox from '@/components/ui/CardBox';
 import InfoHint from '@/components/ui/InfoHint';
 import { notify } from '@/components/ui/ToastProvider';
@@ -9,6 +9,8 @@ import { useSustainability } from '@/context/SustainabilityContext';
 import { MONTH_LABELS_SHORT } from '@/lib/reportingMonths';
 
 const INPUT_ID = 'isolar-monthly-report-input';
+// Paused while the pointer or keyboard focus is inside the summary, so it never closes mid-read.
+const SUMMARY_AUTO_CLOSE_MS = 30_000;
 
 function monthLabel(yearMonth) {
   return `${MONTH_LABELS_SHORT[Number(yearMonth.slice(4, 6)) - 1]} ${yearMonth.slice(0, 4)}`;
@@ -28,9 +30,23 @@ export default function IsolarReportUploadCard({ onImported }) {
   const [result, setResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [isSummaryHeld, setIsSummaryHeld] = useState(false);
 
   const isUploading = status === 'uploading';
   const disabled = isUploading || !mutationsAllowed;
+
+  const closeSummary = ({ restoreFocus = false } = {}) => {
+    setStatus('idle');
+    setResult(null);
+    setIsSummaryHeld(false);
+    if (restoreFocus) document.getElementById(INPUT_ID)?.focus();
+  };
+
+  useEffect(() => {
+    if (status !== 'done' || isSummaryHeld) return undefined;
+    const timer = setTimeout(() => closeSummary(), SUMMARY_AUTO_CLOSE_MS);
+    return () => clearTimeout(timer);
+  }, [status, isSummaryHeld]);
 
   const upload = async (file) => {
     if (!file || disabled) return;
@@ -118,13 +134,79 @@ export default function IsolarReportUploadCard({ onImported }) {
 
       <div aria-live="polite">
         {status === 'done' && result && (
-          <div className="rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-500/10 p-4 space-y-2 text-xs text-slate-700 dark:text-slate-300">
-            <p className="flex items-center gap-2 font-bold text-emerald-800 dark:text-emerald-300">
-              <CheckCircle2 size={16} aria-hidden="true" />
-              {result.fileName} berhasil diimpor
-            </p>
+          <div
+            className="rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-500/10 p-4 space-y-2 text-xs text-slate-700 dark:text-slate-300"
+            onMouseEnter={() => setIsSummaryHeld(true)}
+            onMouseLeave={() => setIsSummaryHeld(false)}
+            onFocus={() => setIsSummaryHeld(true)}
+            onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setIsSummaryHeld(false); }}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <p className="flex items-center gap-2 font-bold text-emerald-800 dark:text-emerald-300">
+                <CheckCircle2 size={16} aria-hidden="true" />
+                {result.fileName} berhasil diimpor
+              </p>
+              <button
+                type="button"
+                onClick={() => closeSummary({ restoreFocus: true })}
+                aria-label="Tutup ringkasan impor"
+                title="Tutup (otomatis tertutup setelah 30 detik)"
+                className="-m-1.5 inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
+              >
+                <X size={16} aria-hidden="true" />
+              </button>
+            </div>
+            {result.changes && (
+              <dl className="grid grid-cols-3 gap-2 pl-6 max-w-md">
+                {[
+                  ['Diisi baru', result.changes.added],
+                  ['Diganti', result.changes.replaced],
+                  ['Sama, tidak berubah', result.changes.unchanged],
+                ].map(([label, count]) => (
+                  <div key={label}>
+                    <dt className="text-[11px] text-slate-600 dark:text-slate-400">{label}</dt>
+                    <dd className="text-base font-bold tabular-nums text-slate-900 dark:text-slate-100">{count.toLocaleString('id-ID')}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            {result.changes?.byMonth?.length > 0 && (
+              <div className="ml-6 overflow-x-auto rounded-lg border border-emerald-200/70 dark:border-emerald-500/20 bg-white/70 dark:bg-slate-900/40">
+                <table className="w-full min-w-[520px] text-[11px] tabular-nums">
+                  <caption className="sr-only">Rincian per bulan</caption>
+                  <thead className="text-slate-600 dark:text-slate-400">
+                    <tr className="border-b border-emerald-200/70 dark:border-emerald-500/20">
+                      <th scope="col" className="px-3 py-1.5 text-left font-semibold">Bulan</th>
+                      <th scope="col" className="px-3 py-1.5 text-right font-semibold">Plant</th>
+                      <th scope="col" className="px-3 py-1.5 text-right font-semibold">Produksi</th>
+                      <th scope="col" className="px-3 py-1.5 text-right font-semibold">Baru</th>
+                      <th scope="col" className="px-3 py-1.5 text-right font-semibold">Diganti</th>
+                      <th scope="col" className="px-3 py-1.5 text-right font-semibold">Sama</th>
+                      <th scope="col" className="px-3 py-1.5 text-right font-semibold">Perubahan produksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.changes.byMonth.map((month) => (
+                      <tr key={month.yearMonth} className="border-b last:border-b-0 border-emerald-100 dark:border-emerald-500/10">
+                        <th scope="row" className="px-3 py-1.5 text-left font-semibold text-slate-800 dark:text-slate-200">{monthLabel(month.yearMonth)}</th>
+                        <td className="px-3 py-1.5 text-right">{month.plants}</td>
+                        <td className="px-3 py-1.5 text-right">{(month.yieldKwh / 1000).toLocaleString('id-ID', { maximumFractionDigits: 1 })} MWh</td>
+                        <td className={`px-3 py-1.5 text-right ${month.added ? 'font-bold text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400'}`}>{month.added}</td>
+                        <td className={`px-3 py-1.5 text-right ${month.replaced ? 'font-bold text-amber-800 dark:text-amber-300' : 'text-slate-500 dark:text-slate-400'}`}>{month.replaced}</td>
+                        <td className="px-3 py-1.5 text-right text-slate-600 dark:text-slate-400">{month.unchanged}</td>
+                        <td className="px-3 py-1.5 text-right">
+                          {month.yieldChangeKwh
+                            ? `${month.yieldChangeKwh > 0 ? '+' : '−'}${(Math.abs(month.yieldChangeKwh) / 1000).toLocaleString('id-ID', { maximumFractionDigits: 2 })} MWh`
+                            : <span className="text-slate-500 dark:text-slate-400">—</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
             <ul className="space-y-1 pl-6 list-disc">
-              <li>{result.plantMonthsSaved} data plant-bulan tersimpan untuk {monthRange(result.months)}.</li>
+              {!result.changes?.byMonth?.length && <li>{result.plantMonthsSaved} data plant-bulan untuk {monthRange(result.months)}.</li>}
               {result.skippedOpenMonthRows > 0 && (
                 <li>{result.skippedOpenMonthRows} baris dari bulan yang belum selesai dilewati. Upload ulang file baru setelah bulan itu berakhir.</li>
               )}

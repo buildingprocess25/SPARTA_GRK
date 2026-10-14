@@ -75,3 +75,49 @@ export async function upsertEnergyFlowRows(db, rows, now = new Date()) {
   }
   return rows.length;
 }
+
+const FLOW_FIELDS = ['yieldKwh', 'feedInKwh', 'purchasedKwh', 'loadKwh'];
+const sameValue = (a, b) => (a == null || b == null ? a == null && b == null : Math.abs(Number(a) - Number(b)) < 0.01);
+
+/** Splits incoming rows into added, replaced (values differ) and unchanged against what is stored, in total and per month. */
+export function diffEnergyFlowRows(existingRows, rows) {
+  const keyOf = (row) => `${row.yearMonth}|${row.psId}|${row.source}`;
+  const existing = new Map(existingRows.map((row) => [keyOf(row), row]));
+  const totals = { added: 0, replaced: 0, unchanged: 0 };
+  const months = new Map();
+  for (const row of rows) {
+    const month = months.get(row.yearMonth) || { yearMonth: row.yearMonth, plants: 0, yieldKwh: 0, added: 0, replaced: 0, unchanged: 0, yieldChangeKwh: 0 };
+    months.set(row.yearMonth, month);
+    month.plants++;
+    month.yieldKwh += Number(row.yieldKwh) || 0;
+
+    const previous = existing.get(keyOf(row));
+    const status = !previous ? 'added' : FLOW_FIELDS.some((field) => !sameValue(previous[field], row[field])) ? 'replaced' : 'unchanged';
+    totals[status]++;
+    month[status]++;
+    if (status === 'replaced') month.yieldChangeKwh += (Number(row.yieldKwh) || 0) - (Number(previous.yieldKwh) || 0);
+  }
+  const byMonth = [...months.values()]
+    .sort((a, b) => a.yearMonth.localeCompare(b.yearMonth))
+    .map((month) => ({ ...month, yieldKwh: Math.round(month.yieldKwh), yieldChangeKwh: Math.round(month.yieldChangeKwh) }));
+  return { ...totals, byMonth };
+}
+
+export async function loadExistingEnergyFlowRows(db, rows) {
+  const months = [...new Set(rows.map((row) => row.yearMonth))];
+  if (months.length === 0) return [];
+  const stored = await db.$queryRaw`
+    SELECT year_month, ps_id, source, yield_kwh, feed_in_kwh, purchased_kwh, load_kwh
+    FROM energy_flow_monthly
+    WHERE year_month = ANY(${months}) AND source = ${REPORT_SOURCE}
+  `;
+  return stored.map((row) => ({
+    yearMonth: row.year_month,
+    psId: Number(row.ps_id),
+    source: row.source,
+    yieldKwh: row.yield_kwh,
+    feedInKwh: row.feed_in_kwh,
+    purchasedKwh: row.purchased_kwh,
+    loadKwh: row.load_kwh,
+  }));
+}

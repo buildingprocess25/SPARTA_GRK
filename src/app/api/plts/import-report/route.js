@@ -5,8 +5,10 @@ import { parseIsolarMonthlyReport } from '@/lib/importers/isolarMonthlyReport.js
 import { createPrismaMonthlyImportRepository, importIsolarMonthlyReport } from '@/lib/importers/isolarMonthlyImport.js';
 import {
   closedMonthReport,
+  diffEnergyFlowRows,
   energyFlowRowsFromDecisions,
   isReportRestatement,
+  loadExistingEnergyFlowRows,
   openMonthCutoff,
   upsertEnergyFlowRows,
 } from '@/lib/importers/energyFlowImport.js';
@@ -65,6 +67,7 @@ export async function POST(request) {
       now,
     });
     const flowRows = energyFlowRowsFromDecisions(result.preview.decisions);
+    const changes = diffEnergyFlowRows(await loadExistingEnergyFlowRows(prisma, flowRows), flowRows);
     await upsertEnergyFlowRows(prisma, flowRows, now);
 
     revalidatePltsDashboardCache({ backgroundPreWarm: true });
@@ -78,6 +81,7 @@ export async function POST(request) {
       duplicateFile: result.duplicateFile,
       months,
       plantMonthsSaved: flowRows.length,
+      changes,
       skippedOpenMonthRows: closed.openMonthRecords,
       reconciliation: result.preview.summary,
       restatementsKept: result.preview.conflicts.filter(isReportRestatement).slice(0, 20).map(item => ({

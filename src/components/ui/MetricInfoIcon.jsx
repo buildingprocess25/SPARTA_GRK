@@ -106,7 +106,7 @@ export default function MetricInfoIcon({
   if (!info) return null;
 
   return (
-    <div
+    <span
       ref={triggerRef}
       data-popover-open={isOpen ? 'true' : 'false'}
       className={`relative inline-flex items-center justify-center ${className}`}
@@ -139,7 +139,6 @@ export default function MetricInfoIcon({
           className="fixed w-80 max-w-[calc(100vw-24px)] max-h-[min(480px,80vh)] overflow-y-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl p-3.5 sm:p-4 z-[100] text-left animate-in fade-in zoom-in-95 duration-150 select-text"
           style={{ top: coords.top, left: coords.left }}
         >
-          {/* Header */}
           <div className="flex items-start justify-between gap-2 pb-2.5 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="size-6 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
@@ -215,6 +214,6 @@ export default function MetricInfoIcon({
         </div>,
         document.body,
       )}
-    </div>
+    </span>
   );
 }
