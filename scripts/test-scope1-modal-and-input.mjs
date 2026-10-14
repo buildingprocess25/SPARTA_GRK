@@ -39,7 +39,7 @@ test('Scope 1 Modal & Input Data Component Verification', async (t) => {
     assert.ok(content.includes('liveCalc.formula'), 'Displays transparent calculation formula');
 
     // 6. Check Excel features
-    assert.ok(content.includes('/api/templates?category=GENSET'), 'Has official template download');
+    assert.ok(content.includes('/api/templates?category=${category}'), 'Template download follows the selected genset/vehicle type');
     assert.ok(content.includes('/api/import/batch'), 'Has batch upload endpoint call');
   });
 

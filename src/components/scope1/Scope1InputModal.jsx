@@ -64,6 +64,13 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
   const [isProcessingExcel, setIsProcessingExcel] = useState(false);
   const [previewResult, setPreviewResult] = useState(null);
   const [allowPartialImport, setAllowPartialImport] = useState(false);
+
+  // A preview was validated against the previous type's columns, so it must not be saved under the new one.
+  useEffect(() => {
+    setExcelFile(null);
+    setPreviewResult(null);
+    setAllowPartialImport(false);
+  }, [category]);
   const [isDragging, setIsDragging] = useState(false);
 
   // Initialize selected facility
@@ -250,10 +257,10 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
 
   const handleDownloadTemplate = () => {
     try {
-      window.open('/api/templates?category=GENSET', '_blank');
+      window.open(`/api/templates?category=${category}`, '_blank');
       setStatusMessage({
         type: 'success',
-        text: 'Mengunduh template Excel Scope 1...'
+        text: `Mengunduh template Excel ${category === 'VEHICLE' ? 'kendaraan' : 'genset'}...`
       });
     } catch (err) {
       console.error(err);
@@ -274,7 +281,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('category', 'GENSET');
+      formData.append('category', category);
       formData.append('mode', 'PREVIEW');
 
       const res = await fetch('/api/import/batch', {
@@ -332,7 +339,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
     try {
       const formData = new FormData();
       formData.append('file', excelFile.file);
-      formData.append('category', 'GENSET');
+      formData.append('category', category);
       formData.append('mode', 'COMMIT');
       formData.append('allowPartial', String(allowPartialImport));
       formData.append('isDraft', 'false');
@@ -998,7 +1005,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
                     <FileSpreadsheet size={15} className="text-emerald-600 dark:text-emerald-400" />
-                    <span>Template Excel Scope 1</span>
+                    <span>Template Excel {category === 'VEHICLE' ? 'kendaraan' : 'genset'}</span>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     Pakai template ini supaya kolomnya langsung terbaca.

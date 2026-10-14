@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { MASTER_FACILITIES } from '../master/facilityMaster.js';
+import { CARBON_FACTORS } from '../carbon/carbonEngine.js';
 
 export const TEMPLATE_VERSION = 'v2026.1';
 
@@ -47,40 +48,41 @@ function createInstructionsSheet(category, categoryTitle, specificNotes = []) {
   return ws;
 }
 
-/**
- * Generate verified facility reference sheet
- */
-function createFacilityReferenceSheet() {
-  const headers = [
-    'KODE_FASILITAS',
-    'NAMA_FASILITAS',
-    'JENIS_FASILITAS',
-    'CABANG_WILAYAH',
-    'SISTEM_GRID_PLN',
-    'FAKTOR_GRID_ESDM (kgCO2e/kWh)',
-    'PROVINSI'
-  ];
+// Grid columns only matter for electricity (Scope 2, PLTS); Scope 1 templates leave them out and get REFERENSI_BBM instead.
+function createFacilityReferenceSheet({ includeGrid = true } = {}) {
+  const headers = includeGrid
+    ? ['KODE_FASILITAS', 'NAMA_FASILITAS', 'JENIS_FASILITAS', 'CABANG_WILAYAH', 'SISTEM_GRID_PLN', 'FAKTOR_GRID_ESDM (kgCO2e/kWh)', 'PROVINSI']
+    : ['KODE_FASILITAS', 'NAMA_FASILITAS', 'JENIS_FASILITAS', 'CABANG_WILAYAH', 'PROVINSI'];
 
   const rows = MASTER_FACILITIES.map(fac => [
     fac.code,
     fac.name,
     fac.facilityType,
     fac.branchName || fac.region,
-    fac.gridRegion || 'JAMALI',
-    fac.gridFactor || 0.87,
+    ...(includeGrid ? [fac.gridRegion || '', fac.gridFactor ?? ''] : []),
     fac.province || fac.region
   ]);
 
   const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-  ws['!cols'] = [
-    { wch: 18 },
-    { wch: 34 },
-    { wch: 18 },
-    { wch: 30 },
-    { wch: 18 },
-    { wch: 28 },
-    { wch: 20 }
-  ];
+  ws['!cols'] = includeGrid
+    ? [{ wch: 18 }, { wch: 34 }, { wch: 18 }, { wch: 30 }, { wch: 18 }, { wch: 28 }, { wch: 20 }]
+    : [{ wch: 18 }, { wch: 34 }, { wch: 18 }, { wch: 30 }, { wch: 20 }];
+  return ws;
+}
+
+// Values for the JENIS_BBM column, with the factor the server applies to each.
+function createFuelReferenceSheet({ acceptsBiosolarAlias = false } = {}) {
+  const headers = ['ISI_DI_JENIS_BBM', 'NAMA_BBM', 'FAKTOR_EMISI (kgCO2e/L)', 'STATUS_SIMPAN', 'CATATAN'];
+  const rows = Object.entries(CARBON_FACTORS.FUEL).map(([code, fuel]) => [
+    code === 'SOLAR' && acceptsBiosolarAlias ? 'SOLAR atau BIOSOLAR' : code,
+    fuel.label,
+    fuel.factorKgPerLiter,
+    fuel.sourceStatus === 'ACTIVE' ? 'FINAL' : 'DRAFT',
+    fuel.sourceStatus === 'ACTIVE' ? fuel.sourceDoc : 'Faktor belum divalidasi, jadi data disimpan berstatus DRAFT.',
+  ]);
+
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  ws['!cols'] = [{ wch: 22 }, { wch: 28 }, { wch: 24 }, { wch: 16 }, { wch: 70 }];
   return ws;
 }
 
@@ -93,7 +95,7 @@ export function generateGensetTemplate() {
   const instructionsWs = createInstructionsSheet('GENSET', 'Scope 1 - Genset Stasioner', [
     'Mode Input LITER: Isi kolom JUMLAH_LITER. Kolom TOTAL_RUPIAH boleh dikosongkan.',
     'Mode Input RUPIAH: Isi kolom TOTAL_RUPIAH dan HARGA_PER_LITER untuk konversi volume.',
-    'Jenis BBM yang didukung: SOLAR (rekomendasi genset), PERTALITE, PERTAMAX.',
+    'Jenis BBM dan faktor emisinya ada di sheet REFERENSI_BBM: SOLAR (atau BIOSOLAR), PERTALITE, PERTAMAX.',
     'Kapasitas kVA dan Jam Operasi bersifat opsional untuk melengkapi logbook audit.'
   ]);
 
@@ -136,7 +138,8 @@ export function generateGensetTemplate() {
 
   XLSX.utils.book_append_sheet(wb, instructionsWs, 'PETUNJUK');
   XLSX.utils.book_append_sheet(wb, dataWs, 'DATA_INPUT');
-  XLSX.utils.book_append_sheet(wb, createFacilityReferenceSheet(), 'REFERENSI_FASILITAS');
+  XLSX.utils.book_append_sheet(wb, createFacilityReferenceSheet({ includeGrid: false }), 'REFERENSI_FASILITAS');
+  XLSX.utils.book_append_sheet(wb, createFuelReferenceSheet({ acceptsBiosolarAlias: true }), 'REFERENSI_BBM');
 
   return wb;
 }
@@ -151,6 +154,7 @@ export function generateVehicleTemplate() {
     'Mode Input LITER: Masukkan volume riil pada kolom JUMLAH_LITER.',
     'Mode Input RUPIAH: Masukkan pengeluaran rupiah pada kolom TOTAL_RUPIAH.',
     'Jenis Kendaraan: TRUCK_LOGISTICS, OPERATIONAL_CAR, atau MOTORCYCLE.',
+    'Jenis BBM dan faktor emisinya ada di sheet REFERENSI_BBM: SOLAR, PERTALITE, PERTAMAX.',
     'Nomor Polisi dan Unit Penanggung Jawab berguna untuk audit konsumsi fleet logistik.'
   ]);
 
@@ -193,7 +197,8 @@ export function generateVehicleTemplate() {
 
   XLSX.utils.book_append_sheet(wb, instructionsWs, 'PETUNJUK');
   XLSX.utils.book_append_sheet(wb, dataWs, 'DATA_INPUT');
-  XLSX.utils.book_append_sheet(wb, createFacilityReferenceSheet(), 'REFERENSI_FASILITAS');
+  XLSX.utils.book_append_sheet(wb, createFacilityReferenceSheet({ includeGrid: false }), 'REFERENSI_FASILITAS');
+  XLSX.utils.book_append_sheet(wb, createFuelReferenceSheet(), 'REFERENSI_BBM');
 
   return wb;
 }
