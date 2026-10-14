@@ -439,7 +439,11 @@ export function calculateScope1FuelEmission({
 
   const emissionKg = effectiveLiters * fuelConfig.factorKgPerLiter;
   const emissionTon = emissionKg / 1000;
-  const costEstimateJuta = (effectiveLiters * (pricePerLiter || fuelConfig.industrialPricePerLiter || fuelConfig.defaultPricePerLiter)) / 1_000_000;
+  const rate = pricePerLiter || fuelConfig.defaultPricePerLiter;
+  const computedCostRupiah = (costRupiah !== null && costRupiah !== undefined && !isNaN(costRupiah) && Number(costRupiah) > 0)
+    ? Number(costRupiah)
+    : Math.round(effectiveLiters * rate);
+  const costEstimateJuta = computedCostRupiah / 1_000_000;
 
   return {
     fuelType: typeKey,
@@ -448,7 +452,9 @@ export function calculateScope1FuelEmission({
     liters: Number(effectiveLiters.toFixed(2)),
     emissionKg: Number(emissionKg.toFixed(2)),
     emissionTon: Number(emissionTon.toFixed(4)),
-    costEstimateJuta: Number(costEstimateJuta.toFixed(2))
+    costRupiah: computedCostRupiah,
+    costEstimateJuta: Number(costEstimateJuta.toFixed(2)),
+    pricePerLiter: rate
   };
 }
 

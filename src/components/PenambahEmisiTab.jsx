@@ -351,8 +351,8 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
               />
               <KpiCard
                 label="Biaya solar genset"
-                value={scope1Loading ? '—' : `Rp ${formatNum(scope1Slice?.summary?.totalCostJuta ?? 0, 1)}`}
-                unit="Juta"
+                value={scope1Loading ? '—' : `Rp ${formatNum((scope1Slice?.summary?.totalCostJuta ?? 0) >= 1000 ? (scope1Slice?.summary?.totalCostJuta ?? 0) / 1000 : (scope1Slice?.summary?.totalCostJuta ?? 0), 1)}`}
+                unit={(scope1Slice?.summary?.totalCostJuta ?? 0) >= 1000 ? 'Miliar' : 'Juta'}
                 icon={Calculator}
                 theme="calc"
               />
@@ -363,7 +363,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 label="Bensin kendaraan"
                 value={scope1Loading ? '—' : formatNum(scope1Slice?.summary?.totalLiters ?? 0)}
                 unit="Liter"
-                trend="Pertalite dan Pertamax"
+                trend="Pertalite, Solar & Pertamax"
                 icon={Car}
                 theme="pln"
               />
@@ -385,8 +385,8 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
               />
               <KpiCard
                 label="Biaya bensin kendaraan"
-                value={scope1Loading ? '—' : `Rp ${formatNum(scope1Slice?.summary?.totalCostJuta ?? 0, 1)}`}
-                unit="Juta"
+                value={scope1Loading ? '—' : `Rp ${formatNum((scope1Slice?.summary?.totalCostJuta ?? 0) >= 1000 ? (scope1Slice?.summary?.totalCostJuta ?? 0) / 1000 : (scope1Slice?.summary?.totalCostJuta ?? 0), 1)}`}
+                unit={(scope1Slice?.summary?.totalCostJuta ?? 0) >= 1000 ? 'Miliar' : 'Juta'}
                 icon={Calculator}
                 theme="calc"
               />

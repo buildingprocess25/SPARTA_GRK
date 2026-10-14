@@ -238,7 +238,11 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
     setError(null);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10_000);
+    let isTimeout = false;
+    const timeoutId = setTimeout(() => {
+      isTimeout = true;
+      controller.abort();
+    }, 30_000);
 
     try {
       const res = await fetch(url, { signal: controller.signal });
@@ -255,14 +259,19 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       setData(json.data);
     } catch (err) {
       clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        if (isTimeout) {
+          setError('Server memerlukan waktu lebih lama untuk memproses data. Silakan coba lagi.');
+        }
+        // Abaikan pembatalan senyap jika disebabkan oleh navigasi/unmount
+        return;
+      }
       console.error('[PLTSSummaryCard] Error fetching data:', err);
-      const isTimeout = err.name === 'AbortError';
-      setError(isTimeout
-        ? 'Server terlalu lama merespons (lebih dari 10 detik). Coba muat ulang.'
-        : (err.message || 'Terjadi kesalahan saat memuat data')
-      );
+      setError(err.message || 'Terjadi kesalahan saat memuat data');
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
   };
 

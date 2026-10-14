@@ -304,9 +304,6 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 </span>
               )}
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Overview menyeluruh emisi operasional, mitigasi terpasang, dan efisiensi biaya di seluruh Distribution Center (DC) Alfamart.
-            </p>
           </div>
         </div>
 
@@ -469,77 +466,76 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
 
       {/* Hidden unless NEXT_PUBLIC_FEATURE_EMISSION_CALCULATOR=true; the calculator code stays in place. */}
       {isEmissionCalculatorEnabled && (
-      <div ref={calculatorRef} className="scroll-mt-6">
-        <CardBox className="border-blue-100/90 dark:border-blue-500/20 bg-gradient-to-r from-blue-50/40 via-white to-slate-50/50 dark:from-blue-500/10 dark:via-slate-900 dark:to-slate-800/60 shadow-sm transition-all">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <div className="size-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-blue-200">
-                <Calculator size={22} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Kalkulator Emisi</h3>
-                  <InfoHint title="Kalkulator Emisi" text="Coba hitung emisi dengan angka sendiri. Hasilnya hanya tersimpan di browser ini dan tidak mengubah data dashboard." />
+        <div ref={calculatorRef} className="scroll-mt-6">
+          <CardBox className="border-blue-100/90 dark:border-blue-500/20 bg-gradient-to-r from-blue-50/40 via-white to-slate-50/50 dark:from-blue-500/10 dark:via-slate-900 dark:to-slate-800/60 shadow-sm transition-all">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="size-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-blue-200">
+                  <Calculator size={22} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Kalkulator Emisi</h3>
+                    <InfoHint title="Kalkulator Emisi" text="Coba hitung emisi dengan angka sendiri. Hasilnya hanya tersimpan di browser ini dan tidak mengubah data dashboard." />
+                  </div>
                 </div>
               </div>
+              <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsCalculatorOpen(prev => !prev)}
+                  className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition shadow-sm ${isCalculatorOpen
+                      ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-100'
+                    }`}
+                  aria-expanded={isCalculatorOpen}
+                >
+                  <Calculator size={16} />
+                  <span>{isCalculatorOpen ? 'Tutup Kalkulator' : 'Buka Kalkulator Emisi'}</span>
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform duration-200 ${isCalculatorOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-              <button
-                type="button"
-                onClick={() => setIsCalculatorOpen(prev => !prev)}
-                className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition shadow-sm ${
-                  isCalculatorOpen
-                    ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-100'
-                }`}
-                aria-expanded={isCalculatorOpen}
-              >
-                <Calculator size={16} />
-                <span>{isCalculatorOpen ? 'Tutup Kalkulator' : 'Buka Kalkulator Emisi'}</span>
-                <ChevronDown
-                  size={16}
-                  className={`transition-transform duration-200 ${isCalculatorOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-            </div>
-          </div>
 
-          {/* Panel Accordion Konten Kalkulator (Lazy-loaded) */}
-          {isCalculatorOpen && (
-            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 animate-in fade-in duration-300">
-              <div className="mb-5 flex items-center justify-between rounded-xl bg-blue-50/70 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 px-4 py-2.5 text-xs text-blue-800 dark:text-blue-200">
-                <span className="font-semibold">
-                  Ini hanya simulasi. Isian tersimpan di browser ini dan tidak mengubah data dashboard.
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setIsCalculatorOpen(false)}
-                  className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 flex items-center gap-1 transition"
-                >
-                  <X size={14} />
-                  <span>Tutup</span>
-                </button>
+            {/* Panel Accordion Konten Kalkulator (Lazy-loaded) */}
+            {isCalculatorOpen && (
+              <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 animate-in fade-in duration-300">
+                <div className="mb-5 flex items-center justify-between rounded-xl bg-blue-50/70 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 px-4 py-2.5 text-xs text-blue-800 dark:text-blue-200">
+                  <span className="font-semibold">
+                    Ini hanya simulasi. Isian tersimpan di browser ini dan tidak mengubah data dashboard.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsCalculatorOpen(false)}
+                    className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 flex items-center gap-1 transition"
+                  >
+                    <X size={14} />
+                    <span>Tutup</span>
+                  </button>
+                </div>
+                <Suspense fallback={<CalculatorLoadingSkeleton />}>
+                  <EmissionCalculatorPage />
+                </Suspense>
+                <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end pb-8 lg:pb-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCalculatorOpen(false);
+                      calculatorRef.current?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition"
+                  >
+                    <ChevronUp size={14} />
+                    <span>Tutup kalkulator</span>
+                  </button>
+                </div>
               </div>
-              <Suspense fallback={<CalculatorLoadingSkeleton />}>
-                <EmissionCalculatorPage />
-              </Suspense>
-              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end pb-8 lg:pb-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsCalculatorOpen(false);
-                    calculatorRef.current?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition"
-                >
-                  <ChevronUp size={14} />
-                  <span>Tutup kalkulator</span>
-                </button>
-              </div>
-            </div>
-          )}
-        </CardBox>
-      </div>
+            )}
+          </CardBox>
+        </div>
       )}
 
       {/* Grafik tren bulanan penambahan vs pengurangan emisi, dengan rata-rata dan rasio offset */}
@@ -549,14 +545,9 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <BarChart3 size={20} />
             </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                Tren Emisi Bulanan, 2026
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                Perbandingan emisi yang dihasilkan operasional vs emisi yang berhasil ditekan tiap bulan
-              </p>
-            </div>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              Tren Emisi
+            </h3>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">

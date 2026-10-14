@@ -20,6 +20,20 @@ let cachedPayload = null;
 let lastCacheTime = 0;
 const CACHE_TTL_MS = 10_000;
 
+function getFuelRecordCost(record) {
+  if (record.costRupiah !== null && record.costRupiah !== undefined && Number(record.costRupiah) > 0) {
+    return Number(record.costRupiah);
+  }
+  const liters = Number(record.liters) || 0;
+  if (liters <= 0) return 0;
+  const p = Number(record.pricePerLiter);
+  if (p > 0) return Math.round(liters * p);
+
+  const fuel = String(record.fuelType || '').toUpperCase();
+  const rate = (fuel === 'PERTALITE') ? 10000 : (fuel === 'PERTAMAX') ? 12500 : 6800;
+  return Math.round(liters * rate);
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -193,7 +207,7 @@ export async function GET(request) {
       fuel: {
         totalLitersYtd: Number(fuelRecords.reduce((acc, r) => acc + r.liters, 0).toFixed(2)),
         totalEmissionTonYtd: Number(fuelScope1Ton.toFixed(3)),
-        totalCostJutaYtd: Number((fuelRecords.reduce((acc, r) => acc + (r.costRupiah || 0), 0) / 1_000_000).toFixed(2)),
+        totalCostJutaYtd: Number((fuelRecords.reduce((acc, r) => acc + getFuelRecordCost(r), 0) / 1_000_000).toFixed(2)),
         monthlyTrend: scope1MonthlyTrend,
         detailActivities: fuelRecords
       },

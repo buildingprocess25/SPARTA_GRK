@@ -39,6 +39,20 @@ function monthRange(start, end) {
   return months;
 }
 
+function getRecordCost(record) {
+  if (record.costRupiah !== null && record.costRupiah !== undefined && Number(record.costRupiah) > 0) {
+    return Number(record.costRupiah);
+  }
+  const liters = Number(record.liters) || 0;
+  if (liters <= 0) return 0;
+  const p = Number(record.pricePerLiter);
+  if (p > 0) return Math.round(liters * p);
+
+  const fuel = String(record.fuelType || '').toUpperCase();
+  const rate = (fuel === 'PERTALITE') ? 10000 : (fuel === 'PERTAMAX') ? 12500 : 6800;
+  return Math.round(liters * rate);
+}
+
 /**
  * Builds one category's full slice (summary + monthly trend + per-facility
  * rows) from only the records belonging to it. Kept as fully independent
@@ -57,7 +71,7 @@ function buildCategorySlice(categoryRecords, months, facilityById) {
     agg.recordCount += 1;
     agg.liters += r.liters;
     agg.emissionTon += r.emissionTon;
-    agg.costRupiah += r.costRupiah || 0;
+    agg.costRupiah += getRecordCost(r);
   }
 
   const rows = [...byFacility.values()].map(agg => {
@@ -82,13 +96,14 @@ function buildCategorySlice(categoryRecords, months, facilityById) {
       yearMonth: ym,
       liters: round(monthRecords.reduce((s, r) => s + r.liters, 0), 2),
       emissionTon: round(monthRecords.reduce((s, r) => s + r.emissionTon, 0), 3),
+      costRupiah: round(monthRecords.reduce((s, r) => s + getRecordCost(r), 0), 0),
     };
   });
 
   const summary = {
     totalLiters: round(categoryRecords.reduce((s, r) => s + r.liters, 0), 2),
     totalEmissionTon: round(categoryRecords.reduce((s, r) => s + r.emissionTon, 0), 3),
-    totalCostJuta: round(categoryRecords.reduce((s, r) => s + (r.costRupiah || 0), 0) / 1_000_000, 2),
+    totalCostJuta: round(categoryRecords.reduce((s, r) => s + getRecordCost(r), 0) / 1_000_000, 2),
     facilityCount: byFacility.size,
     recordCount: categoryRecords.length,
   };
@@ -141,7 +156,7 @@ export async function GET(req) {
       availableMonths,
       combined: {
         totalEmissionTon: round(records.reduce((s, r) => s + r.emissionTon, 0), 3),
-        totalCostJuta: round(records.reduce((s, r) => s + (r.costRupiah || 0), 0) / 1_000_000, 2),
+        totalCostJuta: round(records.reduce((s, r) => s + getRecordCost(r), 0) / 1_000_000, 2),
         recordCount: records.length,
       },
       genset,
