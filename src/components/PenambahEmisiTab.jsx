@@ -148,8 +148,8 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           value={scope1Category}
           onChange={setScope1Category}
           options={[
-            { value: 'genset', label: 'Genset', icon: Fuel },
-            { value: 'vehicle', label: 'Kendaraan', icon: Car },
+            { value: 'genset', label: 'Genset (Solar)', icon: Fuel },
+            { value: 'vehicle', label: 'Kendaraan Operasional', icon: Car },
           ]}
         />
       )}
@@ -163,8 +163,8 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 <Layers size={20} />
               </div>
               <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">Hierarki Pemantauan Listrik & Emisi Cabang</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Filter alur: Branch → Office & Warehouse (WH, Bulky, Depo, Store Hub) + Toko</p>
+                <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">Pemantauan Listrik & Emisi per Cabang</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pilihan Fasilitas: Kantor Cabang, Gudang (DC), dan Jaringan Toko</p>
               </div>
             </div>
 
@@ -227,7 +227,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     : 'bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
-                <Building2 size={13} /> Office
+                <Building2 size={13} /> Kantor
               </button>
               <button
                 type="button"
@@ -238,7 +238,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     : 'bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
-                <Factory size={13} /> Warehouse (DC)
+                <Factory size={13} /> Gudang (DC)
               </button>
               <button
                 type="button"
@@ -258,7 +258,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           {selectedFacility === 'warehouse' && (
             <div className="flex flex-wrap items-center gap-1.5 pt-2 pl-2 border-t border-slate-100 dark:border-slate-800 bg-emerald-50/50 dark:bg-emerald-500/10 p-2.5 rounded-xl">
               <span className="text-xs font-bold text-emerald-800 dark:text-emerald-200 flex items-center gap-1 mr-1">
-                <ArrowRight size={13} /> Tipe Warehouse:
+                <ArrowRight size={13} /> Kategori Gudang:
               </span>
               <button
                 type="button"
@@ -269,7 +269,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     : 'bg-white dark:bg-slate-800 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/15'
                 }`}
               >
-                Semua Gudang (WH+Bulky+Depo+Hub)
+                Semua Gudang
               </button>
               <button
                 type="button"
@@ -280,7 +280,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     : 'bg-white dark:bg-slate-800 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/15'
                 }`}
               >
-                WH Utama (Dry & Chilled)
+                Gudang Utama (Kering & Dingin)
               </button>
               <button
                 type="button"
@@ -291,7 +291,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     : 'bg-white dark:bg-slate-800 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/15'
                 }`}
               >
-                Bulky Warehouse
+                Gudang Barang Besar (Bulky)
               </button>
               <button
                 type="button"
@@ -576,8 +576,8 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           <div>
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
               {activeSubScope === 'scope1'
-                ? (scope1Category === 'genset' ? 'Genset per lokasi' : 'Kendaraan per lokasi')
-                : 'Breakdown Konsumsi Listrik & Emisi per Cabang / Fasilitas'}
+                ? (scope1Category === 'genset' ? 'Rincian Pemakaian Genset per Lokasi' : 'Rincian Pemakaian BBM Kendaraan per Lokasi')
+                : 'Rincian Pemakaian Listrik & Emisi per Cabang'}
             </h3>
             {activeSubScope === 'scope1' && (
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
@@ -620,9 +620,9 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
               <thead className="sticky top-0 z-20 bg-slate-900 text-white text-xs">
                 <tr>
                   <th className="sticky left-0 top-0 z-30 bg-slate-900 px-4 py-3 font-semibold">Lokasi</th>
-                  <th className="px-4 py-3 font-semibold">Wilayah</th>
-                  <th className="text-right px-4 py-3 font-semibold">{scope1Category === 'genset' ? 'Solar' : 'Bensin'}</th>
-                  <th className="text-right px-4 py-3 font-semibold text-amber-300">Emisi</th>
+                  <th className="px-4 py-3 font-semibold">Wilayah PLN</th>
+                  <th className="text-right px-4 py-3 font-semibold">{scope1Category === 'genset' ? 'Solar (Liter)' : 'BBM (Liter)'}</th>
+                  <th className="text-right px-4 py-3 font-semibold text-amber-300">Emisi (tCO₂e)</th>
                   <th className="text-right px-4 py-3 font-semibold">Biaya</th>
                 </tr>
               </thead>
@@ -701,11 +701,11 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 <tr>
                   <th className="sticky left-0 bg-slate-900 dark:bg-slate-950 px-4 py-3 font-semibold z-10">Cabang & Fasilitas</th>
                   <th className="px-4 py-3 font-semibold">Kategori</th>
-                  <th className="px-4 py-3 font-semibold">Wilayah / Grid</th>
+                  <th className="px-4 py-3 font-semibold">Wilayah PLN</th>
                   <th className="px-4 py-3 font-semibold">Faktor Emisi</th>
-                  <th className="text-right px-4 py-3 font-semibold">Konsumsi Listrik (YTD)</th>
+                  <th className="text-right px-4 py-3 font-semibold">Pemakaian Listrik (YTD)</th>
                   <th className="text-right px-4 py-3 font-semibold">Emisi Scope 2 (YTD)</th>
-                  <th className="text-right px-4 py-3 font-semibold">Est. Tagihan Listrik</th>
+                  <th className="text-right px-4 py-3 font-semibold">Perkiraan Tagihan Listrik</th>
                 </tr>
               </thead>
               <tbody>

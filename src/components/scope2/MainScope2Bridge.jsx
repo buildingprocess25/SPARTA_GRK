@@ -40,26 +40,26 @@ export default function MainScope2Bridge({ onNavigate }) {
         />
       </div>
       <div className="flex gap-2">
-        <button onClick={() => onNavigate?.('penambah', 'scope2')} className="rounded-lg border border-blue-200 dark:border-blue-500/30 bg-white dark:bg-slate-800 px-3 py-2 min-h-10 text-xs font-semibold text-blue-700 dark:text-blue-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">Buka Scope 2</button>
-        <button onClick={() => onNavigate?.('pengurang', 'plts')} className="rounded-lg border border-emerald-200 dark:border-emerald-500/30 bg-white dark:bg-slate-800 px-3 py-2 min-h-10 text-xs font-semibold text-emerald-700 dark:text-emerald-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">Buka PLTS</button>
+        <button onClick={() => onNavigate?.('penambah', 'scope2')} className="rounded-lg border border-blue-200 dark:border-blue-500/30 bg-white dark:bg-slate-800 px-3 py-2 min-h-10 text-xs font-semibold text-blue-700 dark:text-blue-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">Lihat Rincian Scope 2</button>
+        <button onClick={() => onNavigate?.('pengurang', 'plts')} className="rounded-lg border border-emerald-200 dark:border-emerald-500/30 bg-white dark:bg-slate-800 px-3 py-2 min-h-10 text-xs font-semibold text-emerald-700 dark:text-emerald-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">Lihat Rincian PLTS</button>
       </div>
     </div>
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
       <div className={`${card} bg-amber-50 dark:bg-amber-500/10`}>
         <p className={`${label} flex items-center gap-1`}>
-          Jika semua dari PLN
-          <InfoHint title="Jika semua dari PLN" text="Emisi seandainya seluruh kebutuhan listrik DC dibeli dari PLN, tanpa PLTS." size={12} />
+          Tanpa Pembangkit PLTS
+          <InfoHint title="Tanpa Pembangkit PLTS" text="Perkiraan emisi seandainya seluruh kebutuhan listrik DC dibeli dari PLN tanpa adanya pasokan listrik tenaga surya (PLTS)." size={12} />
         </p>
         <strong className={value}>{number.format(scope2Bridge.loadBasisTon)} tCO₂e</strong>
       </div>
       <div className={`${card} bg-emerald-50 dark:bg-emerald-500/10`}>
         <Sun size={16} className="text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-        <p className={label}>Dikurangi PLTS</p>
+        <p className={label}>Penghematan dari PLTS</p>
         <strong className={value}>− {number.format(scope2Bridge.pltsAvoidedTon)} tCO₂e</strong>
       </div>
       <div className={`${card} bg-blue-50 dark:bg-blue-500/10`}>
         <Zap size={16} className="text-blue-600 dark:text-blue-400" aria-hidden="true" />
-        <p className={label}>Emisi listrik PLN</p>
+        <p className={label}>Listrik Bersih dari PLN</p>
         <strong className={value}>{number.format(scope2Bridge.afterPltsTon)} tCO₂e</strong>
       </div>
       <div className={`${card} bg-slate-900 dark:bg-black/40 text-white`}>

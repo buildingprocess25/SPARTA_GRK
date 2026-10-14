@@ -12,30 +12,30 @@ const navItems = [
   {
     group: 'Ringkasan',
     items: [
-      { id: 'resume', label: 'Resume Emisi GRK', icon: LayoutDashboard },
+      { id: 'resume', label: 'Ringkasan Emisi', icon: LayoutDashboard },
     ],
   },
   {
     group: 'Emisi',
     items: [
       {
-        id: 'pengurang',
-        label: 'Pengurang Emisi',
-        icon: TrendingDown,
-        badge: 'PLTS & Air',
-        subItems: [
-          { id: 'plts', label: 'PLTS', icon: Sun, colorClass: 'text-orange-500' },
-          { id: 'water', label: 'Daur Ulang Air', icon: Droplets, colorClass: 'text-cyan-500' }
-        ]
-      },
-      {
         id: 'penambah',
-        label: 'Penambah Emisi',
+        label: 'Sumber Emisi',
         icon: TrendingUp,
         badge: 'Scope 1 & 2',
         subItems: [
           { id: 'scope1', label: 'Scope 1', icon: Fuel, colorClass: 'text-rose-500' },
           { id: 'scope2', label: 'Scope 2', icon: Zap, colorClass: 'text-amber-500' }
+        ]
+      },
+      {
+        id: 'pengurang',
+        label: 'Pengurangan Emisi',
+        icon: TrendingDown,
+        badge: 'PLTS & Air',
+        subItems: [
+          { id: 'plts', label: 'PLTS', icon: Sun, colorClass: 'text-orange-500' },
+          { id: 'water', label: 'Daur Ulang Air', icon: Droplets, colorClass: 'text-cyan-500' }
         ]
       },
     ],

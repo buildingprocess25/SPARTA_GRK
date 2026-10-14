@@ -38,17 +38,17 @@ export default function MainScope1Bridge({ onNavigate }) {
           text="Emisi langsung dari pembakaran bahan bakar yang dikendalikan perusahaan: bahan bakar solar untuk genset cadangan dan BBM untuk armada kendaraan operasional Alfamart."
         />
       </div>
-      <button onClick={() => onNavigate?.('penambah', 'scope1')} className="rounded-lg border border-rose-200 dark:border-rose-500/30 bg-white dark:bg-slate-800 px-3 py-2 min-h-10 text-xs font-semibold text-rose-700 dark:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500">Buka Scope 1</button>
+      <button onClick={() => onNavigate?.('penambah', 'scope1')} className="rounded-lg border border-rose-200 dark:border-rose-500/30 bg-white dark:bg-slate-800 px-3 py-2 min-h-10 text-xs font-semibold text-rose-700 dark:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500">Lihat Rincian Scope 1</button>
     </div>
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
       <div className="rounded-xl bg-amber-50 dark:bg-amber-500/10 p-4">
         <Fuel size={16} className="text-amber-600 dark:text-amber-400" aria-hidden="true" />
-        <p className="text-xs text-slate-600 dark:text-slate-400">Genset</p>
+        <p className="text-xs text-slate-600 dark:text-slate-400">Solar Genset Cadangan</p>
         <strong className="text-slate-900 dark:text-slate-100">{number.format(gensetTon)} tCO₂e</strong>
       </div>
       <div className="rounded-xl bg-blue-50 dark:bg-blue-500/10 p-4">
         <Car size={16} className="text-blue-600 dark:text-blue-400" aria-hidden="true" />
-        <p className="text-xs text-slate-600 dark:text-slate-400">Kendaraan</p>
+        <p className="text-xs text-slate-600 dark:text-slate-400">BBM Kendaraan Operasional</p>
         <strong className="text-slate-900 dark:text-slate-100">{number.format(vehicleTon)} tCO₂e</strong>
       </div>
       <div className="rounded-xl bg-slate-900 dark:bg-black/40 p-4 text-white">
