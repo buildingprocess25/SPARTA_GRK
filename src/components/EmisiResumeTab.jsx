@@ -281,7 +281,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
     <div className="space-y-6 animate-in">
       <PageHeader
         title="Dashboard Emisi Karbon"
-        info="Ringkasan emisi karbon semua DC Alfamart: yang menambah emisi (BBM dan listrik PLN) dan yang mengurangi (PLTS dan air daur ulang)."
+        info="Ringkasan emisi karbon di seluruh Bisnis Proses Alfamart, mencakup sumber emisi (Scope 1 2 dan 3) serta pengurang emisi."
       />
 
       {realKpiState.error && (
