@@ -38,7 +38,7 @@ export async function POST(request) {
 
       // Always parse and validate on server
       const validationResult = await parseAndValidateUpload(fileBuffer, {
-        category,
+        categoryHint: category,
         filename
       });
 
@@ -112,9 +112,10 @@ export async function GET(request) {
     const limit = normalizeImportHistoryLimit(searchParams.get('limit'));
     const moduleFilter = searchParams.get('module');
 
-    const where = {};
+    // Deleted uploads stay in import_batch as an audit trail but are hidden unless asked for.
+    const where = searchParams.get('includeDeleted') === 'true' ? {} : { status: { not: 'DELETED' } };
     if (moduleFilter) {
-      where.module = moduleFilter;
+      where.module = { in: moduleFilter.split(',').map((value) => value.trim()).filter(Boolean) };
     }
 
     const batches = await prisma.importBatch.findMany({
@@ -133,5 +134,51 @@ export async function GET(request) {
       { success: false, error: 'Gagal mengambil riwayat import batch.', code: err?.code || 'IMPORT_HISTORY_FAILED' },
       { status: 500 }
     );
+  }
+}
+
+/**
+ * DELETE /api/import/batch?id=BATCH-...
+ * Removes every row an Excel upload created. The import_batch row is kept with status DELETED for the audit trail.
+ */
+export async function DELETE(request) {
+  const mutationDecision = mutationDecisionForRequest(request);
+  if (!mutationDecision.allowed) {
+    return NextResponse.json({ success: false, error: mutationDecision.message || mutationDecision.code, code: mutationDecision.code }, { status: mutationDecision.status });
+  }
+
+  const id = new URL(request.url).searchParams.get('id') || '';
+  // Only Excel uploads from this route carry BATCH- ids; iSolar and legacy imports are linked differently and are not deletable here.
+  if (!id.startsWith('BATCH-')) {
+    return NextResponse.json({ success: false, error: 'ID upload tidak valid.', code: 'INVALID_BATCH_ID' }, { status: 400 });
+  }
+
+  try {
+    const batch = await prisma.importBatch.findUnique({ where: { id } });
+    if (!batch) return NextResponse.json({ success: false, error: 'Upload tidak ditemukan.', code: 'BATCH_NOT_FOUND' }, { status: 404 });
+    if (batch.status === 'DELETED') return NextResponse.json({ success: false, error: 'Upload ini sudah dihapus.', code: 'BATCH_ALREADY_DELETED' }, { status: 409 });
+
+    const deletedBy = request.headers.get('x-sparta-user') || null;
+    const deletedRows = await prisma.$transaction(async (tx) => {
+      const [fuel, energy, water] = await Promise.all([
+        tx.fuelActivity.deleteMany({ where: { batchId: id } }),
+        tx.energyMeasurement.deleteMany({ where: { batchId: id } }),
+        tx.waterActivity.deleteMany({ where: { batchId: id } }),
+      ]);
+      const total = fuel.count + energy.count + water.count;
+      await tx.importBatch.update({
+        where: { id },
+        data: {
+          status: 'DELETED',
+          metadata: { ...(batch.metadata || {}), deletedAt: new Date().toISOString(), deletedBy, deletedRows: total, statusBeforeDelete: batch.status },
+        },
+      });
+      return total;
+    });
+
+    return NextResponse.json({ success: true, id, filename: batch.filename, deletedRows });
+  } catch (err) {
+    console.error('[API /api/import/batch DELETE] Error:', err);
+    return NextResponse.json({ success: false, error: 'Upload gagal dihapus. Tidak ada data yang berubah.', code: err?.code || 'BATCH_DELETE_FAILED' }, { status: 500 });
   }
 }

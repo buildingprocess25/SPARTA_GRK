@@ -1,8 +1,10 @@
 'use client';
 
 import React from 'react';
-import { History, Trash2, RotateCcw } from 'lucide-react';
+import { Trash2, RotateCcw } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
+import UploadHistory from '@/components/history/UploadHistory';
+import InfoHint from '@/components/ui/InfoHint';
 import { useSustainability } from '@/context/SustainabilityContext';
 import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { notify } from '@/components/ui/ToastProvider';
@@ -38,9 +40,9 @@ export default function HistoryTab({ setActiveTab }) {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       <PageHeader
-        title="Riwayat Input"
-        info="Semua data Scope 1, Scope 2, PLTS, dan daur ulang air yang pernah dicatat."
-        actions={
+        title="Riwayat Audit"
+        info="File Excel yang pernah di-upload untuk Scope 1, Scope 2, PLTS, dan daur ulang air. Upload yang salah atau berisi data contoh bisa dihapus di sini."
+        actions={inputHistory.length > 0 && (
           <button
             type="button"
             className="inline-flex items-center gap-2 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 px-4 py-2.5 text-sm font-medium hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:border-rose-300 dark:hover:border-rose-500/50 transition-colors shadow-2xs self-start sm:self-auto focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
@@ -49,25 +51,28 @@ export default function HistoryTab({ setActiveTab }) {
             <RotateCcw size={15} aria-hidden="true" />
             <span>Kembalikan data awal</span>
           </button>
-        }
+        )}
       />
 
+      <UploadHistory />
+
+      {/* Entries kept only in this browser's local state; shown when there are any. */}
+      {inputHistory.length > 0 && (
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-5 lg:p-6 space-y-4">
-        {inputHistory.length === 0 ? (
-          <div className="py-16 text-center space-y-3">
-            <div className="size-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center mx-auto shadow-inner">
-              <History size={28} aria-hidden="true" />
-            </div>
-            <p className="text-sm font-medium text-slate-600 dark:text-slate-400 max-w-sm mx-auto">
-              Belum ada riwayat. Tambahkan data lewat tombol "Input data" di halaman Scope 1, Scope 2, PLTS, atau Daur Ulang Air.
-            </p>
-          </div>
-        ) : (
+        <div className="flex items-center gap-2">
+          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Input di browser ini ({inputHistory.length})</h2>
+          <InfoHint title="Input di browser ini" text="Catatan yang hanya tersimpan di browser ini, bukan di database. Menghapusnya tidak mengubah angka di dashboard." />
+        </div>
           <>
             {/* Desktop Table */}
-            <div className="hidden md:block overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
+            <div
+              role="region"
+              aria-label="Daftar input di browser ini"
+              tabIndex={0}
+              className="hidden md:block max-h-[440px] overflow-auto rounded-2xl border border-slate-100 dark:border-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            >
               <table className="w-full text-left text-sm border-collapse">
-                <thead className="bg-slate-900 dark:bg-slate-950 text-white text-xs font-semibold">
+                <thead className="sticky top-0 z-20 bg-slate-900 dark:bg-slate-950 text-white text-xs font-semibold">
                   <tr>
                     <th className="px-4 py-3 sticky left-0 bg-slate-900 dark:bg-slate-950 z-10">Waktu</th>
                     <th className="px-4 py-3">Kategori</th>
@@ -115,7 +120,12 @@ export default function HistoryTab({ setActiveTab }) {
             </div>
 
             {/* Mobile Card List */}
-            <div className="md:hidden grid grid-cols-1 gap-4">
+            <div
+              role="region"
+              aria-label="Daftar input di browser ini"
+              tabIndex={0}
+              className="md:hidden grid grid-cols-1 gap-4 max-h-[520px] overflow-y-auto pr-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl"
+            >
               {inputHistory.map((item) => (
                 <div key={item.id} className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 space-y-3">
                   <div className="flex items-center justify-between">
@@ -152,8 +162,8 @@ export default function HistoryTab({ setActiveTab }) {
               ))}
             </div>
           </>
-        )}
       </div>
+      )}
     </div>
   );
 }

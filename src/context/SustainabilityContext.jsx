@@ -23,6 +23,20 @@ const SustainabilityContext = createContext(null);
 // v4 drops browsers' cached v3 state, which still holds the old demo numbers and sample history.
 const STORAGE_KEY = 'alfamart_sustainability_sparta_v4';
 
+// A batch import adds many entries in the same millisecond, so the timestamp alone is not unique.
+const newHistoryId = () => `entry-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+// Older saved history has duplicate timestamp ids; re-id the repeats so keys and per-entry delete stay distinct.
+function withUniqueHistoryIds(entries) {
+  const seen = new Set();
+  return entries.map((entry) => {
+    if (!seen.has(entry.id)) { seen.add(entry.id); return entry; }
+    const id = newHistoryId();
+    seen.add(id);
+    return { ...entry, id };
+  });
+}
+
 export function SustainabilityProvider({ children }) {
   const [dcLocations, setDcLocations] = useState(initialDCLocations);
   const [waterData, setWaterData] = useState(initialWaterData);
@@ -145,7 +159,7 @@ export function SustainabilityProvider({ children }) {
         if (parsed.pltsData) setPltsData(parsed.pltsData);
         if (parsed.scope1) setScope1(parsed.scope1);
         if (parsed.scope2) setScope2(parsed.scope2);
-        if (parsed.inputHistory) setInputHistory(parsed.inputHistory);
+        if (parsed.inputHistory) setInputHistory(withUniqueHistoryIds(parsed.inputHistory));
       }
     } catch (e) {
       console.warn('Failed to load sustainability state from localStorage', e);
@@ -376,7 +390,7 @@ export function SustainabilityProvider({ children }) {
     }
 
     const newHistoryItem = {
-      id: 'entry-' + Date.now(),
+      id: newHistoryId(),
       date: entry.date || new Date().toISOString().split('T')[0],
       dcName: entry.dcName,
       module: entry.module,

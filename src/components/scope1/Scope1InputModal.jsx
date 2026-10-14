@@ -16,7 +16,7 @@ import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 import StorePicker from '@/components/scope1/StorePicker';
 
 export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCategory = 'GENSET' }) {
-  const { dcLocations, addDataEntry, importBatchData, refreshData } = useSustainability();
+  const { dcLocations, addDataEntry, refreshData } = useSustainability();
   const confirm = useConfirm();
 
   // Mode: 'manual' | 'excel'
@@ -354,25 +354,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
         throw new Error(data.error || 'Gagal menyimpan batch transaksi');
       }
 
-      if (Array.isArray(previewResult.records)) {
-        const validEntries = previewResult.records
-          .filter(r => r.isValid)
-          .map(r => ({
-            module: 'genset',
-            dcId: r.facilityCode,
-            dcName: r.facilityName || r.facilityCode,
-            date: r.period || '2026-08-15',
-            fuelType: r.fuelType || 'SOLAR',
-            fuelLiters: r.liters || 0,
-            costRupiah: r.costRupiah || null,
-            runHours: r.runHours || 40,
-            gensetAssetCode: r.assetCode || 'GEN-DC-01'
-          }));
-
-        if (validEntries.length > 0 && typeof importBatchData === 'function') {
-          importBatchData(validEntries);
-        }
-      }
+      // The upload is listed from the database on the Riwayat page, so rows are not copied into browser history.
 
       if (typeof refreshData === 'function') {
         refreshData();
@@ -380,7 +362,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
 
       setStatusMessage({
         type: 'success',
-        text: `Sukses! ${data.committedCount} transaksi Scope 1 Genset berhasil diimpor ke database!`
+        text: `${data.committedCount} baris ${category === 'VEHICLE' ? 'kendaraan' : 'genset'} berhasil disimpan.`
       });
       notify.success(toastPresets.uploadSuccess);
 

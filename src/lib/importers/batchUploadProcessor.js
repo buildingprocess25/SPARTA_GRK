@@ -680,7 +680,7 @@ export async function commitBatchToDatabase({
             date: rowDate,
             yearMonth: rowYearMonth,
             dcId: facilityCode,
-            facilityType: item.storeCode ? 'toko' : (categoryData?.activityType === 'GENSET' ? 'warehouse' : 'vehicle'),
+            facilityType: categoryData?.activityType === 'VEHICLE' ? 'transport' : (item.storeCode ? 'toko' : 'warehouse'),
             warehouseSub: categoryData?.activityType,
             fuelType: categoryData?.fuelType || 'SOLAR',
             liters,

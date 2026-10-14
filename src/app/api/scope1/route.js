@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma.js';
+import { isVehicleFuelRecord } from '@/lib/scope1/fuelCategory.js';
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -37,14 +38,6 @@ function monthRange(start, end) {
   }
   return months;
 }
-
-// The input modal tags each record's category via facilityType:
-// 'transport' = kendaraan operasional (mobile combustion), anything else =
-// genset stasioner. This mirrors exactly what /api/sustainability's POST
-// handler already sets (isMobile ? 'transport' : 'warehouse'), so category
-// here is never guessed from fuelType - a genset or a vehicle can in
-// principle run on any fuel type.
-const isVehicleRecord = (r) => r.facilityType === 'transport';
 
 /**
  * Builds one category's full slice (summary + monthly trend + per-facility
@@ -136,8 +129,8 @@ export async function GET(req) {
     const availableMonths = allYearMonths.map(r => r.yearMonth);
     const facilityById = new Map(facilities.map(f => [f.id, f]));
 
-    const gensetRecords = records.filter(r => !isVehicleRecord(r));
-    const vehicleRecords = records.filter(isVehicleRecord);
+    const gensetRecords = records.filter(r => !isVehicleFuelRecord(r));
+    const vehicleRecords = records.filter(isVehicleFuelRecord);
 
     const genset = buildCategorySlice(gensetRecords, months, facilityById);
     const vehicle = buildCategorySlice(vehicleRecords, months, facilityById);

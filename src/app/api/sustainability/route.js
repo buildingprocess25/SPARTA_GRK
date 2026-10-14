@@ -11,6 +11,7 @@ import {
   getGridEmissionFactor
 } from '@/lib/carbon/carbonEngine';
 import { getYearToDateMonths } from '@/lib/reportingMonths';
+import { isVehicleFuelRecord } from '@/lib/scope1/fuelCategory.js';
 import { getCanonicalEnergyRows, getCanonicalMonthlySummary } from '@/lib/energy-data.js';
 import { buildScope2CanonicalDashboard } from '@/lib/scope2/dashboardService.js';
 
@@ -112,6 +113,8 @@ export async function GET(request) {
         yearMonth: ym,
         fuelLiters: Number(monthFuel.reduce((acc, r) => acc + (r.liters || 0), 0).toFixed(2)),
         emissionTon: Number(monthFuel.reduce((acc, r) => acc + (r.emissionTon || 0), 0).toFixed(3)),
+        gensetEmissionTon: Number(monthFuel.filter((r) => !isVehicleFuelRecord(r)).reduce((acc, r) => acc + (r.emissionTon || 0), 0).toFixed(3)),
+        vehicleEmissionTon: Number(monthFuel.filter(isVehicleFuelRecord).reduce((acc, r) => acc + (r.emissionTon || 0), 0).toFixed(3)),
         runHours: monthFuel.reduce((acc, r) => acc + (Number(r.metadata?.runHours) || 0), 0),
       };
     });
@@ -325,7 +328,7 @@ export async function POST(request) {
           date,
           yearMonth: ym,
           dcId: targetDcId,
-          facilityType: body.facilityType || (isMobile ? 'transport' : 'warehouse'),
+          facilityType: isMobile ? 'transport' : (body.facilityType || 'warehouse'),
           warehouseSub: body.warehouseSub || 'wh',
           fuelType,
           liters: calculationResult.liters,

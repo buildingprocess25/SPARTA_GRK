@@ -167,18 +167,21 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
   // Kompilasi bulanan penambahan vs pengurangan emisi (tCO2e), Januari s.d. bulan berjalan.
   const months = getYearToDateMonths().map(m => m.label);
 
-  const { monthlyComparisonData, avgPenambahan, avgPengurangan, avgNet, avgOffsetRatio, completeMonthCount } = useMemo(() => {
+  const { monthlyComparisonData, avgPenambahan, avgPengurangan, avgNet, avgOffsetRatio, avgScope1Genset, avgScope1Vehicle, completeMonthCount } = useMemo(() => {
     const forMonth = (trend, month) => (trend || []).find(m => m.month === month);
     const list = months.map((month) => {
       const pltsMonth = forMonth(pltsData.monthlyTrend, month);
       const scope2Month = forMonth(scope2.monthlyTrend, month);
       // A month whose iSolarCloud report is not imported yet has no PLTS or PLN rows; show it as pending, not as zero.
       if (pltsMonth?.hasData === false && scope2Month?.hasData === false) {
-        return { month, pending: true, penambahanTon: null, penguranganTon: null, netTon: null, offsetRatioPct: null, scope1Ton: null, scope2Ton: null, pltsAvoided: null, waterAvoided: null };
+        return { month, pending: true, penambahanTon: null, penguranganTon: null, netTon: null, offsetRatioPct: null, scope1Ton: null, scope1GensetTon: null, scope1VehicleTon: null, scope2Ton: null, pltsAvoided: null, waterAvoided: null };
       }
 
-      // Penambahan: Scope 1 (genset) + Scope 2 (PLN)
-      const s1Ton = forMonth(scope1.monthlyTrend, month)?.emissionTon || 0;
+      // Penambahan: Scope 1 (genset + kendaraan) + Scope 2 (PLN)
+      const scope1Month = forMonth(scope1.monthlyTrend, month);
+      const s1Ton = scope1Month?.emissionTon || 0;
+      const s1GensetTon = scope1Month?.gensetEmissionTon || 0;
+      const s1VehicleTon = scope1Month?.vehicleEmissionTon || 0;
       const s2Ton = scope2Month?.emissionTon || 0;
       const penambahanTon = Number((s1Ton + s2Ton).toFixed(1));
 
@@ -205,6 +208,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         netTon,
         offsetRatioPct,
         scope1Ton: Number(s1Ton.toFixed(1)),
+        scope1GensetTon: Number(s1GensetTon.toFixed(1)),
+        scope1VehicleTon: Number(s1VehicleTon.toFixed(1)),
         scope2Ton: Number(s2Ton.toFixed(1)),
         pltsAvoided: Number(pltsAvoided.toFixed(1)),
         waterAvoided: Number(waterAvoided.toFixed(1)),
@@ -222,6 +227,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       avgPengurangan: average('penguranganTon', 1),
       avgNet: average('netTon', 1),
       avgOffsetRatio: average('offsetRatioPct', 2),
+      avgScope1Genset: average('scope1GensetTon', 1),
+      avgScope1Vehicle: average('scope1VehicleTon', 1),
       completeMonthCount: complete.length,
     };
   }, [scope1, scope2, pltsData, waterData]);
@@ -518,7 +525,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                             <strong className="text-rose-700 dark:text-rose-300">+{formatYAxisNumber(data.penambahanTon)} tCO₂e</strong>
                           </div>
                           <div className="text-[10px] text-slate-500 dark:text-slate-400 pl-3.5">
-                            Genset: {formatYAxisNumber(data.scope1Ton)} &middot; PLN: {formatYAxisNumber(data.scope2Ton)}
+                            Genset: {formatYAxisNumber(data.scope1GensetTon)} &middot; Kendaraan: {formatYAxisNumber(data.scope1VehicleTon)} &middot; PLN: {formatYAxisNumber(data.scope2Ton)}
                           </div>
 
                           <div className="flex items-center justify-between gap-3 font-mono pt-1">
@@ -593,7 +600,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             <thead className="bg-slate-900 dark:bg-slate-950 text-white text-xs">
               <tr>
                 <th className="sticky left-0 bg-slate-900 dark:bg-slate-950 px-4 py-3 font-semibold z-10 whitespace-nowrap min-w-[140px] border-r border-slate-800">Bulan 2026</th>
-                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Scope 1 (BBM)</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Scope 1 genset</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Scope 1 kendaraan</th>
                 <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Scope 2 (listrik PLN)</th>
                 <th className="text-right px-4 py-3 font-semibold bg-red-950 text-red-100 whitespace-nowrap">Total penambahan (tCO₂e)</th>
                 <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Dikurangi PLTS</th>
@@ -607,14 +615,15 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
               {monthlyComparisonData.map((d, i) => d.pending ? (
                 <tr key={i} className="print:break-inside-avoid border-b border-slate-100 dark:border-slate-800">
                   <td className="sticky left-0 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap min-w-[140px]">{d.month} 2026</td>
-                  <td colSpan={8} className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 italic">
+                  <td colSpan={9} className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 italic">
                     Laporan bulanan iSolarCloud belum diimpor, jadi bulan ini belum dihitung.
                   </td>
                 </tr>
               ) : (
                 <tr key={i} className="print:break-inside-avoid border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                   <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap min-w-[140px]">{d.month} 2026</td>
-                  <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap">{d.scope1Ton.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-600 dark:text-slate-400 font-mono whitespace-nowrap">{d.scope1GensetTon.toFixed(1)}</td>
+                  <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-600 dark:text-slate-400 font-mono whitespace-nowrap">{d.scope1VehicleTon.toFixed(1)}</td>
                   <td className="px-4 py-3 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 font-mono whitespace-nowrap">{d.scope2Ton.toFixed(1)}</td>
                   <td className="px-4 py-3 text-sm tabular-nums text-right font-bold text-red-600 dark:text-red-400 bg-red-50/30 dark:bg-red-500/10 font-mono whitespace-nowrap">+{d.penambahanTon.toFixed(1)}</td>
                   <td className="px-4 py-3 text-sm tabular-nums text-right text-emerald-600 dark:text-emerald-400 font-mono whitespace-nowrap">{d.pltsAvoided.toFixed(1)}</td>
@@ -632,7 +641,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             <tfoot>
               <tr className="bg-slate-50 dark:bg-slate-900 font-semibold border-t-2 border-slate-200 dark:border-slate-700">
                 <td className="sticky left-0 bg-slate-50 dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-4 py-3.5 z-10 border-r border-slate-200 dark:border-slate-800 whitespace-nowrap min-w-[140px]">Rata-rata per bulan</td>
-                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap">{(scope1.summary.totalEmissionCO2e / (completeMonthCount || 1)).toFixed(1)}</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-600 dark:text-slate-400 font-mono whitespace-nowrap">{avgScope1Genset.toFixed(1)}</td>
+                <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-600 dark:text-slate-400 font-mono whitespace-nowrap">{avgScope1Vehicle.toFixed(1)}</td>
                 <td className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 font-mono whitespace-nowrap">{(scope2.summary.totalEmissionCO2e / (completeMonthCount || 1)).toFixed(1)}</td>
                 <td className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-red-700 dark:text-red-300 bg-red-50/50 dark:bg-red-500/10 font-mono whitespace-nowrap">+{avgPenambahan} tCO₂e</td>
                 <td className="px-4 py-3.5 text-sm tabular-nums text-right text-emerald-600 dark:text-emerald-400 font-mono whitespace-nowrap">{(pltsData.summary.co2Avoided / (completeMonthCount || 1)).toFixed(1)}</td>
