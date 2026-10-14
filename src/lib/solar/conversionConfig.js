@@ -85,12 +85,16 @@ export const CONVERSION_CONFIG = {
 
   features: {
     auditBaseline: process.env.NEXT_PUBLIC_FEATURE_AUDIT_BASELINE === 'true',
+    emissionCalculator: process.env.NEXT_PUBLIC_FEATURE_EMISSION_CALCULATOR === 'true',
   }
 };
 
 export function isFeatureEnabled(featureName) {
   if (featureName === 'auditBaseline') {
     return process.env.NEXT_PUBLIC_FEATURE_AUDIT_BASELINE === 'true';
+  }
+  if (featureName === 'emissionCalculator') {
+    return process.env.NEXT_PUBLIC_FEATURE_EMISSION_CALCULATOR === 'true';
   }
   return false;
 }

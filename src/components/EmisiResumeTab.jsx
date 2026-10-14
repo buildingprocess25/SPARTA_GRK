@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect, lazy, Suspense } from 'react';
 import {
-  Plus, Sun, Droplets, Fuel, Zap, ArrowRight,
+  Sun, Droplets, Fuel, Zap, ArrowRight,
   FileCheck2, TrendingDown, TrendingUp, CheckCircle2,
   ExternalLink, AlertCircle, ChevronDown, ChevronUp,
   Award, BarChart3, Activity, Scale, Percent, ArrowDownRight, Layers,
@@ -26,17 +26,18 @@ import { CARBON_FACTORS } from '@/lib/carbon/carbonEngine';
 import { getYearToDateMonths } from '@/lib/reportingMonths';
 import PageHeader from '@/components/ui/PageHeader';
 import KpiCard from '@/components/ui/KpiCard';
-import InputDataButton from '@/components/ui/InputDataButton';
 import CardBox from '@/components/ui/CardBox';
 import InfoHint from '@/components/ui/InfoHint';
 import MainScope2Bridge from '@/components/scope2/MainScope2Bridge';
 import MainScope1Bridge from '@/components/scope1/MainScope1Bridge';
+import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
 import { fetchAnnualReportData } from '@/lib/reports/reportDataService.js';
 import { exportSrnPpiReport } from '@/lib/reports/srnPpiReport.js';
 import { exportOjkReport } from '@/lib/reports/ojkReport.js';
 
 // Lazy-load EmissionCalculatorPage agar halaman tetap ringan dan cepat saat awal render
 const EmissionCalculatorPage = lazy(() => import('@/components/calculator/EmissionCalculatorPage'));
+const isEmissionCalculatorEnabled = isFeatureEnabled('emissionCalculator');
 
 function CalculatorLoadingSkeleton() {
   return (
@@ -230,13 +231,6 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       <PageHeader
         title="Dashboard Emisi Karbon"
         info="Ringkasan emisi karbon semua DC Alfamart: yang menambah emisi (BBM dan listrik PLN) dan yang mengurangi (PLTS dan air daur ulang)."
-        actions={
-          <InputDataButton
-            label="Input Emisi"
-            icon={Plus}
-            onClick={() => handleNav('penambah', 'scope1')}
-          />
-        }
       />
 
       {/* scope1Bridge: canonical connection to Scope 1 (Genset + Kendaraan) */}
@@ -295,7 +289,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         />
       </div>
 
-      {/* Kalkulator emisi GRK (lazy-loaded accordion) */}
+      {/* Hidden unless NEXT_PUBLIC_FEATURE_EMISSION_CALCULATOR=true; the calculator code stays in place. */}
+      {isEmissionCalculatorEnabled && (
       <div ref={calculatorRef} className="scroll-mt-6">
         <CardBox className="border-blue-100/90 dark:border-blue-500/20 bg-gradient-to-r from-blue-50/40 via-white to-slate-50/50 dark:from-blue-500/10 dark:via-slate-900 dark:to-slate-800/60 shadow-sm transition-all">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -367,6 +362,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
           )}
         </CardBox>
       </div>
+      )}
 
       {/* Grafik tren bulanan penambahan vs pengurangan emisi, dengan rata-rata dan rasio offset */}
       <CardBox className="space-y-6">
