@@ -13,6 +13,7 @@ import BaseModal from '@/components/ui/BaseModal';
 import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { notify } from '@/components/ui/ToastProvider';
 import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
+import StorePicker from '@/components/scope1/StorePicker';
 
 export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCategory = 'GENSET' }) {
   const { dcLocations, addDataEntry, importBatchData, refreshData } = useSustainability();
@@ -25,11 +26,10 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
   const [facilities, setFacilities] = useState(dcLocations?.length > 0 ? dcLocations : MASTER_FACILITIES);
   const [facilitySearch, setFacilitySearch] = useState('');
   const [selectedFacilityId, setSelectedFacilityId] = useState('');
+  const [locationType, setLocationType] = useState('facility'); // 'facility' | 'store'
+  const [selectedStore, setSelectedStore] = useState(null);
 
-  // Kategori input: menentukan apakah BBM ini untuk genset stasioner (DC/Toko)
-  // atau kendaraan operasional (mobile) - backend /api/sustainability sudah
-  // mendukung keduanya via field `module`, modal ini sebelumnya selalu
-  // mengirim 'genset' saja.
+  // Genset (stationary) or vehicle (mobile); /api/sustainability tells them apart by `module`.
   const [category, setCategory] = useState(initialCategory === 'VEHICLE' ? 'VEHICLE' : 'GENSET'); // 'GENSET' | 'VEHICLE'
   const [vehiclePlateNo, setVehiclePlateNo] = useState('');
   const [operatorUnit, setOperatorUnit] = useState('');
@@ -127,10 +127,17 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
     setActivityDate(`${year}-${month.padStart(2, '0')}-15`);
   };
 
+  // The location the entry is booked against: a synced store or a DC / office from the facility master.
+  const location = locationType === 'store' && selectedStore
+    ? { id: `STORE-${selectedStore.code}`, name: selectedStore.name, code: selectedStore.code, storeCode: selectedStore.code }
+    : { id: selectedDC.id, name: selectedDC.name, code: selectedDC.code };
+
   const validateManualForm = () => {
     const errors = {};
-    if (!selectedFacilityId) {
-      errors.facility = 'Pilih lokasi fasilitas / DC';
+    if (locationType === 'store' && !selectedStore) {
+      errors.facility = 'Pilih toko dari hasil pencarian';
+    } else if (locationType === 'facility' && !selectedFacilityId) {
+      errors.facility = 'Pilih DC atau kantor';
     }
     if (!activityDate || !activityDate.startsWith(`${periodYear}-${periodMonth.padStart(2, '0')}`)) {
       errors.date = 'Tanggal pengisian harus berada dalam periode yang dipilih.';
@@ -171,15 +178,16 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
     const periodStr = `${periodYear}-${periodMonth.padStart(2, '0')}`;
     const dateStr = activityDate || `${periodStr}-15`;
     const isVehicle = category === 'VEHICLE';
-    const idempotencyKey = `tx-${isVehicle ? 'vehicle' : 'genset'}-${selectedDC.id}-${dateStr}-${Date.now()}`;
+    const idempotencyKey = `tx-${isVehicle ? 'vehicle' : 'genset'}-${location.id}-${dateStr}-${Date.now()}`;
     const refPrefix = isVehicle ? 'VHC' : 'GEN';
-    const refCode = proofRef.trim() || `${refPrefix}-${selectedDC.code || 'DC'}-${periodMonth}${periodYear.slice(2)}-${Date.now().toString().slice(-4)}`;
+    const refCode = proofRef.trim() || `${refPrefix}-${location.code || 'DC'}-${periodMonth}${periodYear.slice(2)}-${Date.now().toString().slice(-4)}`;
 
     const payload = {
       module: isVehicle ? 'vehicle' : 'genset',
-      dcId: selectedDC.id,
-      dcName: selectedDC.name,
-      dcCode: selectedDC.code,
+      dcId: location.id,
+      dcName: location.name,
+      dcCode: location.code,
+      ...(location.storeCode ? { storeCode: location.storeCode, facilityType: 'toko' } : {}),
       date: dateStr,
       yearMonth: periodStr,
       fuelType,
@@ -190,7 +198,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
         ? { vehiclePlateNo: vehiclePlateNo.trim(), operatorUnit: operatorUnit.trim() || '-' }
         : {
           runHours: parseFloat(runHours) || 40,
-          gensetAssetCode: gensetAssetCode.trim() || `GEN-${selectedDC.code || 'DC'}-01`,
+          gensetAssetCode: gensetAssetCode.trim() || `GEN-${location.code || 'DC'}-01`,
           gensetKva: parseFloat(gensetKva) || 500,
         }),
       status: fuelType === 'PERTAMAX' ? 'DRAFT' : 'ACTIVE',
@@ -216,7 +224,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
 
       setStatusMessage({
         type: 'success',
-        text: `Data ${isVehicle ? 'kendaraan' : 'genset'} ${selectedDC.name} (${payload.fuelLiters.toLocaleString('id-ID')} L / +${liveCalc.emissionTon.toFixed(2)} tCO₂e) berhasil disimpan!`
+        text: `Data ${isVehicle ? 'kendaraan' : 'genset'} ${location.name} (${payload.fuelLiters.toLocaleString('id-ID')} L / +${liveCalc.emissionTon.toFixed(2)} tCO₂e) berhasil disimpan!`
       });
       notify.success(toastPresets.saveSuccess);
 
@@ -394,6 +402,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
   const hasUnsavedChanges = Boolean(
     activeTab !== 'manual'
     || selectedFacilityId !== defaultFacilityId
+    || locationType !== 'facility'
+    || selectedStore
     || fuelType !== 'SOLAR'
     || fuelInputMode !== 'liter'
     || fuelLiters
@@ -519,21 +529,46 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
 
               {/* Bagian 1: Lokasi / Fasilitas Operasional */}
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="modal-dc-select" className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <label htmlFor={locationType === 'facility' ? 'modal-dc-select' : undefined} className="text-xs font-bold text-slate-700 dark:text-slate-300">
                     Lokasi <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
                   </label>
-                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                    {selectedDC.region} • Grid: <strong className="text-slate-800 dark:text-slate-200">{selectedDC.grid || selectedDC.gridRegion || 'JAMALI'}</strong>
-                  </span>
+                  <div role="radiogroup" aria-label="Jenis lokasi" className="inline-flex rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5 text-xs font-semibold">
+                    {[['facility', 'DC atau kantor'], ['store', 'Toko']].map(([type, label]) => (
+                      <button
+                        key={type}
+                        type="button"
+                        role="radio"
+                        aria-checked={locationType === type}
+                        onClick={() => { setLocationType(type); setFormErrors((prev) => ({ ...prev, facility: undefined })); }}
+                        className={`min-h-8 rounded-md px-3 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 ${locationType === type ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'}`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
+                {locationType === 'store' ? (
+                  <StorePicker
+                    value={selectedStore}
+                    onChange={(store) => {
+                      setSelectedStore(store);
+                      if (store) setGensetAssetCode(`GEN-${store.code}-01`);
+                    }}
+                  />
+                ) : (
+                <>
+                <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                  {selectedDC.region} · Wilayah PLN: <strong className="text-slate-800 dark:text-slate-200">{selectedDC.grid || selectedDC.gridRegion || '—'}</strong>
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <input
                     type="text"
                     value={facilitySearch}
                     onChange={(e) => setFacilitySearch(e.target.value)}
-                    placeholder="Cari DC/kode..."
+                    aria-label="Cari DC atau kantor"
+                    placeholder="Cari DC atau kode..."
                     className="sm:col-span-1 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                   />
                   <select
@@ -558,6 +593,8 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                     ))}
                   </select>
                 </div>
+                </>
+                )}
                 {formErrors.facility && (
                   <p className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 mt-1">{formErrors.facility}</p>
                 )}
@@ -903,7 +940,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                   type="text"
                   value={proofRef}
                   onChange={(e) => setProofRef(e.target.value)}
-                  placeholder={`Contoh: INV-SOLAR-${selectedDC.code || 'DC'}-${periodMonth}26-001`}
+                  placeholder={`Contoh: INV-SOLAR-${location.code || 'DC'}-${periodMonth}26-001`}
                   className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                 />
               </div>

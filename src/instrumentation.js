@@ -43,29 +43,21 @@ export async function register() {
     }
 
     try {
-      // startServerDaemon() existed in scheduler.js but was never actually
-      // called anywhere - every SyncRun in the database has trigger='manual'
-      // only, meaning the Dokploy Schedule cron (which depends on exact
-      // external config: URL, CRON_SECRET header match, shell command syntax)
-      // has never once successfully fired, even during production hours.
-      // Running the sync loop in-process here means auto-sync no longer
-      // depends on any external scheduler config at all - it starts the
-      // moment this server process boots.
-      //
-      // Interval widened from 5 to 10 minutes: each cycle writes dozens to
-      // hundreds of individual DB operations (39 plants upserted, faults,
-      // inverter telemetry, snapshots), and running every 5 minutes was the
-      // single largest contributor to the managed Postgres plan's monthly
-      // operations quota being exhausted (confirmed: workspace got blocked
-      // mid-month). Doubling the interval roughly halves that cost with no
-      // effect on page load speed - it only trades a few extra minutes of
-      // telemetry staleness, which is an acceptable tradeoff for a solar
-      // production dashboard (not a safety-critical real-time system).
+      // In-process so auto-sync does not depend on the external Dokploy cron, which never fired successfully.
+      // 10 minutes, not 5: each cycle costs hundreds of DB operations and 5 minutes exhausted the Postgres plan quota.
       console.log('[Instrumentation] Starting in-process iSolar sync daemon (10-minute interval)...');
       const { startServerDaemon } = await import('./lib/solar/scheduler.js');
       startServerDaemon({ intervalMs: 600_000 });
     } catch (error) {
       console.warn('[Instrumentation] Sync daemon start notice:', error?.message || error);
+    }
+
+    try {
+      console.log('[Instrumentation] Starting monthly store sync from the Google Sheet...');
+      const { startStoreSyncScheduler } = await import('./lib/stores/storeSync.js');
+      startStoreSyncScheduler();
+    } catch (error) {
+      console.warn('[Instrumentation] Store sync scheduler notice:', error?.message || error);
     }
 
     console.log('[Instrumentation] PLTS Server boot sequence complete.');

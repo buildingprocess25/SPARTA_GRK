@@ -140,6 +140,12 @@ export function detectCategoryFromSheet(headers = [], sheetName = '') {
 /**
  * Parse and Validate Excel / CSV buffer or Array of Objects
  */
+async function loadStoreIndex() {
+  if (!prisma.storeMaster) return new Map();
+  const stores = await prisma.storeMaster.findMany({ select: { code: true, name: true, branch: true, ownership: true, isActive: true } });
+  return new Map(stores.map((store) => [store.code, store]));
+}
+
 export async function parseAndValidateUpload(fileBuffer, { categoryHint = 'AUTO', filename = 'upload.xlsx' } = {}) {
   const wb = XLSX.read(fileBuffer, { type: 'buffer' });
 
@@ -185,6 +191,8 @@ export async function parseAndValidateUpload(fileBuffer, { categoryHint = 'AUTO'
   let exampleRowsSkipped = 0;
 
   const seenRecordKeys = new Set();
+  // Scope 1 rows may use a store code from the synced store master instead of a facility code.
+  const storeIndex = ['GENSET', 'VEHICLE'].includes(detectedCategory) ? await loadStoreIndex() : new Map();
 
   for (let rowIndex = 1; rowIndex < rawRows.length; rowIndex++) {
     const row = rawRows[rowIndex];
@@ -231,10 +239,19 @@ export async function parseAndValidateUpload(fileBuffer, { categoryHint = 'AUTO'
     }
 
     const facCode = String(facCodeRaw || '').trim();
-    const facility = findFacilityById(facCode);
+    let facility = findFacilityById(facCode);
+    let storeCode = null;
 
-    if (!facility) {
-      errors.push(`Kode fasilitas '${facCode}' tidak terdaftar pada Master Fasilitas resmi`);
+    const store = !facility && facCode ? storeIndex.get(facCode.toUpperCase()) : null;
+    if (store) {
+      if (!store.isActive) errors.push(`Toko '${store.code}' ${store.name} sudah nonaktif di master toko`);
+      else if (store.ownership === 'F') errors.push(`Toko '${store.code}' ${store.name} adalah Franchise, jadi BBM-nya bukan Scope 1 Alfa`);
+      else {
+        storeCode = store.code;
+        facility = { id: `STORE-${store.code}`, name: store.name, region: store.branch };
+      }
+    } else if (!facility && facCode) {
+      errors.push(`Kode '${facCode}' tidak terdaftar pada Master Fasilitas maupun master toko`);
     }
 
     const { dateStr, yearMonth, isValid: isDateValid } = parseDateAndPeriod(periodRaw);
@@ -460,7 +477,8 @@ export async function parseAndValidateUpload(fileBuffer, { categoryHint = 'AUTO'
       isValid,
       isDraft,
       category: detectedCategory,
-      facilityCode: facCode,
+      facilityCode: storeCode ? `STORE-${storeCode}` : facCode,
+      storeCode,
       facilityName: facility ? facility.name : facCode,
       facilityId: facility ? facility.id : null,
       region: facility ? (facility.region || facility.province) : null,
@@ -662,7 +680,7 @@ export async function commitBatchToDatabase({
             date: rowDate,
             yearMonth: rowYearMonth,
             dcId: facilityCode,
-            facilityType: categoryData?.activityType === 'GENSET' ? 'warehouse' : 'vehicle',
+            facilityType: item.storeCode ? 'toko' : (categoryData?.activityType === 'GENSET' ? 'warehouse' : 'vehicle'),
             warehouseSub: categoryData?.activityType,
             fuelType: categoryData?.fuelType || 'SOLAR',
             liters,

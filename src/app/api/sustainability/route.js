@@ -274,6 +274,21 @@ export async function POST(request) {
       const pricePerLiter = parseFloat(body.pricePerLiter) || null;
       const isMobile = module === 'vehicle';
 
+      let store = null;
+      if (body.storeCode) {
+        store = await prisma.storeMaster.findUnique({ where: { code: String(body.storeCode).trim().toUpperCase() } });
+        const storeProblem = !store
+          ? `Kode toko ${body.storeCode} tidak ada di master toko.`
+          : !store.isActive
+            ? `Toko ${store.code} ${store.name} sudah nonaktif sejak sinkronisasi terakhir.`
+            : store.ownership === 'F'
+              ? `Toko ${store.code} ${store.name} adalah Franchise, jadi BBM-nya bukan Scope 1 Alfa.`
+              : null;
+        if (storeProblem) {
+          return NextResponse.json({ status: 'error', code: 'STORE_NOT_ELIGIBLE', message: storeProblem }, { status: 422 });
+        }
+      }
+
       // Check existing by proofRef & date to prevent double submit
       if (proofRef) {
         const existing = await prisma.fuelActivity.findFirst({
@@ -325,6 +340,7 @@ export async function POST(request) {
           source,
           proofRef: proofRef || null,
           metadata: {
+            ...(store ? { storeCode: store.code, storeName: store.name, storeBranch: store.branch } : {}),
             ...(isMobile
               ? { vehiclePlateNo: body.vehiclePlateNo || null, operatorUnit: body.operatorUnit || null }
               : { runHours: parseFloat(body.runHours) || null, gensetAssetCode: body.gensetAssetCode || null, gensetKva: parseFloat(body.gensetKva) || null }),
