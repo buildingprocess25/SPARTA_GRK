@@ -158,14 +158,9 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
       {activeSubScope === 'scope2' && (
         <CardBox className="p-5 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                <Layers size={20} />
-              </div>
-              <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">Pemantauan Listrik & Emisi per Cabang</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pilihan Fasilitas: Kantor Cabang, Gudang (DC), dan Jaringan Toko</p>
-              </div>
+            <div>
+              <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">Pemantauan Listrik & Emisi per Cabang</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pilihan Fasilitas: Kantor Cabang, Gudang (DC), dan Jaringan Toko</p>
             </div>
 
             {/* Periode Selector */}
@@ -353,6 +348,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 label="Biaya solar genset"
                 value={scope1Loading ? '—' : `Rp ${formatNum((scope1Slice?.summary?.totalCostJuta ?? 0) >= 1000 ? (scope1Slice?.summary?.totalCostJuta ?? 0) / 1000 : (scope1Slice?.summary?.totalCostJuta ?? 0), 1)}`}
                 unit={(scope1Slice?.summary?.totalCostJuta ?? 0) >= 1000 ? 'Miliar' : 'Juta'}
+                trend="Total pembelian solar genset"
                 icon={Calculator}
                 theme="calc"
               />
@@ -387,6 +383,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 label="Biaya bensin kendaraan"
                 value={scope1Loading ? '—' : `Rp ${formatNum((scope1Slice?.summary?.totalCostJuta ?? 0) >= 1000 ? (scope1Slice?.summary?.totalCostJuta ?? 0) / 1000 : (scope1Slice?.summary?.totalCostJuta ?? 0), 1)}`}
                 unit={(scope1Slice?.summary?.totalCostJuta ?? 0) >= 1000 ? 'Miliar' : 'Juta'}
+                trend="Total pembelian BBM kendaraan"
                 icon={Calculator}
                 theme="calc"
               />

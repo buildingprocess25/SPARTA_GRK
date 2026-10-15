@@ -123,17 +123,12 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
     <div className="space-y-4" data-testid="tab-system-performance-pr">
       {/* Control Bar */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <div className="flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 flex items-center justify-center shrink-0">
-            <Gauge size={20} aria-hidden="true" />
-          </div>
-          <div className="flex items-center gap-2">
-            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Kinerja panel dibanding cuaca</h4>
-            <InfoHint
-              title="Kinerja panel (PR)"
-              text="PR (performance ratio) membandingkan listrik yang benar-benar dihasilkan dengan yang seharusnya bisa dihasilkan dari sinar matahari yang diterima. Plant yang lebih besar diberi bobot lebih besar. Plant yang masih dibangun atau tanpa data sinar matahari tidak dihitung. Target 80%, waspada di bawah 75%."
-            />
-          </div>
+        <div className="flex items-center gap-2">
+          <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Kinerja panel dibanding cuaca</h4>
+          <InfoHint
+            title="Kinerja panel (PR)"
+            text="PR (performance ratio) membandingkan listrik yang benar-benar dihasilkan dengan yang seharusnya bisa dihasilkan dari sinar matahari yang diterima. Plant yang lebih besar diberi bobot lebih besar. Plant yang masih dibangun atau tanpa data sinar matahari tidak dihitung. Target 80%, waspada di bawah 75%."
+          />
         </div>
 
         {/* Filter Selectors */}

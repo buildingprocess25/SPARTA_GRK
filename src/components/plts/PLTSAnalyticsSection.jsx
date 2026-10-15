@@ -1072,25 +1072,20 @@ export default function PLTSAnalyticsSection({
       {/* Control & scope filter bar */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-5 space-y-4">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-              <Award size={20} aria-hidden="true" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="font-bold text-base text-slate-900 dark:text-slate-100">
-                  Perbandingan antar DC
-                </h2>
-                <InfoHint title="Perbandingan antar DC" text="Bandingkan dan urutkan kinerja PLTS tiap DC. Plant yang masih dibangun tidak ikut peringkat dan rata-rata." />
-                <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20">
-                  {operationalItems.length} plant beroperasi{underConstructionCount > 0 ? `, ${underConstructionCount} masih dibangun` : ''}
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="font-bold text-base text-slate-900 dark:text-slate-100">
+                Perbandingan antar DC
+              </h2>
+              <InfoHint title="Perbandingan antar DC" text="Bandingkan dan urutkan kinerja PLTS tiap DC. Plant yang masih dibangun tidak ikut peringkat dan rata-rata." />
+              <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20">
+                {operationalItems.length} plant beroperasi{underConstructionCount > 0 ? `, ${underConstructionCount} masih dibangun` : ''}
+              </span>
+              {operationalKwp > 0 && (
+                <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20">
+                  {formatNum(operationalKwp, 2)} kWp
                 </span>
-                {operationalKwp > 0 && (
-                  <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20">
-                    {formatNum(operationalKwp, 2)} kWp
-                  </span>
-                )}
-              </div>
+              )}
             </div>
           </div>
 

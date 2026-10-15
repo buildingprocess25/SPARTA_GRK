@@ -326,19 +326,14 @@ export default function PLTSMonthlyMatrixTable({
     <CardBox className="space-y-4">
       {/* Header & Controls Toolbar */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-            <Award size={20} aria-hidden="true" />
-          </div>
-          <div className="flex items-center gap-2">
-            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-              Rekap PLTS per bulan, {selectedYear}
-            </h3>
-            <InfoHint
-              title="Rekap PLTS per bulan"
-              text={`Target dan realisasi produksi, kinerja panel, kapasitas, emisi yang dicegah, batubara, dan setara pohon. Emisi = listrik PLTS yang dipakai sendiri × ${CONVERSION_CONFIG.emission.factorKgPerKwh} kgCO₂/kWh. Batubara = produksi × ${CONVERSION_CONFIG.coal.factorKgPerKwh} kg/kWh. Pohon = emisi ÷ ${CONVERSION_CONFIG.tree.factorKgPerTreePerYear} kgCO₂ per pohon per tahun. Progres setahun = realisasi s.d. bulan terpilih ÷ target setahun. Proyeksi akhir tahun = (realisasi ÷ target s.d. bulan terpilih) × target setahun.`}
-            />
-          </div>
+        <div className="flex items-center gap-2">
+          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+            Rekap PLTS per bulan, {selectedYear}
+          </h3>
+          <InfoHint
+            title="Rekap PLTS per bulan"
+            text={`Target dan realisasi produksi, kinerja panel, kapasitas, emisi yang dicegah, batubara, dan setara pohon. Emisi = listrik PLTS yang dipakai sendiri × ${CONVERSION_CONFIG.emission.factorKgPerKwh} kgCO₂/kWh. Batubara = produksi × ${CONVERSION_CONFIG.coal.factorKgPerKwh} kg/kWh. Pohon = emisi ÷ ${CONVERSION_CONFIG.tree.factorKgPerTreePerYear} kgCO₂ per pohon per tahun. Progres setahun = realisasi s.d. bulan terpilih ÷ target setahun. Proyeksi akhir tahun = (realisasi ÷ target s.d. bulan terpilih) × target setahun.`}
+          />
         </div>
 
         {/* Toolbar Controls */}

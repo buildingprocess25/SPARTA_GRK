@@ -48,16 +48,9 @@ export default function PLTSPerformanceAnalysis({ filters, onPlantSelect }) {
     <CardBox className="space-y-4" data-plts-performance-analysis="true">
       {/* Header & Sub-Tab Navigation */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
-        <div className="flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
-            <Activity size={20} />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Analisis kinerja PLTS</h3>
-              <InfoHint title="Analisis kinerja PLTS" text="Pilih tab untuk melihat produksi dibanding target, seberapa baik panel bekerja, pengaruh cuaca, dan berapa bagian kebutuhan listrik DC yang dipenuhi PLTS." />
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Analisis kinerja PLTS</h3>
+          <InfoHint title="Analisis kinerja PLTS" text="Pilih tab untuk melihat produksi dibanding target, seberapa baik panel bekerja, pengaruh cuaca, dan berapa bagian kebutuhan listrik DC yang dipenuhi PLTS." />
         </div>
         <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-slate-100 dark:bg-slate-800 p-1 [scrollbar-width:none]">
           {TABS.map(([key, label, Icon, endpoint]) => (

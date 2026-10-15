@@ -869,34 +869,47 @@ export async function readDashboardPayload() {
   const timeInfo = getWibTimeInfo(now);
   
   let portalPrReferences = [];
-  try {
-    portalPrReferences = await prisma.$queryRaw`SELECT id, ps_id as "psId", pr_percent as "prPercent", captured_at as "capturedAt", source, notes FROM portal_pr_reference ORDER BY ps_id ASC`;
-  } catch (_) {
-    portalPrReferences = [];
-  }
-
   let plants = [], lastSync = null, lastSuccessfulSync = null, quotaCounts = { hourly: 0, monthly: 0 }, dailyYields = [], devices = [], inverters = [], faults = [], plantPrs = [], monthlyYields = [], apiToken = null;
-  try {
-    plants = prisma.plantLatest?.findMany ? await prisma.plantLatest.findMany({ orderBy: { psId: 'asc' } }) : [];
-    lastSync = prisma.syncRun?.findFirst ? await prisma.syncRun.findFirst({ orderBy: { startedAt: 'desc' } }) : null;
-    lastSuccessfulSync = prisma.syncRun?.findFirst ? await prisma.syncRun.findFirst({ where: { status: 'success' }, orderBy: { finishedAt: 'desc' } }) : null;
-    quotaCounts = await getQuotaCounts(now);
-    dailyYields = prisma.dailyYield?.findMany ? await prisma.dailyYield.findMany({
-      where: { dateWib: { startsWith: timeInfo.monthWib } },
-      orderBy: [{ dateWib: 'asc' }, { psId: 'asc' }],
-    }) : [];
-    devices = prisma.device?.findMany ? await prisma.device.findMany({ orderBy: { psId: 'asc' } }) : [];
-    inverters = prisma.inverterLatest?.findMany ? await prisma.inverterLatest.findMany({ orderBy: { psId: 'asc' } }) : [];
-    faults = prisma.faultActive?.findMany ? await prisma.faultActive.findMany({ orderBy: { psId: 'asc' } }) : [];
-    plantPrs = prisma.plantPr?.findMany ? await prisma.plantPr.findMany({ orderBy: { psId: 'asc' } }) : [];
-    monthlyYields = prisma.monthlyYield?.findMany ? await prisma.monthlyYield.findMany({ orderBy: [{ yearMonth: 'asc' }, { psId: 'asc' }] }) : [];
-    apiToken = prisma.apiToken?.findFirst ? await prisma.apiToken.findFirst() : null;
-  } catch (err) {
-    console.error('[SyncEngine] Core database query failed:', err?.code || err?.name || 'UNKNOWN');
-    const publicError = new Error('Database telemetry unavailable');
-    publicError.code = 'DATABASE_UNAVAILABLE';
-    throw publicError;
-  }
+  
+  const fetchTelemetryWithRetry = async (retries = 3) => {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        try {
+          portalPrReferences = await prisma.$queryRaw`SELECT id, ps_id as "psId", pr_percent as "prPercent", captured_at as "capturedAt", source, notes FROM portal_pr_reference ORDER BY ps_id ASC`;
+        } catch (_) {
+          portalPrReferences = [];
+        }
+        plants = prisma.plantLatest?.findMany ? await prisma.plantLatest.findMany({ orderBy: { psId: 'asc' } }) : [];
+        lastSync = prisma.syncRun?.findFirst ? await prisma.syncRun.findFirst({ orderBy: { startedAt: 'desc' } }) : null;
+        lastSuccessfulSync = prisma.syncRun?.findFirst ? await prisma.syncRun.findFirst({ where: { status: 'success' }, orderBy: { finishedAt: 'desc' } }) : null;
+        quotaCounts = await getQuotaCounts(now);
+        dailyYields = prisma.dailyYield?.findMany ? await prisma.dailyYield.findMany({
+          where: { dateWib: { startsWith: timeInfo.monthWib } },
+          orderBy: [{ dateWib: 'asc' }, { psId: 'asc' }],
+        }) : [];
+        devices = prisma.device?.findMany ? await prisma.device.findMany({ orderBy: { psId: 'asc' } }) : [];
+        inverters = prisma.inverterLatest?.findMany ? await prisma.inverterLatest.findMany({ orderBy: { psId: 'asc' } }) : [];
+        faults = prisma.faultActive?.findMany ? await prisma.faultActive.findMany({ orderBy: { psId: 'asc' } }) : [];
+        plantPrs = prisma.plantPr?.findMany ? await prisma.plantPr.findMany({ orderBy: { psId: 'asc' } }) : [];
+        monthlyYields = prisma.monthlyYield?.findMany ? await prisma.monthlyYield.findMany({ orderBy: [{ yearMonth: 'asc' }, { psId: 'asc' }] }) : [];
+        apiToken = prisma.apiToken?.findFirst ? await prisma.apiToken.findFirst() : null;
+        return;
+      } catch (err) {
+        const isConnLimit = String(err?.message || '').includes('Too many database connections') ||
+                            String(err?.message || '').includes('FATAL: sorry, too many clients already');
+        if (isConnLimit && attempt < retries) {
+          await new Promise((r) => setTimeout(r, 1500));
+          continue;
+        }
+        console.error('[SyncEngine] Core database query failed:', err?.code || err?.name || 'UNKNOWN');
+        const publicError = new Error('Database telemetry unavailable');
+        publicError.code = 'DATABASE_UNAVAILABLE';
+        throw publicError;
+      }
+    }
+  };
+
+  await fetchTelemetryWithRetry();
   
   // Compute month-to-date from DailyYield
   const monthDates = [...new Set(dailyYields.map(d => d.dateWib))].sort();

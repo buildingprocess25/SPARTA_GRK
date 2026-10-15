@@ -74,47 +74,44 @@ export default function KpiCard({
       className={`relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 sm:p-5 flex flex-col justify-between h-full shadow-2xs dark:shadow-none transition-colors duration-200 min-w-0 has-[[data-popover-open="true"]]:z-50 has-[[data-popover-open="true"]]:relative ${themeConfig.accentBorder} ${className}`}
       {...props}
     >
-      {/* Top Row: Label & Icons */}
-      <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-2">
+      {/* Top Row: Label & Optional Info Hint */}
+      <div className="flex items-center justify-between gap-1.5 sm:gap-2 mb-2">
         <div className="flex flex-col min-w-0 pr-1 flex-1">
           <span className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 line-clamp-2 leading-tight break-words">
             {label}
           </span>
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          {infoKey ? <MetricInfoIcon infoKey={infoKey} /> : <InfoHint title={label} text={tooltip} />}
-          {Icon && (
-            <div
-              className={`size-8 sm:size-9 rounded-xl flex items-center justify-center shrink-0 ${themeConfig.iconBg}`}
-            >
-              <Icon size={16} strokeWidth={2.2} />
-            </div>
-          )}
-        </div>
+        {(infoKey || tooltip) && (
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+            {infoKey ? <MetricInfoIcon infoKey={infoKey} /> : <InfoHint title={label} text={tooltip} />}
+          </div>
+        )}
       </div>
 
-      {/* Middle Row: Big Number & Unit - the dominant element on the card */}
-      {React.isValidElement(value) ? (
-        <div className="mt-1 w-full">{value}</div>
-      ) : (
-        <div className="mt-1 flex items-baseline flex-wrap">
-          <span
-            className={`text-[28px] sm:text-[30px] font-extrabold tracking-tight tabular-nums transition-all duration-300 ${themeConfig.numberColor}`}
-          >
-            {value != null ? value : '—'}
-          </span>
-          {unit && (
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1.5 shrink-0">
-              {unit}
+      {/* Middle Row: Big Number & Unit - anchored directly below label for uniform baseline */}
+      <div className="flex-1 flex items-baseline flex-wrap content-start mt-0.5">
+        {React.isValidElement(value) ? (
+          <div className="w-full">{value}</div>
+        ) : (
+          <>
+            <span
+              className={`text-[26px] sm:text-[28px] font-extrabold tracking-tight tabular-nums transition-all duration-300 ${themeConfig.numberColor}`}
+            >
+              {value != null ? value : '—'}
             </span>
-          )}
-        </div>
-      )}
+            {unit && (
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1.5 shrink-0">
+                {unit}
+              </span>
+            )}
+          </>
+        )}
+      </div>
 
-      {/* Bottom Row: Description / Footnote - intentionally quieter than the number above */}
+      {/* Bottom Row: Description / Footnote */}
       {descriptionContent && (
-        <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-snug">
+        <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-snug">
           {descriptionContent}
         </div>
       )}

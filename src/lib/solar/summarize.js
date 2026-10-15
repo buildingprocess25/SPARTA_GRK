@@ -47,6 +47,23 @@ export async function summarizePlts({ period, grid, dc, compareYears, comparison
   const computePromise = (async () => {
     try {
       return await computeSummarizePlts({ period, grid, dc, compareYears, comparisonThroughMonth });
+    } catch (err) {
+      const isConnError = String(err?.message || '').includes('Too many database connections') ||
+                          String(err?.message || '').includes('FATAL: sorry, too many clients already') ||
+                          String(err?.message || '').includes('Can\'t reach database');
+      if (isConnError) {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        try {
+          return await computeSummarizePlts({ period, grid, dc, compareYears, comparisonThroughMonth });
+        } catch (retryErr) {
+          if (summarizeMemoryCache.has(cacheKey)) {
+            console.warn('[summarizePlts] DB connection saturated, serving stale cache gracefully');
+            return summarizeMemoryCache.get(cacheKey).data;
+          }
+          throw retryErr;
+        }
+      }
+      throw err;
     } finally {
       summarizeInFlight.delete(cacheKey);
     }

@@ -249,11 +249,20 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       clearTimeout(timeoutId);
       if (!res.ok) {
         const errText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errText || 'Gagal memuat ringkasan PLTS'}`);
+        let errMsg = 'Gagal memuat ringkasan PLTS';
+        try {
+          const parsed = JSON.parse(errText);
+          if (parsed?.error) errMsg = parsed.error;
+        } catch (_) {
+          if (errText) errMsg = errText;
+        }
+        setError(errMsg);
+        return;
       }
       const json = await res.json();
       if (!json.success || !json.data) {
-        throw new Error(json.error || 'Respons server tidak valid');
+        setError(json.error || 'Respons server tidak valid');
+        return;
       }
       summaryCardClientCache.set(url, json.data);
       setData(json.data);
@@ -684,14 +693,9 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       {/* Cascade filter: periode → wilayah grid → cabang/DC */}
       <CardBox className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-              <Sun size={20} aria-hidden="true" />
-            </div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Ringkasan PLTS</h3>
-              <MetricInfoIcon infoKey="plts_multi_dc_analytics" />
-            </div>
+          <div className="flex items-center gap-2">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Ringkasan PLTS</h3>
+            <MetricInfoIcon infoKey="plts_multi_dc_analytics" />
           </div>
 
           {/* Period Selector */}

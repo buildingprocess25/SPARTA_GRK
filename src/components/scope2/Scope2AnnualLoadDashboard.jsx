@@ -362,8 +362,7 @@ export default function Scope2AnnualLoadDashboard() {
 
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-          <Activity size={14} className="text-blue-600 dark:text-blue-400" aria-hidden="true" />
+        <h2 className="text-sm font-bold text-slate-700 dark:text-slate-300">
           Ringkasan Scope 2
         </h2>
       </div>
@@ -390,6 +389,7 @@ export default function Scope2AnnualLoadDashboard() {
           label="Emisi per MWh"
           value={show(intensity)}
           unit="tCO₂e/MWh"
+          trend="Intensitas rata-rata tertimbang"
           icon={Flame}
           theme="calc"
           infoKey="scope2_emission_intensity"

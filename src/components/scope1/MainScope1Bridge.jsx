@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertCircle, Fuel, Car } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 import CardBox from '@/components/ui/CardBox';
 import InfoHint from '@/components/ui/InfoHint';
@@ -29,32 +29,50 @@ export default function MainScope1Bridge({ onNavigate }) {
   const vehicleTon = state.data.vehicle.summary.totalEmissionTon;
   const totalTon = Number((gensetTon + vehicleTon).toFixed(3));
 
-  return <CardBox className="space-y-4 border-rose-200 dark:border-rose-500/30 bg-gradient-to-br from-white to-rose-50/40 dark:from-slate-900 dark:to-rose-950/30">
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="flex items-center gap-2">
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Scope 1: Emisi Langsung</h2>
-        <InfoHint
-          title="Scope 1: Emisi Langsung"
-          text="Emisi langsung dari pembakaran bahan bakar yang dikendalikan perusahaan: bahan bakar solar untuk genset cadangan dan BBM untuk armada kendaraan operasional Alfamart."
-        />
+  return (
+    <CardBox className="space-y-4 border-rose-200/80 dark:border-rose-500/20 bg-gradient-to-br from-white to-rose-50/30 dark:from-slate-900 dark:to-rose-950/20">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Scope 1: Emisi Langsung</h3>
+          <InfoHint
+            title="Scope 1: Emisi Langsung"
+            text="Emisi langsung dari pembakaran bahan bakar yang dikendalikan perusahaan: bahan bakar solar untuk genset cadangan dan BBM untuk armada kendaraan operasional Alfamart."
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => onNavigate?.('penambah', 'scope1')}
+          className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60 shadow-sm transition active:scale-95"
+        >
+          Lihat Rincian Scope 1
+        </button>
       </div>
-      <button onClick={() => onNavigate?.('penambah', 'scope1')} className="rounded-lg border border-rose-200 dark:border-rose-500/30 bg-white dark:bg-slate-800 px-3 py-2 min-h-10 text-xs font-semibold text-rose-700 dark:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500">Lihat Rincian Scope 1</button>
-    </div>
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-      <div className="rounded-xl bg-amber-50 dark:bg-amber-500/10 p-4">
-        <Fuel size={16} className="text-amber-600 dark:text-amber-400" aria-hidden="true" />
-        <p className="text-xs text-slate-600 dark:text-slate-400">Solar Genset Cadangan</p>
-        <strong className="text-slate-900 dark:text-slate-100">{number.format(gensetTon)} tCO₂e</strong>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-3.5 flex flex-col justify-between">
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Solar Genset Cadangan</p>
+          <div className="mt-2">
+            <strong className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{number.format(gensetTon)}</strong>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">tCO₂e</span>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-3.5 flex flex-col justify-between">
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">BBM Kendaraan Operasional</p>
+          <div className="mt-2">
+            <strong className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{number.format(vehicleTon)}</strong>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">tCO₂e</span>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50/80 dark:bg-rose-500/10 p-3.5 flex flex-col justify-between">
+          <p className="text-xs font-bold text-rose-700 dark:text-rose-300">Total Scope 1</p>
+          <div className="mt-2">
+            <strong className="text-xl font-black text-rose-950 dark:text-rose-100 tracking-tight">{number.format(totalTon)}</strong>
+            <span className="text-xs font-bold text-rose-700/80 dark:text-rose-300 ml-1">tCO₂e</span>
+          </div>
+        </div>
       </div>
-      <div className="rounded-xl bg-blue-50 dark:bg-blue-500/10 p-4">
-        <Car size={16} className="text-blue-600 dark:text-blue-400" aria-hidden="true" />
-        <p className="text-xs text-slate-600 dark:text-slate-400">BBM Kendaraan Operasional</p>
-        <strong className="text-slate-900 dark:text-slate-100">{number.format(vehicleTon)} tCO₂e</strong>
-      </div>
-      <div className="rounded-xl bg-slate-900 dark:bg-black/40 p-4 text-white">
-        <p className="text-xs text-slate-300">Total Scope 1</p>
-        <strong>{number.format(totalTon)} tCO₂e</strong>
-      </div>
-    </div>
-  </CardBox>;
+    </CardBox>
+  );
 }

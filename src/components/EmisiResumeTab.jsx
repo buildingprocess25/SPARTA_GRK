@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect, lazy, Suspense } from 'react';
 import {
-  Sun, Droplets, Fuel, Zap, ArrowRight,
+  Sun, Droplets, Fuel, Zap, ArrowRight, ArrowUpRight,
   FileCheck2, TrendingDown, TrendingUp, CheckCircle2,
   ExternalLink, AlertCircle, ChevronDown, ChevronUp,
   Award, BarChart3, Activity, Scale, Percent, ArrowDownRight, Layers,
@@ -112,8 +112,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         const pltsAvoidedTon = reportData.emissions.data.reduce((sum, d) => sum + (d.avoidedEmissionTon || 0), 0);
         const waterAvoidedTon = reportData.water.summary?.totalEmissionAvoidedTon || 0;
         const avoidedEmissionTon = pltsAvoidedTon + waterAvoidedTon;
-        // PLTS already lowers Scope 2 (only purchased PLN power is counted), so only water is subtracted; PLTS stays as avoided info.
-        const netEmissionTon = grossEmissionTon - waterAvoidedTon;
+        // Emisi Bersih sama seperti di production: Emisi Kotor (Scope 1 + Scope 2) dikurangi emisi yang ditekan (PLTS + Air Daur Ulang)
+        const netEmissionTon = grossEmissionTon - avoidedEmissionTon;
 
         const netReductionPct = grossEmissionTon > 0 ? `${((avoidedEmissionTon / grossEmissionTon) * 100).toFixed(1)}%` : '0%';
         const scope1SharePct = grossEmissionTon > 0 ? ((scope1Ton / grossEmissionTon) * 100).toFixed(1) : '0';
@@ -262,7 +262,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       const waterAvoided = (waterM3 * CARBON_FACTORS.WATER.FACTOR_KG_PER_M3) / 1000;
       const penguranganTon = Number((pltsAvoided + waterAvoided).toFixed(1));
 
-      const netTon = Number((penambahanTon - waterAvoided).toFixed(1));
+      const netTon = Number((penambahanTon - penguranganTon).toFixed(1));
 
       const offsetRatioPct = penambahanTon > 0
         ? Number(((penguranganTon / penambahanTon) * 100).toFixed(2))
@@ -320,7 +320,6 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <BarChart3 size={18} className="text-emerald-500 shrink-0" aria-hidden="true" />
               <span>Rincian & Ikhtisar Sumber Emisi</span>
               {resumeKPI.periodLabel && (
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
@@ -332,72 +331,82 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
-          {/* Card 1: Emisi Bersih */}
-          <CardBox className="border-slate-200 dark:border-slate-800 hover:border-purple-300 dark:hover:border-purple-500/40 transition-colors shadow-sm">
+          {/* Card 1: Emisi Bersih (Spotlight Card) */}
+          <CardBox
+            className="hover:scale-[1.01] transition-transform shadow-md"
+          >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="size-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                    <Award size={18} aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                      Emisi Bersih
-                    </h3>
-                    <span className="text-[10px] font-semibold text-purple-600 dark:text-purple-400">
-                      Beban Akhir Perusahaan
-                    </span>
-                  </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
+                    Emisi Bersih
+                  </h3>
+                  <span className="text-[10px] font-semibold text-purple-600 dark:text-purple-400">
+                    Beban Akhir Perusahaan
+                  </span>
                 </div>
-                <InfoHint
-                  title="Emisi Bersih Alfamart"
-                  text="Emisi akhir Alfamart: Scope 1 + Scope 2, dikurangi emisi yang dihindari dari daur ulang air. PLTS tidak dikurangkan lagi di sini, karena manfaatnya sudah membuat Scope 2 lebih kecil (listrik yang dibeli dari PLN berkurang)."
-                />
+                <div className="flex items-center gap-1.5">
+                  <InfoHint
+                    title="Emisi Bersih"
+                    text="Total emisi operasional Alfamart setelah memperhitungkan kontribusi mitigasi hijau PLTS atap dan pemanfaatan daur ulang air."
+                  />
+                </div>
               </div>
 
               <div>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                  <span className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
                     {realKpiState.loading ? '...' : formatNum(resumeKPI.netEmissionTon, 1)}
                   </span>
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">tCO₂e</span>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Scope 1 + Scope 2 dikurangi daur ulang air
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-normal">
+                  Berhasil ditekan {resumeKPI.netReductionPct} berkat PLTS dan air daur ulang
                 </p>
               </div>
             </div>
           </CardBox>
 
           {/* Card 2: Total Emisi Dihasilkan (Scope 1 & 2) */}
-          <CardBox className="border-slate-200 dark:border-slate-800 hover:border-red-300 dark:hover:border-red-500/40 transition-colors shadow-sm">
+          <CardBox className="hover:border-red-500/40 transition-colors shadow-sm">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="size-9 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
-                    <TrendingUp size={18} aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                      Total Emisi Dihasilkan
-                    </h3>
-                    <span className="text-[10px] font-semibold text-red-600 dark:text-red-400">
-                      Scope 1 (BBM) & Scope 2 (Listrik)
-                    </span>
-                  </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                    Total Emisi Dihasilkan
+                  </h3>
+                  <span className="text-[10px] font-semibold text-red-600 dark:text-red-400">
+                    Scope 1 & Scope 2
+                  </span>
                 </div>
-                <InfoHint
-                  title="Total Emisi yang Dihasilkan (Scope 1 & 2)"
-                  text="Total emisi dari operasional Alfamart. Scope 1: emisi langsung (solar genset cadangan dan BBM kendaraan). Scope 2: emisi dari listrik yang dibeli dari PLN; karena listrik dari PLTS tidak dibeli, angka ini sudah lebih kecil berkat PLTS."
-                />
+                <div className="flex items-center gap-1.5">
+                  <InfoHint
+                    title="Total Emisi yang Dihasilkan (Scope 1 & 2)"
+                    text="Total emisi dari operasional Alfamart: solar genset cadangan, BBM kendaraan, dan listrik PLN."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleNav('penambah')}
+                    title="Buka rincian sumber emisi"
+                    aria-label="Buka rincian sumber emisi"
+                    className="size-8 rounded-full bg-slate-100 dark:bg-white/[0.08] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/15 flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                  >
+                    <ArrowUpRight size={16} strokeWidth={2.4} />
+                  </button>
+                </div>
               </div>
 
               <div>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
-                    {realKpiState.loading ? '...' : formatNum(resumeKPI.grossEmissionTon, 1)}
+                <div className="flex items-baseline justify-between gap-1.5 flex-wrap">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                      {realKpiState.loading ? '...' : formatNum(resumeKPI.grossEmissionTon, 1)}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">tCO₂e</span>
+                  </div>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-200/60 dark:border-rose-500/20">
+                    BBM & Listrik
                   </span>
-                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">tCO₂e</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Scope 2 (Listrik PLN) {resumeKPI.scope2SharePct}% · Scope 1 (BBM) {resumeKPI.scope1SharePct}%
@@ -406,35 +415,46 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             </div>
           </CardBox>
 
-          {/* Card 3: Mengurangi Emisi (PLTS & Air) */}
-          <CardBox className="border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-500/40 transition-colors shadow-sm">
+          {/* Card 3: Emisi yang Ditekan (PLTS & Air) */}
+          <CardBox className="hover:border-blue-500/40 transition-colors shadow-sm">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                    <TrendingDown size={18} aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                      Emisi yang Dihindari
-                    </h3>
-                    <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400">
-                      Mitigasi Inisiatif Hijau
-                    </span>
-                  </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                    Emisi yang Ditekan
+                  </h3>
+                  <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400">
+                    Mitigasi PLTS & Air
+                  </span>
                 </div>
-                <InfoHint
-                  title="Emisi yang Dihindari"
-                  text="Emisi yang dicegah oleh PLTS atap (listrik PLTS yang dipakai sendiri × 0,997 kgCO₂/kWh) dan daur ulang air. Hanya daur ulang air yang mengurangi emisi bersih; manfaat PLTS sudah tercermin di Scope 2 yang lebih kecil, jadi tidak dikurangkan dua kali."
-                />
+                <div className="flex items-center gap-1.5">
+                  <InfoHint
+                    title="Emisi yang Ditekan"
+                    text="Total emisi karbon yang berhasil ditekan berkat pemanfaatan PLTS atap dan pengolahan air daur ulang."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleNav('pengurang')}
+                    title="Buka rincian pengurangan emisi"
+                    aria-label="Buka rincian pengurangan emisi"
+                    className="size-8 rounded-full bg-slate-100 dark:bg-white/[0.08] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/15 flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                  >
+                    <ArrowUpRight size={16} strokeWidth={2.4} />
+                  </button>
+                </div>
               </div>
 
               <div>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
-                    {realKpiState.loading ? '...' : formatNum(resumeKPI.avoidedEmissionTon, 1)}
+                <div className="flex items-baseline justify-between gap-1.5 flex-wrap">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                      {realKpiState.loading ? '...' : formatNum(resumeKPI.avoidedEmissionTon, 1)}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">tCO₂e</span>
+                  </div>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200/60 dark:border-blue-500/20">
+                    PLTS & Air
                   </span>
-                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">tCO₂e</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Dari {formatNum(resumeKPI.pltsProdMwh, 0)} MWh PLTS dan {formatNum(resumeKPI.waterVolumeM3, 0)} m³ air daur ulang
@@ -444,34 +464,45 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
           </CardBox>
 
           {/* Card 4: Penghematan Biaya (Financial Impact) */}
-          <CardBox className="border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-500/40 transition-colors shadow-sm">
+          <CardBox className="hover:border-emerald-500/40 transition-colors shadow-sm">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="size-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                    <Calculator size={18} aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                      Penghematan Biaya
-                    </h3>
-                    <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                      Efisiensi Finansial
-                    </span>
-                  </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                    Penghematan Biaya
+                  </h3>
+                  <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                    Efisiensi Finansial
+                  </span>
                 </div>
-                <InfoHint
-                  title="Penghematan Biaya Utilitas"
-                  text="Total pengeluaran operasional yang berhasil dihemat perusahaan karena menggunakan listrik PLTS mandiri dan air daur ulang, sehingga tidak perlu membayar penuh tagihan PLN dan PDAM."
-                />
+                <div className="flex items-center gap-1.5">
+                  <InfoHint
+                    title="Penghematan Biaya Utilitas"
+                    text="Total pengeluaran operasional yang berhasil dihemat perusahaan karena menggunakan listrik PLTS mandiri dan air daur ulang, sehingga tidak perlu membayar penuh tagihan PLN dan PDAM."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleNav('pengurang', 'plts')}
+                    title="Buka rincian PLTS"
+                    aria-label="Buka rincian PLTS"
+                    className="size-8 rounded-full bg-slate-100 dark:bg-white/[0.08] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/15 flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                  >
+                    <ArrowUpRight size={16} strokeWidth={2.4} />
+                  </button>
+                </div>
               </div>
 
               <div>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
-                    {realKpiState.loading ? '...' : `Rp ${formatNum(resumeKPI.totalCostSavingJuta, 1)}`}
+                <div className="flex items-baseline justify-between gap-1.5 flex-wrap">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                      {realKpiState.loading ? '...' : `Rp ${formatNum(resumeKPI.totalCostSavingJuta, 1)}`}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Juta</span>
+                  </div>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20">
+                    Efisiensi
                   </span>
-                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Juta</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Tagihan listrik PLN dan air bersih yang berhasil dihemat
@@ -564,11 +595,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
 
       {/* Grafik tren bulanan penambahan vs pengurangan emisi, dengan rata-rata dan rasio offset */}
       <CardBox className="space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-              <BarChart3 size={20} />
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+          <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
               Tren Emisi
             </h3>
@@ -579,9 +607,9 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             <ChartPillLegend
               items={[
                 ...(chartMetricView === 'all' || chartMetricView === 'penambahan' ? [{ label: 'Emisi Dihasilkan (Scope 1+2)', color: CHART_PALETTE.emission }] : []),
-                ...(chartMetricView === 'all' || chartMetricView === 'pengurangan' ? [{ label: 'Emisi Dihindari (PLTS+Air)', color: CHART_PALETTE.savings }] : []),
+                ...(chartMetricView === 'all' || chartMetricView === 'pengurangan' ? [{ label: 'Emisi Ditekan (PLTS+Air)', color: CHART_PALETTE.savings }] : []),
                 ...(chartMetricView === 'all' || chartMetricView === 'net' ? [{ label: 'Emisi Bersih', color: CHART_PALETTE.net, type: 'line' }] : []),
-                ...(chartMetricView === 'all' || chartMetricView === 'net' ? [{ label: '% Emisi Dihindari', color: CHART_PALETTE.target, type: 'line' }] : []),
+                ...(chartMetricView === 'all' || chartMetricView === 'net' ? [{ label: '% Emisi Berhasil Ditekan', color: CHART_PALETTE.target, type: 'line' }] : []),
               ]}
             />
 
@@ -615,7 +643,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                   }`}
                 onClick={() => setChartMetricView('pengurangan')}
               >
-                Emisi Dihindari
+                Emisi Ditekan
               </button>
               <button
                 type="button"
@@ -639,7 +667,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
           </div>
           <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
           <div className="flex flex-col">
-            <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Rata-rata emisi dihindari</span>
+            <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Rata-rata emisi ditekan</span>
             <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">-{formatYAxisNumber(avgPengurangan)} <span className="text-xs font-sans font-medium">tCO₂e/bln</span></span>
           </div>
           <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
@@ -650,10 +678,10 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
           <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
           <div className="flex flex-col">
             <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1">
-              % Emisi Dihindari
+              % Emisi Berhasil Ditekan
               <InfoHint
-                title="% Emisi Dihindari"
-                text="Emisi yang dihindari PLTS dan daur ulang air, dibandingkan dengan emisi yang dihasilkan. Hanya pembanding: angka ini tidak berarti emisi bersih turun sebesar itu, karena manfaat PLTS sudah ada di Scope 2."
+                title="% Emisi Berhasil Ditekan"
+                text="Persentase emisi yang berhasil ditekan melalui PLTS dan daur ulang air dibandingkan total emisi yang dihasilkan operasional."
                 size={12}
               />
             </span>
@@ -721,7 +749,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                           <div className="flex items-center justify-between gap-3 font-mono pt-1">
                             <span className="flex items-center gap-1.5 font-sans text-slate-600 dark:text-slate-400">
                               <span className="size-2 rounded-full bg-emerald-500 shrink-0" />
-                              Emisi Dihindari:
+                              Emisi Ditekan:
                             </span>
                             <strong className="text-emerald-700 dark:text-emerald-300">-{formatYAxisNumber(data.penguranganTon)} tCO₂e</strong>
                           </div>
@@ -740,7 +768,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                           <div className="flex items-center justify-between gap-3 font-mono pt-1">
                             <span className="flex items-center gap-1.5 font-sans text-purple-700 dark:text-purple-300 font-semibold">
                               <span className="size-2 rounded-full bg-purple-500 shrink-0" />
-                              % Emisi Dihindari:
+                              % Emisi Berhasil Ditekan:
                             </span>
                             <strong className="text-purple-700 dark:text-purple-300">{data.offsetRatioPct}%</strong>
                           </div>
@@ -757,7 +785,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 <ReferenceLine yAxisId="left" y={avgPenambahan} stroke={CHART_PALETTE.emission} strokeDasharray="4 4" label={{ value: `Rata-rata dihasilkan: ${avgPenambahan}`, fill: CHART_PALETTE.emission, fontSize: 10, position: 'insideTopLeft' }} />
               )}
               {(chartMetricView === 'all' || chartMetricView === 'pengurangan') && (
-                <ReferenceLine yAxisId="left" y={avgPengurangan} stroke={CHART_PALETTE.savings} strokeDasharray="4 4" label={{ value: `Rata-rata dihindari: ${avgPengurangan}`, fill: CHART_PALETTE.savings, fontSize: 10, position: 'insideBottomLeft' }} />
+                <ReferenceLine yAxisId="left" y={avgPengurangan} stroke={CHART_PALETTE.savings} strokeDasharray="4 4" label={{ value: `Rata-rata ditekan: ${avgPengurangan}`, fill: CHART_PALETTE.savings, fontSize: 10, position: 'insideBottomLeft' }} />
               )}
 
               {(chartMetricView === 'all' || chartMetricView === 'penambahan') && (
@@ -768,7 +796,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 </Bar>
               )}
               {(chartMetricView === 'all' || chartMetricView === 'pengurangan') && (
-                <Bar yAxisId="left" dataKey="penguranganTon" name="Emisi Dihindari (PLTS+Air)" fill={CHART_PALETTE.savings} radius={[4, 4, 0, 0]} maxBarSize={36} animationDuration={800} animationEasing="ease-out">
+                <Bar yAxisId="left" dataKey="penguranganTon" name="Emisi Ditekan (PLTS+Air)" fill={CHART_PALETTE.savings} radius={[4, 4, 0, 0]} maxBarSize={36} animationDuration={800} animationEasing="ease-out">
                   {monthlyComparisonData.map((d, i) => (
                     <Cell key={`peng-cell-${i}`} opacity={d.month?.includes('*') ? PARTIAL_OPACITY : 1} />
                   ))}
@@ -778,7 +806,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 <Line yAxisId="left" type="monotone" dataKey="netTon" name="Emisi Bersih" stroke={CHART_PALETTE.net} strokeWidth={2.5} dot={{ r: 3.5, fill: CHART_PALETTE.net }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
               )}
               {(chartMetricView === 'all' || chartMetricView === 'net') && (
-                <Line yAxisId="right" type="monotone" dataKey="offsetRatioPct" name="% Emisi Dihindari" stroke={CHART_PALETTE.target} strokeWidth={2} strokeDasharray="3 3" dot={{ r: 3, fill: CHART_PALETTE.target }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
+                <Line yAxisId="right" type="monotone" dataKey="offsetRatioPct" name="% Emisi Berhasil Ditekan" stroke={CHART_PALETTE.target} strokeWidth={2} strokeDasharray="3 3" dot={{ r: 3, fill: CHART_PALETTE.target }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
               )}
             </ComposedChart>
           </ResponsiveContainer>
@@ -794,16 +822,16 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Scope 1 · BBM Kendaraan</th>
                 <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Scope 2 · Listrik PLN</th>
                 <th className="text-right px-4 py-3 font-semibold bg-red-950 text-red-100 whitespace-nowrap">Total Emisi Dihasilkan (tCO₂e)</th>
-                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Dihindari PLTS</th>
-                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Dihindari Daur Ulang Air</th>
-                <th className="text-right px-4 py-3 font-semibold bg-emerald-950 text-emerald-100 whitespace-nowrap">Total Emisi Dihindari (tCO₂e)</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Ditekan PLTS</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Ditekan Daur Ulang Air</th>
+                <th className="text-right px-4 py-3 font-semibold bg-emerald-950 text-emerald-100 whitespace-nowrap">Total Emisi Ditekan (tCO₂e)</th>
                 <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">
                   <span className="inline-flex items-center justify-end gap-1">
                     Emisi Bersih (tCO₂e)
-                    <InfoHint size={12} title="Emisi Bersih" text="Total emisi dihasilkan dikurangi daur ulang air. PLTS tidak dikurangkan lagi karena manfaatnya sudah ada di Scope 2." />
+                    <InfoHint size={12} title="Emisi Bersih" text="Total emisi operasional setelah dikurangi penghematan dari PLTS dan daur ulang air." />
                   </span>
                 </th>
-                <th className="text-center px-4 py-3 font-semibold whitespace-nowrap">% Emisi Dihindari</th>
+                <th className="text-center px-4 py-3 font-semibold whitespace-nowrap">% Emisi Berhasil Ditekan</th>
               </tr>
             </thead>
             <tbody>
@@ -856,18 +884,13 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       {/* Export Laporan Resmi (SRN-PPI & OJK Sustainability Report) */}
       <CardBox className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-              <FileSpreadsheet size={20} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Unduh laporan resmi</h3>
-                <InfoHint
-                  title="Unduh laporan resmi"
-                  text="Format terstandardisasi siap pakai untuk pelaporan SRN-PPI Kementerian LHK dan Sustainability Report POJK 51/2017."
-                />
-              </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Unduh laporan resmi</h3>
+              <InfoHint
+                title="Unduh laporan resmi"
+                text="Format terstandardisasi siap pakai untuk pelaporan SRN-PPI Kementerian LHK dan Sustainability Report POJK 51/2017."
+              />
             </div>
           </div>
 

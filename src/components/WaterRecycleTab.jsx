@@ -127,6 +127,7 @@ export default function WaterRecycleTab() {
           label="Emisi yang dicegah"
           value={loading ? '—' : formatNum(summary?.totalEmissionAvoidedTon ?? 0, 3)}
           unit="tCO₂e"
+          trend="Faktor 0,344 kgCO₂e/m³"
           tooltip="Volume × 0,344 kgCO₂e/m³. Faktor dari workbook internal, belum diverifikasi sumber luar."
           icon={ArrowDownRight}
           theme="savings"
@@ -135,6 +136,7 @@ export default function WaterRecycleTab() {
           label="Penghematan biaya"
           value={loading ? '—' : `Rp ${formatNum(summary?.totalCostSavedJuta ?? 0, 2)}`}
           unit="Juta"
+          trend="Asumsi tarif PDAM industri"
           tooltip="Volume × Rp 8.000/m³, perkiraan tarif PDAM industri."
           icon={Calculator}
           theme="savings"
@@ -144,13 +146,8 @@ export default function WaterRecycleTab() {
       {/* Chart bulanan */}
       <CardBox className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
-              <Waves size={20} />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Air didaur ulang per bulan</h3>
-            </div>
+          <div>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Air didaur ulang per bulan</h3>
           </div>
           <ChartPillLegend items={[{ label: 'Air Daur Ulang', color: CHART_PALETTE.water }]} />
         </div>

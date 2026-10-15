@@ -20,11 +20,10 @@ function getTunedDatabaseUrl() {
   if (!rawUrl) return undefined;
   try {
     const parsed = new URL(rawUrl);
-    if (!parsed.searchParams.has('connection_limit')) {
-      parsed.searchParams.set('connection_limit', process.env.DB_CONNECTION_LIMIT || '15');
-    }
+    const maxConn = process.env.DB_CONNECTION_LIMIT || '5';
+    parsed.searchParams.set('connection_limit', maxConn);
     if (!parsed.searchParams.has('pool_timeout')) {
-      parsed.searchParams.set('pool_timeout', process.env.DB_POOL_TIMEOUT || '30');
+      parsed.searchParams.set('pool_timeout', process.env.DB_POOL_TIMEOUT || '20');
     }
     if (!parsed.searchParams.has('connect_timeout')) {
       parsed.searchParams.set('connect_timeout', '10');
