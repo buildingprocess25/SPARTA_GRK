@@ -20,7 +20,7 @@ function getTunedDatabaseUrl() {
   if (!rawUrl) return undefined;
   try {
     const parsed = new URL(rawUrl);
-    const maxConn = process.env.DB_CONNECTION_LIMIT || '5';
+    const maxConn = process.env.DB_CONNECTION_LIMIT || '3';
     parsed.searchParams.set('connection_limit', maxConn);
     if (!parsed.searchParams.has('pool_timeout')) {
       parsed.searchParams.set('pool_timeout', process.env.DB_POOL_TIMEOUT || '20');
