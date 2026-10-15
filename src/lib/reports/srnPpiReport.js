@@ -22,7 +22,8 @@ export function buildSrnPpiWorkbookData(reportData) {
   const totalPltsAvoided = Number(emissions.data.reduce((s, d) => s + (d.avoidedEmissionTon || 0), 0).toFixed(3));
   const totalWaterAvoided = water.summary.totalEmissionAvoidedTon;
   const totalAvoided = Number((totalPltsAvoided + totalWaterAvoided).toFixed(3));
-  const netEmission = Number((totalAddition - totalAvoided).toFixed(3));
+  // Same basis as the monthly rows: PLTS already lowers Scope 2, so only water is subtracted.
+  const netEmission = Number((totalAddition - totalWaterAvoided).toFixed(3));
 
   const lastMonth = trend.at(-1);
   const firstMonth = trend[0];

@@ -187,9 +187,10 @@ test('Standard case: Gross > Offset', () => {
   });
 
   assert.equal(bal.grossEmissionsTon, 200); // 50 + 150
-  assert.equal(bal.totalOffsetTon, 65); // 60 + 5
-  assert.equal(bal.rawNetEmissionsTon, 135); // 200 - 65
-  assert.equal(bal.displayNetEmissionsTon, 135);
+  assert.equal(bal.totalOffsetTon, 65); // 60 + 5, shown as avoided
+  assert.equal(bal.deductedOffsetTon, 5); // only water; PLTS is already inside the purchased Scope 2
+  assert.equal(bal.rawNetEmissionsTon, 195); // 200 - 5
+  assert.equal(bal.displayNetEmissionsTon, 195);
   assert.equal(bal.isNetNegative, false);
   assert.equal(bal.offsetRatioPct, 32.5); // 65 / 200 = 32.5%
   assert.equal(bal.offsetRatioLabel, '32.5%');
@@ -201,15 +202,15 @@ test('Over-offset case: Offset > Gross (Net Negative)', () => {
     scope1Ton: 20,
     scope2Ton: 30,
     pltsAvoidedTon: 70,
-    waterAvoidedTon: 10
+    waterAvoidedTon: 60
   });
 
   assert.equal(bal.grossEmissionsTon, 50);
-  assert.equal(bal.totalOffsetTon, 80);
-  assert.equal(bal.rawNetEmissionsTon, -30); // True mathematical difference
+  assert.equal(bal.totalOffsetTon, 130);
+  assert.equal(bal.rawNetEmissionsTon, -10); // 50 - 60 water
   assert.equal(bal.displayNetEmissionsTon, 0); // Zero-floor for display
   assert.equal(bal.isNetNegative, true);
-  assert.equal(bal.offsetRatioPct, 160); // 80 / 50 = 160%
+  assert.equal(bal.offsetRatioPct, 260); // 130 / 50
 });
 
 test('Division-by-zero protection: Gross = 0', () => {

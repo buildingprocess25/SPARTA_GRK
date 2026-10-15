@@ -18,6 +18,7 @@ import { processAllDCAnalytics, SOLAR_CONSTANTS } from '@/lib/solar/processor';
 import { formatNum } from '@/data/sustainabilityData';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
 import { normalizePlantStatus } from '@/lib/solar/status';
+import { getYearToDateMonths } from '@/lib/reportingMonths';
 
 const ALL_METRIC_OPTIONS = [
   {
@@ -96,17 +97,17 @@ const METRIC_OPTIONS = isFeatureEnabled('auditBaseline')
   ? ALL_METRIC_OPTIONS
   : ALL_METRIC_OPTIONS.filter(m => m.sourceType !== 'AUDIT_BASELINE');
 
-const API_MONTHS_2026 = [
-  { ym: '202601', label: 'Jan 2026', short: 'Jan', days: 31 },
-  { ym: '202602', label: 'Feb 2026', short: 'Feb', days: 28 },
-  { ym: '202603', label: 'Mar 2026', short: 'Mar', days: 31 },
-  { ym: '202604', label: 'Apr 2026', short: 'Apr', days: 30 },
-  { ym: '202605', label: 'Mei 2026', short: 'Mei', days: 31 },
-  { ym: '202606', label: 'Jun 2026', short: 'Jun', days: 30 },
-  { ym: '202607', label: 'Jul 2026', short: 'Jul', days: 31 },
-  { ym: '202608', label: 'Agu 2026', short: 'Agu', days: 31 },
-  { ym: '202609', label: 'Sep 2026', short: 'Sep', days: 30 }
-];
+// January through the current month; the current month counts only the days elapsed so far.
+const API_MONTHS = getYearToDateMonths().map(({ yearMonth, label }, index, all) => {
+  const [year, month] = yearMonth.split('-').map(Number);
+  const isCurrent = index === all.length - 1;
+  return {
+    ym: `${year}${String(month).padStart(2, '0')}`,
+    label: `${label} ${year}`,
+    short: label,
+    days: isCurrent ? Math.max(1, new Date().getDate()) : new Date(year, month, 0).getDate(),
+  };
+});
 
 export function getPlantColor(idx, total = 39) {
   const hue = Math.round((idx * 137.508) % 360);
@@ -844,7 +845,7 @@ export default function PLTSAnalyticsSection({
 
   // Trend Dataset Construction (Monthly 2026 from Canonical ISOLAR_REPORT_IMPORT)
   const trendDataset = useMemo(() => {
-    return API_MONTHS_2026.map(m => {
+    return API_MONTHS.map(m => {
       const isDaily = unitMode === 'daily';
       const monthObj = {
         month: m.label,

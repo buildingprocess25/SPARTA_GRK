@@ -22,6 +22,7 @@ const unitTestScripts = [
   ['--test', 'tests/reconciliation-identities.test.mjs'],
   ['--test', 'src/lib/importers/__tests__/energyFlowImport.test.mjs'],
   ['--test', 'src/lib/stores/__tests__/storeSync.test.mjs'],
+  ['--test', 'src/lib/solar/__tests__/pushCooldown.test.mjs'],
   ['--test', 'src/lib/alarms/__tests__/normalize.test.mjs'],
   ['--test', 'src/lib/alarms/__tests__/apiContract.test.mjs'],
   ['--test', 'src/context/__tests__/alarmState.test.mjs'],

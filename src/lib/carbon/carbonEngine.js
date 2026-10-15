@@ -563,8 +563,8 @@ export function calculateWaterRecycleImpact({
 // Carbon balance reconciliation
 
 /**
- * Computes consolidated Gross, Offset, Net Emissions, Offset Ratio, and Total Cost Savings.
- * Fully handles over-offset edge cases without hiding values or throwing NaN.
+ * Gross, avoided and net emissions. Net subtracts only water recycling: scope2Ton is purchased PLN power,
+ * so PLTS already lowered it and subtracting PLTS avoided emissions again would count PLTS twice.
  */
 export function reconcileCarbonBalance({
   scope1Ton = 0,
@@ -577,8 +577,8 @@ export function reconcileCarbonBalance({
   const grossEmissionsTon = Number((Math.max(0, scope1Ton) + Math.max(0, scope2Ton)).toFixed(2));
   const totalOffsetTon = Number((Math.max(0, pltsAvoidedTon) + Math.max(0, waterAvoidedTon)).toFixed(2));
 
-  // Mathematical Net Balance: Gross - Offset
-  const rawNetEmissionsTon = Number((grossEmissionsTon - totalOffsetTon).toFixed(2));
+  const deductedOffsetTon = Number(Math.max(0, waterAvoidedTon).toFixed(2));
+  const rawNetEmissionsTon = Number((grossEmissionsTon - deductedOffsetTon).toFixed(2));
   // Display Net Clamped for reporting (zero-floor)
   const displayNetEmissionsTon = Number(Math.max(0, rawNetEmissionsTon).toFixed(2));
   const isNetNegative = rawNetEmissionsTon < 0;
@@ -606,6 +606,7 @@ export function reconcileCarbonBalance({
     pltsAvoidedTon: Number(pltsAvoidedTon.toFixed(2)),
     waterAvoidedTon: Number(waterAvoidedTon.toFixed(2)),
     totalOffsetTon,
+    deductedOffsetTon,
     rawNetEmissionsTon,
     displayNetEmissionsTon,
     isNetNegative,

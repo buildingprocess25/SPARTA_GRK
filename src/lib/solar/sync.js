@@ -24,6 +24,7 @@ import { parseFreshnessThreshold, resolveTelemetryFreshness } from './freshness.
 import { classifyVendorPlantStatus } from './status.js';
 import { isDcLocation, CANONICAL_DC_ENTITIES } from './plantMap.js';
 import { getValidToken } from './tokenManager.js';
+import { takePushable } from './pushCooldown.js';
 
 const SYNC_WINDOW = { start: 5, end: 18, startMinute: 30, endMinute: 30 };
 // 05:30 - 18:30 WIB
@@ -546,33 +547,30 @@ export async function runSync({ trigger = 'cron' } = {}) {
       // always-succeeding getPowerStationList signal (see newlyDegradedPlants
       // above) - independent of whether the getFaultAlarmInfo sub-component
       // below succeeds.
-      if (newlyDegradedPlants.length > 0) {
+      const pushablePlants = takePushable(newlyDegradedPlants, (p) => `status:${p.psId}:${p.category}`);
+      if (pushablePlants.length < newlyDegradedPlants.length) {
+        console.log(`[SYNC] Push status-change dilewati untuk ${newlyDegradedPlants.length - pushablePlants.length} plant (sudah dikirim < 2 jam lalu)`);
+      }
+      if (pushablePlants.length > 0) {
         try {
           const { sendPushToAll } = await import('../push.js');
           const dcName = (psId, fallback) => {
             const entity = CANONICAL_DC_ENTITIES.find((e) => (e.sungrowPsIds || []).includes(psId));
             return entity?.canonicalName || fallback || `Plant ${psId}`;
           };
-          const first = newlyDegradedPlants[0];
+          const first = pushablePlants[0];
           const categoryIcon = { OFFLINE: '⚫', FAULT: '🔴', ALARM: '🟠' };
           const categoryLabel = { OFFLINE: 'Offline', FAULT: 'Fault', ALARM: 'Alarm' };
-          const isUrgent = newlyDegradedPlants.some((p) => p.category === 'FAULT' || p.category === 'OFFLINE');
-          const title = newlyDegradedPlants.length === 1
+          const isUrgent = pushablePlants.some((p) => p.category === 'FAULT' || p.category === 'OFFLINE');
+          const title = pushablePlants.length === 1
             ? `${categoryIcon[first.category]} ${categoryLabel[first.category]} Baru: ${dcName(first.psId, first.psName)}`
-            : `${isUrgent ? '🔴' : '🟠'} ${newlyDegradedPlants.length} Plant Berubah Status`;
-          const body = newlyDegradedPlants.length === 1
+            : `${isUrgent ? '🔴' : '🟠'} ${pushablePlants.length} Plant Berubah Status`;
+          const body = pushablePlants.length === 1
             ? first.reason
-            : newlyDegradedPlants.slice(0, 3).map((p) => `${dcName(p.psId, p.psName)}: ${categoryLabel[p.category]}`).join(' | ');
+            : pushablePlants.slice(0, 3).map((p) => `${dcName(p.psId, p.psName)}: ${categoryLabel[p.category]}`).join(' | ');
 
           const pushResult = await sendPushToAll({ title, body, tag: 'sparta-status-change', requireInteraction: isUrgent, url: '/' });
-          // sendPushToAll() can "succeed" (no exception) while actually
-          // delivering to nobody - eg. VAPID not configured server-side
-          // returns {sent:0, skipped:'VAPID_NOT_CONFIGURED'} silently, and a
-          // subscription rejected by the push service (expired, wrong keys)
-          // just increments `failed` without throwing. Neither case was ever
-          // logged, so a real incident (alarm fired, zero notifications
-          // received) left no trace to diagnose from. Log the outcome every
-          // time so this is visible in Dokploy logs going forward.
+          // sendPushToAll() resolves even when nobody receives it (VAPID missing, expired subscription), so log the outcome.
           if (pushResult.skipped || pushResult.sent === 0) {
             console.warn(`[SYNC] Push status-change TIDAK terkirim ke siapa pun: ${JSON.stringify(pushResult)}`);
           } else {
@@ -624,12 +622,7 @@ export async function runSync({ trigger = 'cron' } = {}) {
           });
 
           if (!faultRes.ok) {
-            // FaultActive has historically stayed at 0 rows forever with no
-            // error ever surfacing - this silent break on a non-OK vendor
-            // response was why: it looks identical to "no faults" in every
-            // downstream log/metric. Log it so a real vendor failure (auth,
-            // quota, wrong scope) is finally visible instead of indistinguishable
-            // from "nothing to report".
+            // Logged so a vendor failure is not mistaken for "no faults".
             console.warn(`[SYNC] getFaultAlarmInfo HTTP ${faultRes.status} pada halaman ${curPage} - vendor API gagal, berhenti sync fault/alarm untuk siklus ini.`);
             break;
           }
@@ -641,7 +634,8 @@ export async function runSync({ trigger = 'cron' } = {}) {
 
           const pageData = faultJson.result_data || {};
           const faults = pageData.pageList || pageData.data || [];
-          const totalRecords = Number(pageData.totalRows || pageData.total || faults.length);
+          // iSolarCloud reports the total as rowCount (see docs/evidence getPowerStationList); without it only page 1 was read.
+          const totalRecords = Number(pageData.rowCount || pageData.totalRows || pageData.total || faults.length);
           totalPages = Math.ceil(totalRecords / 100) || 1;
           totalFaultsSynced += faults.length;
 
@@ -695,20 +689,22 @@ export async function runSync({ trigger = 'cron' } = {}) {
 
         console.log(`[SYNC] getFaultAlarmInfo synced rowCount=${totalFaultsSynced} (Active=${activeFaultsCount}, History=${historyFaultsCount}, New=${newlyAppearedFaults.length})`);
 
-        if (newlyAppearedFaults.length > 0) {
+        // Flapping alarms get a new fault id on every reappearance, so cool down per plant and fault name.
+        const pushableFaults = takePushable(newlyAppearedFaults, (f) => `fault:${f.psId}:${f.faultName}`);
+        if (pushableFaults.length > 0) {
           try {
             const { sendPushToAll } = await import('../push.js');
             const dcName = (psId, fallback) => {
               const entity = CANONICAL_DC_ENTITIES.find((e) => (e.sungrowPsIds || []).includes(psId));
               return entity?.canonicalName || fallback || `Plant ${psId}`;
             };
-            const first = newlyAppearedFaults[0];
-            const title = newlyAppearedFaults.length === 1
+            const first = pushableFaults[0];
+            const title = pushableFaults.length === 1
               ? `🔴 Fault Baru: ${dcName(first.psId, first.psName)}`
-              : `🔴 ${newlyAppearedFaults.length} Fault Baru Terdeteksi`;
-            const body = newlyAppearedFaults.length === 1
+              : `🔴 ${pushableFaults.length} Fault Baru Terdeteksi`;
+            const body = pushableFaults.length === 1
               ? (first.faultName || 'Gangguan operasional inverter terdeteksi.')
-              : newlyAppearedFaults.slice(0, 3).map((f) => `${dcName(f.psId, f.psName)}: ${f.faultName}`).join(' | ');
+              : pushableFaults.slice(0, 3).map((f) => `${dcName(f.psId, f.psName)}: ${f.faultName}`).join(' | ');
 
             const pushResult = await sendPushToAll({ title, body, tag: 'sparta-fault-alarm', requireInteraction: true, url: '/' });
             if (pushResult.skipped || pushResult.sent === 0) {

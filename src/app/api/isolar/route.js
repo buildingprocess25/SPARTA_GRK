@@ -15,6 +15,7 @@ import { isFeatureEnabled } from '@/lib/solar/conversionConfig.js';
 import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
 import { isTokenRefreshing } from '@/lib/solar/tokenManager.js';
 import { isDbConnectionError, sanitizeErrorMessage } from '@/lib/server/apiError.js';
+import { getYearToDateMonths } from '@/lib/reportingMonths.js';
 
 const MANUAL_COOLDOWN_MS = 60_000;
 const CACHE_TTL_MS = 10_000; // 10s micro-cache to protect DB connection pool
@@ -78,6 +79,15 @@ export async function buildFullDashboardPayload(now = new Date()) {
   const faultsList = data.faults || [];
   const plantPrsList = data.plantPrs || [];
   const monthlyYieldsList = data.monthlyYields || [];
+  const dailyYieldsList = data.dailyYields || [];
+  const dailyDayCount = new Set(dailyYieldsList.map((d) => d.dateWib)).size;
+  // January through the current month; the current month has no monthly_yield row yet, so it is summed from daily_yield.
+  const reportingMonths = getYearToDateMonths().map(({ yearMonth }, index, all) => {
+    const ym = yearMonth.replace('-', '');
+    const isCurrent = index === all.length - 1;
+    const days = isCurrent ? dailyDayCount : new Date(Number(ym.slice(0, 4)), Number(ym.slice(4, 6)), 0).getDate();
+    return { ym, days, isCurrent };
+  });
 
   canonicalStations.forEach(dc => {
     const psIds = (dc.sungrowPsIds || []).map(Number);
@@ -135,24 +145,16 @@ export async function buildFullDashboardPayload(now = new Date()) {
       dc.officialPlantPr = null;
     }
 
-    // Monthly history (Jan-Sep 2026)
     const dcMonthly = monthlyYieldsList.filter(m => psIds.includes(Number(m.psId)));
-    const months = [
-      { ym: '202601', days: 31 },
-      { ym: '202602', days: 28 },
-      { ym: '202603', days: 31 },
-      { ym: '202604', days: 30 },
-      { ym: '202605', days: 31 },
-      { ym: '202606', days: 30 },
-      { ym: '202607', days: 31 },
-      { ym: '202608', days: 31 },
-      { ym: '202609', days: 30 },
-    ];
+    const dcDaily = dailyYieldsList.filter(d => psIds.includes(Number(d.psId)));
 
     const capacity = (dc.installedKwp && dc.installedKwp > 0) ? dc.installedKwp : null;
 
-    const monthlyData = months.map(({ ym, days }) => {
-      const matchingRecords = dcMonthly.filter(m => m.yearMonth === ym);
+    const monthlyData = reportingMonths.map(({ ym, days, isCurrent }) => {
+      const monthlyRecords = dcMonthly.filter(m => m.yearMonth === ym);
+      const matchingRecords = isCurrent && monthlyRecords.length === 0
+        ? dcDaily.map(d => ({ energyKwh: Number(d.yieldKwh) || 0 }))
+        : monthlyRecords;
       if (matchingRecords.length === 0) {
         return {
           yearMonth: ym,
@@ -172,7 +174,7 @@ export async function buildFullDashboardPayload(now = new Date()) {
         ? Number((specificYield / days).toFixed(2))
         : null;
 
-      const source = ym === '202609' ? 'api_live_partial' : 'api_history';
+      const source = isCurrent ? 'api_live_partial' : 'api_history';
       return {
         yearMonth: ym,
         energyKwh: Number(energyKwh.toFixed(1)),

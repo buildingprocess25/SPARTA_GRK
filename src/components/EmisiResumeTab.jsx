@@ -102,7 +102,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         const pltsAvoidedTon = reportData.emissions.data.reduce((sum, d) => sum + (d.avoidedEmissionTon || 0), 0);
         const waterAvoidedTon = reportData.water.summary?.totalEmissionAvoidedTon || 0;
         const avoidedEmissionTon = pltsAvoidedTon + waterAvoidedTon;
-        const netEmissionTon = grossEmissionTon - avoidedEmissionTon;
+        // PLTS already lowers Scope 2 (only purchased PLN power is counted), so only water is subtracted; PLTS stays as avoided info.
+        const netEmissionTon = grossEmissionTon - waterAvoidedTon;
 
         const netReductionPct = grossEmissionTon > 0 ? `${((avoidedEmissionTon / grossEmissionTon) * 100).toFixed(1)}%` : '0%';
         const scope1SharePct = grossEmissionTon > 0 ? ((scope1Ton / grossEmissionTon) * 100).toFixed(1) : '0';
@@ -229,7 +230,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       const s2Ton = scope2Month?.emissionTon || 0;
       const penambahanTon = Number((s1Ton + s2Ton).toFixed(1));
 
-      // Pengurangan: PLTS + water recycle avoided
+      // Avoided: PLTS + water recycle; only water is subtracted from the net (see netEmissionTon above).
       const pltsKwh = pltsMonth?.pltsGen || 0;
       // Same 0.997 factor and basis as /api/sustainability, so both pages agree.
       const pltsAvoided = pltsMonth?.avoidedCo2Ton
@@ -238,7 +239,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       const waterAvoided = (waterM3 * CARBON_FACTORS.WATER.FACTOR_KG_PER_M3) / 1000;
       const penguranganTon = Number((pltsAvoided + waterAvoided).toFixed(1));
 
-      const netTon = Number((penambahanTon - penguranganTon).toFixed(1));
+      const netTon = Number((penambahanTon - waterAvoided).toFixed(1));
 
       const offsetRatioPct = penambahanTon > 0
         ? Number(((penguranganTon / penambahanTon) * 100).toFixed(2))
@@ -327,7 +328,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 </div>
                 <InfoHint
                   title="Emisi Bersih Alfamart"
-                  text="Total beban emisi gas rumah kaca akhir Alfamart setelah dikurangi hasil penghematan dari PLTS dan daur ulang air. Rumus: Total Emisi Dihasilkan dikurangi Total Emisi yang Berhasil Ditekan."
+                  text="Emisi akhir Alfamart: Scope 1 + Scope 2, dikurangi emisi yang dihindari dari daur ulang air. PLTS tidak dikurangkan lagi di sini, karena manfaatnya sudah membuat Scope 2 lebih kecil (listrik yang dibeli dari PLN berkurang)."
                 />
               </div>
 
@@ -339,7 +340,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">tCO₂e</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Berhasil ditekan {resumeKPI.netReductionPct} berkat PLTS dan air daur ulang
+                  Scope 1 + Scope 2 dikurangi daur ulang air
                 </p>
               </div>
             </div>
@@ -364,7 +365,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 </div>
                 <InfoHint
                   title="Total Emisi yang Dihasilkan (Scope 1 & 2)"
-                  text="Total seluruh emisi yang timbul dari aktivitas operasional Alfamart sebelum ada pengurangan. Terdiri atas Scope 1: Emisi Langsung (solar genset cadangan & bensin armada dinas) dan Scope 2: Emisi Tidak Langsung (pemakaian listrik dari jaringan PLN)."
+                  text="Total emisi dari operasional Alfamart. Scope 1: emisi langsung (solar genset cadangan dan BBM kendaraan). Scope 2: emisi dari listrik yang dibeli dari PLN; karena listrik dari PLTS tidak dibeli, angka ini sudah lebih kecil berkat PLTS."
                 />
               </div>
 
@@ -392,7 +393,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                   </div>
                   <div>
                     <h3 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                      Emisi yang Ditekan
+                      Emisi yang Dihindari
                     </h3>
                     <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400">
                       Mitigasi Inisiatif Hijau
@@ -400,8 +401,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                   </div>
                 </div>
                 <InfoHint
-                  title="Emisi yang Berhasil Ditekan (Mitigasi)"
-                  text="Banyaknya emisi gas rumah kaca yang berhasil dicegah lepas ke atmosfer berkat pemanfaatan energi surya PLTS atap dan pengolahan daur ulang air limbah di Distribution Center Alfamart."
+                  title="Emisi yang Dihindari"
+                  text="Emisi yang dicegah oleh PLTS atap (listrik PLTS yang dipakai sendiri × 0,997 kgCO₂/kWh) dan daur ulang air. Hanya daur ulang air yang mengurangi emisi bersih; manfaat PLTS sudah tercermin di Scope 2 yang lebih kecil, jadi tidak dikurangkan dua kali."
                 />
               </div>
 
@@ -555,9 +556,9 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             <ChartPillLegend
               items={[
                 ...(chartMetricView === 'all' || chartMetricView === 'penambahan' ? [{ label: 'Emisi Dihasilkan (Scope 1+2)', color: CHART_PALETTE.emission }] : []),
-                ...(chartMetricView === 'all' || chartMetricView === 'pengurangan' ? [{ label: 'Emisi Ditekan (PLTS+Air)', color: CHART_PALETTE.savings }] : []),
+                ...(chartMetricView === 'all' || chartMetricView === 'pengurangan' ? [{ label: 'Emisi Dihindari (PLTS+Air)', color: CHART_PALETTE.savings }] : []),
                 ...(chartMetricView === 'all' || chartMetricView === 'net' ? [{ label: 'Emisi Bersih', color: CHART_PALETTE.net, type: 'line' }] : []),
-                ...(chartMetricView === 'all' || chartMetricView === 'net' ? [{ label: '% Emisi Berhasil Ditekan', color: CHART_PALETTE.target, type: 'line' }] : []),
+                ...(chartMetricView === 'all' || chartMetricView === 'net' ? [{ label: '% Emisi Dihindari', color: CHART_PALETTE.target, type: 'line' }] : []),
               ]}
             />
 
@@ -591,7 +592,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                   }`}
                 onClick={() => setChartMetricView('pengurangan')}
               >
-                Emisi Ditekan
+                Emisi Dihindari
               </button>
               <button
                 type="button"
@@ -615,7 +616,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
           </div>
           <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
           <div className="flex flex-col">
-            <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Rata-rata emisi ditekan</span>
+            <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Rata-rata emisi dihindari</span>
             <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">-{formatYAxisNumber(avgPengurangan)} <span className="text-xs font-sans font-medium">tCO₂e/bln</span></span>
           </div>
           <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
@@ -626,10 +627,10 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
           <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
           <div className="flex flex-col">
             <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1">
-              % Emisi Berhasil Ditekan
+              % Emisi Dihindari
               <InfoHint
-                title="% Emisi Berhasil Ditekan"
-                text="Persentase emisi dihasilkan (Scope 1 & 2) yang berhasil dipangkas oleh PLTS atap dan pengolahan air daur ulang. Semakin tinggi angkanya, semakin besar porsi emisi yang berhasil diatasi. Rumus: total emisi ditekan dibagi total emisi dihasilkan."
+                title="% Emisi Dihindari"
+                text="Emisi yang dihindari PLTS dan daur ulang air, dibandingkan dengan emisi yang dihasilkan. Hanya pembanding: angka ini tidak berarti emisi bersih turun sebesar itu, karena manfaat PLTS sudah ada di Scope 2."
                 size={12}
               />
             </span>
@@ -697,7 +698,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                           <div className="flex items-center justify-between gap-3 font-mono pt-1">
                             <span className="flex items-center gap-1.5 font-sans text-slate-600 dark:text-slate-400">
                               <span className="size-2 rounded-full bg-emerald-500 shrink-0" />
-                              Emisi Ditekan (Mitigasi):
+                              Emisi Dihindari:
                             </span>
                             <strong className="text-emerald-700 dark:text-emerald-300">-{formatYAxisNumber(data.penguranganTon)} tCO₂e</strong>
                           </div>
@@ -716,7 +717,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                           <div className="flex items-center justify-between gap-3 font-mono pt-1">
                             <span className="flex items-center gap-1.5 font-sans text-purple-700 dark:text-purple-300 font-semibold">
                               <span className="size-2 rounded-full bg-purple-500 shrink-0" />
-                              % Emisi Berhasil Ditekan:
+                              % Emisi Dihindari:
                             </span>
                             <strong className="text-purple-700 dark:text-purple-300">{data.offsetRatioPct}%</strong>
                           </div>
@@ -733,7 +734,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 <ReferenceLine yAxisId="left" y={avgPenambahan} stroke={CHART_PALETTE.emission} strokeDasharray="4 4" label={{ value: `Rata-rata dihasilkan: ${avgPenambahan}`, fill: CHART_PALETTE.emission, fontSize: 10, position: 'insideTopLeft' }} />
               )}
               {(chartMetricView === 'all' || chartMetricView === 'pengurangan') && (
-                <ReferenceLine yAxisId="left" y={avgPengurangan} stroke={CHART_PALETTE.savings} strokeDasharray="4 4" label={{ value: `Rata-rata ditekan: ${avgPengurangan}`, fill: CHART_PALETTE.savings, fontSize: 10, position: 'insideBottomLeft' }} />
+                <ReferenceLine yAxisId="left" y={avgPengurangan} stroke={CHART_PALETTE.savings} strokeDasharray="4 4" label={{ value: `Rata-rata dihindari: ${avgPengurangan}`, fill: CHART_PALETTE.savings, fontSize: 10, position: 'insideBottomLeft' }} />
               )}
 
               {(chartMetricView === 'all' || chartMetricView === 'penambahan') && (
@@ -744,7 +745,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 </Bar>
               )}
               {(chartMetricView === 'all' || chartMetricView === 'pengurangan') && (
-                <Bar yAxisId="left" dataKey="penguranganTon" name="Emisi Ditekan (PLTS+Air)" fill={CHART_PALETTE.savings} radius={[4, 4, 0, 0]} maxBarSize={36} animationDuration={800} animationEasing="ease-out">
+                <Bar yAxisId="left" dataKey="penguranganTon" name="Emisi Dihindari (PLTS+Air)" fill={CHART_PALETTE.savings} radius={[4, 4, 0, 0]} maxBarSize={36} animationDuration={800} animationEasing="ease-out">
                   {monthlyComparisonData.map((d, i) => (
                     <Cell key={`peng-cell-${i}`} opacity={d.month?.includes('*') ? PARTIAL_OPACITY : 1} />
                   ))}
@@ -754,7 +755,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 <Line yAxisId="left" type="monotone" dataKey="netTon" name="Emisi Bersih" stroke={CHART_PALETTE.net} strokeWidth={2.5} dot={{ r: 3.5, fill: CHART_PALETTE.net }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
               )}
               {(chartMetricView === 'all' || chartMetricView === 'net') && (
-                <Line yAxisId="right" type="monotone" dataKey="offsetRatioPct" name="% Emisi Berhasil Ditekan" stroke={CHART_PALETTE.target} strokeWidth={2} strokeDasharray="3 3" dot={{ r: 3, fill: CHART_PALETTE.target }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
+                <Line yAxisId="right" type="monotone" dataKey="offsetRatioPct" name="% Emisi Dihindari" stroke={CHART_PALETTE.target} strokeWidth={2} strokeDasharray="3 3" dot={{ r: 3, fill: CHART_PALETTE.target }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
               )}
             </ComposedChart>
           </ResponsiveContainer>
@@ -770,11 +771,16 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Scope 1 · BBM Kendaraan</th>
                 <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Scope 2 · Listrik PLN</th>
                 <th className="text-right px-4 py-3 font-semibold bg-red-950 text-red-100 whitespace-nowrap">Total Emisi Dihasilkan (tCO₂e)</th>
-                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Ditekan PLTS</th>
-                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Ditekan Daur Ulang Air</th>
-                <th className="text-right px-4 py-3 font-semibold bg-emerald-950 text-emerald-100 whitespace-nowrap">Total Emisi Ditekan (tCO₂e)</th>
-                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Emisi Bersih (tCO₂e)</th>
-                <th className="text-center px-4 py-3 font-semibold whitespace-nowrap">% Emisi Berhasil Ditekan</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Dihindari PLTS</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">Dihindari Daur Ulang Air</th>
+                <th className="text-right px-4 py-3 font-semibold bg-emerald-950 text-emerald-100 whitespace-nowrap">Total Emisi Dihindari (tCO₂e)</th>
+                <th className="text-right px-4 py-3 font-semibold whitespace-nowrap">
+                  <span className="inline-flex items-center justify-end gap-1">
+                    Emisi Bersih (tCO₂e)
+                    <InfoHint size={12} title="Emisi Bersih" text="Total emisi dihasilkan dikurangi daur ulang air. PLTS tidak dikurangkan lagi karena manfaatnya sudah ada di Scope 2." />
+                  </span>
+                </th>
+                <th className="text-center px-4 py-3 font-semibold whitespace-nowrap">% Emisi Dihindari</th>
               </tr>
             </thead>
             <tbody>
