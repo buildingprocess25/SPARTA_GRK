@@ -8,11 +8,21 @@ import {
   Phone, BadgeCheck, Eye, EyeOff, Menu, LogOut,
   AlertCircle, LoaderCircle, PanelLeftClose, PanelLeftOpen,
   Wrench, Server, Users, RefreshCw, Cpu, Database, Check,
-  UserPlus, Trash2
+  UserPlus, Trash2, Search, Sparkles, Building
 } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandSeparator,
+  CommandShortcut,
+} from '@/components/ui/command';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -41,6 +51,18 @@ export default function Header({
   const [showNewPass, setShowNewPass] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [commandOpen, setCommandOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        setCommandOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -306,6 +328,18 @@ export default function Header({
               Sustainability ESG
             </span>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setCommandOpen(true)}
+            className="hidden lg:inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700 hover:text-slate-700 dark:hover:text-slate-200 transition-colors ml-2"
+          >
+            <Search size={13} className="text-slate-400" />
+            <span>Cari DC / Navigasi...</span>
+            <kbd className="rounded bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] font-mono text-slate-500 font-bold">
+              Ctrl K
+            </kbd>
+          </button>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -1087,6 +1121,121 @@ export default function Header({
           </div>
         </div>
       )}
+
+      {/* Shadcn Command Palette (Ctrl+K) */}
+      <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>
+        <CommandInput placeholder="Cari Distribution Center (DC), tab navigasi, atau perintah..." />
+        <CommandList>
+          <CommandEmpty>Tidak ada hasil yang cocok.</CommandEmpty>
+
+          <CommandGroup heading="Navigasi Tab Cepat">
+            <CommandItem
+              onSelect={() => {
+                setCommandOpen(false);
+                router.push('/?tab=resume');
+              }}
+            >
+              <Sparkles className="mr-2 size-4 text-blue-500" />
+              <span>Ringkasan Emisi (Dashboard Utama)</span>
+              <CommandShortcut>G R</CommandShortcut>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setCommandOpen(false);
+                router.push('/?tab=penambah&scope=scope1');
+              }}
+            >
+              <Building className="mr-2 size-4 text-rose-500" />
+              <span>Scope 1: Emisi Langsung (Genset & Kendaraan)</span>
+              <CommandShortcut>G 1</CommandShortcut>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setCommandOpen(false);
+                router.push('/?tab=penambah&scope=scope2');
+              }}
+            >
+              <Building className="mr-2 size-4 text-amber-500" />
+              <span>Scope 2: Emisi Listrik PLN</span>
+              <CommandShortcut>G 2</CommandShortcut>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setCommandOpen(false);
+                router.push('/?tab=pengurang&tech=plts');
+              }}
+            >
+              <Sparkles className="mr-2 size-4 text-amber-500" />
+              <span>Pengurangan Emisi: PLTS Atap</span>
+              <CommandShortcut>G P</CommandShortcut>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setCommandOpen(false);
+                router.push('/?tab=pengurang&tech=water');
+              }}
+            >
+              <Sparkles className="mr-2 size-4 text-cyan-500" />
+              <span>Pengurangan Emisi: Air Daur Ulang</span>
+              <CommandShortcut>G W</CommandShortcut>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                setCommandOpen(false);
+                router.push('/?tab=history');
+              }}
+            >
+              <Sparkles className="mr-2 size-4 text-slate-400" />
+              <span>Riwayat Audit & Sinkronisasi</span>
+              <CommandShortcut>G H</CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          <CommandGroup heading="Distribution Center (DC)">
+            {['DC-BDG1', 'DC-SMG', 'DC-SDA', 'DC-KRW', 'DC-PRG', 'DC-BGR', 'DC-CLS', 'DC-BLR', 'DC-TGL', 'DC-CKR', 'HO-01'].map((dc) => (
+              <CommandItem
+                key={dc}
+                onSelect={() => {
+                  setCommandOpen(false);
+                  router.push(`/?tab=penambah&scope=scope1&search=${encodeURIComponent(dc)}`);
+                }}
+              >
+                <Building className="mr-2 size-4 text-slate-400" />
+                <span>{dc}</span>
+                <span className="text-[10px] text-slate-400 ml-auto">Distribution Center</span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          <CommandGroup heading="Akun & Sistem">
+            <CommandItem
+              onSelect={() => {
+                setCommandOpen(false);
+                setIsProfileOpen(true);
+              }}
+            >
+              <User className="mr-2 size-4 text-blue-500" />
+              <span>Buka Profil & Pengaturan Akun</span>
+            </CommandItem>
+            {isSuperAdmin && (
+              <CommandItem
+                onSelect={() => {
+                  setCommandOpen(false);
+                  setIsProfileOpen(true);
+                  setProfileTab('users');
+                }}
+              >
+                <Users className="mr-2 size-4 text-purple-500" />
+                <span>Manajemen Pengguna & Hak Akses</span>
+              </CommandItem>
+            )}
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
 
       {/* Fullscreen Logout Waiting Animation */}
       {loggingOut && (

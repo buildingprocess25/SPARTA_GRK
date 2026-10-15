@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { Activity, BarChart3, CloudSun, Gauge, PlugZap } from 'lucide-react';
 import CardBox from '@/components/ui/CardBox';
 import InfoHint from '@/components/ui/InfoHint';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TabContentSkeleton } from '@/components/plts/PLTSDashboardSkeletons';
 import { prefetchPltsEndpoint } from '@/hooks/usePltsData';
 
@@ -52,25 +53,22 @@ export default function PLTSPerformanceAnalysis({ filters, onPlantSelect }) {
           <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Analisis kinerja PLTS</h3>
           <InfoHint title="Analisis kinerja PLTS" text="Pilih tab untuk melihat produksi dibanding target, seberapa baik panel bekerja, pengaruh cuaca, dan berapa bagian kebutuhan listrik DC yang dipenuhi PLTS." />
         </div>
-        <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-slate-100 dark:bg-slate-800 p-1 [scrollbar-width:none]">
-          {TABS.map(([key, label, Icon, endpoint]) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setTab(key)}
-              onMouseEnter={() => handlePrefetch(endpoint)}
-              onFocus={() => handlePrefetch(endpoint)}
-              className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-[11px] font-bold transition-all ${
-                tab === key
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-              }`}
-            >
-              <Icon size={13} aria-hidden="true" />
-              {label}
-            </button>
-          ))}
-        </div>
+        <Tabs value={tab} onValueChange={setTab} className="gap-0">
+          <TabsList className="h-auto p-1 bg-slate-100 dark:bg-slate-800 rounded-xl max-w-full overflow-x-auto [scrollbar-width:none]">
+            {TABS.map(([key, label, Icon, endpoint]) => (
+              <TabsTrigger
+                key={key}
+                value={key}
+                onMouseEnter={() => handlePrefetch(endpoint)}
+                onFocus={() => handlePrefetch(endpoint)}
+                className="gap-1.5 px-3 py-2 text-[11px] font-bold h-auto rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-slate-900 dark:data-[state=active]:text-slate-100 data-[state=active]:shadow-sm"
+              >
+                <Icon size={13} aria-hidden="true" />
+                <span>{label}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* When no tab is active, show clean prompt */}
