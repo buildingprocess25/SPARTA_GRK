@@ -120,7 +120,7 @@ export default function TabLoadVsPlts({ filters }) {
           </div>
 
           <div className="h-[260px] w-full overflow-x-auto">
-            <ResponsiveContainer width="100%" height="100%" minWidth={loadViewMode === 'by-branch' && branchLoadLimit === 39 ? 900 : undefined}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={loadViewMode === 'by-branch' && branchLoadLimit >= 37 ? 900 : undefined}>
               {loadViewMode === 'monthly' ? (
                 <BarChart data={chartRows} margin={{ left: 0, right: 8, top: 12, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />

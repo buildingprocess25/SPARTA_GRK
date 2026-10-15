@@ -87,7 +87,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
     const avgPr = validMonths.reduce((s, m) => s + m.prPercent, 0) / validMonths.length;
     const avgPrCorr = validMonths.reduce((s, m) => s + (m.prCorrectedPercent || m.prPercent), 0) / validMonths.length;
     const avgParam = validMonths.reduce((s, m) => s + (m.paramValue || 0), 0) / validMonths.length;
-    const totalPlants = validMonths[0]?.totalPlantCount || 39;
+    const totalPlants = validMonths[0]?.totalPlantCount || 37;
     const avgPlants = Math.round(validMonths.reduce((s, m) => s + m.includedPlantCount, 0) / validMonths.length);
 
     return {

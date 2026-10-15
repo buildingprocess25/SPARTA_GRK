@@ -8,6 +8,7 @@ import {
 import CardBox from '@/components/ui/CardBox';
 import InfoHint from '@/components/ui/InfoHint';
 import { CONVERSION_CONFIG } from '@/lib/solar/conversionConfig';
+import { isDcLocation } from '@/lib/solar/plantMap';
 
 const MONTH_NAMES = [
   'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
@@ -39,9 +40,9 @@ export default function PLTSMonthlyMatrixTable({
   const unitMultiplier = unit === 'MWh' ? 0.001 : 1;
   const unitDecimals = unit === 'MWh' ? 2 : 0;
 
-  // Extract master plants from dashboardData
+  // Extract master plants from dashboardData (filter out non-DC drive-thru)
   const plantList = useMemo(() => {
-    return dashboardData?.plants || [];
+    return (dashboardData?.plants || []).filter(isDcLocation);
   }, [dashboardData]);
 
   // Current Plant Capacity & Data
@@ -304,7 +305,7 @@ export default function PLTSMonthlyMatrixTable({
     ];
 
     const csvContent = [
-      `Rekapitulasi Kinerja Bulanan & Indikator Lingkungan PLTS 2026 (${selectedPlant === 'ALL' ? 'Nasional 39 DC' : selectedPlantData?.canonicalName})`,
+      `Rekapitulasi Kinerja Bulanan & Indikator Lingkungan PLTS 2026 (${selectedPlant === 'ALL' ? 'Nasional 37 DC' : selectedPlantData?.canonicalName})`,
       `Tanggal Unduh: ${new Date().toLocaleString('id-ID')}`,
       '',
       headers.map(h => `"${h}"`).join(','),

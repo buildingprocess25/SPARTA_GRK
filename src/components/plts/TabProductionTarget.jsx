@@ -88,7 +88,7 @@ export default function TabProductionTarget({ filters }) {
         : (row.previousPlantCount ?? yoyMonth?.previousPlantCount ?? (val2025Raw != null ? 37 : 0));
       const plantCount2026 = isLikeForLike
         ? (row.lflPlantCount ?? yoyMonth?.lflPlantCount ?? 0)
-        : (row.currentPlantCount ?? yoyMonth?.currentPlantCount ?? (val2026Raw != null ? 39 : 0));
+        : (row.currentPlantCount ?? yoyMonth?.currentPlantCount ?? (val2026Raw != null ? 37 : 0));
 
       const val2025 = val2025Raw != null ? Number((val2025Raw * unitMultiplier).toFixed(unitDecimals)) : null;
       const val2026 = val2026Raw != null ? Number((val2026Raw * unitMultiplier).toFixed(unitDecimals)) : null;

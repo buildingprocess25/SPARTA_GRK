@@ -109,14 +109,14 @@ const API_MONTHS = getYearToDateMonths().map(({ yearMonth, label }, index, all) 
   };
 });
 
-export function getPlantColor(idx, total = 39) {
+export function getPlantColor(idx, total = 37) {
   const hue = Math.round((idx * 137.508) % 360);
   const sat = 68;
   const light = 48 + (idx % 3) * 4;
   return `hsl(${hue}, ${sat}%, ${light}%)`;
 }
 
-const PALETTE = Array.from({ length: 39 }, (_, i) => getPlantColor(i, 39));
+const PALETTE = Array.from({ length: 37 }, (_, i) => getPlantColor(i, 37));
 
 function SafePrBarTooltip({ active, payload }) {
   if (active && payload && payload.length) {

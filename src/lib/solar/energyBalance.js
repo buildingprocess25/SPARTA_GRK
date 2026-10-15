@@ -106,7 +106,7 @@ export function computeEnergyBalance(rows = [], options = {}) {
   const totalSelfConsumptionMwh = Number((totalSelfConsumptionKwh / 1000).toFixed(2));
 
   // Coverage statistics
-  const totalPlantCount = allPlantIds.size || 39;
+  const totalPlantCount = allPlantIds.size || 37;
   const validPlantCount = validPlantIds.size;
   const plantCoveragePct = totalPlantCount > 0
     ? Number(((validPlantCount / totalPlantCount) * 100).toFixed(1))

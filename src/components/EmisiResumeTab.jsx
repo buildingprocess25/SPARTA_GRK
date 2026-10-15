@@ -6,7 +6,7 @@ import {
   FileCheck2, TrendingDown, TrendingUp, CheckCircle2,
   ExternalLink, AlertCircle, ChevronDown, ChevronUp,
   Award, BarChart3, Activity, Scale, Percent, ArrowDownRight, Layers,
-  Calculator, X, FileDown, RefreshCw
+  Calculator, X, FileDown, RefreshCw, Calendar, FileSpreadsheet, Table
 } from 'lucide-react';
 import {
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis,
@@ -30,7 +30,11 @@ import InfoHint from '@/components/ui/InfoHint';
 import MainScope2Bridge from '@/components/scope2/MainScope2Bridge';
 import MainScope1Bridge from '@/components/scope1/MainScope1Bridge';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
-import { fetchAnnualReportData } from '@/lib/reports/reportDataService.js';
+import {
+  fetchAnnualReportData,
+  getAvailableReportPeriods,
+  exportCsvReport,
+} from '@/lib/reports/reportDataService.js';
 import { exportSrnPpiReport } from '@/lib/reports/srnPpiReport.js';
 import { exportOjkReport } from '@/lib/reports/ojkReport.js';
 
@@ -66,7 +70,13 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
   const calculatorRef = useRef(null);
   const [isExportingSrnPpi, setIsExportingSrnPpi] = useState(false);
   const [isExportingOjk, setIsExportingOjk] = useState(false);
+  const [isExportingCsv, setIsExportingCsv] = useState(false);
   const [exportError, setExportError] = useState(null);
+
+  const availableReportPeriods = useMemo(() => getAvailableReportPeriods(), []);
+  const [selectedReportPeriod, setSelectedReportPeriod] = useState(
+    availableReportPeriods[0]?.value || '2026-01_2026-09'
+  );
 
   // Real top-level KPIs (Net/Gross/Offset/Cost Saving), sourced from the same
   // real APIs the report export and the Scope 1/2 bridge panels already use,
@@ -169,7 +179,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
     setIsExportingSrnPpi(true);
     setExportError(null);
     try {
-      const reportData = await fetchAnnualReportData();
+      const reportData = await fetchAnnualReportData({ period: selectedReportPeriod });
       await exportSrnPpiReport(reportData);
     } catch (err) {
       setExportError(`Gagal membuat laporan SRN-PPI: ${err.message}`);
@@ -182,12 +192,25 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
     setIsExportingOjk(true);
     setExportError(null);
     try {
-      const reportData = await fetchAnnualReportData();
+      const reportData = await fetchAnnualReportData({ period: selectedReportPeriod });
       await exportOjkReport(reportData);
     } catch (err) {
       setExportError(`Gagal membuat Sustainability Report: ${err.message}`);
     } finally {
       setIsExportingOjk(false);
+    }
+  };
+
+  const handleExportCsv = async () => {
+    setIsExportingCsv(true);
+    setExportError(null);
+    try {
+      const reportData = await fetchAnnualReportData({ period: selectedReportPeriod });
+      exportCsvReport(reportData);
+    } catch (err) {
+      setExportError(`Gagal mengekspor data CSV: ${err.message}`);
+    } finally {
+      setIsExportingCsv(false);
     }
   };
 
@@ -832,51 +855,178 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
 
       {/* Export Laporan Resmi (SRN-PPI & OJK Sustainability Report) */}
       <CardBox className="space-y-4">
-        <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-          <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-            <FileCheck2 size={20} />
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <FileSpreadsheet size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Unduh laporan resmi</h3>
+                <InfoHint
+                  title="Unduh laporan resmi"
+                  text="Format terstandardisasi siap pakai untuk pelaporan SRN-PPI Kementerian LHK dan Sustainability Report POJK 51/2017."
+                />
+              </div>
+            </div>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Unduh laporan</h3>
-              <InfoHint title="Unduh laporan" text="Angka diambil langsung dari dashboard. Bagian tulisan seperti strategi dan tata kelola tetap perlu dilengkapi sendiri sebelum laporan dikirim." />
+
+          <div className="flex items-center gap-2 self-start md:self-center shrink-0 bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5">
+            <Calendar size={15} className="text-slate-400 dark:text-slate-500 shrink-0" />
+            <label htmlFor="report-period-select" className="text-xs font-medium text-slate-600 dark:text-slate-300">
+              Periode:
+            </label>
+            <select
+              id="report-period-select"
+              aria-label="Pilih periode data laporan"
+              value={selectedReportPeriod}
+              onChange={(e) => setSelectedReportPeriod(e.target.value)}
+              className="text-xs font-semibold rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 py-1 px-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/40 cursor-pointer"
+            >
+              <optgroup label="Akumulasi & Kuartal">
+                {availableReportPeriods.filter(p => p.type === 'ytd' || p.type === 'quarter').map(p => (
+                  <option key={p.value} value={p.value}>{p.label}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Bulan Tertentu">
+                {availableReportPeriods.filter(p => p.type === 'month').map(p => (
+                  <option key={p.value} value={p.value}>{p.label}</option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        {/* Pilihan Template Laporan Utama */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Card 1: SRN-PPI KLHK */}
+          <div className="flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/90 p-5 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-sm transition-all">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold tracking-wide uppercase px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-500/30">
+                  Permen LHK No. 21/2022
+                </span>
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                  .xlsx • 9 Sheet
+                </span>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                  SRN-PPI (Kementerian LHK)
+                </h4>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Laporan inventarisasi Gas Rumah Kaca nasional format resmi. Mencakup data transaksi genset, konsumsi BBM armada, pemakaian listrik 37 DC, mitigasi penurunan emisi, dan rujukan faktor emisi resmi.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+              <div className="text-[11px] text-slate-400 dark:text-slate-500">
+                Data terformat & tabel kalkulasi
+              </div>
+              <button
+                type="button"
+                disabled={isExportingSrnPpi}
+                onClick={handleExportSrnPpi}
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-4 py-2 text-xs font-semibold shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isExportingSrnPpi ? (
+                  <>
+                    <RefreshCw size={14} className="animate-spin" />
+                    <span>Menyiapkan Excel...</span>
+                  </>
+                ) : (
+                  <>
+                    <FileDown size={14} />
+                    <span>Unduh SRN-PPI (.xlsx)</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Card 2: Sustainability Report OJK */}
+          <div className="flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/90 p-5 hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:shadow-sm transition-all">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold tracking-wide uppercase px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-500/30">
+                  POJK 51/POJK.03/2017
+                </span>
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                  .xlsx • 5 Sheet
+                </span>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                  Sustainability Report (OJK)
+                </h4>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                  Laporan Keberlanjutan standar Otoritas Jasa Keuangan Lampiran II Kategori Lingkungan. Mencakup 20 indikator kinerja, efisiensi energi terbarukan 37 DC, konservasi air, dan efisiensi biaya.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+              <div className="text-[11px] text-slate-400 dark:text-slate-500">
+                Pilar Lingkungan (Poin F.1 - F.11)
+              </div>
+              <button
+                type="button"
+                disabled={isExportingOjk}
+                onClick={handleExportOjk}
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-4 py-2 text-xs font-semibold shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isExportingOjk ? (
+                  <>
+                    <RefreshCw size={14} className="animate-spin" />
+                    <span>Menyiapkan Excel...</span>
+                  </>
+                ) : (
+                  <>
+                    <FileDown size={14} />
+                    <span>Unduh OJK Report (.xlsx)</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+        {/* Fitur Tambahan: Quick Export CSV Tabular */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30 p-3.5">
+          <div className="flex items-center gap-3">
+            <div className="size-8 rounded-lg bg-slate-200/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0">
+              <Table size={16} />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                Ekspor Tabulasi Ringkasan Emisi (.csv)
+              </div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                Untuk pengolahan data mentah, BI dashboard internal, atau audit tim analitik.
+              </div>
+            </div>
+          </div>
           <button
             type="button"
-            disabled={isExportingSrnPpi}
-            onClick={handleExportSrnPpi}
-            className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 text-left hover:border-blue-300 dark:hover:border-blue-500/50 hover:bg-blue-50/30 dark:hover:bg-blue-500/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isExportingCsv}
+            onClick={handleExportCsv}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
           >
-            <div>
-              <div className="text-sm font-bold text-slate-900 dark:text-slate-100">SRN-PPI (Kementerian LHK)</div>
-              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Data BBM dan listrik, faktor emisi, emisi per bulan</div>
-            </div>
-            {isExportingSrnPpi ? (
-              <RefreshCw size={18} className="text-blue-500 animate-spin shrink-0" />
+            {isExportingCsv ? (
+              <>
+                <RefreshCw size={13} className="animate-spin" />
+                <span>Mengekspor...</span>
+              </>
             ) : (
-              <FileDown size={18} className="text-blue-500 shrink-0" />
-            )}
-          </button>
-          <button
-            type="button"
-            disabled={isExportingOjk}
-            onClick={handleExportOjk}
-            className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 text-left hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:bg-emerald-50/30 dark:hover:bg-emerald-500/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <div>
-              <div className="text-sm font-bold text-slate-900 dark:text-slate-100">Sustainability Report (OJK)</div>
-              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Ringkasan kinerja lingkungan (POJK 51/2017)</div>
-            </div>
-            {isExportingOjk ? (
-              <RefreshCw size={18} className="text-emerald-500 animate-spin shrink-0" />
-            ) : (
-              <FileDown size={18} className="text-emerald-500 shrink-0" />
+              <>
+                <FileDown size={13} />
+                <span>Unduh CSV</span>
+              </>
             )}
           </button>
         </div>
+
         {exportError && (
           <div className="flex items-center gap-2 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-4 py-3 text-xs font-semibold text-rose-800 dark:text-rose-300">
             <AlertCircle size={16} className="shrink-0" />
