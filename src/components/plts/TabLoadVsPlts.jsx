@@ -6,6 +6,7 @@ import { PlugZap } from 'lucide-react';
 import { usePltsEndpoint } from '@/hooks/usePltsData';
 import { TabContentSkeleton } from './PLTSDashboardSkeletons';
 import InfoHint from '@/components/ui/InfoHint';
+import { CustomSelect } from '@/components/ui/select';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -88,16 +89,18 @@ export default function TabLoadVsPlts({ filters }) {
         {loadViewMode === 'by-branch' && (
           <div className="flex items-center gap-2 text-xs">
             <span className="text-slate-600 dark:text-slate-400 font-semibold">Tampilkan:</span>
-            <select
-              aria-label="Jumlah DC yang ditampilkan"
-              value={branchLoadLimit}
-              onChange={(e) => setBranchLoadLimit(Number(e.target.value))}
-              className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1 font-bold text-slate-800 dark:text-slate-200 shadow-2xs"
-            >
-              <option value={10}>10 DC terbesar</option>
-              <option value={20}>20 DC terbesar</option>
-              <option value={1000}>Semua DC</option>
-            </select>
+            <div className="w-36">
+              <CustomSelect
+                ariaLabel="Jumlah DC yang ditampilkan"
+                value={branchLoadLimit}
+                onValueChange={(val) => setBranchLoadLimit(Number(val))}
+                options={[
+                  { value: 10, label: '10 DC terbesar' },
+                  { value: 20, label: '20 DC terbesar' },
+                  { value: 1000, label: 'Semua DC' },
+                ]}
+              />
+            </div>
           </div>
         )}
       </div>

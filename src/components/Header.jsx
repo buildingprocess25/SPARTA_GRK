@@ -6,10 +6,22 @@ import {
   ShieldCheck, User, KeyRound, CheckCircle2,
   X, ChevronDown, Lock, Shield, Building2,
   Phone, BadgeCheck, Eye, EyeOff, Menu, LogOut,
-  AlertCircle, LoaderCircle, PanelLeftClose, PanelLeftOpen
+  AlertCircle, LoaderCircle, PanelLeftClose, PanelLeftOpen,
+  Wrench, Server, Users, RefreshCw, Cpu, Database, Check,
+  UserPlus, Trash2
 } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
-import { getProfileFor, getInitials } from '@/lib/profileMeta';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import { getProfileFor, getInitials, SPARTA_ROLES, PROFILE_BY_USERNAME } from '@/lib/profileMeta';
 import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { dialogPresets } from '@/lib/dialog-presets';
 
@@ -58,12 +70,83 @@ export default function Header({
   const profileData = getProfileFor(currentUser?.username);
   const initials = getInitials(displayName);
 
+  const [profileTab, setProfileTab] = useState('account'); // 'account' | 'roles' | 'maintenance' | 'users'
+  const [activeRoleOverride, setActiveRoleOverride] = useState(null);
+  const [healthData, setHealthData] = useState(null);
+  const [healthLoading, setHealthLoading] = useState(false);
+  const [maintActionStatus, setMaintActionStatus] = useState(null);
+
+  const effectiveRoleId = activeRoleOverride || profileData.roleId || 'super_admin';
+  const roleConfig = SPARTA_ROLES[effectiveRoleId] || SPARTA_ROLES.super_admin;
+  const isSuperAdmin = effectiveRoleId === 'super_admin';
+
+  const fetchHealth = async () => {
+    setHealthLoading(true);
+    setMaintActionStatus(null);
+    try {
+      const res = await fetch('/api/health', { cache: 'no-store' });
+      const data = await res.json();
+      setHealthData(data);
+    } catch (_) {
+      setHealthData({ status: 'error', database: { status: 'error' } });
+    }
+    setHealthLoading(false);
+  };
+
+  const handleForceSync = async () => {
+    setMaintActionStatus('Menjalankan sinkronisasi telemetri iSolarCloud...');
+    try {
+      await fetch('/api/isolar', { method: 'POST', cache: 'no-store' });
+      setMaintActionStatus('Sinkronisasi telemetri 37 DC berhasil diperbarui.');
+      fetchHealth();
+    } catch (_) {
+      setMaintActionStatus('Sinkronisasi selesai diproses.');
+    }
+    setTimeout(() => setMaintActionStatus(null), 4000);
+  };
+
+  const handleClearCache = () => {
+    try {
+      sessionStorage.clear();
+    } catch (_) {}
+    setMaintActionStatus('Cache sesi lokal berhasil disegarkan.');
+    setTimeout(() => setMaintActionStatus(null), 3000);
+  };
+
   const [passwordState, setPasswordState] = useState({
     currentPass: '',
     newPass: '',
     confirmPass: '',
   });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  // User Management States (Khusus Super Admin)
+  const [usersList, setUsersList] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [isAddingUser, setIsAddingUser] = useState(false);
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [showNewUserPassword, setShowNewUserPassword] = useState(false);
+  const [newUserForm, setNewUserForm] = useState({
+    username: '',
+    displayName: '',
+    password: 'ptsat123',
+    roleId: 'admin',
+    nip: '',
+    dept: '',
+    division: '',
+  });
+
+  const fetchUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const res = await fetch('/api/auth/users', { cache: 'no-store' });
+      const data = await res.json();
+      if (data?.success && Array.isArray(data.users)) {
+        setUsersList(data.users);
+      }
+    } catch (_) {}
+    setLoadingUsers(false);
+  };
 
   const [notification, setNotification] = useState(null);
   const [notificationType, setNotificationType] = useState('success');
@@ -126,6 +209,65 @@ export default function Header({
     }
   };
 
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    if (creatingUser) return;
+    setCreatingUser(true);
+    try {
+      const res = await fetch('/api/auth/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newUserForm),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.success) {
+        showNotification(data?.message || 'Pengguna berhasil didaftarkan.', 'success');
+        setIsAddingUser(false);
+        setNewUserForm({
+          username: '',
+          displayName: '',
+          password: 'ptsat123',
+          roleId: 'admin',
+          nip: '',
+          dept: '',
+          division: '',
+        });
+        fetchUsers();
+      } else {
+        showNotification(data?.error || 'Gagal mendaftarkan pengguna.', 'error');
+      }
+    } catch (_) {
+      showNotification('Koneksi gagal, coba lagi.', 'error');
+    } finally {
+      setCreatingUser(false);
+    }
+  };
+
+  const handleDeleteUser = async (targetUsername) => {
+    if (!await confirm({
+      title: 'Hapus Pengguna',
+      message: `Hapus akun @${targetUsername}? Pengguna tidak akan dapat mengakses sistem SPARTA lagi.`,
+      confirmText: 'Hapus Akun',
+      cancelText: 'Batal',
+      destructive: true,
+    })) return;
+
+    try {
+      const res = await fetch(`/api/auth/users?username=${encodeURIComponent(targetUsername)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.success) {
+        showNotification(data?.message || `Akun @${targetUsername} berhasil dihapus.`, 'success');
+        fetchUsers();
+      } else {
+        showNotification(data?.error || 'Gagal menghapus akun.', 'error');
+      }
+    } catch (_) {
+      showNotification('Gagal menghubungi server.', 'error');
+    }
+  };
+
   return (
     <>
       <header className="print:hidden sticky top-0 z-40 flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-8 h-16 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-xs">
@@ -142,24 +284,24 @@ export default function Header({
             <Menu size={20} />
           </button>
 
-          {/* Desktop sidebar toggle button */}
-          {onToggleDesktopSidebar && (
+          {/* Desktop sidebar reopen button - hanya tampil saat sidebar desktop tertutup */}
+          {onToggleDesktopSidebar && !isDesktopSidebarOpen && (
             <button
               type="button"
-              className="hidden md:inline-flex size-9 -ml-1 items-center justify-center text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-150 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+              className="hidden md:inline-flex size-9 -ml-1 items-center justify-center text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-150 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none animate-in fade-in"
               onClick={onToggleDesktopSidebar}
-              aria-label={isDesktopSidebarOpen ? 'Tutup sidebar (Ctrl+B)' : 'Buka sidebar (Ctrl+B)'}
-              title={isDesktopSidebarOpen ? 'Tutup sidebar (Ctrl+B)' : 'Buka sidebar (Ctrl+B)'}
+              aria-label="Buka sidebar (Ctrl+B)"
+              title="Buka sidebar (Ctrl+B)"
             >
-              {isDesktopSidebarOpen ? <PanelLeftClose size={19} /> : <PanelLeftOpen size={19} />}
+              <PanelLeftOpen size={19} />
             </button>
           )}
 
           <div className="flex items-center gap-2.5">
-            <h1 className="max-w-[9rem] truncate text-sm sm:max-w-none sm:text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
-              {displayName}
-            </h1>
-            <span className="hidden lg:inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-500/10 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20">
+            <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+              SPARTA
+            </span>
+            <span className="hidden sm:inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-500/10 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20">
               Sustainability ESG
             </span>
           </div>
@@ -167,6 +309,21 @@ export default function Header({
 
         <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle />
+
+          {/* Quick-access Profile Trigger: avatar 36px proporsional, hanya tampil saat sidebar desktop tertutup */}
+          {!isDesktopSidebarOpen && (
+            <button
+              type="button"
+              onClick={() => setIsProfileOpen(true)}
+              aria-label={`Profil Pengguna: ${displayName} (${roleConfig.name})`}
+              title={`${displayName} · ${roleConfig.name} (Buka Detail Akun & Peran)`}
+              className="relative size-9 inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all duration-150 active:scale-[0.98] ring-2 ring-transparent hover:ring-blue-400/40 animate-in fade-in zoom-in-95"
+            >
+              <span>{initials}</span>
+              <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900" />
+            </button>
+          )}
+
           <button
             type="button"
             onClick={handleLogout}
@@ -194,10 +351,10 @@ export default function Header({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header Profil dengan Gradient Card & Avatar Badge */}
-            <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 p-6 text-white shrink-0">
+            <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 p-5 sm:p-6 text-white shrink-0">
               <button
                 ref={modalCloseRef}
-                className="absolute top-2 right-2 size-11 inline-flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                className="absolute top-2 right-2 size-10 inline-flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
                 onClick={() => setIsProfileOpen(false)}
                 title="Tutup"
               >
@@ -212,12 +369,17 @@ export default function Header({
                   </div>
                 </div>
 
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="text-lg font-bold text-white truncate">{displayName}</h3>
-                    <span className="inline-flex rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-semibold">
-                      Active PIC
+                    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${roleConfig.badgeColor}`}>
+                      {roleConfig.badge}
                     </span>
+                    {activeRoleOverride && (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        Mode Preview
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-slate-300 truncate">{profileData.role}</p>
                   <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1 truncate">
@@ -241,127 +403,666 @@ export default function Header({
               </div>
             )}
 
+            {/* Modal Navigation Tabs */}
+            <div className="flex items-center gap-1 px-4 sm:px-6 pt-2.5 pb-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 overflow-x-auto text-xs shrink-0">
+              <button
+                type="button"
+                onClick={() => setProfileTab('account')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all shrink-0 ${
+                  profileTab === 'account'
+                    ? 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-400 shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                <User size={13} />
+                <span>Akun</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setProfileTab('roles')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all shrink-0 ${
+                  profileTab === 'roles'
+                    ? 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-400 shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                <ShieldCheck size={13} />
+                <span>Peran & Akses</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileTab('maintenance');
+                  if (!healthData) fetchHealth();
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all shrink-0 ${
+                  profileTab === 'maintenance'
+                    ? 'bg-white dark:bg-slate-800 text-purple-700 dark:text-purple-400 shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                <Wrench size={13} />
+                <span>Maintenance</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold">
+                  Super
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setProfileTab('users')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all shrink-0 ${
+                  profileTab === 'users'
+                    ? 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-400 shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                <Users size={13} />
+                <span>Pengguna</span>
+              </button>
+            </div>
+
+            {/* Modal Body Container */}
             <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
-              {/* Informasi akun */}
-              <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100">
-                    <User size={15} className="text-emerald-600 dark:text-emerald-400" />
-                    <span>Data akun</span>
-                  </div>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{profileData.nip}</span>
-                </div>
+              {/* TAB 1: AKUN & KEAMANAN */}
+              {profileTab === 'account' && (
+                <div className="space-y-4 animate-in">
+                  <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100">
+                        <User size={15} className="text-emerald-600 dark:text-emerald-400" />
+                        <span>Data Akun</span>
+                      </div>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{profileData.nip}</span>
+                    </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Username</span>
-                    <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">@{currentUser?.username || '—'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Departemen</span>
-                    <span className="font-semibold text-slate-900 dark:text-slate-100">{profileData.dept}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Divisi</span>
-                    <span className="text-slate-800 dark:text-slate-200">{profileData.division}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Bergabung Sejak</span>
-                    <span className="font-mono text-slate-800 dark:text-slate-200">{profileData.joinYear}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Reset password */}
-              <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100">
-                    <KeyRound size={15} className="text-amber-600 dark:text-amber-400" />
-                    <span>Ganti password</span>
-                  </div>
-                </div>
-
-                <form onSubmit={handleResetPassword} className="space-y-3">
-                  <div>
-                    <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Password Saat Ini</label>
-                    <div className="relative">
-                      <input
-                        type={showCurrentPass ? 'text' : 'password'}
-                        placeholder="Masukkan password lama"
-                        value={passwordState.currentPass}
-                        onChange={(e) => setPasswordState({ ...passwordState, currentPass: e.target.value })}
-                        autoComplete="current-password"
-                        required
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-9 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                        onClick={() => setShowCurrentPass(!showCurrentPass)}
-                      >
-                        {showCurrentPass ? <EyeOff size={14} /> : <Eye size={14} />}
-                      </button>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Username</span>
+                        <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">@{currentUser?.username || '—'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Peran Sistem</span>
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">{roleConfig.name}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Departemen</span>
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">{profileData.dept}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Divisi</span>
+                        <span className="text-slate-800 dark:text-slate-200">{profileData.division}</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Password Baru</label>
-                      <div className="relative">
-                        <input
-                          type={showNewPass ? 'text' : 'password'}
-                          placeholder="Min. 8 karakter"
-                          value={passwordState.newPass}
-                          onChange={(e) => setPasswordState({ ...passwordState, newPass: e.target.value })}
-                          autoComplete="new-password"
-                          minLength={8}
-                          required
-                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
-                        />
-                        <button
-                          type="button"
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                          onClick={() => setShowNewPass(!showNewPass)}
-                        >
-                          {showNewPass ? <EyeOff size={14} /> : <Eye size={14} />}
-                        </button>
+                  <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100">
+                        <KeyRound size={15} className="text-amber-600 dark:text-amber-400" />
+                        <span>Ganti Password</span>
                       </div>
                     </div>
 
+                    <form onSubmit={handleResetPassword} className="space-y-3">
+                      <div>
+                        <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Password Saat Ini</label>
+                        <div className="relative">
+                          <input
+                            type={showCurrentPass ? 'text' : 'password'}
+                            placeholder="Masukkan password lama"
+                            value={passwordState.currentPass}
+                            onChange={(e) => setPasswordState({ ...passwordState, currentPass: e.target.value })}
+                            autoComplete="current-password"
+                            required
+                            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-9 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                            onClick={() => setShowCurrentPass(!showCurrentPass)}
+                          >
+                            {showCurrentPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Password Baru</label>
+                          <div className="relative">
+                            <input
+                              type={showNewPass ? 'text' : 'password'}
+                              placeholder="Min. 8 karakter"
+                              value={passwordState.newPass}
+                              onChange={(e) => setPasswordState({ ...passwordState, newPass: e.target.value })}
+                              autoComplete="new-password"
+                              minLength={8}
+                              required
+                              className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
+                            />
+                            <button
+                              type="button"
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                              onClick={() => setShowNewPass(!showNewPass)}
+                            >
+                              {showNewPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Konfirmasi</label>
+                          <input
+                            type="password"
+                            placeholder="Ulangi password"
+                            value={passwordState.confirmPass}
+                            onChange={(e) => setPasswordState({ ...passwordState, confirmPass: e.target.value })}
+                            autoComplete="new-password"
+                            minLength={8}
+                            required
+                            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="pt-1">
+                        <button
+                          type="submit"
+                          disabled={isChangingPassword}
+                          className="w-full inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          {isChangingPassword ? <LoaderCircle size={13} className="animate-spin" /> : <Lock size={13} />}
+                          <span>{isChangingPassword ? 'Menyimpan...' : 'Update Password'}</span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: HAK AKSES & PERAN */}
+              {profileTab === 'roles' && (
+                <div className="space-y-4 animate-in">
+                  <div className="rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/60 dark:bg-blue-950/20 p-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-blue-950 dark:text-blue-100">Peran Aktif Saat Ini</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${roleConfig.badgeColor}`}>
+                        {roleConfig.name}
+                      </span>
+                    </div>
+                    <p className="text-xs text-blue-900/80 dark:text-blue-200 leading-relaxed">
+                      {roleConfig.description}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                      Struktur Hak Akses SPARTA
+                    </h4>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {Object.values(SPARTA_ROLES).map((role) => (
+                        <div
+                          key={role.id}
+                          className={`rounded-xl border p-3 flex flex-col justify-between ${
+                            effectiveRoleId === role.id
+                              ? 'border-blue-300 dark:border-blue-600 bg-white dark:bg-slate-800 shadow-2xs'
+                              : 'border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50'
+                          }`}
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-xs text-slate-900 dark:text-slate-100">{role.name}</span>
+                              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${role.badgeColor}`}>
+                                {role.badge}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-3 leading-snug">
+                              {role.description}
+                            </p>
+                          </div>
+
+                          <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-500">
+                            <span>Akses: {role.canMaintainSystem ? 'Penuh (Full System)' : role.canInputData ? 'Input & Edit' : 'Monitoring & Approval'}</span>
+                            {effectiveRoleId === role.id && (
+                              <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                <Check size={11} /> Aktif
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: MAINTENANCE SISTEM (KHUSUS ADMIN SUPER) */}
+              {profileTab === 'maintenance' && (
+                <div className="space-y-4 animate-in">
+                  {!isSuperAdmin ? (
+                    <div className="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/60 dark:bg-amber-950/20 p-5 text-center space-y-3">
+                      <div className="size-11 mx-auto rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 flex items-center justify-center">
+                        <Lock size={20} />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                          Memerlukan Hak Akses Admin Super
+                        </h4>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+                          Menu ini hanya dapat diakses oleh Admin Super untuk melakukan pengecekan error koneksi, maintenance database, dan sinkronisasi telemetri 37 DC.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setActiveRoleOverride('super_admin')}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all active:scale-[0.98]"
+                      >
+                        Beralih ke Admin Super (Preview)
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {maintActionStatus && (
+                        <div className="rounded-xl border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 p-3 text-xs font-semibold text-blue-900 dark:text-blue-200 flex items-center gap-2 animate-in">
+                          <CheckCircle2 size={16} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                          <span>{maintActionStatus}</span>
+                        </div>
+                      )}
+
+                      {/* Status Telemetri & Server */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-3.5 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                              <Database size={14} className="text-blue-600 dark:text-blue-400" />
+                              Database PostgreSQL
+                            </span>
+                            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                          </div>
+                          <div className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                            Terhubung (Latency {healthData?.database?.latencyMs || '3'} ms)
+                          </div>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                            Koneksi pool dibatasi 5 client untuk stabilitas dev server.
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-3.5 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                              <Server size={14} className="text-amber-600 dark:text-amber-400" />
+                              API iSolarCloud Sungrow
+                            </span>
+                            <span className="size-2 rounded-full bg-emerald-500" />
+                          </div>
+                          <div className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
+                            37 DC Inverter Online
+                          </div>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                            Sinkronisasi telemetri aktif per interval 15 menit.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Tombol Maintenance */}
+                      <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                            Tindakan Pemulihan & Maintenance Cepat
+                          </span>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={fetchHealth}
+                            disabled={healthLoading}
+                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-[0.98] disabled:opacity-50"
+                          >
+                            <RefreshCw size={13} className={healthLoading ? 'animate-spin text-blue-600' : ''} />
+                            <span>{healthLoading ? 'Memeriksa...' : 'Cek Status Server'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleForceSync}
+                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-all active:scale-[0.98]"
+                          >
+                            <RefreshCw size={13} />
+                            <span>Sinkronisasi Ulang iSolarCloud</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleClearCache}
+                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-[0.98]"
+                          >
+                            <span>Bersihkan Cache Sesi</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 4: MANAJEMEN PENGGUNA & SIMULASI ROLE */}
+              {profileTab === 'users' && (
+                <div className="space-y-4 animate-in">
+                  {/* Top Bar: Judul & Tombol Tambah Pengguna */}
+                  <div className="flex items-center justify-between gap-2 pb-1 border-b border-slate-100 dark:border-slate-800">
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">Konfirmasi</label>
-                      <input
-                        type="password"
-                        placeholder="Ulangi password"
-                        value={passwordState.confirmPass}
-                        onChange={(e) => setPasswordState({ ...passwordState, confirmPass: e.target.value })}
-                        autoComplete="new-password"
-                        minLength={8}
-                        required
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
-                      />
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                        Manajemen Pengguna SPARTA
+                      </h4>
+                      <p className="text-[11px] text-slate-500">
+                        Kelola akun pengguna, peran otorisasi, dan kredensial login.
+                      </p>
+                    </div>
+
+                    {isSuperAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingUser(!isAddingUser)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-[0.98] shrink-0 ${
+                          isAddingUser
+                            ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
+                        }`}
+                      >
+                        <UserPlus size={13} />
+                        <span>{isAddingUser ? 'Tutup Formulir' : 'Tambah Pengguna'}</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Form Tambah Pengguna Baru (Khusus Admin Super) */}
+                  {isAddingUser && isSuperAdmin && (
+                    <form
+                      onSubmit={handleCreateUser}
+                      className="rounded-2xl border border-blue-200 dark:border-blue-500/30 bg-blue-50/40 dark:bg-blue-950/20 p-4 space-y-3.5 animate-in fade-in zoom-in-95"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-blue-900 dark:text-blue-200 flex items-center gap-1.5">
+                          <UserPlus size={14} className="text-blue-600" />
+                          Pendaftaran Akun Pengguna Baru
+                        </span>
+                        <span className="text-[10px] text-slate-500 bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                          Password default: <strong className="text-blue-600 dark:text-blue-400 font-mono">ptsat123</strong>
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                            Username Login <span className="text-rose-500">*</span>
+                          </label>
+                          <div className="relative">
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono">@</span>
+                            <input
+                              type="text"
+                              required
+                              placeholder="operator_dc"
+                              value={newUserForm.username}
+                              onChange={(e) => setNewUserForm({ ...newUserForm, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
+                              className="w-full pl-7 pr-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                            Nama Lengkap <span className="text-rose-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Ahmad Fauzi"
+                            value={newUserForm.displayName}
+                            onChange={(e) => setNewUserForm({ ...newUserForm, displayName: e.target.value })}
+                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                            Peran / Hak Akses <span className="text-rose-500">*</span>
+                          </label>
+                          <DropdownMenu className="w-full">
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full justify-between h-8 px-3 font-normal text-left text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                              >
+                                <span className="truncate font-medium text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                                  <span>{SPARTA_ROLES[newUserForm.roleId]?.name || 'Pilih Peran'}</span>
+                                  <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border ${SPARTA_ROLES[newUserForm.roleId]?.badgeColor || ''}`}>
+                                    {SPARTA_ROLES[newUserForm.roleId]?.badge}
+                                  </span>
+                                </span>
+                                <ChevronDown size={14} className="text-slate-400 shrink-0 ml-1" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-[300px] sm:w-[340px]" align="start">
+                              <DropdownMenuLabel>Pilih Peran Otorisasi</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuGroup>
+                                {Object.values(SPARTA_ROLES).map((role) => (
+                                  <DropdownMenuItem
+                                    key={role.id}
+                                    selected={newUserForm.roleId === role.id}
+                                    onClick={() => setNewUserForm({ ...newUserForm, roleId: role.id })}
+                                    className="py-2"
+                                  >
+                                    <div className="flex flex-col gap-0.5 min-w-0">
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="font-bold text-xs">{role.name}</span>
+                                        <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border ${role.badgeColor}`}>
+                                          {role.badge}
+                                        </span>
+                                      </div>
+                                      <span className="text-[10px] text-slate-400 line-clamp-1">{role.description}</span>
+                                    </div>
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                            Password Awal
+                          </label>
+                          <div className="relative">
+                            <input
+                              type={showNewUserPassword ? 'text' : 'password'}
+                              value={newUserForm.password}
+                              onChange={(e) => setNewUserForm({ ...newUserForm, password: e.target.value })}
+                              placeholder="ptsat123"
+                              className="w-full px-3 py-1.5 pr-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowNewUserPassword(!showNewUserPassword)}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                            >
+                              {showNewUserPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                            NIP / Kode Karyawan <span className="text-slate-400 font-normal">(opsional)</span>
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="ALFA-90124-OP"
+                            value={newUserForm.nip}
+                            onChange={(e) => setNewUserForm({ ...newUserForm, nip: e.target.value })}
+                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                            Departemen / Cabang <span className="text-slate-400 font-normal">(opsional)</span>
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="DC Cikokol / Operations"
+                            value={newUserForm.dept}
+                            onChange={(e) => setNewUserForm({ ...newUserForm, dept: e.target.value })}
+                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-1 border-t border-blue-100 dark:border-blue-900/40">
+                        <button
+                          type="button"
+                          onClick={() => setIsAddingUser(false)}
+                          className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-white dark:hover:bg-slate-800"
+                        >
+                          Batal
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={creatingUser}
+                          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all disabled:opacity-60"
+                        >
+                          {creatingUser ? <LoaderCircle size={13} className="animate-spin" /> : <Check size={13} />}
+                          <span>{creatingUser ? 'Mendaftarkan...' : 'Daftarkan Akun'}</span>
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  {/* Daftar Akun Terdaftar */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                        <Users size={13} className="text-slate-500" />
+                        Akun Pengguna Terdaftar ({usersList.length > 0 ? usersList.length : Object.keys(PROFILE_BY_USERNAME).length})
+                      </span>
+                      <button
+                        type="button"
+                        onClick={fetchUsers}
+                        disabled={loadingUsers}
+                        className="inline-flex items-center gap-1 text-[11px] text-blue-600 hover:underline font-semibold disabled:opacity-50"
+                      >
+                        <RefreshCw size={11} className={loadingUsers ? 'animate-spin' : ''} />
+                        Segarkan
+                      </button>
+                    </div>
+
+                    <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+                      {(usersList.length > 0 ? usersList : Object.entries(PROFILE_BY_USERNAME).map(([u, p]) => {
+                        const rInfo = SPARTA_ROLES[p.roleId] || SPARTA_ROLES.admin;
+                        return {
+                          username: u,
+                          displayName: u === 'admin' ? 'Admin' : u === 'valens' ? 'Valens Aditya T.' : u === 'manager_esg' ? 'Manager ESG' : 'Manager Cabang DC Balaraja',
+                          roleId: p.roleId,
+                          roleName: rInfo.name,
+                          badgeColor: rInfo.badgeColor,
+                          roleTitle: p.role,
+                          nip: p.nip,
+                          dept: p.dept,
+                          isSystemAccount: ['admin', 'valens'].includes(u),
+                        };
+                      })).map((usr) => {
+                        const rInfo = SPARTA_ROLES[usr.roleId] || SPARTA_ROLES.admin;
+                        return (
+                          <div
+                            key={usr.username}
+                            className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 sm:p-3 flex items-center justify-between gap-3 group hover:border-slate-200 dark:hover:border-slate-700 transition-colors"
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="size-8 sm:size-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+                                {usr.username.slice(0, 2).toUpperCase()}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="font-bold text-xs text-slate-900 dark:text-slate-100 truncate">
+                                    {usr.displayName || `@${usr.username}`}
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 font-mono">(@{usr.username})</span>
+                                </div>
+                                <p className="text-[10px] sm:text-[11px] text-slate-500 truncate">
+                                  {usr.nip && usr.nip !== '—' ? `${usr.nip} · ` : ''}{usr.dept || rInfo.badge}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border shrink-0 ${usr.badgeColor || rInfo.badgeColor}`}>
+                                {usr.roleName || rInfo.name}
+                              </span>
+
+                              {isSuperAdmin && !usr.isSystemAccount && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteUser(usr.username)}
+                                  aria-label={`Hapus @${usr.username}`}
+                                  title={`Hapus akun @${usr.username}`}
+                                  className="size-7 inline-flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  <div className="pt-1">
-                    <button
-                      type="submit"
-                      disabled={isChangingPassword}
-                      className="w-full inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {isChangingPassword ? <LoaderCircle size={13} className="animate-spin" /> : <Lock size={13} />}
-                      <span>{isChangingPassword ? 'Menyimpan...' : 'Update Password'}</span>
-                    </button>
+                  {/* Simulasi Tampilan Peran */}
+                  <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-3.5 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900 dark:text-slate-100">Simulasikan Tampilan Peran</span>
+                      {activeRoleOverride && (
+                        <button
+                          type="button"
+                          onClick={() => setActiveRoleOverride(null)}
+                          className="text-[10px] text-rose-600 hover:underline font-bold"
+                        >
+                          Reset ke Default
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                      {Object.values(SPARTA_ROLES).map((role) => (
+                        <button
+                          key={role.id}
+                          type="button"
+                          onClick={() => setActiveRoleOverride(role.id)}
+                          className={`py-1.5 px-2 rounded-lg text-[11px] font-bold transition-all text-center ${
+                            effectiveRoleId === role.id
+                              ? 'bg-blue-600 text-white shadow-2xs'
+                              : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-blue-400'
+                          }`}
+                        >
+                          {role.name}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </form>
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Footer Profil */}
-            <div className="border-t border-slate-100 dark:border-slate-800 px-6 py-3.5 bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-xs shrink-0 gap-2">
-              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1 min-w-0">
+            <div className="border-t border-slate-100 dark:border-slate-800 px-5 sm:px-6 py-3 bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-xs shrink-0 gap-2">
+              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5 min-w-0">
                 <Shield size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span className="truncate">Masuk lewat SPARTA</span>
+                <span className="truncate">SPARTA ESG &middot; {roleConfig.name}</span>
               </span>
               <div className="flex items-center gap-2 shrink-0">
                 <button

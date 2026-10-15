@@ -37,6 +37,16 @@ import {
 } from '@/lib/reports/reportDataService.js';
 import { exportSrnPpiReport } from '@/lib/reports/srnPpiReport.js';
 import { exportOjkReport } from '@/lib/reports/ojkReport.js';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectLabel,
+  SelectItem,
+  SelectSeparator
+} from '@/components/ui/select';
 
 // Lazy-load EmissionCalculatorPage agar halaman tetap ringan dan cepat saat awal render
 const EmissionCalculatorPage = lazy(() => import('@/components/calculator/EmissionCalculatorPage'));
@@ -894,29 +904,35 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-start md:self-center shrink-0 bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5">
+          <div className="flex items-center gap-2 self-start md:self-center shrink-0">
             <Calendar size={15} className="text-slate-400 dark:text-slate-500 shrink-0" />
             <label htmlFor="report-period-select" className="text-xs font-medium text-slate-600 dark:text-slate-300">
               Periode:
             </label>
-            <select
-              id="report-period-select"
-              aria-label="Pilih periode data laporan"
-              value={selectedReportPeriod}
-              onChange={(e) => setSelectedReportPeriod(e.target.value)}
-              className="text-xs font-semibold rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 py-1 px-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/40 cursor-pointer"
-            >
-              <optgroup label="Akumulasi & Kuartal">
-                {availableReportPeriods.filter(p => p.type === 'ytd' || p.type === 'quarter').map(p => (
-                  <option key={p.value} value={p.value}>{p.label}</option>
-                ))}
-              </optgroup>
-              <optgroup label="Bulan Tertentu">
-                {availableReportPeriods.filter(p => p.type === 'month').map(p => (
-                  <option key={p.value} value={p.value}>{p.label}</option>
-                ))}
-              </optgroup>
-            </select>
+            <div className="w-56">
+              <Select value={selectedReportPeriod} onValueChange={setSelectedReportPeriod}>
+                <SelectTrigger id="report-period-select" aria-label="Pilih periode data laporan" className="h-8 text-xs font-semibold">
+                  <SelectValue>
+                    {availableReportPeriods.find(p => p.value === selectedReportPeriod)?.label || 'Pilih periode'}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="max-h-72">
+                  <SelectGroup>
+                    <SelectLabel>Akumulasi & Kuartal</SelectLabel>
+                    {availableReportPeriods.filter(p => p.type === 'ytd' || p.type === 'quarter').map(p => (
+                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                  <SelectSeparator />
+                  <SelectGroup>
+                    <SelectLabel>Bulan Tertentu</SelectLabel>
+                    {availableReportPeriods.filter(p => p.type === 'month').map(p => (
+                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 

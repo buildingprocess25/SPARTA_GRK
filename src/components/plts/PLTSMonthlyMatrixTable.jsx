@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import CardBox from '@/components/ui/CardBox';
 import InfoHint from '@/components/ui/InfoHint';
+import { CustomSelect } from '@/components/ui/select';
 import { CONVERSION_CONFIG } from '@/lib/solar/conversionConfig';
 import { isDcLocation } from '@/lib/solar/plantMap';
 
@@ -339,44 +340,43 @@ export default function PLTSMonthlyMatrixTable({
         {/* Toolbar Controls */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Dropdown Sampai Bulan */}
-          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1 text-xs">
+          <div className="flex items-center gap-1.5 text-xs">
             <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Sampai bulan:</span>
-            <select
-              aria-label="Sampai bulan"
-              className="bg-transparent font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
-              value={selectedThroughMonth}
-              onChange={(e) => setSelectedThroughMonth(Number(e.target.value))}
-            >
-              {FULL_MONTH_NAMES.map((name, idx) => (
-                <option key={idx + 1} value={idx + 1}>
-                  {name}{idx + 1 > currentMonth ? ' (belum berjalan)' : ''}
-                </option>
-              ))}
-            </select>
+            <div className="w-44">
+              <CustomSelect
+                ariaLabel="Sampai bulan"
+                value={selectedThroughMonth}
+                onValueChange={(val) => setSelectedThroughMonth(Number(val))}
+                options={FULL_MONTH_NAMES.map((name, idx) => ({
+                  value: idx + 1,
+                  label: `${name}${idx + 1 > currentMonth ? ' (belum berjalan)' : ''}`,
+                }))}
+              />
+            </div>
           </div>
 
           {/* Dropdown Cabang */}
-          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1 text-xs">
+          <div className="flex items-center gap-1.5 text-xs">
             <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">DC:</span>
-            <select
-              aria-label="DC"
-              className="bg-transparent font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer max-w-[150px] truncate"
-              value={selectedPlant}
-              onChange={(e) => {
-                const val = e.target.value;
-                setSelectedPlant(val);
-                if (onFilterChange) {
-                  onFilterChange('plant', val);
-                }
-              }}
-            >
-              <option value="ALL">Semua DC</option>
-              {plantList.map(p => (
-                <option key={p.dcId} value={p.dcId}>
-                  {p.canonicalName} ({p.capacityKwp?.toFixed(1)} kWp)
-                </option>
-              ))}
-            </select>
+            <div className="w-52">
+              <CustomSelect
+                ariaLabel="DC"
+                value={selectedPlant}
+                onValueChange={(val) => {
+                  setSelectedPlant(val);
+                  if (onFilterChange) {
+                    onFilterChange('plant', val);
+                  }
+                }}
+                options={[
+                  { value: 'ALL', label: 'Semua DC' },
+                  ...plantList.map(p => ({
+                    value: p.dcId,
+                    label: `${p.canonicalName} (${p.capacityKwp?.toFixed(1)} kWp)`,
+                  })),
+                ]}
+              />
+            </div>
           </div>
 
           {/* Toggle Unit: kWh | MWh */}

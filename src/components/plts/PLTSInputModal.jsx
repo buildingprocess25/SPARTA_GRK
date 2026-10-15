@@ -7,6 +7,7 @@ import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { notify } from '@/components/ui/ToastProvider';
 import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
+import { CustomSelect } from '@/components/ui/select';
 
 const MONTHS = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -130,25 +131,47 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
       )}
     >
       <form id="plts-input-form" onSubmit={handleSubmit} className="space-y-5 p-5 sm:p-6">
-        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-          DC <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
-          <select value={plantKey} onChange={(event) => setPlantKey(event.target.value)} className={inputClass}>
-            {plantOptions.map((plant) => <option key={plant.key} value={plant.key}>{plant.name} · PS {plant.psId} · {plant.grid || 'wilayah belum diisi'}</option>)}
-          </select>
+        <div>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+            DC <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>
+          </label>
+          <CustomSelect
+            ariaLabel="Pilih DC"
+            value={plantKey}
+            onChange={(event) => setPlantKey(event.target.value)}
+            options={plantOptions.map((plant) => ({
+              value: plant.key,
+              label: `${plant.name} · PS ${plant.psId} · ${plant.grid || 'wilayah belum diisi'}`,
+            }))}
+          />
           {errors.dc && <span className="mt-1 block text-[11px] normal-case text-rose-600 dark:text-rose-400">{errors.dc}</span>}
-        </label>
+        </div>
 
         <div className="grid grid-cols-1 gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 p-3 sm:grid-cols-2">
-          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Bulan
-            <select value={month} onChange={(event) => setMonth(event.target.value)} className={inputClass}>
-              {MONTHS.map((label, index) => <option key={label} value={String(index + 1).padStart(2, '0')}>{label}</option>)}
-            </select>
-          </label>
-          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Tahun
-            <select value={year} onChange={(event) => setYear(event.target.value)} className={inputClass}>
-              {[2026, 2025, 2024].map((value) => <option key={value}>{value}</option>)}
-            </select>
-          </label>
+          <div>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Bulan</label>
+            <CustomSelect
+              ariaLabel="Bulan"
+              value={month}
+              onChange={(event) => setMonth(event.target.value)}
+              options={MONTHS.map((label, index) => ({
+                value: String(index + 1).padStart(2, '0'),
+                label,
+              }))}
+            />
+          </div>
+          <div>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Tahun</label>
+            <CustomSelect
+              ariaLabel="Tahun"
+              value={year}
+              onChange={(event) => setYear(event.target.value)}
+              options={[2026, 2025, 2024].map((val) => ({
+                value: String(val),
+                label: String(val),
+              }))}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

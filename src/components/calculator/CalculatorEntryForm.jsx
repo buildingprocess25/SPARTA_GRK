@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { AlertCircle, ArrowLeft, Database, Info, Plus, Save } from 'lucide-react';
 
 import { calculateEntry, inclusiveDays } from '@/lib/calculator/engine.js';
@@ -8,6 +8,7 @@ import { EMISSION_FACTORS, factorByCode, factorsByCategory } from '@/lib/calcula
 import { formatEmission, formatNumber } from '@/lib/calculator/format.js';
 import { CATEGORY_MAP } from './calculatorConfig';
 import SearchableSelect from './SearchableSelect';
+import { CustomSelect } from '@/components/ui/select';
 
 const defaults = {
   scope1a: { activity: '', activityUnit: 'L', factorCode: 'FUEL_DIESEL' },
@@ -34,7 +35,30 @@ function DateField({ id, label, value, onChange }) {
 }
 
 function SelectField({ id, label, value, onChange, children, helper }) {
-  return <label htmlFor={id} className="block text-sm font-semibold text-slate-700 dark:text-slate-300">{label}<select id={id} value={value ?? ''} onChange={event => onChange(event.target.value)} className={fieldClass}>{children}</select>{helper && <span className="mt-1 block text-xs font-normal text-slate-500 dark:text-slate-400">{helper}</span>}</label>;
+  const options = React.Children.map(children, child => {
+    if (React.isValidElement(child)) {
+      return {
+        value: child.props.value,
+        label: child.props.children,
+      };
+    }
+    return null;
+  }).filter(Boolean);
+
+  return (
+    <div className="space-y-1.5">
+      <label htmlFor={id} className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+        {label}
+      </label>
+      <CustomSelect
+        id={id}
+        value={value ?? ''}
+        onChange={event => onChange(event.target.value)}
+        options={options}
+      />
+      {helper && <span className="mt-1 block text-xs font-normal text-slate-500 dark:text-slate-400">{helper}</span>}
+    </div>
+  );
 }
 
 const optionsFor = category => factorsByCategory(category).map(option);

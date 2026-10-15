@@ -9,6 +9,7 @@ import {
 import CardBox from '@/components/ui/CardBox';
 import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
 import KpiCard from '@/components/ui/KpiCard';
+import { CustomSelect } from '@/components/ui/select';
 import { isDcLocation } from '@/lib/solar/plantMap';
 import { isValidPltsHistoryPeriod } from '@/lib/solar/cacheKey';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
@@ -701,34 +702,37 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           {/* Period Selector */}
           <div className="flex flex-wrap items-center justify-end gap-2">
             <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Periode:</span>
-            <select
-              aria-label="Periode"
-              value={data?.history?.activePeriod?.value || period}
-              onChange={(e) => handlePeriodChange(e.target.value)}
-              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
-            >
-              {(data?.history?.periodOptions || []).map(p => (
-                <option key={p.value} value={p.value}>{p.label}</option>
-              ))}
-            </select>
-            <select
-              aria-label="Mode periode"
-              value={periodMode}
-              onChange={(event) => handleModeChange(event.target.value)}
-              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-300"
-            >
-              <option value="YTD">Sejak Januari</option>
-              <option value="MONTH">Satu bulan</option>
-            </select>
+            <div className="w-36">
+              <CustomSelect
+                ariaLabel="Periode"
+                value={data?.history?.activePeriod?.value || period}
+                onChange={(e) => handlePeriodChange(e.target.value)}
+                options={data?.history?.periodOptions || []}
+              />
+            </div>
+            <div className="w-36">
+              <CustomSelect
+                ariaLabel="Mode periode"
+                value={periodMode}
+                onChange={(event) => handleModeChange(event.target.value)}
+                options={[
+                  { value: 'YTD', label: 'Sejak Januari' },
+                  { value: 'MONTH', label: 'Satu bulan' },
+                ]}
+              />
+            </div>
             {periodMode === 'MONTH' && (
-              <select
-                aria-label="Bulan terpilih"
-                value={selectedMonth}
-                onChange={(event) => handleModeChange('MONTH', Number(event.target.value))}
-                className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-300"
-              >
-                {Array.from({ length: 12 }, (_, index) => <option key={index + 1} value={index + 1}>{['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][index]}</option>)}
-              </select>
+              <div className="w-24">
+                <CustomSelect
+                  ariaLabel="Bulan terpilih"
+                  value={selectedMonth}
+                  onValueChange={(val) => handleModeChange('MONTH', Number(val))}
+                  options={Array.from({ length: 12 }, (_, index) => ({
+                    value: index + 1,
+                    label: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][index],
+                  }))}
+                />
+              </div>
             )}
             <label className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1.5 text-xs font-bold text-blue-800 dark:text-blue-300 cursor-pointer">
               <input
@@ -739,16 +743,17 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               Bandingkan tahun
             </label>
             {compareYears && (
-              <select
-                aria-label="Batas bulan perbandingan"
-                value={throughMonth}
-                onChange={(event) => handleThroughMonthChange(Number(event.target.value))}
-                className="rounded-xl border border-blue-200 dark:border-blue-500/30 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-blue-800 dark:text-blue-300"
-              >
-                {Array.from({ length: 12 }, (_, index) => (
-                  <option key={index + 1} value={index + 1}>s.d. {['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][index]}</option>
-                ))}
-              </select>
+              <div className="w-28">
+                <CustomSelect
+                  ariaLabel="Batas bulan perbandingan"
+                  value={throughMonth}
+                  onValueChange={(val) => handleThroughMonthChange(Number(val))}
+                  options={Array.from({ length: 12 }, (_, index) => ({
+                    value: index + 1,
+                    label: `s.d. ${['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][index]}`,
+                  }))}
+                />
+              </div>
             )}
           </div>
         </div>
@@ -761,19 +766,13 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               <Globe size={11} className="text-blue-600 dark:text-blue-400" aria-hidden="true" />
               Wilayah PLN
             </label>
-            <div className="relative">
-              <select
-                id="plts-summary-grid"
-                value={selectedGrid}
-                onChange={(e) => handleGridChange(e.target.value)}
-                className="w-full pl-3 pr-8 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none shadow-2xs cursor-pointer"
-              >
-                {GRID_OPTIONS.map(g => (
-                  <option key={g.value} value={g.value}>{g.label}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none" size={14} />
-            </div>
+            <CustomSelect
+              id="plts-summary-grid"
+              ariaLabel="Wilayah PLN"
+              value={selectedGrid}
+              onChange={(e) => handleGridChange(e.target.value)}
+              options={GRID_OPTIONS}
+            />
           </div>
 
           {/* Cabang / DC / fasilitas */}
@@ -782,22 +781,19 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
               <Building2 size={11} className="text-amber-600 dark:text-amber-400" aria-hidden="true" />
               DC
             </label>
-            <div className="relative">
-              <select
-                id="plts-summary-dc"
-                value={selectedDc}
-                onChange={(e) => handleDcChange(e.target.value)}
-                className="w-full pl-3 pr-8 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 appearance-none shadow-2xs cursor-pointer"
-              >
-                <option value="ALL">Semua DC {selectedGrid !== 'ALL' ? `(${selectedGrid})` : ''}</option>
-                {availableDcOptions.map(dc => (
-                  <option key={dc.dcId} value={dc.dcId}>
-                    {dc.canonicalName} ({dc.grid})
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none" size={14} />
-            </div>
+            <CustomSelect
+              id="plts-summary-dc"
+              ariaLabel="DC"
+              value={selectedDc}
+              onChange={(e) => handleDcChange(e.target.value)}
+              options={[
+                { value: 'ALL', label: `Semua DC ${selectedGrid !== 'ALL' ? `(${selectedGrid})` : ''}` },
+                ...availableDcOptions.map(dc => ({
+                  value: dc.dcId,
+                  label: `${dc.canonicalName} (${dc.grid})`,
+                })),
+              ]}
+            />
           </div>
 
           {/* Status filter & reset */}

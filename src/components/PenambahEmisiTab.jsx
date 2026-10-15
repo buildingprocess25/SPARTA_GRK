@@ -25,6 +25,7 @@ import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import Scope2AnnualLoadDashboard from '@/components/scope2/Scope2AnnualLoadDashboard';
 import Scope1InputModal from '@/components/scope1/Scope1InputModal';
 import InputDataButton from '@/components/ui/InputDataButton';
+import { CustomSelect } from '@/components/ui/select';
 import {
   branchHierarchyList,
   getHierarchyElectricityStats,
@@ -167,16 +168,20 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
             <div className="flex items-center gap-2 shrink-0">
               <Calendar size={15} className="text-slate-500 dark:text-slate-400 hidden sm:block" />
               <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Periode:</span>
-              <select
-                value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="ytd">{ytdLabel}</option>
-                {MONTH_NAMES_FULL.map((m, idx) => (
-                  <option key={idx} value={idx.toString()}>{m} 2026</option>
-                ))}
-              </select>
+              <div className="w-44">
+                <CustomSelect
+                  ariaLabel="Periode"
+                  value={selectedPeriod}
+                  onChange={(e) => setSelectedPeriod(e.target.value)}
+                  options={[
+                    { value: 'ytd', label: ytdLabel },
+                    ...MONTH_NAMES_FULL.map((m, idx) => ({
+                      value: idx.toString(),
+                      label: `${m} 2026`,
+                    })),
+                  ]}
+                />
+              </div>
             </div>
           </div>
 
@@ -187,16 +192,20 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0 flex items-center gap-1">
                 <MapPin size={14} className="text-red-500" /> Cabang:
               </label>
-              <select
-                value={selectedBranch}
-                onChange={(e) => setSelectedBranch(e.target.value)}
-                className="w-full text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="all">Semua Cabang (Konsolidasi Nasional)</option>
-                {branchHierarchyList.map(b => (
-                  <option key={b.id} value={b.id}>{b.name} ({b.region}) - Grid {b.grid}</option>
-                ))}
-              </select>
+              <div className="flex-1 min-w-0">
+                <CustomSelect
+                  ariaLabel="Cabang"
+                  value={selectedBranch}
+                  onChange={(e) => setSelectedBranch(e.target.value)}
+                  options={[
+                    { value: 'all', label: 'Semua Cabang (Konsolidasi Nasional)' },
+                    ...branchHierarchyList.map((b) => ({
+                      value: b.id,
+                      label: `${b.name} (${b.region}) - Grid ${b.grid}`,
+                    })),
+                  ]}
+                />
+              </div>
             </div>
 
             {/* Facility Level Selector */}
@@ -584,19 +593,18 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
           </div>
           {activeSubScope === 'scope1' && (
             <div className="flex items-center gap-2 shrink-0">
-              <select
-                aria-label="Periode"
-                value={scope1Period || scope1Api?.period || ''}
-                onChange={(e) => setScope1Period(e.target.value)}
-                className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                {scope1PeriodOptions.length === 0 && scope1Api?.period && (
-                  <option value={scope1Api.period}>Periode berjalan</option>
-                )}
-                {scope1PeriodOptions.map(p => (
-                  <option key={p.value} value={p.value}>{p.label}</option>
-                ))}
-              </select>
+              <div className="w-44">
+                <CustomSelect
+                  ariaLabel="Periode"
+                  value={scope1Period || scope1Api?.period || ''}
+                  onChange={(e) => setScope1Period(e.target.value)}
+                  options={
+                    scope1PeriodOptions.length === 0 && scope1Api?.period
+                      ? [{ value: scope1Api.period, label: 'Periode berjalan' }]
+                      : scope1PeriodOptions
+                  }
+                />
+              </div>
               <label className="relative shrink-0">
                 <Search className="absolute left-3 top-2.5 text-slate-500 dark:text-slate-400" size={14} aria-hidden="true" />
                 <input

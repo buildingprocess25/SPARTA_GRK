@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Search, RefreshCw, X } from 'lucide-react';
 import { notify } from '@/components/ui/ToastProvider';
+import { CustomSelect } from '@/components/ui/select';
 
 const SEARCH_DEBOUNCE_MS = 250;
 
@@ -150,17 +151,23 @@ export default function StorePicker({ value, onChange, error }) {
                 className={`w-full rounded-xl border bg-white dark:bg-slate-900 pl-8 pr-3 py-2 min-h-10 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 ${error ? 'border-rose-400 dark:border-rose-500/60' : 'border-slate-200 dark:border-slate-700'}`}
               />
             </div>
-            <select
-              aria-label="Filter branch"
-              value={branch}
-              onChange={(e) => { setBranch(e.target.value); setIsOpen(true); }}
-              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 min-h-10 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500"
-            >
-              <option value="">Semua branch</option>
-              {branches.map(item => (
-                <option key={item.branch} value={item.branch}>{item.branch} ({item.count})</option>
-              ))}
-            </select>
+            <div className="w-48 shrink-0">
+              <CustomSelect
+                ariaLabel="Filter branch"
+                value={branch}
+                onChange={(e) => {
+                  setBranch(e.target.value);
+                  setIsOpen(true);
+                }}
+                options={[
+                  { value: '', label: 'Semua branch' },
+                  ...branches.map(item => ({
+                    value: item.branch,
+                    label: `${item.branch} (${item.count})`,
+                  })),
+                ]}
+              />
+            </div>
           </div>
 
           {isOpen && (

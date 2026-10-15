@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { TabContentSkeleton } from './PLTSDashboardSkeletons';
 import InfoHint from '@/components/ui/InfoHint';
+import { CustomSelect } from '@/components/ui/select';
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -149,59 +150,67 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
           </div>
 
           {/* Scope Selector */}
-          <select
-            value={selectedScope}
-            onChange={(e) => {
-              setSelectedScope(e.target.value);
-              setSelectedTargetId('ALL');
-            }}
-            className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
-          >
-            <option value="national">Semua plant</option>
-            <option value="grid">Per wilayah PLN</option>
-            <option value="dc">Per DC</option>
-          </select>
+          <div className="w-36">
+            <CustomSelect
+              ariaLabel="Scope"
+              value={selectedScope}
+              onValueChange={(val) => {
+                setSelectedScope(val);
+                setSelectedTargetId('ALL');
+              }}
+              options={[
+                { value: 'national', label: 'Semua plant' },
+                { value: 'grid', label: 'Per wilayah PLN' },
+                { value: 'dc', label: 'Per DC' },
+              ]}
+            />
+          </div>
 
           {/* Target ID Selector if grid or dc */}
           {selectedScope === 'grid' && (
-            <select
-              value={selectedTargetId}
-              onChange={(e) => setSelectedTargetId(e.target.value)}
-              className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-2xs"
-            >
-              <option value="ALL">Semua wilayah</option>
-              {(apiData?.meta?.availableGrids || []).map(g => (
-                <option key={g} value={g}>{g}</option>
-              ))}
-            </select>
+            <div className="w-40">
+              <CustomSelect
+                ariaLabel="Wilayah PLN"
+                value={selectedTargetId}
+                onValueChange={(val) => setSelectedTargetId(val)}
+                options={[
+                  { value: 'ALL', label: 'Semua wilayah' },
+                  ...(apiData?.meta?.availableGrids || []).map(g => ({ value: g, label: g })),
+                ]}
+              />
+            </div>
           )}
 
           {selectedScope === 'dc' && (
-            <select
-              value={selectedTargetId}
-              onChange={(e) => setSelectedTargetId(e.target.value)}
-              className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-2xs max-w-[200px]"
-            >
-              <option value="ALL">Semua DC</option>
-              {(apiData?.meta?.availableDcs || []).map(d => (
-                <option key={d.dcId} value={d.dcId}>{d.name} ({d.grid})</option>
-              ))}
-            </select>
+            <div className="w-52">
+              <CustomSelect
+                ariaLabel="DC"
+                value={selectedTargetId}
+                onValueChange={(val) => setSelectedTargetId(val)}
+                options={[
+                  { value: 'ALL', label: 'Semua DC' },
+                  ...(apiData?.meta?.availableDcs || []).map(d => ({
+                    value: d.dcId,
+                    label: `${d.name} (${d.grid})`,
+                  })),
+                ]}
+              />
+            </div>
           )}
 
           {/* Parameter Selector */}
-          <select
-            value={selectedParamId}
-            onChange={(e) => setSelectedParamId(e.target.value)}
-            aria-label="Bandingkan dengan"
-            className="text-xs font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 shadow-2xs"
-          >
-            {PARAM_OPTIONS.map(opt => (
-              <option key={opt.id} value={opt.id}>
-                vs {opt.label} ({opt.unit})
-              </option>
-            ))}
-          </select>
+          <div className="w-56">
+            <CustomSelect
+              ariaLabel="Bandingkan dengan"
+              value={selectedParamId}
+              onValueChange={(val) => setSelectedParamId(val)}
+              triggerClassName="border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300 font-bold"
+              options={PARAM_OPTIONS.map(opt => ({
+                value: opt.id,
+                label: `vs ${opt.label} (${opt.unit})`,
+              }))}
+            />
+          </div>
         </div>
       </div>
 

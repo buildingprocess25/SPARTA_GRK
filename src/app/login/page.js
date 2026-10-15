@@ -75,12 +75,9 @@ function LoginForm() {
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl p-6">
-          <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 text-center">
+          <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 text-center mb-5">
             SPARTA Sustainability Dashboard
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 text-center mt-1 mb-5">
-            Masuk untuk mengakses dashboard
-          </p>
 
           {error && (
             <div className="mb-4 rounded-lg border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-3 py-2 text-xs text-rose-700 dark:text-rose-300">
@@ -104,7 +101,7 @@ function LoginForm() {
                   required
                   autoFocus
                   className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-                  placeholder="admin atau valens"
+                  placeholder="Username"
                 />
               </div>
             </div>

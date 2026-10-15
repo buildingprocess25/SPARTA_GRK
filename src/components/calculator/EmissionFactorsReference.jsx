@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight, Clipboard, Download, HelpCircle, Search } from 'lucide-react';
 import { EMISSION_FACTORS, FACTOR_STATUS } from '@/lib/calculator/factors.v1.js';
 import { formatNumber } from '@/lib/calculator/format.js';
+import { CustomSelect } from '@/components/ui/select';
 
 const PAGE_SIZE = 12;
 const categoryLabels = { fuel: 'Bahan bakar', vehicle: 'Kendaraan', grid: 'Listrik grid', travel: 'Perjalanan', renewable: 'EBT', ev: 'Kendaraan listrik', offset: 'Carbon offset', finance: 'Surat berharga hijau' };
@@ -43,7 +44,36 @@ export default function EmissionFactorsReference() {
     </div>
     <div className="flex gap-2 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4 text-sm text-amber-900 dark:text-amber-200"><AlertTriangle size={18} className="mt-0.5 shrink-0" /><span><strong>Perhatian:</strong> faktor sementara belum boleh dipakai untuk pelaporan resmi. Verifikasi sumber, tahun berlaku, dan batas organisasi terlebih dahulu.</span></div>
     <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm">
-      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px_180px]"><label className="relative block"><span className="sr-only">Cari faktor emisi</span><Search size={17} className="absolute left-3 top-3 text-slate-500 dark:text-slate-400" /><input value={query} onChange={event => changeFilter(setQuery)(event.target.value)} placeholder="Cari faktor, sumber, atau grid…" className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 py-2.5 pl-10 pr-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" /></label><select aria-label="Filter kategori" value={category} onChange={event => changeFilter(setCategory)(event.target.value)} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 dark:text-slate-100 px-3 text-sm"><option value="all">Semua kategori</option>{Object.entries(categoryLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select><select aria-label="Filter status" value={status} onChange={event => changeFilter(setStatus)(event.target.value)} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 dark:text-slate-100 px-3 text-sm"><option value="all">Semua status</option>{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
+      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px_180px] items-center">
+        <label className="relative block">
+          <span className="sr-only">Cari faktor emisi</span>
+          <Search size={17} className="absolute left-3 top-3 text-slate-500 dark:text-slate-400" />
+          <input
+            value={query}
+            onChange={event => changeFilter(setQuery)(event.target.value)}
+            placeholder="Cari faktor, sumber, atau grid…"
+            className="w-full h-9 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 pl-10 pr-3 text-xs outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </label>
+        <CustomSelect
+          ariaLabel="Filter kategori"
+          value={category}
+          onChange={event => changeFilter(setCategory)(event.target.value)}
+          options={[
+            { value: 'all', label: 'Semua kategori' },
+            ...Object.entries(categoryLabels).map(([value, label]) => ({ value, label })),
+          ]}
+        />
+        <CustomSelect
+          ariaLabel="Filter status"
+          value={status}
+          onChange={event => changeFilter(setStatus)(event.target.value)}
+          options={[
+            { value: 'all', label: 'Semua status' },
+            ...Object.entries(statusLabels).map(([value, label]) => ({ value, label })),
+          ]}
+        />
+      </div>
       <div className="mt-4 overflow-x-auto rounded-xl border dark:border-slate-700"><table className="min-w-[1020px] w-full text-sm"><thead className="bg-slate-900 text-white"><tr><th className="p-3 text-left">{header('name', 'Faktor')}</th><th className="p-3 text-left">{header('category', 'Kategori')}</th><th className="p-3 text-left">{header('value', 'Nilai + satuan')}</th><th className="p-3 text-left">Sumber</th><th className="p-3 text-left">{header('year', 'Tahun / versi')}</th><th className="p-3 text-left">{header('status', 'Status')}</th><th className="p-3 text-left">Aksi</th></tr></thead><tbody>{visible.map(item => { const Icon = statusIcon[item.status]; return <tr key={item.code} className="border-b dark:border-slate-800 align-top hover:bg-slate-50 dark:hover:bg-slate-800/60"><td className="p-3"><span className="font-semibold text-slate-900 dark:text-slate-100">{item.name}</span>{item.biogenic && <span className="mt-1 block text-[10px] font-bold text-emerald-700 dark:text-emerald-400">Biogenik</span>}</td><td className="p-3 text-slate-600 dark:text-slate-400">{categoryLabels[item.category]}</td><td className="p-3 font-medium">{item.value === null ? '—' : formatNumber(item.value)} {item.unit}</td><td className="max-w-xs p-3 text-xs text-slate-600 dark:text-slate-400"><span>{item.source}</span><span className="mt-1 block text-slate-500 dark:text-slate-400">{item.notes}</span></td><td className="p-3 text-xs">{item.year}<br />{item.version}</td><td className="p-3"><span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold ${statusStyle[item.status]}`}><Icon size={12} />{statusLabels[item.status]}</span></td><td className="p-3"><button type="button" disabled={item.value === null} onClick={() => copy(item)} className="inline-flex min-h-9 items-center gap-1 rounded-lg border dark:border-slate-700 px-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40"><Clipboard size={13} />{copied === item.code ? 'Tersalin' : copied === 'error' ? 'Gagal menyalin' : 'Salin nilai'}</button></td></tr>; })}</tbody></table>{visible.length === 0 && <p className="p-10 text-center text-sm text-slate-500 dark:text-slate-400">Tidak ada faktor yang cocok.</p>}</div>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600 dark:text-slate-400"><span>Menampilkan {visible.length} dari {filtered.length} faktor</span><div className="flex items-center gap-2"><button type="button" aria-label="Halaman sebelumnya" disabled={safePage === 1} onClick={() => setPage(current => Math.max(1, current - 1))} className="rounded-lg border dark:border-slate-700 p-2 disabled:opacity-40"><ChevronLeft size={16} /></button><span>Halaman {safePage} / {pages}</span><button type="button" aria-label="Halaman berikutnya" disabled={safePage === pages} onClick={() => setPage(current => Math.min(pages, current + 1))} className="rounded-lg border dark:border-slate-700 p-2 disabled:opacity-40"><ChevronRight size={16} /></button></div></div>
     </div>

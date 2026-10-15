@@ -14,6 +14,7 @@ import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { notify } from '@/components/ui/ToastProvider';
 import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 import { getYearToDateMonths } from '@/lib/reportingMonths';
+import { CustomSelect } from '@/components/ui/select';
 
 export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = [] }) {
   const { addDataEntry, refreshData } = useSustainability();
@@ -490,20 +491,23 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                     placeholder="Cari nama DC..."
                     className="sm:col-span-1 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   />
-                  <select
-                    id="modal-scope2-dc"
-                    value={selectedPsId}
-                    onChange={(e) => setSelectedPsId(e.target.value)}
-                    className={`sm:col-span-2 rounded-xl border bg-white dark:bg-slate-900 px-3 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
-                      formErrors.dc ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10' : 'border-slate-200 dark:border-slate-700'
-                    }`}
-                  >
-                    {filteredDcs.map((dc) => (
-                      <option key={dc.psId || dc.dcId} value={String(dc.psId || dc.dcId)}>
-                        {dc.name}, Grid {dc.grid} ({dc.factor} tCO₂e/MWh)
-                      </option>
-                    ))}
-                  </select>
+                  <div className="sm:col-span-2">
+                    <CustomSelect
+                      id="modal-scope2-dc"
+                      ariaLabel="Pilih DC"
+                      value={selectedPsId}
+                      onChange={(e) => setSelectedPsId(e.target.value)}
+                      options={filteredDcs.map((dc) => ({
+                        value: String(dc.psId || dc.dcId),
+                        label: `${dc.name}, Grid ${dc.grid} (${dc.factor} tCO₂e/MWh)`,
+                      }))}
+                      triggerClassName={
+                        formErrors.dc
+                          ? 'border-rose-400 dark:border-rose-500/60 bg-rose-50/30 dark:bg-rose-500/10'
+                          : ''
+                      }
+                    />
+                  </div>
                 </div>
                 {formErrors.dc && (
                   <p className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 mt-1">{formErrors.dc}</p>
@@ -517,41 +521,43 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                     <label htmlFor="modal-scope2-month" className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
                       Bulan Pelaporan <span className="text-rose-500 dark:text-rose-400">*</span>
                     </label>
-                    <select
+                    <CustomSelect
                       id="modal-scope2-month"
+                      ariaLabel="Bulan Pelaporan"
                       value={periodMonth}
-                      onChange={(e) => handlePeriodChange(e.target.value, periodYear)}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                    >
-                      <option value="01">01 - Januari</option>
-                      <option value="02">02 - Februari</option>
-                      <option value="03">03 - Maret</option>
-                      <option value="04">04 - April</option>
-                      <option value="05">05 - Mei</option>
-                      <option value="06">06 - Juni</option>
-                      <option value="07">07 - Juli</option>
-                      <option value="08">08 - Agustus</option>
-                      <option value="09">09 - September</option>
-                      <option value="10">10 - Oktober</option>
-                      <option value="11">11 - November</option>
-                      <option value="12">12 - Desember</option>
-                    </select>
+                      onValueChange={(val) => handlePeriodChange(val, periodYear)}
+                      options={[
+                        { value: '01', label: '01 - Januari' },
+                        { value: '02', label: '02 - Februari' },
+                        { value: '03', label: '03 - Maret' },
+                        { value: '04', label: '04 - April' },
+                        { value: '05', label: '05 - Mei' },
+                        { value: '06', label: '06 - Juni' },
+                        { value: '07', label: '07 - Juli' },
+                        { value: '08', label: '08 - Agustus' },
+                        { value: '09', label: '09 - September' },
+                        { value: '10', label: '10 - Oktober' },
+                        { value: '11', label: '11 - November' },
+                        { value: '12', label: '12 - Desember' },
+                      ]}
+                    />
                   </div>
 
                   <div className="col-span-6 sm:col-span-3">
                     <label htmlFor="modal-scope2-year" className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
                       Tahun <span className="text-rose-500 dark:text-rose-400">*</span>
                     </label>
-                    <select
+                    <CustomSelect
                       id="modal-scope2-year"
+                      ariaLabel="Tahun"
                       value={periodYear}
-                      onChange={(e) => handlePeriodChange(periodMonth, e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                    >
-                      <option value="2026">2026</option>
-                      <option value="2025">2025</option>
-                      <option value="2024">2024</option>
-                    </select>
+                      onValueChange={(val) => handlePeriodChange(periodMonth, val)}
+                      options={[
+                        { value: '2026', label: '2026' },
+                        { value: '2025', label: '2025' },
+                        { value: '2024', label: '2024' },
+                      ]}
+                    />
                   </div>
                   <div className="col-span-6 sm:col-span-4">
                     <label htmlFor="modal-scope2-date" className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">

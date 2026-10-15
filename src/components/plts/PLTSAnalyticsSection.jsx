@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import CardBox from '@/components/ui/CardBox';
 import InfoHint from '@/components/ui/InfoHint';
+import { CustomSelect } from '@/components/ui/select';
 import { processAllDCAnalytics, SOLAR_CONSTANTS } from '@/lib/solar/processor';
 import { formatNum } from '@/data/sustainabilityData';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
@@ -1153,15 +1154,18 @@ export default function PLTSAnalyticsSection({
 
           <div className="flex items-center gap-2 shrink-0 self-start md:self-auto">
             <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Urutkan:</span>
-            <select
-              value={sortDirection}
-              onChange={(e) => handleSortChange(e.target.value)}
-              className="h-9 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            >
-              <option value="desc">Tertinggi ke Terendah</option>
-              <option value="asc">Terendah ke Tertinggi</option>
-              <option value="alpha">Alfabet Nama DC</option>
-            </select>
+            <div className="w-48">
+              <CustomSelect
+                ariaLabel="Urutkan"
+                value={sortDirection}
+                onChange={(e) => handleSortChange(e.target.value)}
+                options={[
+                  { value: 'desc', label: 'Tertinggi ke Terendah' },
+                  { value: 'asc', label: 'Terendah ke Tertinggi' },
+                  { value: 'alpha', label: 'Alfabet Nama DC' },
+                ]}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -1691,15 +1695,18 @@ export default function PLTSAnalyticsSection({
           <div className="flex items-center gap-2">
             {activeTab === 'table' && (
               <div className="flex items-center gap-2">
-                <select
-                  value={tablePageSize}
-                  onChange={(e) => setTablePageSize(e.target.value)}
-                  className="text-xs bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="all">Tampil Semua ({tableDisplayItems.length})</option>
-                  <option value="10">10 per halaman</option>
-                  <option value="20">20 per halaman</option>
-                </select>
+                <div className="w-44">
+                  <CustomSelect
+                    ariaLabel="Ukuran halaman"
+                    value={tablePageSize}
+                    onChange={(e) => setTablePageSize(e.target.value)}
+                    options={[
+                      { value: 'all', label: `Tampil Semua (${tableDisplayItems.length})` },
+                      { value: '10', label: '10 per halaman' },
+                      { value: '20', label: '20 per halaman' },
+                    ]}
+                  />
+                </div>
                 <button
                   type="button"
                   onClick={handleExportCSV}

@@ -21,6 +21,7 @@ import KpiCard from '@/components/ui/KpiCard';
 import CardBox from '@/components/ui/CardBox';
 import InputDataButton from '@/components/ui/InputDataButton';
 import WaterRecycleInputModal from '@/components/water/WaterRecycleInputModal';
+import { CustomSelect } from '@/components/ui/select';
 import { formatNum } from '@/data/sustainabilityData';
 
 export default function WaterRecycleTab() {
@@ -88,19 +89,18 @@ export default function WaterRecycleTab() {
         actions={
           <div className="flex shrink-0 flex-col items-end gap-2 self-start">
             <InputDataButton label="Input data air" icon={Droplets} onClick={() => setIsInputModalOpen(true)} />
-            <select
-              aria-label="Periode"
-              value={period || api?.period || ''}
-              onChange={(e) => setPeriod(e.target.value)}
-              className="text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
-            >
-              {periodOptions.length === 0 && api?.period && (
-                <option value={api.period}>Periode berjalan</option>
-              )}
-              {periodOptions.map(p => (
-                <option key={p.value} value={p.value}>{p.label}</option>
-              ))}
-            </select>
+            <div className="w-48">
+              <CustomSelect
+                ariaLabel="Periode"
+                value={period || api?.period || ''}
+                onChange={(e) => setPeriod(e.target.value)}
+                options={
+                  periodOptions.length === 0 && api?.period
+                    ? [{ value: api.period, label: 'Periode berjalan' }]
+                    : periodOptions
+                }
+              />
+            </div>
           </div>
         }
       />

@@ -42,11 +42,18 @@ function getEnvConfiguredUsers() {
   return users;
 }
 
+const DEFAULT_SPARTA_ACCOUNTS = [
+  { username: 'admin', displayName: 'Admin' },
+  { username: 'valens', displayName: 'Valens Aditya T.' },
+  { username: 'manager_esg', displayName: 'Manager ESG' },
+  { username: 'dc_balaraja', displayName: 'Manager Cabang DC Balaraja' },
+];
+
 /**
  * Upserts the env-configured accounts into app_user, but only when that
  * username doesn't already exist - a password changed in-app via
  * changePassword() must never be silently reverted by the env var hash on
- * the next server restart.
+ * the next server restart. Also ensures standard SPARTA role accounts exist.
  */
 export async function seedAppUsersFromEnv() {
   const envUsers = getEnvConfiguredUsers();
@@ -56,6 +63,20 @@ export async function seedAppUsersFromEnv() {
     await prisma.appUser.create({
       data: { username: user.username, passwordHash: user.passwordHash, displayName: user.displayName },
     });
+  }
+
+  // Ensure default role accounts exist with default password ptsat123 if not in DB
+  for (const acct of DEFAULT_SPARTA_ACCOUNTS) {
+    const existing = await prisma.appUser.findUnique({ where: { username: acct.username } });
+    if (!existing) {
+      await prisma.appUser.create({
+        data: {
+          username: acct.username,
+          passwordHash: hashPassword('ptsat123'),
+          displayName: acct.displayName,
+        },
+      });
+    }
   }
 }
 

@@ -43,6 +43,7 @@ import { getYearToDateMonths } from '@/lib/reportingMonths';
 import InputDataButton from '@/components/ui/InputDataButton';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import PLTSInputModal from '@/components/plts/PLTSInputModal';
+import { CustomSelect } from '@/components/ui/select';
 import { useAlarms } from '@/context/AlarmContext';
 
 const PLTSSummaryCard = dynamic(() => import('@/components/plts/PLTSSummaryCard'), {
@@ -1468,15 +1469,14 @@ export default function PLTSTab() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Periode</span>
-                <select
-                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
-                  value={selectedPeriod}
-                  onChange={(e) => setSelectedPeriod(e.target.value)}
-                >
-                  {emissionsPeriods.map(p => (
-                    <option key={p.value} value={p.value}>{p.label}</option>
-                  ))}
-                </select>
+                <div className="w-40">
+                  <CustomSelect
+                    ariaLabel="Periode"
+                    value={selectedPeriod}
+                    onChange={(e) => setSelectedPeriod(e.target.value)}
+                    options={emissionsPeriods}
+                  />
+                </div>
               </div>
             </div>
 
@@ -1484,45 +1484,39 @@ export default function PLTSTab() {
             <div className="flex flex-col md:flex-row gap-3 bg-slate-50/50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
               <div className="flex-1 space-y-1.5">
                 <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1">Wilayah PLN</label>
-                <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" size={14} />
-                  <select
-                    className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
-                    value={selectedGridFilter}
-                    onChange={(e) => {
-                      setSelectedGridFilter(e.target.value);
-                      if (selectedDcFilter !== 'ALL') setSelectedDcFilter('ALL');
-                    }}
-                  >
-                    <option value="ALL">Semua wilayah</option>
-                    <option value="JAMALI">JAMALI (Jawa-Madura-Bali)</option>
-                    <option value="SUMATERA">Sumatera</option>
-                    <option value="KALBAR">Kalimantan Barat</option>
-                    <option value="KALSELTENG">Kalimantan Sel-Teng</option>
-                    <option value="SULSELRABAR">Sulawesi Sel-Ra-Bar</option>
-                    <option value="SULUTGO">Sulawesi Utara-Go</option>
-                    <option value="BATAM">Batam</option>
-                    <option value="NTB_LOMBOK">NTB - Lombok</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none" size={14} />
-                </div>
+                <CustomSelect
+                  ariaLabel="Wilayah PLN"
+                  value={selectedGridFilter}
+                  onValueChange={(val) => {
+                    setSelectedGridFilter(val);
+                    if (selectedDcFilter !== 'ALL') setSelectedDcFilter('ALL');
+                  }}
+                  options={[
+                    { value: 'ALL', label: 'Semua wilayah' },
+                    { value: 'JAMALI', label: 'JAMALI (Jawa-Madura-Bali)' },
+                    { value: 'SUMATERA', label: 'Sumatera' },
+                    { value: 'KALBAR', label: 'Kalimantan Barat' },
+                    { value: 'KALSELTENG', label: 'Kalimantan Sel-Teng' },
+                    { value: 'SULSELRABAR', label: 'Sulawesi Sel-Ra-Bar' },
+                    { value: 'SULUTGO', label: 'Sulawesi Utara-Go' },
+                    { value: 'BATAM', label: 'Batam' },
+                    { value: 'NTB_LOMBOK', label: 'NTB - Lombok' },
+                  ]}
+                />
               </div>
               <div className="flex-1 space-y-1.5">
                 <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1">Cabang / DC</label>
-                <div className="relative">
-                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" size={14} />
-                  <select
-                    className="w-full pl-9 pr-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
-                    value={selectedDcFilter}
-                    onChange={(e) => setSelectedDcFilter(e.target.value)}
-                  >
-                    <option value="ALL">Semua cabang / DC</option>
-                    {validDcs.filter(dc => selectedGridFilter === 'ALL' || dc.grid === selectedGridFilter || dc.gridRegion === selectedGridFilter).map(dc => (
-                      <option key={dc.id} value={dc.id}>{dc.name}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none" size={14} />
-                </div>
+                <CustomSelect
+                  ariaLabel="Cabang / DC"
+                  value={selectedDcFilter}
+                  onValueChange={(val) => setSelectedDcFilter(val)}
+                  options={[
+                    { value: 'ALL', label: 'Semua cabang / DC' },
+                    ...validDcs
+                      .filter(dc => selectedGridFilter === 'ALL' || dc.grid === selectedGridFilter || dc.gridRegion === selectedGridFilter)
+                      .map(dc => ({ value: dc.id, label: dc.name })),
+                  ]}
+                />
               </div>
               <div className="flex-1 space-y-1.5">
                 <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1">Cari</label>
