@@ -21,7 +21,7 @@ export default function SegmentedTabs({ value, onChange, options, className = ''
             key={opt.value}
             type="button"
             onClick={() => onChange(opt.value)}
-            className={`flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-bold transition-all ${fullWidthOnMobile ? 'flex-1 sm:flex-initial' : ''} ${
+            className={`flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-bold transition-all duration-150 active:scale-[0.98] ${fullWidthOnMobile ? 'flex-1 sm:flex-initial' : ''} ${
               isActive
                 ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'

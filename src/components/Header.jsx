@@ -6,14 +6,20 @@ import {
   ShieldCheck, User, KeyRound, CheckCircle2,
   X, ChevronDown, Lock, Shield, Building2,
   Phone, BadgeCheck, Eye, EyeOff, Menu, LogOut,
-  AlertCircle, LoaderCircle
+  AlertCircle, LoaderCircle, PanelLeftClose, PanelLeftOpen
 } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { getProfileFor, getInitials } from '@/lib/profileMeta';
 import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { dialogPresets } from '@/lib/dialog-presets';
 
-export default function Header({ isProfileOpen: externalProfileOpen, setIsProfileOpen: setExternalProfileOpen, onToggleMobileSidebar }) {
+export default function Header({
+  isProfileOpen: externalProfileOpen,
+  setIsProfileOpen: setExternalProfileOpen,
+  onToggleMobileSidebar,
+  isDesktopSidebarOpen = true,
+  onToggleDesktopSidebar,
+}) {
   const router = useRouter();
   const [internalProfileOpen, setInternalProfileOpen] = useState(false);
   const isProfileOpen = externalProfileOpen !== undefined ? externalProfileOpen : internalProfileOpen;
@@ -42,8 +48,10 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
     } catch (_) { /* best effort - cookie clear still redirects below */ }
-    router.replace('/login');
-    router.refresh();
+    setTimeout(() => {
+      router.replace('/login');
+      router.refresh();
+    }, 650);
   };
 
   const displayName = currentUser?.displayName || 'Pengguna SPARTA';
@@ -121,8 +129,9 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
   return (
     <>
       <header className="print:hidden sticky top-0 z-40 flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-8 h-16 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-xs">
-        {/* KIRI: Hamburger Menu untuk HP, Nama & Badge ESG */}
-        <div className="flex items-center gap-3">
+        {/* KIRI: Hamburger Menu untuk HP, Toggle Sidebar Desktop, Nama & Badge ESG */}
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          {/* Mobile hamburger menu */}
           <button
             type="button"
             className="md:hidden size-11 -ml-2 inline-flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
@@ -132,6 +141,19 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
           >
             <Menu size={20} />
           </button>
+
+          {/* Desktop sidebar toggle button */}
+          {onToggleDesktopSidebar && (
+            <button
+              type="button"
+              className="hidden md:inline-flex size-9 -ml-1 items-center justify-center text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-150 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+              onClick={onToggleDesktopSidebar}
+              aria-label={isDesktopSidebarOpen ? 'Tutup sidebar (Ctrl+B)' : 'Buka sidebar (Ctrl+B)'}
+              title={isDesktopSidebarOpen ? 'Tutup sidebar (Ctrl+B)' : 'Buka sidebar (Ctrl+B)'}
+            >
+              {isDesktopSidebarOpen ? <PanelLeftClose size={19} /> : <PanelLeftOpen size={19} />}
+            </button>
+          )}
 
           <div className="flex items-center gap-2.5">
             <h1 className="max-w-[9rem] truncate text-sm sm:max-w-none sm:text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
@@ -359,6 +381,30 @@ export default function Header({ isProfileOpen: externalProfileOpen, setIsProfil
                   Tutup
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Logout Waiting Animation */}
+      {loggingOut && (
+        <div
+          role="status"
+          aria-live="assertive"
+          aria-label="Sedang keluar dari sistem..."
+          className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-slate-950/75 backdrop-blur-md animate-in fade-in select-none"
+        >
+          <div className="flex flex-col items-center max-w-xs text-center px-6 py-7 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xl space-y-4">
+            <div className="relative flex items-center justify-center size-14 rounded-2xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200/60 dark:border-rose-500/20 text-rose-600 dark:text-rose-400">
+              <LogOut size={22} className="animate-pulse" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                Mengakhiri Sesi...
+              </h3>
+            </div>
+            <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden relative">
+              <div className="h-full bg-rose-600 dark:bg-rose-500 rounded-full animate-indeterminate-slide" />
             </div>
           </div>
         </div>

@@ -82,7 +82,7 @@ export default function Scope2Waterfall({ summary }) {
           <React.Fragment key={step.id}>
             {/* Step Card */}
             <div
-              className={`flex-1 min-w-0 rounded-2xl p-4 transition-colors duration-200 flex flex-col justify-between h-full ${
+              className={`flex-1 min-w-0 rounded-2xl p-4 interactive-card flex flex-col justify-between h-full ${
                 step.isResult
                   ? 'bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200/90 dark:border-rose-900/50 shadow-2xs'
                   : 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700'

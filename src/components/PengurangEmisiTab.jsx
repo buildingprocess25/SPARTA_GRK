@@ -12,7 +12,7 @@ export default function PengurangEmisiTab({ activeSubTab = 'plts', setActiveSubT
   };
 
   return (
-    <div className="space-y-6 animate-in">
+    <div key={activeSubTab} className="space-y-6 animate-in">
       {activeSubTab === 'plts' ? <PLTSTab /> : <WaterRecycleTab />}
     </div>
   );

@@ -12,6 +12,7 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -29,9 +30,13 @@ function LoginForm() {
         setLoading(false);
         return;
       }
+      setLoginSuccess(true);
       const redirectTo = searchParams.get('redirect');
-      router.replace(redirectTo && redirectTo.startsWith('/') ? redirectTo : '/');
-      router.refresh();
+      const targetUrl = redirectTo && redirectTo.startsWith('/') ? redirectTo : '/';
+      setTimeout(() => {
+        router.replace(targetUrl);
+        router.refresh();
+      }, 700);
     } catch (_err) {
       setError('Tidak dapat terhubung ke server. Coba lagi.');
       setLoading(false);
@@ -40,6 +45,30 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0B1220] px-4">
+      {/* Fullscreen Login Transition Animation */}
+      {loginSuccess && (
+        <div
+          role="status"
+          aria-live="assertive"
+          aria-label="Menyiapkan dashboard..."
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/70 backdrop-blur-md animate-in fade-in select-none"
+        >
+          <div className="flex flex-col items-center max-w-xs text-center px-6 py-7 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xl space-y-4">
+            <div className="relative flex items-center justify-center size-14 rounded-2xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200/60 dark:border-blue-500/20">
+              <img src="/alfamart-logo.png" alt="Alfamart" className="w-10 h-auto object-contain dark:brightness-110" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                Masuk Berhasil
+              </h3>
+            </div>
+            <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden relative">
+              <div className="h-full bg-blue-600 rounded-full animate-indeterminate-slide" />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-sm">
         <div className="flex items-center justify-center mb-6">
           <img src="/alfamart-logo.png" alt="Alfamart" className="w-40 h-auto dark:brightness-110" />

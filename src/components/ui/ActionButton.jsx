@@ -40,7 +40,7 @@ export default function ActionButton({
     <button
       type={type}
       disabled={isDisabled}
-      className={`inline-flex items-center justify-center font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ${sizeClass} ${variantClass} ${className}`}
+      className={`inline-flex items-center justify-center font-bold transition-all duration-150 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 ${sizeClass} ${variantClass} ${className}`}
       {...props}
     >
       {loading ? (
