@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -802,14 +803,14 @@ export default function Header({
                             Username Login <span className="text-rose-500">*</span>
                           </label>
                           <div className="relative">
-                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono">@</span>
-                            <input
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-xs z-10">@</span>
+                            <Input
                               type="text"
                               required
                               placeholder="operator_dc"
                               value={newUserForm.username}
                               onChange={(e) => setNewUserForm({ ...newUserForm, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
-                              className="w-full pl-7 pr-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              className="pl-7 pr-3"
                             />
                           </div>
                         </div>
@@ -818,13 +819,13 @@ export default function Header({
                           <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
                             Nama Lengkap <span className="text-rose-500">*</span>
                           </label>
-                          <input
+                          <Input
                             type="text"
                             required
                             placeholder="Ahmad Fauzi"
                             value={newUserForm.displayName}
                             onChange={(e) => setNewUserForm({ ...newUserForm, displayName: e.target.value })}
-                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="px-3"
                           />
                         </div>
 
