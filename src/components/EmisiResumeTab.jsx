@@ -26,6 +26,7 @@ import { CARBON_FACTORS } from '@/lib/carbon/carbonEngine';
 import { getYearToDateMonths } from '@/lib/reportingMonths';
 import PageHeader from '@/components/ui/PageHeader';
 import CardBox from '@/components/ui/CardBox';
+import { Button } from '@/components/ui/button';
 import InfoHint from '@/components/ui/InfoHint';
 import MainScope2Bridge from '@/components/scope2/MainScope2Bridge';
 import MainScope1Bridge from '@/components/scope1/MainScope1Bridge';
@@ -546,14 +547,12 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 </div>
               </div>
               <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-                <button
+                <Button
                   type="button"
+                  variant={isCalculatorOpen ? 'outline' : 'default'}
                   onClick={() => setIsCalculatorOpen(prev => !prev)}
-                  className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition shadow-sm ${isCalculatorOpen
-                      ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-100'
-                    }`}
                   aria-expanded={isCalculatorOpen}
+                  className="min-h-10 px-4 py-2 text-sm font-semibold gap-2"
                 >
                   <Calculator size={16} />
                   <span>{isCalculatorOpen ? 'Tutup Kalkulator' : 'Buka Kalkulator Emisi'}</span>
@@ -561,7 +560,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                     size={16}
                     className={`transition-transform duration-200 ${isCalculatorOpen ? 'rotate-180' : ''}`}
                   />
-                </button>
+                </Button>
               </div>
             </div>
 

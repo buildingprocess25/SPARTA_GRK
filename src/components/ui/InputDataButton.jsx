@@ -1,7 +1,9 @@
 'use client';
 
+import React from 'react';
 import { Plus, Lock } from 'lucide-react';
 import { useSustainability } from '@/context/SustainabilityContext';
+import { Button } from '@/components/ui/button';
 
 export default function InputDataButton({
   label = 'Input Data',
@@ -26,27 +28,29 @@ export default function InputDataButton({
 
   if (isDisabled) {
     return (
-      <button
+      <Button
         type="button"
+        variant="outline"
         disabled
         title={reason}
         aria-disabled="true"
-        className={`inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-500 dark:text-slate-400 cursor-not-allowed opacity-80 ${className}`}
+        className={`cursor-not-allowed opacity-75 ${className}`}
       >
         <Lock size={15} className="text-slate-500 dark:text-slate-400" />
         <span>{label}</span>
-      </button>
+      </Button>
     );
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="default"
       onClick={onClick}
-      className={`inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${className}`}
+      className={className}
     >
-      <Icon size={17} />
+      <Icon size={16} />
       <span>{label}</span>
-    </button>
+    </Button>
   );
 }

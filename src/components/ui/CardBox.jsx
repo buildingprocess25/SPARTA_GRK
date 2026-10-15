@@ -1,13 +1,12 @@
+'use client';
+
 import React from 'react';
+import { Card } from '@/components/ui/card';
 
 export default function CardBox({ children, className = '', spotlight: _spotlight, ...props }) {
   return (
-    <div
-      className={`bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 lg:p-5 shadow-2xs dark:shadow-none transition-all duration-200 print:break-inside-avoid ${className}`}
-      {...props}
-    >
+    <Card className={className} {...props}>
       {children}
-    </div>
+    </Card>
   );
 }
-

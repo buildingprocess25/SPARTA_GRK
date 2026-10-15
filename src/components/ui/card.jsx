@@ -1,120 +1,119 @@
-import * as React from "react"
-import { cn } from "cn"
+'use client';
 
-function Card({
-  className,
-  size = "default",
+import * as React from 'react';
+
+export function Card({
+  className = '',
+  size = 'default',
+  children,
   ...props
 }) {
   return (
     <div
       data-slot="card"
       data-size={size}
-      className={cn(
-        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
-        className
-      )}
+      className={`group/card rounded-xl border border-slate-200/90 dark:border-slate-800/80 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-4 lg:p-5 shadow-2xs dark:shadow-none transition-all duration-200 print:break-inside-avoid ${className}`}
       {...props}
-    />
-  )
+    >
+      {children}
+    </div>
+  );
 }
 
-function CardHeader({
-  className,
+export function CardHeader({
+  className = '',
+  children,
   ...props
 }) {
   return (
     <div
       data-slot="card-header"
-      className={cn(
-        "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-(--card-spacing) has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-(--card-spacing)",
-        className
-      )}
+      className={`flex flex-col space-y-1.5 pb-3 border-b border-slate-100 dark:border-slate-800/80 ${className}`}
       {...props}
-    />
-  )
+    >
+      {children}
+    </div>
+  );
 }
 
-function CardTitle({
-  className,
+export function CardTitle({
+  className = '',
+  children,
   ...props
 }) {
   return (
-    <div
+    <h3
       data-slot="card-title"
-      className={cn(
-        "font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",
-        className
-      )}
+      className={`text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight leading-snug ${className}`}
       {...props}
-    />
-  )
+    >
+      {children}
+    </h3>
+  );
 }
 
-function CardDescription({
-  className,
+export function CardDescription({
+  className = '',
+  children,
   ...props
 }) {
   return (
-    <div
+    <p
       data-slot="card-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={`text-xs text-slate-500 dark:text-slate-400 leading-relaxed ${className}`}
       {...props}
-    />
-  )
+    >
+      {children}
+    </p>
+  );
 }
 
-function CardAction({
-  className,
+export function CardAction({
+  className = '',
+  children,
   ...props
 }) {
   return (
     <div
       data-slot="card-action"
-      className={cn(
-        "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
-        className
-      )}
+      className={`flex items-center gap-2 self-start sm:self-auto shrink-0 ${className}`}
       {...props}
-    />
-  )
+    >
+      {children}
+    </div>
+  );
 }
 
-function CardContent({
-  className,
+export function CardContent({
+  className = '',
+  children,
   ...props
 }) {
   return (
     <div
       data-slot="card-content"
-      className={cn("px-(--card-spacing)", className)}
+      className={`pt-2 ${className}`}
       {...props}
-    />
-  )
+    >
+      {children}
+    </div>
+  );
 }
 
-function CardFooter({
-  className,
+export function CardFooter({
+  className = '',
+  children,
   ...props
 }) {
   return (
     <div
       data-slot="card-footer"
-      className={cn(
-        "flex items-center rounded-b-xl border-t bg-muted/50 p-(--card-spacing)",
-        className
-      )}
+      className={`flex items-center pt-3 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-500 dark:text-slate-400 ${className}`}
       {...props}
-    />
-  )
+    >
+      {children}
+    </div>
+  );
 }
 
-export {
-  Card,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardAction,
-  CardDescription,
-  CardContent,
-}
+export default Card;

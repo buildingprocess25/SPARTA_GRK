@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
 import CardBox from '@/components/ui/CardBox';
 import InfoHint from '@/components/ui/InfoHint';
 
@@ -41,20 +42,22 @@ export default function MainScope2Bridge({ onNavigate }) {
           />
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => onNavigate?.('penambah', 'scope2')}
-            className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60 shadow-sm transition active:scale-95"
           >
             Lihat Rincian Scope 2
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => onNavigate?.('pengurang', 'plts')}
-            className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60 shadow-sm transition active:scale-95"
           >
             Lihat Rincian PLTS
-          </button>
+          </Button>
         </div>
       </div>
 

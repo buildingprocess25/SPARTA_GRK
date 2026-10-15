@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
 import CardBox from '@/components/ui/CardBox';
 import InfoHint from '@/components/ui/InfoHint';
 
@@ -39,13 +40,14 @@ export default function MainScope1Bridge({ onNavigate }) {
             text="Emisi langsung dari pembakaran bahan bakar yang dikendalikan perusahaan: bahan bakar solar untuk genset cadangan dan BBM untuk armada kendaraan operasional Alfamart."
           />
         </div>
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={() => onNavigate?.('penambah', 'scope1')}
-          className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60 shadow-sm transition active:scale-95"
         >
           Lihat Rincian Scope 1
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
