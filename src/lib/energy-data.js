@@ -20,6 +20,7 @@ import { getGridFactor, GRID_EMISSION_FACTORS } from './emission-factors.js';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './solar/conversionConfig.js';
 import { isPlantUnderConstruction } from './solar/dashboard.js';
 import { parseIsolarMonthlyReportFile } from './importers/isolarMonthlyReport.js';
+import { isApiEnergyFlow, mergeEnergyFlowRows } from './solar/energyFlowSources.js';
 
 const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -46,6 +47,7 @@ export async function fetchRawEnergyFlows({ year = 2026, rootDir = process.cwd()
              ef.purchased_kwh as "purchasedKwh", 
              ef.load_kwh as "loadKwh", 
              ef.source as "source",
+             ef.fetched_at as "fetchedAt",
              pm.canonical_name as "canonicalName",
              pm.dc_id as "dcId",
              pm.grid as "grid",
@@ -57,7 +59,7 @@ export async function fetchRawEnergyFlows({ year = 2026, rootDir = process.cwd()
     `);
 
     if (Array.isArray(dbFlows) && dbFlows.length > 0) {
-      return dbFlows.map(r => ({
+      return mergeEnergyFlowRows(dbFlows).map(r => ({
         yearMonth: `${r.yearMonth.slice(0, 4)}-${r.yearMonth.slice(4, 6)}`,
         storageYearMonth: r.yearMonth,
         psId: Number(r.psId),
@@ -70,6 +72,7 @@ export async function fetchRawEnergyFlows({ year = 2026, rootDir = process.cwd()
         purchasedKwh: Number(r.purchasedKwh || 0),
         loadKwh: Number(r.loadKwh || 0),
         source: r.source || 'DB_ENERGY_FLOW_MONTHLY',
+        fetchedAt: r.fetchedAt ? new Date(r.fetchedAt).toISOString() : null,
       }));
     }
   } catch (dbErr) {
@@ -164,7 +167,9 @@ export async function getCanonicalEnergyRows({
     seenIdentities.add(identity);
 
     const mNum = Number(raw.storageYearMonth.slice(4, 6));
-    const isPartial = mNum > throughMonth;
+    // API rows are month-to-date until the monthly report replaces them, so they never count as a closed month.
+    const isProvisional = isApiEnergyFlow(raw);
+    const isPartial = mNum > throughMonth || isProvisional;
 
     const yieldKwh = Number(raw.yieldKwh || 0);
     const feedInKwh = Number(raw.feedInKwh || 0);
@@ -222,9 +227,12 @@ export async function getCanonicalEnergyRows({
       avoidedEmissionTonRaw,
       scope2EmissionTonRaw,
       periodStatus: isPartial ? 'partial' : 'complete',
+      isProvisional,
+      dataFetchedAt: isProvisional ? raw.fetchedAt : null,
       qualityFlags: [
         ...(factorStatus !== 'resmi' ? ['TEMPORARY_EMISSION_FACTOR'] : []),
         ...(isPartial ? ['PARTIAL_PERIOD'] : []),
+        ...(isProvisional ? ['PROVISIONAL_API'] : []),
       ],
     });
   }
@@ -273,6 +281,8 @@ export async function getCanonicalMonthlySummary({
       month: m,
       monthLabel: MONTH_NAMES_SHORT[m - 1],
       periodStatus: isPartial ? 'partial' : 'complete',
+      isProvisional: mRows.some(r => r.isProvisional),
+      dataFetchedAt: mRows.map(r => r.dataFetchedAt).filter(Boolean).sort().at(-1) || null,
       plantCount: mRows.length,
       officialPlantCount: eligibleRows.length,
       temporaryPlantCount: mRows.length - eligibleRows.length,

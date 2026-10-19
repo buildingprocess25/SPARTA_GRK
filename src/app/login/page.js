@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Lock, User, Eye, EyeOff, LogIn } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, LogIn, Clock } from 'lucide-react';
 import { SESSION_IDLE_TIMEOUT_MS } from '@/lib/sessionPolicy';
 
 function LoginForm() {
@@ -77,12 +77,18 @@ function LoginForm() {
 
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl p-6">
           <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 text-center mb-5">
-            SPARTA Sustainability Dashboard
+            SPARTA Gas Rumah Kaca
           </h1>
 
           {!error && searchParams.get('reason') === 'idle' && (
-            <div role="status" className="mb-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-xs text-slate-700 dark:text-slate-300">
-              Anda keluar otomatis karena tidak ada aktivitas selama {SESSION_IDLE_TIMEOUT_MS / 60_000} menit. Silakan masuk lagi.
+            <div role="status" className="mb-4 flex items-start gap-3 rounded-xl border border-amber-200 dark:border-amber-500/25 bg-amber-50 dark:bg-amber-500/10 px-3.5 py-3">
+              <Clock size={16} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+              <div className="space-y-0.5">
+                <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">Sesi Anda berakhir</p>
+                <p className="text-xs leading-relaxed text-amber-800/90 dark:text-amber-200/80">
+                  Tidak ada aktivitas selama {SESSION_IDLE_TIMEOUT_MS / 60_000} menit. Masuk lagi untuk melanjutkan dari halaman terakhir.
+                </p>
+              </div>
             </div>
           )}
 

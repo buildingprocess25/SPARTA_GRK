@@ -10,6 +10,8 @@
 import { runSync, isInSyncWindow, getWibTimeInfo, formatWibTime } from './sync.js';
 import { captureSnapshot30m, get30mSlotInfo, getSnapshotStatusReport } from './snapshot.js';
 import prisma from '../prisma.js';
+import { syncEnergyFlowFromApi } from './energyFlowSync.js';
+import { invalidatePltsServerCache } from './dashboardService.js';
 
 /**
  * Execute a coordinated scheduler cycle
@@ -50,6 +52,17 @@ export async function runSchedulerCycle({
     }
   } else {
     cycleReport.syncResult = { status: 'skipped', reason: trigger === 'test' ? 'Test mode' : 'Outside 05:30-18:30 WIB window' };
+  }
+
+  // Monthly PLN/load/PLTS totals for Scope 2; self-throttled to one pull every 3 hours.
+  if (inWindow && trigger !== 'test') {
+    try {
+      cycleReport.energyFlowResult = await syncEnergyFlowFromApi({ now, force: trigger === 'manual' });
+      if (cycleReport.energyFlowResult.status === 'success') invalidatePltsServerCache();
+    } catch (err) {
+      console.error('[Scheduler] Energy flow sync error:', err.message);
+      cycleReport.energyFlowResult = { status: 'failed', error: err.message };
+    }
   }
 
   // Check if snapshot for current slot already exists

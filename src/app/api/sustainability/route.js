@@ -93,6 +93,8 @@ export async function GET(request) {
         avoidedCo2Ton: Number((m?.avoidedEmissionTon || 0).toFixed(3)),
         plantCount: m?.plantCount || 0,
         hasData: yieldMwh > 0 || (m?.purchasedMwh || 0) > 0,
+        provisional: Boolean(m?.isProvisional),
+        dataFetchedAt: m?.dataFetchedAt || null,
       };
     });
 
@@ -142,6 +144,8 @@ export async function GET(request) {
         plnKwh: Number((m?.totalPurchasedKwh || 0).toFixed(1)),
         emissionTon: Number((m?.scope2EmissionTon || 0).toFixed(3)),
         hasData: (m?.totalPurchasedKwh || 0) > 0,
+        provisional: m?.periodStatus === 'partial',
+        dataThroughDate: m?.dataThroughDate || null,
       };
     });
     const totalPurchasedKwh = scope2MonthlyTrend.reduce((acc, m) => acc + m.plnKwh, 0);

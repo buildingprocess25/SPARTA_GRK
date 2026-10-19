@@ -4,6 +4,7 @@ import path from 'node:path';
 import { CARBON_FACTORS, FACTOR_REGISTRY_PROVENANCE } from '../carbon/carbonEngine.js';
 import { fetchRawEnergyFlows } from '../energy-data.js';
 import { CANONICAL_DC_ENTITIES, isDcLocation } from '../solar/plantMap.js';
+import { isApiEnergyFlow } from '../solar/energyFlowSources.js';
 import {
   buildAutomaticSummary,
   buildProjection,
@@ -89,8 +90,9 @@ async function buildRowsFromDb({ year, rootDir }) {
       exportKwh: raw.feedInKwh,
       gridFactorKgPerKwh: factor.value,
       factorStatus: factor.status,
-      periodStatus: 'complete', // energy_flow_monthly only carries finalized monthly-report imports
-      dataThroughDate: null,
+      // API rows are month-to-date figures; only report imports and manual entries close a month.
+      periodStatus: isApiEnergyFlow(raw) ? 'partial' : 'complete',
+      dataThroughDate: isApiEnergyFlow(raw) ? raw.fetchedAt : null,
       sourceRefs: [`energy_flow_monthly:${raw.source}`],
       qualityFlags: factor.status === 'temporary' ? [`FACTOR_SOURCE:${factor.source}`] : [],
     }));
@@ -192,7 +194,7 @@ export async function buildScope2CanonicalDashboard({ rootDir = process.cwd(), n
   });
   const projection = buildProjection(currentRows, { year: targetYear, field: 'scope2EmissionTon' });
   const allQualityFlags = currentRows.flatMap(row => row.qualityFlags);
-  const completeThroughMonth = currentRows.reduce((max, row) => Math.max(max, Number(row.yearMonth.slice(5, 7)) || 0), 0);
+  const completeThroughMonth = completeRows.reduce((max, row) => Math.max(max, Number(row.yearMonth.slice(5, 7)) || 0), 0);
 
   return {
     source: 'ISOLAR_ANNUAL_REPORT_MONTHLY_LOAD_WITH_CANONICAL_RECONCILIATION',

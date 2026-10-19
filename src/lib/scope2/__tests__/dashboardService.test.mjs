@@ -9,21 +9,20 @@ test('builds one canonical view model for Scope 2, PLTS and main dashboard', asy
     now: new Date('2026-10-07T00:00:00Z'),
   });
 
-  // Source: energy_flow_monthly (DB), which only carries finalized monthly
-  // report imports - so every included row is 'complete' and there is no
-  // in-progress partial month (unlike the old CSV snapshot this test used to
-  // pin against, which happened to include a partial October reading).
+  // Source: energy_flow_monthly (DB). Months closed by the monthly report are 'complete';
+  // a month that only has the scheduler's ISOLAR_API month-to-date pull is the one 'partial' month.
+  const closedRows = dashboard.current.completeRows;
+  const partialRows = dashboard.current.partialRows;
   assert.equal(dashboard.coverage.monitoredPlantCount, 37);
   assert.equal(dashboard.current.completeThroughMonth, 9);
-  assert.equal(dashboard.current.partialMonth, null);
-  assert.equal(dashboard.current.partialDataThroughDate, null);
-  assert.equal(dashboard.current.completeRows.length, 333);
-  assert.equal(dashboard.current.partialRows.length, 0);
-  assert.equal(dashboard.summary.plantMonthCount, 333);
-  assert.equal(dashboard.summary.purchasedBasisCount, 333);
+  assert.equal(closedRows.length, 333);
+  assert.ok(closedRows.every(row => row.periodStatus === 'complete'));
+  assert.ok(partialRows.every(row => row.periodStatus === 'partial' && row.dataThroughDate));
+  assert.equal(dashboard.current.partialMonth, partialRows.length ? 10 : null);
+  assert.equal(dashboard.summary.plantMonthCount, closedRows.length + partialRows.length);
   assert.equal(dashboard.summary.loadUpperBoundCount, 0);
-  assert.equal(dashboard.monthly.length, 9);
   assert.equal(dashboard.monthly[8].periodStatus, 'complete');
+  assert.equal(dashboard.monthly.length, partialRows.length ? 10 : 9);
 });
 
 test('bridge never subtracts avoided PLTS twice', async () => {

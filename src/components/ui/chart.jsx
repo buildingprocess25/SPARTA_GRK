@@ -20,13 +20,19 @@ export const ChartContainer = React.forwardRef(function ChartContainer(
 ) {
   const uniqueId = React.useId();
   const chartId = `chart-${id || uniqueId.replace(/:/g, '')}`;
+  const size = useElementSize();
+  const setRefs = React.useCallback((node) => {
+    size.ref(node);
+    if (typeof ref === 'function') ref(node);
+    else if (ref) ref.current = node;
+  }, [ref, size.ref]);
 
   return (
     <ChartContext.Provider value={{ config }}>
       <div
         data-slot="chart"
         data-chart={chartId}
-        ref={ref}
+        ref={setRefs}
         className={cn(
           "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-slate-500 [&_.recharts-cartesian-grid_line]:stroke-slate-200/80 dark:[&_.recharts-cartesian-grid_line]:stroke-slate-800/80 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-slate-300 dark:[&_.recharts-curve.recharts-tooltip-cursor]:stroke-slate-700 [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-slate-200 dark:[&_.recharts-polar-grid_[stroke='#ccc']]:stroke-slate-800 [&_.recharts-radial-bar-background-sector]:fill-slate-100 dark:[&_.recharts-radial-bar-background-sector]:fill-slate-800 [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-slate-100/60 dark:[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-slate-800/40 [&_.recharts-reference-line_[stroke='#ccc']]:stroke-slate-300 dark:[&_.recharts-reference-line_[stroke='#ccc']]:stroke-slate-700 [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
           className
@@ -34,13 +40,34 @@ export const ChartContainer = React.forwardRef(function ChartContainer(
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer>
-          {children}
-        </RechartsPrimitive.ResponsiveContainer>
+        {size.width > 0 && size.height > 0 && React.isValidElement(children)
+          ? React.cloneElement(children, { width: size.width, height: size.height })
+          : null}
       </div>
     </ChartContext.Provider>
   );
 });
+
+// Charts get their size as props instead of through Recharts' ResponsiveContainer context, which intermittently
+// never reached charts rendered inside this wrapper (the chart store stayed at 0×0 and drew nothing).
+function useElementSize() {
+  const [size, setSize] = React.useState({ width: 0, height: 0 });
+  const observerRef = React.useRef(null);
+  const ref = React.useCallback((node) => {
+    observerRef.current?.disconnect();
+    observerRef.current = null;
+    if (!node || typeof ResizeObserver === 'undefined') return;
+    const update = () => {
+      const width = Math.floor(node.clientWidth);
+      const height = Math.floor(node.clientHeight);
+      setSize((prev) => (prev.width === width && prev.height === height ? prev : { width, height }));
+    };
+    update();
+    observerRef.current = new ResizeObserver(update);
+    observerRef.current.observe(node);
+  }, []);
+  return { ...size, ref };
+}
 
 export function ChartStyle({ id, config }) {
   const colorConfig = Object.entries(config).filter(

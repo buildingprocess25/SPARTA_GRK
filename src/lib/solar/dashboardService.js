@@ -2,6 +2,7 @@ import prisma from '../prisma.js';
 import { getGridFactor } from '../emission-factors.js';
 import { buildPltsDashboardFromRows, parseDashboardQuery } from './dashboard.js';
 import { isDcLocation } from './plantMap.js';
+import { mergeEnergyFlowRows } from './energyFlowSources.js';
 import { performance } from 'perf_hooks';
 
 let nextRevalidateTag = null;
@@ -222,7 +223,7 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
           FROM energy_flow_monthly
           WHERE year_month BETWEEN ${minYm} AND ${maxYm}
           ORDER BY year_month ASC, ps_id ASC
-        `.catch(() => []),
+        `.then(mergeEnergyFlowRows).catch(() => []),
         db.$queryRaw`
           SELECT 
             SUBSTRING(date, 1, 7) as "yearMonth",

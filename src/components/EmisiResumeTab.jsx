@@ -85,6 +85,9 @@ function CalculatorLoadingSkeleton() {
   );
 }
 
+// API pulls run through the day, so the as-of time matters as much as the date.
+const formatDataAsOf = (iso) => new Date(iso).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
+
 const NO_SCOPE3_MONTHS = Object.freeze({});
 // Scope 3 is voluntary for now; this browser-level choice decides whether it joins the totals and reports.
 const INCLUDE_SCOPE3_KEY = 'sparta_include_scope3';
@@ -304,7 +307,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
   const yearMonthOf = Object.fromEntries(ytdMonths.map(m => [m.label, m.yearMonth]));
   const scope3ByMonth = (includeScope3 && realKpiState.data?.scope3ByMonth) || NO_SCOPE3_MONTHS;
 
-  const { monthlyComparisonData, avgPenambahan, avgPengurangan, avgNet, avgOffsetRatio, avgScope1Genset, avgScope1Vehicle, avgScope3, completeMonthCount } = useMemo(() => {
+  const { monthlyComparisonData, chartData, avgPenambahan, avgPengurangan, avgNet, avgOffsetRatio, avgScope1Genset, avgScope1Vehicle, avgScope2, avgPltsAvoided, avgWaterAvoided, avgScope3 } = useMemo(() => {
     const forMonth = (trend, month) => (trend || []).find(m => m.month === month);
     const list = months.map((month) => {
       const pltsMonth = forMonth(pltsData.monthlyTrend, month);
@@ -338,9 +341,15 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         ? Number(((penguranganTon / penambahanTon) * 100).toFixed(2))
         : 0;
 
+      // Month-to-date figures pulled from the iSolarCloud API until the monthly report replaces them.
+      const provisional = Boolean(pltsMonth?.provisional || scope2Month?.provisional);
+      const dataAsOf = scope2Month?.dataThroughDate || pltsMonth?.dataFetchedAt || null;
+
       return {
         month,
         pending: false,
+        provisional,
+        dataAsOf,
         penambahanTon,
         penguranganTon,
         netTon,
@@ -355,24 +364,29 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       };
     });
 
-    const complete = list.filter(d => !d.pending);
+    // A part-month would drag the monthly averages down, so only closed months are averaged.
+    const complete = list.filter(d => !d.pending && !d.provisional);
     const average = (key, digits) => Number(
       (complete.reduce((acc, d) => acc + d[key], 0) / (complete.length || 1)).toFixed(digits)
     );
 
     return {
       monthlyComparisonData: list,
+      // The chart marks month-to-date months with the same '*' and faded bars as other partial periods.
+      chartData: list.map(d => (d.provisional ? { ...d, month: `${d.month}*` } : d)),
       avgPenambahan: average('penambahanTon', 1),
       avgPengurangan: average('penguranganTon', 1),
       avgNet: average('netTon', 1),
       avgOffsetRatio: average('offsetRatioPct', 2),
       avgScope1Genset: average('scope1GensetTon', 1),
       avgScope1Vehicle: average('scope1VehicleTon', 1),
+      avgScope2: average('scope2Ton', 1),
+      avgPltsAvoided: average('pltsAvoided', 1),
+      avgWaterAvoided: average('waterAvoided', 1),
       avgScope3: (() => {
         const withScope3 = complete.filter(d => d.scope3Ton !== null);
         return withScope3.length ? Number((withScope3.reduce((acc, d) => acc + d.scope3Ton, 0) / withScope3.length).toFixed(1)) : null;
       })(),
-      completeMonthCount: complete.length,
     };
   }, [scope1, scope2, pltsData, waterData, scope3ByMonth]);
 
@@ -784,7 +798,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
             }}
             className="w-full h-72 lg:h-[300px] aspect-auto"
           >
-            <ComposedChart data={monthlyComparisonData} margin={{ top: 12, right: 12, bottom: 0, left: 8 }}>
+            <ComposedChart data={chartData} margin={{ top: 12, right: 12, bottom: 0, left: 8 }}>
               <CartesianGrid {...CHART_GRID_PROPS} />
               <XAxis dataKey="month" {...CHART_AXIS_PROPS} />
               <YAxis
@@ -807,11 +821,11 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
-                    const isPartial = data.month?.includes('*');
+                    const isPartial = data.month?.includes('*') || data.provisional;
                     if (data.pending) {
                       return (
                         <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs max-w-[240px]">
-                          <span className="font-bold">Bulan: {label} 2026</span>
+                          <span className="font-bold">Bulan: {String(label).replace("*", "")} 2026</span>
                           <p className="mt-1 text-slate-500 dark:text-slate-400">Laporan bulanan iSolarCloud belum diimpor.</p>
                         </div>
                       );
@@ -819,7 +833,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                     return (
                       <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs space-y-1.5 min-w-[240px] select-text">
                         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1 mb-1">
-                          <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {label} 2026</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {String(label).replace("*", "")} 2026</span>
                           {isPartial && (
                             <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
                               Sebagian
@@ -882,14 +896,14 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
 
               {(chartMetricView === 'all' || chartMetricView === 'penambahan') && (
                 <Bar yAxisId="left" dataKey="penambahanTon" name={`Emisi Dihasilkan (Scope ${includeScope3 ? '1-3' : '1+2'})`} fill={CHART_PALETTE.emission} radius={[4, 4, 0, 0]} maxBarSize={36} animationDuration={800} animationEasing="ease-out">
-                  {monthlyComparisonData.map((d, i) => (
+                  {chartData.map((d, i) => (
                     <Cell key={`pen-cell-${i}`} opacity={d.month?.includes('*') ? PARTIAL_OPACITY : 1} />
                   ))}
                 </Bar>
               )}
               {(chartMetricView === 'all' || chartMetricView === 'pengurangan') && (
                 <Bar yAxisId="left" dataKey="penguranganTon" name="Pengurangan Emisi (PLTS & Air)" fill={CHART_PALETTE.savings} radius={[4, 4, 0, 0]} maxBarSize={36} animationDuration={800} animationEasing="ease-out">
-                  {monthlyComparisonData.map((d, i) => (
+                  {chartData.map((d, i) => (
                     <Cell key={`peng-cell-${i}`} opacity={d.month?.includes('*') ? PARTIAL_OPACITY : 1} />
                   ))}
                 </Bar>
@@ -937,13 +951,20 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 </TableRow>
               ) : (
                 <TableRow key={i} className="print:break-inside-avoid border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                  <TableCell className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap min-w-[140px]">{d.month} 2026</TableCell>
+                  <TableCell className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap min-w-[140px]">
+                    {d.month} 2026
+                    {d.provisional && (
+                      <span className="block text-[11px] font-medium text-amber-700 dark:text-amber-300">
+                        Sementara{d.dataAsOf ? ` · data s.d. ${formatDataAsOf(d.dataAsOf)}` : ''}
+                      </span>
+                    )}
+                  </TableCell>
                   <TableCell className="px-4 py-3 text-sm tabular-nums text-right text-slate-600 dark:text-slate-400 whitespace-nowrap">{formatNum(d.scope1GensetTon, 1)}</TableCell>
                   <TableCell className="px-4 py-3 text-sm tabular-nums text-right text-slate-600 dark:text-slate-400 whitespace-nowrap">{formatNum(d.scope1VehicleTon, 1)}</TableCell>
                   <TableCell className="px-4 py-3 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 whitespace-nowrap">{formatNum(d.scope2Ton, 1)}</TableCell>
                   {includeScope3 && (
                     <TableCell className="px-4 py-3 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 whitespace-nowrap" title={d.scope3Ton === null ? 'Jurnal BPDL bulan ini belum diunggah' : undefined}>
-                      {formatNum(d.scope3Ton === null ? <span className="text-slate-400 dark:text-slate-500">—</span> : d.scope3Ton, 1)}
+                      {d.scope3Ton === null ? <span className="text-slate-400 dark:text-slate-500">—</span> : formatNum(d.scope3Ton, 1)}
                     </TableCell>
                   )}
                   <TableCell className="px-4 py-3 text-sm tabular-nums text-right font-bold text-red-600 dark:text-red-400 bg-red-50/30 dark:bg-red-500/10 whitespace-nowrap">+{formatNum(d.penambahanTon, 1)}</TableCell>
@@ -964,11 +985,11 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 <TableCell className="sticky left-0 bg-slate-50 dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-4 py-3.5 z-10 border-r border-slate-200 dark:border-slate-800 whitespace-nowrap min-w-[140px]">Rata-rata per bulan</TableCell>
                 <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-600 dark:text-slate-400 whitespace-nowrap">{formatNum(avgScope1Genset, 1)}</TableCell>
                 <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-600 dark:text-slate-400 whitespace-nowrap">{formatNum(avgScope1Vehicle, 1)}</TableCell>
-                <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 whitespace-nowrap">{formatNum((scope2.summary.totalEmissionCO2e / (completeMonthCount || 1)), 1)}</TableCell>
-                {includeScope3 && <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 whitespace-nowrap">{formatNum(avgScope3 === null ? '—' : avgScope3, 1)}</TableCell>}
+                <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 whitespace-nowrap">{formatNum(avgScope2, 1)}</TableCell>
+                {includeScope3 && <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right text-slate-700 dark:text-slate-300 whitespace-nowrap">{avgScope3 === null ? '—' : formatNum(avgScope3, 1)}</TableCell>}
                 <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-red-700 dark:text-red-300 bg-red-50/50 dark:bg-red-500/10 whitespace-nowrap">+{formatNum(avgPenambahan, 1)} tCO₂e</TableCell>
-                <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right text-emerald-600 dark:text-emerald-400 whitespace-nowrap">{formatNum((pltsData.summary.co2Avoided / (completeMonthCount || 1)), 1)}</TableCell>
-                <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right text-cyan-600 dark:text-cyan-400 whitespace-nowrap">{formatNum((waterData.summary.co2Avoided / (completeMonthCount || 1)), 1)}</TableCell>
+                <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right text-emerald-600 dark:text-emerald-400 whitespace-nowrap">{formatNum(avgPltsAvoided, 1)}</TableCell>
+                <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right text-cyan-600 dark:text-cyan-400 whitespace-nowrap">{formatNum(avgWaterAvoided, 1)}</TableCell>
                 <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50/50 dark:bg-emerald-500/10 whitespace-nowrap">-{formatNum(avgPengurangan, 1)} tCO₂e</TableCell>
                 <TableCell className="px-4 py-3.5 text-sm tabular-nums text-right font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">{formatNum(avgNet, 1)} tCO₂e</TableCell>
                 <TableCell className="px-4 py-3.5 text-center font-bold text-purple-900 dark:text-purple-200 tabular-nums whitespace-nowrap">{formatNum(avgOffsetRatio, 2)}%</TableCell>
