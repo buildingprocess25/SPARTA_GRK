@@ -38,7 +38,17 @@ function seriesHead(s, i) {
 }
 
 function barSeries(chart, s, i) {
-  return `<c:ser>${seriesHead(s, i)}<c:spPr>${fill(s.color)}</c:spPr><c:invertIfNegative val="0"/>`
+  // A single-series bar with chart.colors gives each category its own colour (e.g. emitted vs avoided vs net).
+  const points = chart.colors && chart.series.length === 1
+    ? chart.colors.map((color, idx) => `<c:dPt><c:idx val="${idx}"/><c:invertIfNegative val="0"/><c:bubble3D val="0"/><c:spPr>${fill(color)}</c:spPr></c:dPt>`).join('')
+    : '';
+  // Value labels keep small bars readable next to large ones (water recycling is ~0.01% of PLTS savings).
+  const labels = chart.dataLabels
+    ? `<c:dLbls><c:numFmt formatCode="${esc(chart.valueFormat || '#,##0')}" sourceLinked="0"/><c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr>`
+      + '<c:txPr><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="900" b="1"/></a:pPr><a:endParaRPr lang="id-ID"/></a:p></c:txPr>'
+      + '<c:dLblPos val="outEnd"/><c:showLegendKey val="0"/><c:showVal val="1"/><c:showCatName val="0"/><c:showSerName val="0"/><c:showPercent val="0"/><c:showBubbleSize val="0"/></c:dLbls>'
+    : '';
+  return `<c:ser>${seriesHead(s, i)}<c:spPr>${fill(s.color || chart.colors?.[0] || '64748B')}</c:spPr><c:invertIfNegative val="0"/>${points}${labels}`
     + `<c:cat>${strRef(chart.categories.ref, chart.categories.values)}</c:cat><c:val>${numRef(s.ref, s.values)}</c:val></c:ser>`;
 }
 

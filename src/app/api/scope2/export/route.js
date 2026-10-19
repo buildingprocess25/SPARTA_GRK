@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import * as XLSX from 'xlsx';
 
 import { buildScope2CanonicalDashboard } from '@/lib/scope2/dashboardService.js';
-import { buildScope2Csv, buildScope2ExportData, buildScope2Workbook } from '@/lib/scope2/export.js';
+import { buildScope2Csv, buildScope2ExportData, buildScope2WorkbookBytes } from '@/lib/scope2/export.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +20,7 @@ export async function GET(request) {
         },
       });
     }
-    const buffer = XLSX.write(buildScope2Workbook(exported), { type: 'buffer', bookType: 'xlsx' });
+    const buffer = Buffer.from(await buildScope2WorkbookBytes(exported));
     return new NextResponse(buffer, {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

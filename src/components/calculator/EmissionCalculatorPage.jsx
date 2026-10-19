@@ -22,12 +22,6 @@ const AUDIT_KEY = 'alfamart-esg-calculator-audit-history-v1';
 const INITIAL_PROFILE = Object.freeze({ organizationName: 'Alfamart', unitName: '', periodStart: '2026-01-01', periodEnd: '2026-12-31' });
 const fieldClass = 'mt-1 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-500/20';
 
-function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a'); anchor.href = url; anchor.download = filename; anchor.click();
-  URL.revokeObjectURL(url);
-}
-
 export default function EmissionCalculatorPage() {
   const confirm = useConfirm();
   const [view, setView] = useState('home');
@@ -117,11 +111,37 @@ export default function EmissionCalculatorPage() {
   const exportExcel = async () => {
     try {
       inclusiveDays(profile.periodStart, profile.periodEnd);
-      const XLSX = await import('xlsx');
-      const rows = entries.map(entry => ({ Sumber: CATEGORY_MAP[entry.category]?.title, Jenis: entry.kind === 'addition' ? 'Penambah' : 'Pengurangan', Entri: entry.label, 'kgCO2e': entry.calculated.kgCo2e ?? '', Status: entry.calculated.status, 'ID Faktor': entry.factorSnapshots?.map(item => item.id).join('; '), 'Nilai Faktor': entry.factorSnapshots?.map(item => item.value ?? '').join('; '), Versi: entry.factorSnapshots?.map(item => item.version).join('; ') }));
-      const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(rows), 'Rekap Emisi');
-      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet([{ Metrik: 'Total Emisi Dihasilkan kgCO2e', Nilai: summary.totalAdditionKg }, { Metrik: 'Total Pengurangan Emisi kgCO2e', Nilai: summary.totalReductionKg }, { Metrik: 'Total Emisi Akhir kgCO2e', Nilai: summary.netKg }]), 'Ringkasan');
-      const bytes = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' }); downloadBlob(new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'rekap-kalkulator-emisi.xlsx');
+      const { REPORT_COLORS, downloadWorkbook, rankRows, renderReportWorkbook } = await import('@/lib/reports/xlsxReport.js');
+      const rows = entries.map(entry => ({ Sumber: CATEGORY_MAP[entry.category]?.title, Jenis: entry.kind === 'addition' ? 'Penambah' : 'Pengurangan', Entri: entry.label, 'Emisi (kgCO2e)': entry.calculated.kgCo2e ?? null, Status: entry.calculated.status, 'ID faktor': entry.factorSnapshots?.map(item => item.id).join('; '), 'Nilai faktor': entry.factorSnapshots?.map(item => item.value ?? '').join('; '), 'Versi faktor': entry.factorSnapshots?.map(item => item.version).join('; ') }));
+      const bySource = new Map();
+      for (const row of rows) {
+        if (typeof row['Emisi (kgCO2e)'] !== 'number') continue;
+        const key = `${row.Sumber} (${row.Jenis.toLowerCase()})`;
+        bySource.set(key, (bySource.get(key) || 0) + row['Emisi (kgCO2e)']);
+      }
+      const perSumber = rankRows([...bySource].map(([Sumber, kg]) => ({ Sumber, 'Emisi (kgCO2e)': kg })), 'Emisi (kgCO2e)');
+      const neraca = [
+        { Metrik: 'Total emisi dihasilkan', Nilai: summary.totalAdditionKg, Satuan: 'kgCO2e' },
+        { Metrik: 'Total pengurangan emisi', Nilai: summary.totalReductionKg, Satuan: 'kgCO2e' },
+        { Metrik: 'Total emisi akhir', Nilai: summary.netKg, Satuan: 'kgCO2e' },
+      ];
+      const bytes = await renderReportWorkbook({
+        reportName: 'Rekap Kalkulator Emisi',
+        company: [profile.organizationName, profile.unitName].filter(Boolean).join(' · ') || 'Alfamart',
+        periodLabel: `${profile.periodStart} s.d. ${profile.periodEnd}`,
+        sheets: [
+          {
+            name: 'Ringkasan', title: 'Ringkasan kalkulator emisi', rows: neraca, keyValue: true,
+            side: [{ title: 'Emisi per sumber', rows: perSumber }],
+            charts: [
+              { type: 'bar', title: 'Neraca emisi (kgCO2e)', categoryKey: 'Metrik', dataLabels: true, heightCm: 6, colors: [REPORT_COLORS.pln, REPORT_COLORS.plts, REPORT_COLORS.net], series: [{ key: 'Nilai', name: 'kgCO2e' }] },
+              { table: 0, type: 'bar', title: 'Emisi per sumber (kgCO2e)', categoryKey: 'Sumber', series: [{ key: 'Emisi (kgCO2e)', name: 'kgCO2e', color: REPORT_COLORS.vehicle }] },
+            ],
+          },
+          { name: 'Rekap Emisi', title: 'Rincian entri kalkulator', rows },
+        ],
+      });
+      downloadWorkbook(bytes, 'rekap-kalkulator-emisi.xlsx');
     } catch { setNotice('Rekap Excel gagal dibuat. Coba ulangi atau gunakan cetak PDF.'); }
   };
 

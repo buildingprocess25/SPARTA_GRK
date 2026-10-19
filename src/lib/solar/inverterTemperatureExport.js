@@ -1,8 +1,9 @@
-import * as XLSX from 'xlsx';
 import zlib from 'zlib';
 import prismaClient from '../prisma.js';
 import { getInverterTemperaturePerformance } from './inverterTemperatureService.js';
 import { getActiveInverterTempMethodVersion } from './inverterTemperatureConfig.js';
+import { renderReportWorkbook } from '../reports/xlsxReport.js';
+import { CANONICAL_DC_ENTITIES } from './plantMap.js';
 
 /**
  * CRC32 computation for ZIP archive creation
@@ -146,18 +147,61 @@ export function createZipBuffer(files) {
   return Buffer.concat([...localHeaders, centralDirBuf, eocd]);
 }
 
+const PLANT_NAME_BY_PS_ID = new Map(CANONICAL_DC_ENTITIES.flatMap(entity => (entity.sungrowPsIds || []).map(id => [Number(id), entity.canonicalName])));
+
+// inverter_temp_daily holds one row per plant per day (aggregated over its inverters), so the detail sheet is per plant.
+const DAILY_HEADER = [
+  'Tanggal (WIB)',
+  'PS ID',
+  'Nama Plant / DC',
+  'Versi Metodologi',
+  'Run Terjadwal',
+  'Run Terhitung',
+  'Slot Valid',
+  'Suhu Rata-rata (°C)',
+  'Suhu Maksimum (°C)',
+  'Selisih Antar Inverter (°C)',
+  'Inverter Terpantau',
+  'Cakupan Suhu (%)',
+  'Rasio Stale (%)',
+  'Status Kualitas',
+  'Alasan Kualitas',
+];
+
+function dailyRowsOrPlaceholder(dailyRecords) {
+  if (!dailyRecords.length) return [['Belum ada data rekaman harian suhu inverter', ...DAILY_HEADER.slice(1).map(() => '')]];
+  return dailyRecords.map(d => [
+    d.dateWib,
+    d.psId,
+    sanitizeCellForFormulaInjection(PLANT_NAME_BY_PS_ID.get(Number(d.psId)) || ''),
+    sanitizeCellForFormulaInjection(d.methodVersion),
+    d.expectedRunCount,
+    d.includedRunCount,
+    d.validSlotCount,
+    d.avgTempC ?? '',
+    d.maxTempC ?? '',
+    d.maxInverterSpreadC ?? '',
+    `${d.invertersCovered}/${d.invertersRegistered}`,
+    d.coveragePct,
+    d.staleDeviceTimePct,
+    d.qualityStatus,
+    Array.isArray(d.qualityReasons) ? d.qualityReasons.join('; ') : '',
+  ]);
+}
+
 /**
  * Fetch raw daily inverter temp records for detailed export
  */
 async function fetchDailyInverterTempDetails({ year, db }) {
   try {
+    // date_wib is a DATE column, so the year is a range; a string filter made Prisma throw and the export came out empty.
     const dailies = await db.inverterTempDaily.findMany({
       where: {
-        dateWib: { startsWith: `${year}-` },
+        dateWib: { gte: new Date(`${year}-01-01T00:00:00Z`), lt: new Date(`${year + 1}-01-01T00:00:00Z`) },
       },
-      orderBy: [{ dateWib: 'asc' }, { inverterSn: 'asc' }],
+      orderBy: [{ dateWib: 'asc' }, { psId: 'asc' }],
     });
-    return dailies;
+    return dailies.map(d => ({ ...d, dateWib: d.dateWib instanceof Date ? d.dateWib.toISOString().slice(0, 10) : d.dateWib }));
   } catch {
     return [];
   }
@@ -210,42 +254,7 @@ export async function buildInverterTempXlsx({
   ];
 
   // Sheet 2: rincian harian
-  const sheet2Data = [
-    [
-      'Tanggal (WIB)',
-      'Inverter SN',
-      'Nama Plant / DC',
-      'Versi Metodologi',
-      'Slot Terjadwal',
-      'Slot Sukses',
-      'Slot Valid',
-      'Suhu Rata-rata (°C)',
-      'Suhu Minimum (°C)',
-      'Suhu Maksimum (°C)',
-      'Spread Suhu (°C)',
-      'Rasio Stale (%)',
-      'Status Kualitas',
-      'Alasan Kualitas',
-    ],
-    ...(dailyRecords.length > 0
-      ? dailyRecords.map(d => [
-          d.dateWib,
-          d.inverterSn,
-          d.dcId || d.plantName || '',
-          d.methodVersion,
-          d.scheduledSlots,
-          d.successSlots,
-          d.validSlots,
-          d.avgTempC !== null ? d.avgTempC : '',
-          d.minTempC !== null ? d.minTempC : '',
-          d.maxTempC !== null ? d.maxTempC : '',
-          d.spreadTempC !== null ? d.spreadTempC : '',
-          d.staleRatioPct !== null ? d.staleRatioPct : '',
-          d.qualityStatus,
-          d.qualityReasons ? d.qualityReasons.join('; ') : '',
-        ])
-      : [['Belum ada data rekaman harian inverter temperature', '', '', '', '', '', '', '', '', '', '', '', '', '']]),
-  ];
+  const sheet2Data = [DAILY_HEADER, ...dailyRowsOrPlaceholder(dailyRecords)];
 
   // Sheet 3: metadata & kualitas
   const meta = performanceData.metadata;
@@ -277,18 +286,37 @@ export async function buildInverterTempXlsx({
     ['Suhu Udara Open-Meteo vs PR', meta.correlation?.ambientTempVsPr?.label || performanceData.correlation.ambientTempVsPr.label],
   ];
 
-  const wb = XLSX.utils.book_new();
+  // The AOA sheets above stay the single definition of columns; the workbook renderer wants one object per row.
+  const toObjects = ([header, ...rows]) => rows.map(row => Object.fromEntries(header.map((key, i) => [key, row[i]])));
+  const metadataRows = sheet3Data.slice(1)
+    .filter(([key]) => key !== '')
+    .map(([key, value]) => ({ Parameter: key, 'Nilai / Keterangan': value === '' ? null : value }));
+  const percentAsNumber = { 'PR Terbobot (%)': '0.0', 'Cakupan Suhu Inverter (%)': '0.0', 'Cakupan Suhu (%)': '0.0', 'Rasio Stale (%)': '0.0', 'PS ID': '0' };
 
-  const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
-  const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
-  const ws3 = XLSX.utils.aoa_to_sheet(sheet3Data);
-
-  XLSX.utils.book_append_sheet(wb, ws1, 'Ringkasan Bulanan');
-  XLSX.utils.book_append_sheet(wb, ws2, 'Rincian Harian');
-  XLSX.utils.book_append_sheet(wb, ws3, 'Metadata & Kualitas');
-
-  const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
-  return buf;
+  const bytes = await renderReportWorkbook({
+    reportName: 'Suhu Inverter & Performance Ratio PLTS',
+    company: 'PT Sumber Alfaria Trijaya Tbk',
+    periodLabel: `Tahun ${year}${targetId && targetId !== 'ALL' ? ` · ${targetId}` : ''}`,
+    sheets: [
+      {
+        name: 'Ringkasan Bulanan', title: 'Suhu inverter dan performance ratio per bulan', rows: toObjects(sheet1Data), formats: percentAsNumber,
+        notes: ['PR dan cakupan ditulis dalam persen (0–100). Bulan bertanda Parsial belum lengkap datanya.'],
+        charts: [
+          { type: 'line', title: 'Performance ratio terbobot per bulan (%)', categoryKey: 'Nama Bulan', valueFormat: '0', series: [{ key: 'PR Terbobot (%)', name: 'PR (%)', color: '16A34A' }] },
+          {
+            type: 'line', title: 'Suhu inverter dibanding suhu udara (°C)', categoryKey: 'Nama Bulan', valueFormat: '0',
+            series: [
+              { key: 'Suhu Inverter (°C)', name: 'Suhu inverter', color: 'EA580C' },
+              { key: 'Suhu Udara Open-Meteo (°C)', name: 'Suhu udara', color: '2563EB' },
+            ],
+          },
+        ],
+      },
+      { name: 'Rincian Harian', title: 'Rincian harian suhu inverter per plant', rows: toObjects(sheet2Data), formats: percentAsNumber },
+      { name: 'Metadata & Kualitas', title: 'Metadata dan kualitas data', rows: metadataRows },
+    ],
+  });
+  return Buffer.from(bytes);
 }
 
 /**
@@ -341,44 +369,7 @@ export async function buildInverterTempZipCsv({
   const csv1Content = `\uFEFF${csv1Rows.join('\r\n')}\r\n`;
 
   // CSV 2: 02_rincian_harian.csv
-  const csv2Rows = [
-    formatCsvRow([
-      'Tanggal (WIB)',
-      'Inverter SN',
-      'Nama Plant / DC',
-      'Versi Metodologi',
-      'Slot Terjadwal',
-      'Slot Sukses',
-      'Slot Valid',
-      'Suhu Rata-rata (°C)',
-      'Suhu Minimum (°C)',
-      'Suhu Maksimum (°C)',
-      'Spread Suhu (°C)',
-      'Rasio Stale (%)',
-      'Status Kualitas',
-      'Alasan Kualitas',
-    ]),
-    ...(dailyRecords.length > 0
-      ? dailyRecords.map(d =>
-          formatCsvRow([
-            d.dateWib,
-            d.inverterSn,
-            d.dcId || d.plantName || '',
-            d.methodVersion,
-            d.scheduledSlots,
-            d.successSlots,
-            d.validSlots,
-            d.avgTempC !== null ? d.avgTempC : '',
-            d.minTempC !== null ? d.minTempC : '',
-            d.maxTempC !== null ? d.maxTempC : '',
-            d.spreadTempC !== null ? d.spreadTempC : '',
-            d.staleRatioPct !== null ? d.staleRatioPct : '',
-            d.qualityStatus,
-            d.qualityReasons ? d.qualityReasons.join('; ') : '',
-          ])
-        )
-      : [formatCsvRow(['Belum ada data rekaman harian inverter temperature', '', '', '', '', '', '', '', '', '', '', '', '', ''])]),
-  ];
+  const csv2Rows = [DAILY_HEADER, ...dailyRowsOrPlaceholder(dailyRecords)].map(formatCsvRow);
   const csv2Content = `\uFEFF${csv2Rows.join('\r\n')}\r\n`;
 
   // CSV 3: 03_metadata_kualitas.csv

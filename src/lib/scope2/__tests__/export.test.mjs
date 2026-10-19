@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { buildScope2CanonicalDashboard } from '../dashboardService.js';
-import { buildScope2Csv, buildScope2ExportData, buildScope2Workbook } from '../export.js';
+import * as XLSX from 'xlsx';
+import { buildScope2Csv, buildScope2ExportData, buildScope2WorkbookBytes } from '../export.js';
 
 test('export uses the same filtered canonical rows as dashboard', async () => {
   const dashboard = await buildScope2CanonicalDashboard({ rootDir: process.cwd() });
@@ -26,7 +27,7 @@ test('CSV has BOM and formula-like text is escaped', async () => {
 test('Excel workbook contains required sheets', async () => {
   const dashboard = await buildScope2CanonicalDashboard({ rootDir: process.cwd() });
   const exported = buildScope2ExportData(dashboard, new URLSearchParams('period=ytd'));
-  const workbook = buildScope2Workbook(exported);
+  const workbook = XLSX.read(await buildScope2WorkbookBytes(exported), { type: 'array' });
   assert.deepEqual(workbook.SheetNames, ['Ringkasan', 'Per DC-Bulan', 'Per Grid', 'Parameter']);
 });
 

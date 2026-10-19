@@ -233,11 +233,13 @@ test('7. Ekspor XLSX 3-Sheet: validitas struktur dan paritas dataset', async () 
   const wb = XLSX.read(xlsxBuf, { type: 'buffer' });
   assert.deepEqual(wb.SheetNames, ['Ringkasan Bulanan', 'Rincian Harian', 'Metadata & Kualitas']);
 
+  // Title rows sit above the table, so locate the header row instead of assuming row 1.
   const sheet1 = XLSX.utils.sheet_to_json(wb.Sheets['Ringkasan Bulanan'], { header: 1 });
-  assert.equal(sheet1[0][0], 'Bulan (YYYY-MM)');
-  assert.equal(sheet1[0][2], 'PR Terbobot (%)');
-  assert.equal(sheet1[0][3], 'Suhu Inverter (°C)');
-  assert.equal(sheet1.length, 13); // 1 header + 12 monthly rows
+  const headerIndex = sheet1.findIndex(row => row[0] === 'Bulan (YYYY-MM)');
+  assert.ok(headerIndex > 0);
+  assert.equal(sheet1[headerIndex][2], 'PR Terbobot (%)');
+  assert.equal(sheet1[headerIndex][3], 'Suhu Inverter (°C)');
+  assert.equal(sheet1.length - headerIndex - 1, 12);
 });
 
 test('8. Ekspor ZIP 3-CSV: validitas ZIP buffer dan konten RFC 4180', async () => {
@@ -263,4 +265,28 @@ test('8. Ekspor ZIP 3-CSV: validitas ZIP buffer dan konten RFC 4180', async () =
   assert.equal(zipBuf[1], 0x4b);
   assert.equal(zipBuf[2], 0x03);
   assert.equal(zipBuf[3], 0x04);
+});
+
+test('7b. Rincian harian memakai kolom inverter_temp_daily yang sebenarnya (satu baris per plant per hari)', async () => {
+  const daily = {
+    psId: 1092345, dateWib: new Date('2026-10-01T00:00:00Z'), methodVersion: 'v1', avgTempC: 41.2, maxTempC: 55.0,
+    invertersCovered: 3, invertersRegistered: 3, coveragePct: 100, maxInverterSpreadC: 4.1, qualityStatus: 'VALID',
+    qualityReasons: [], includedRunCount: 24, expectedRunCount: 26, validSlotCount: 24, staleDeviceTimePct: 0,
+  };
+  const mockDb = {
+    monthlyYieldObservation: { findMany: async () => [] },
+    productionTarget: { findMany: async () => [] },
+    weatherDaily: { findMany: async () => [] },
+    inverterTempDaily: { findMany: async () => [daily] },
+    inverterTempSamplingRun: { findFirst: async () => null },
+    inverterTempAggregationRun: { findFirst: async () => null },
+  };
+  const wb = XLSX.read(await buildInverterTempXlsx({ year: 2026, db: mockDb }), { type: 'buffer' });
+  const rows = XLSX.utils.sheet_to_json(wb.Sheets['Rincian Harian'], { header: 1 });
+  const headerIndex = rows.findIndex(row => row[0] === 'Tanggal (WIB)');
+  const [first] = rows.slice(headerIndex + 1);
+  assert.equal(first[0], '2026-10-01');
+  assert.equal(first[1], 1092345);
+  assert.equal(first[2], 'Karawang');
+  assert.equal(first[10], '3/3');
 });

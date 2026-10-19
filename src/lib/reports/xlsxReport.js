@@ -25,6 +25,9 @@ const DEFAULT_ROW_HEIGHT_EMU = 15 * 12700;
 // Headers already carry their unit, so the unit decides the cell format; key-value sheets use the row's Satuan instead.
 const UNIT_FORMATS = [
   [/\(tCO2e\)|^tCO2e$/, '#,##0.000'],
+  [/\(kgCO2e\)|^kgCO2e$/, '#,##0.00'],
+  [/\(°C\)/, '0.0'],
+  [/\(kWh\/m²\)/, '#,##0.00'],
   [/\(Rp\)|^Rupiah$|\(Rupiah\)/, '#,##0'],
   [/\(kWh\)|^kWh$/, '#,##0'],
   [/\(MWh\)|^MWh$/, '#,##0.00'],
@@ -67,7 +70,9 @@ function textWidth(value) {
  * Writes one table and returns where its columns and rows ended up, so charts can reference them.
  * @returns {{ headerRow: number, firstRow: number, lastRow: number, colOf: Map<string, number>, width: number }}
  */
-function writeTable(ws, { rows, startRow, startCol, total, keyValue, title }) {
+function writeTable(ws, { rows, startRow, startCol, total, keyValue, title, formats = {} }) {
+  // Explicit per-column formats win over the unit inferred from the header (e.g. a 0-100 "(%)" column).
+  const fmtFor = (header) => (header in formats ? formats[header] : formatFor(header));
   let row = startRow;
   if (title) {
     const cell = ws.getCell(row, startCol);
@@ -84,7 +89,7 @@ function writeTable(ws, { rows, startRow, startCol, total, keyValue, title }) {
     cell.value = header;
     cell.font = { bold: true, size: 10, color: { argb: STYLE.ink } };
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: STYLE.headerFill } };
-    cell.alignment = { vertical: 'middle', horizontal: i === 0 || !formatFor(header) ? 'left' : 'right', wrapText: true };
+    cell.alignment = { vertical: 'middle', horizontal: i === 0 || !fmtFor(header) ? 'left' : 'right', wrapText: true };
     cell.border = { bottom: { style: 'thin', color: { argb: STYLE.headerRule } } };
   });
   ws.getRow(headerRow).height = 30;
@@ -92,14 +97,14 @@ function writeTable(ws, { rows, startRow, startCol, total, keyValue, title }) {
   rows.forEach((record, r) => {
     const rowNumber = headerRow + 1 + r;
     const unit = keyValue ? String(record.Satuan || '') : null;
-    const emphasise = keyValue && /^Total/.test(String(record.Parameter || record.Indikator || ''));
+    const emphasise = keyValue && /^Total/.test(String(record.Parameter || record.Indikator || record.Metrik || ''));
     headers.forEach((header, i) => {
       const cell = ws.getCell(rowNumber, startCol + i);
-      let value = record[header];
+      let value = record[header] === '' ? null : record[header];
       const indented = typeof value === 'string' && /^\s+-\s/.test(value);
       if (indented) value = value.trim().replace(/^-\s*/, '');
       cell.value = value === undefined ? null : value;
-      const numFmt = keyValue && header === 'Nilai' ? formatFor(unit) : formatFor(header);
+      const numFmt = keyValue && header === 'Nilai' ? formatFor(unit) : fmtFor(header);
       if (typeof value === 'number' && numFmt) cell.numFmt = numFmt;
       cell.font = { size: 10, bold: emphasise, color: { argb: STYLE.ink } };
       cell.alignment = {
@@ -122,7 +127,7 @@ function writeTable(ws, { rows, startRow, startCol, total, keyValue, title }) {
       else if (isSummable(header) && rows.some((r) => typeof r[header] === 'number')) {
         const result = rows.reduce((s, r) => s + (typeof r[header] === 'number' ? r[header] : 0), 0);
         cell.value = { formula: `SUM(${colLetter(col)}${headerRow + 1}:${colLetter(col)}${headerRow + rows.length})`, result };
-        cell.numFmt = formatFor(header);
+        cell.numFmt = fmtFor(header);
         cell.alignment = { horizontal: 'right' };
       }
       cell.font = { bold: true, size: 10, color: { argb: STYLE.ink } };
@@ -133,7 +138,7 @@ function writeTable(ws, { rows, startRow, startCol, total, keyValue, title }) {
 
   headers.forEach((header, i) => {
     const column = ws.getColumn(startCol + i);
-    const numeric = Boolean(formatFor(header)) && rows.some((r) => typeof r[header] === 'number');
+    const numeric = Boolean(fmtFor(header)) && rows.some((r) => typeof r[header] === 'number');
     const longestWord = Math.max(...header.split(/\s+/).map((w) => w.length));
     const content = Math.max(0, ...rows.map((r) => textWidth(r[header])));
     const wanted = numeric
@@ -164,7 +169,7 @@ function chartFromSpec(spec, table, sheetName) {
 
 /**
  * @param {{ reportName: string, company: string, periodLabel: string, sheets: object[] }} report
- * Each sheet: { name, title, notes?, rows, keyValue?, total?, side?: [{ title, rows, total? }], charts?: [{ table: 'main'|number, type, title, categoryKey, series, ... }], chartsBelow? }
+ * Each sheet: { name, title, notes?, rows, keyValue?, total?, formats?: { [header]: numFmt }, side?: [{ title, rows, total?, formats? }], charts?: [{ table: 'main'|number, type, title, categoryKey, series, ... }], chartsBelow? }
  */
 export async function renderReportWorkbook(report) {
   const ExcelJSModule = await import('exceljs');
@@ -191,7 +196,7 @@ export async function renderReportWorkbook(report) {
     });
 
     const mainStart = 4 + (sheet.notes?.length || 0);
-    const main = writeTable(ws, { rows: sheet.rows, startRow: mainStart, startCol: 1, total: sheet.total, keyValue: sheet.keyValue });
+    const main = writeTable(ws, { rows: sheet.rows, startRow: mainStart, startCol: 1, total: sheet.total, keyValue: sheet.keyValue, formats: sheet.formats });
     main.rows = sheet.rows;
     ws.views = [{ state: 'frozen', ySplit: main.headerRow, xSplit: 0 }];
     if (!sheet.keyValue && sheet.rows.length > 8) {
@@ -206,7 +211,7 @@ export async function renderReportWorkbook(report) {
 
     const tables = [main];
     for (const side of sheet.side || []) {
-      const placed = writeTable(ws, { rows: side.rows, startRow: zoneRow, startCol: zoneCol, total: side.total, title: side.title });
+      const placed = writeTable(ws, { rows: side.rows, startRow: zoneRow, startCol: zoneCol, total: side.total, title: side.title, formats: side.formats });
       placed.rows = side.rows;
       tables.push(placed);
       zoneRow = placed.endRow + 3;

@@ -213,6 +213,18 @@ export function buildSrnPpiWorkbookData(reportData) {
   const topBar = (title, categoryKey, key, name, color) => ({
     type: 'bar', title, categoryKey, topN: 10, series: [{ key, name, color }],
   });
+  // Water recycling and PLTS are reductions, not sources, so they sit in the balance next to the emitted total.
+  const neraca = [
+    { Posisi: 'Emisi dihasilkan', 'Nilai (tCO2e)': totalAddition },
+    { Posisi: 'Pengurangan PLTS atap', 'Nilai (tCO2e)': totalPltsAvoided },
+    { Posisi: 'Pengurangan daur ulang air', 'Nilai (tCO2e)': totalWaterAvoided },
+    { Posisi: 'Emisi akhir', 'Nilai (tCO2e)': netEmission },
+  ];
+  const neracaChart = (table) => ({
+    table, type: 'bar', title: 'Neraca emisi (tCO2e)', categoryKey: 'Posisi', dataLabels: true, heightCm: 7,
+    colors: [REPORT_COLORS.pln, REPORT_COLORS.plts, REPORT_COLORS.water, REPORT_COLORS.net],
+    series: [{ key: 'Nilai (tCO2e)', name: 'tCO2e' }],
+  });
   const rankedNote = 'Diurutkan dari nilai terbesar; grafik menampilkan 10 teratas.';
   const safePeriod = String(reportData.period || year).replace(/[^a-zA-Z0-9_-]/g, '_');
 
@@ -220,8 +232,14 @@ export function buildSrnPpiWorkbookData(reportData) {
     sheets: [
       {
         name: 'Ringkasan Eksekutif', title: 'Ringkasan eksekutif inventarisasi GRK', rows: ringkasan, keyValue: true,
-        side: [{ title: 'Komposisi emisi dihasilkan', rows: komposisi, total: true }],
-        charts: [{ table: 0, type: 'doughnut', title: 'Porsi emisi per sumber', categoryKey: 'Sumber emisi', colors: komposisiColors, series: [{ key: 'Emisi (tCO2e)', name: 'Emisi (tCO2e)' }] }],
+        side: [
+          { title: 'Komposisi emisi dihasilkan', rows: komposisi, total: true },
+          { title: 'Neraca emisi dan pengurangan', rows: neraca },
+        ],
+        charts: [
+          { table: 0, type: 'doughnut', title: 'Porsi emisi per sumber', categoryKey: 'Sumber emisi', colors: komposisiColors, series: [{ key: 'Emisi (tCO2e)', name: 'Emisi (tCO2e)' }] },
+          neracaChart(1),
+        ],
       },
       {
         name: 'Scope 1 - Genset', title: 'Scope 1 · Solar genset cadangan per fasilitas', notes: [rankedNote], rows: dataGenset, total: true,

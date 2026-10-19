@@ -136,6 +136,18 @@ export function buildOjkWorkbookData(reportData) {
     { 'Sumber listrik': 'PLTS atap', 'Energi (MWh)': totalPltsProdMwh },
   ].map(r => ({ ...r, 'Porsi (%)': totalElectricityConsumedMwh > 0 ? round(r['Energi (MWh)'] / totalElectricityConsumedMwh, 4) : 0 }));
 
+  // Water recycling and PLTS are reductions, not sources, so they sit in the balance next to the emitted total.
+  const neraca = [
+    { Posisi: 'Emisi dihasilkan', 'Nilai (tCO2e)': totalEmission },
+    { Posisi: 'Pengurangan PLTS atap', 'Nilai (tCO2e)': totalPltsAvoided },
+    { Posisi: 'Pengurangan daur ulang air', 'Nilai (tCO2e)': totalWaterAvoided },
+    { Posisi: 'Emisi akhir', 'Nilai (tCO2e)': netEmission },
+  ];
+  const neracaChart = (table) => ({
+    table, type: 'bar', title: 'Neraca emisi (tCO2e)', categoryKey: 'Posisi', dataLabels: true, heightCm: 7,
+    colors: [REPORT_COLORS.pln, REPORT_COLORS.plts, REPORT_COLORS.water, REPORT_COLORS.net],
+    series: [{ key: 'Nilai (tCO2e)', name: 'tCO2e' }],
+  });
   const rankedNote = 'Diurutkan dari nilai terbesar; grafik menampilkan 10 teratas.';
   const safePeriod = String(reportData.period || year).replace(/[^a-zA-Z0-9_-]/g, '_');
 
@@ -146,10 +158,12 @@ export function buildOjkWorkbookData(reportData) {
         side: [
           { title: 'Komposisi emisi GRK dihasilkan', rows: komposisi, total: true },
           { title: 'Bauran sumber listrik', rows: bauranEnergi, total: true },
+          { title: 'Neraca emisi dan pengurangan', rows: neraca },
         ],
         charts: [
           { table: 0, type: 'doughnut', title: 'Porsi emisi per sumber', categoryKey: 'Sumber emisi', colors: [REPORT_COLORS.genset, REPORT_COLORS.vehicle, REPORT_COLORS.scope2, REPORT_COLORS.scope3], series: [{ key: 'Emisi (tCO2e)', name: 'Emisi (tCO2e)' }] },
           { table: 1, type: 'doughnut', title: 'Bauran listrik PLN dan PLTS atap', categoryKey: 'Sumber listrik', colors: [REPORT_COLORS.pln, REPORT_COLORS.plts], series: [{ key: 'Energi (MWh)', name: 'Energi (MWh)' }] },
+          neracaChart(2),
         ],
       },
       {
