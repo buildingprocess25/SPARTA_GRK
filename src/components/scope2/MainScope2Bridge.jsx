@@ -27,9 +27,6 @@ export default function MainScope2Bridge({ onNavigate }) {
 
   const scope2Bridge = state.data.scope2Bridge;
   const scope2Ton = scope2Bridge.scope2InventoryTon;
-  const card = 'rounded-xl p-4';
-  const label = 'text-xs text-slate-600 dark:text-slate-400';
-  const value = 'text-slate-900 dark:text-slate-100';
 
   return (
     <CardBox className="space-y-4 border-blue-200/80 dark:border-blue-500/20 bg-gradient-to-br from-white to-blue-50/30 dark:from-slate-900 dark:to-blue-950/20">
@@ -61,7 +58,7 @@ export default function MainScope2Bridge({ onNavigate }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-3.5 flex flex-col justify-between">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
             <span>Tanpa Pembangkit PLTS</span>
@@ -78,14 +75,6 @@ export default function MainScope2Bridge({ onNavigate }) {
           <div className="mt-2">
             <strong className="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">− {number.format(scope2Bridge.pltsAvoidedTon)}</strong>
             <span className="text-xs font-semibold text-emerald-600/80 dark:text-emerald-400 ml-1">tCO₂e</span>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-3.5 flex flex-col justify-between">
-          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Emisi Listrik Setelah PLTS</p>
-          <div className="mt-2">
-            <strong className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{number.format(scope2Bridge.afterPltsTon)}</strong>
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">tCO₂e</span>
           </div>
         </div>
 

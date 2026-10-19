@@ -148,7 +148,7 @@ export default function MetricInfoIcon({
                 {info.title}
               </h4>
               {info.badge && (
-                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
+                <span className="text-[10px] tabular-nums font-semibold px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
                   {info.badge}
                 </span>
               )}

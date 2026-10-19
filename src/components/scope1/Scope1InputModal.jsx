@@ -707,7 +707,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                       )}
                     </div>
                     <div>
-                      <div className="text-[11px] text-amber-700 dark:text-amber-400 font-mono font-semibold">2.6685 kgCO₂e/L</div>
+                      <div className="text-[11px] text-amber-700 dark:text-amber-400 tabular-nums font-semibold">2.6685 kgCO₂e/L</div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Faktor ESDM</div>
                     </div>
                   </button>
@@ -730,7 +730,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                       )}
                     </div>
                     <div>
-                      <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-mono font-semibold">2.2951 kgCO₂e/L</div>
+                      <div className="text-[11px] text-emerald-700 dark:text-emerald-400 tabular-nums font-semibold">2.2951 kgCO₂e/L</div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">Faktor ESDM</div>
                     </div>
                   </button>
@@ -753,7 +753,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                       )}
                     </div>
                     <div>
-                      <div className="text-[11px] text-blue-700 dark:text-blue-400 font-mono font-semibold">2.2868 kgCO₂e/L</div>
+                      <div className="text-[11px] text-blue-700 dark:text-blue-400 tabular-nums font-semibold">2.2868 kgCO₂e/L</div>
                       <div className="text-[11px] text-slate-600 dark:text-slate-400 leading-tight">Faktor belum divalidasi</div>
                     </div>
                   </button>
@@ -839,7 +839,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                         value={vehiclePlateNo}
                         onChange={(e) => setVehiclePlateNo(e.target.value.toUpperCase())}
                         placeholder="B 1234 XYZ"
-                        className={`w-full rounded-lg border bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 ${
+                        className={`w-full rounded-lg border bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs tabular-nums font-bold text-slate-800 dark:text-slate-200 ${
                           formErrors.vehiclePlateNo ? 'border-rose-400 dark:border-rose-500/60' : 'border-slate-200 dark:border-slate-700'
                         }`}
                       />
@@ -891,7 +891,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                           value={gensetAssetCode}
                           onChange={(e) => setGensetAssetCode(e.target.value)}
                           placeholder="GEN-DC-500KVA"
-                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-bold text-slate-800 dark:text-slate-200"
+                          className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs tabular-nums font-bold text-slate-800 dark:text-slate-200"
                         />
                       </div>
                       <div>
@@ -936,7 +936,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                   value={proofRef}
                   onChange={(e) => setProofRef(e.target.value)}
                   placeholder={`Contoh: INV-SOLAR-${location.code || 'DC'}-${periodMonth}26-001`}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs tabular-nums text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                 />
               </div>
 
@@ -949,7 +949,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                       Emisi dari input ini
                     </span>
                   </div>
-                  <span className="text-xs font-mono font-extrabold text-rose-400 bg-rose-950/60 border border-rose-800/80 px-2.5 py-0.5 rounded-full">
+                  <span className="text-xs tabular-nums font-extrabold text-rose-400 bg-rose-950/60 border border-rose-800/80 px-2.5 py-0.5 rounded-full">
                     +{liveCalc.emissionTon.toFixed(3)} tCO₂e
                   </span>
                 </div>
@@ -957,31 +957,31 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   <div>
                     <span className="text-[10px] text-slate-400 block">Volume BBM</span>
-                    <strong className="text-slate-100 font-mono text-xs">
+                    <strong className="text-slate-100 tabular-nums text-xs">
                       {liveCalc.liters.toLocaleString('id-ID')} Liter
                     </strong>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 block">Faktor Emisi</span>
-                    <strong className="text-slate-100 font-mono text-xs">
+                    <strong className="text-slate-100 tabular-nums text-xs">
                       {liveCalc.factor} kg/L
                     </strong>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 block">Emisi Total</span>
-                    <strong className="text-rose-400 font-mono font-bold text-xs">
+                    <strong className="text-rose-400 tabular-nums font-bold text-xs">
                       +{liveCalc.emissionTon.toFixed(3)} tCO₂e
                     </strong>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 block">Est. Biaya</span>
-                    <strong className="text-slate-100 font-mono text-xs">
+                    <strong className="text-slate-100 tabular-nums text-xs">
                       Rp {liveCalc.costJuta.toFixed(1)} Jt
                     </strong>
                   </div>
                 </div>
 
-                <div className="text-[10px] font-mono text-slate-400 bg-slate-800/60 px-2.5 py-1.5 rounded-lg border border-slate-800">
+                <div className="text-[10px] tabular-nums text-slate-400 bg-slate-800/60 px-2.5 py-1.5 rounded-lg border border-slate-800">
                   Verifikasi: <strong className="text-slate-200">{liveCalc.formula}</strong>
                 </div>
               </div>
@@ -1071,19 +1071,19 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                       <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Total Baris</span>
-                      <strong className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">
+                      <strong className="text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                         {previewResult.totalRows || 0}
                       </strong>
                     </div>
                     <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
                       <span className="text-[10px] text-emerald-700 dark:text-emerald-300 block">Valid</span>
-                      <strong className="text-sm font-bold text-emerald-700 dark:text-emerald-300 font-mono">
+                      <strong className="text-sm font-bold text-emerald-700 dark:text-emerald-300 tabular-nums">
                         {previewResult.validCount || 0}
                       </strong>
                     </div>
                     <div className="p-2 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20">
                       <span className="text-[10px] text-rose-700 dark:text-rose-300 block">Error</span>
-                      <strong className="text-sm font-bold text-rose-700 dark:text-rose-300 font-mono">
+                      <strong className="text-sm font-bold text-rose-700 dark:text-rose-300 tabular-nums">
                         {previewResult.errorCount || 0}
                       </strong>
                     </div>

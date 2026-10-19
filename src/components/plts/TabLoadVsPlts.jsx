@@ -130,7 +130,7 @@ export default function TabLoadVsPlts({ filters }) {
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748b' }} />
                   <YAxis
                     tick={{ fontSize: 10, fill: '#64748b' }}
-                    tickFormatter={(v) => v >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : `${(v / 1000).toFixed(0)}k`}
+                    tickFormatter={(v) => v >= 1e6 ? `${formatNum(v / 1e6, 1)} jt` : `${formatNum(v / 1000, 0)} rb`}
                     unit=" kWh"
                     width={85}
                   />
@@ -156,7 +156,7 @@ export default function TabLoadVsPlts({ filters }) {
                   />
                   <YAxis
                     tick={{ fontSize: 10, fill: '#64748b' }}
-                    tickFormatter={(v) => v >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : `${(v / 1000).toFixed(0)}k`}
+                    tickFormatter={(v) => v >= 1e6 ? `${formatNum(v / 1e6, 1)} jt` : `${formatNum(v / 1000, 0)} rb`}
                     unit=" kWh"
                     width={85}
                   />
@@ -188,7 +188,7 @@ export default function TabLoadVsPlts({ filters }) {
               <div>
                 <div className="flex justify-between text-xs font-bold mb-1">
                   <span className="text-amber-800 dark:text-amber-300">Dari PLTS</span>
-                  <span className="text-amber-900 dark:text-amber-200 font-mono font-black">
+                  <span className="text-amber-900 dark:text-amber-200 tabular-nums font-black">
                     {energyMix.pltsSharePct != null ? `${formatNum(energyMix.pltsSharePct, 1, 1)}%` : '—'}
                   </span>
                 </div>
@@ -203,7 +203,7 @@ export default function TabLoadVsPlts({ filters }) {
               <div>
                 <div className="flex justify-between text-xs font-bold mb-1">
                   <span className="text-slate-600 dark:text-slate-400">Dari PLN</span>
-                  <span className="text-slate-800 dark:text-slate-200 font-mono font-black">
+                  <span className="text-slate-800 dark:text-slate-200 tabular-nums font-black">
                     {energyMix.plnSharePct != null ? `${formatNum(energyMix.plnSharePct, 1, 1)}%` : '—'}
                   </span>
                 </div>
@@ -219,11 +219,11 @@ export default function TabLoadVsPlts({ filters }) {
             <div className="mt-4 rounded-lg bg-slate-50 dark:bg-slate-800/40 p-2.5 text-[11px] space-y-1">
               <div className="flex justify-between text-slate-600 dark:text-slate-400">
                 <span>Total kebutuhan listrik DC:</span>
-                <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{formatNum(totalLoadKwh, 0, 0)} kWh</span>
+                <span className="tabular-nums font-bold text-slate-900 dark:text-slate-100">{formatNum(totalLoadKwh, 0, 0)} kWh</span>
               </div>
               <div className="flex justify-between text-amber-700 dark:text-amber-300">
                 <span>Produksi PLTS:</span>
-                <span className="font-mono font-bold">{formatNum(totalProdKwh, 0, 0)} kWh</span>
+                <span className="tabular-nums font-bold">{formatNum(totalProdKwh, 0, 0)} kWh</span>
               </div>
             </div>
           </div>

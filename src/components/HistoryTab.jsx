@@ -84,7 +84,7 @@ export default function HistoryTab({ setActiveTab }) {
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {inputHistory.map((item) => (
                     <tr key={item.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                      <td className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400 font-mono sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 z-10 whitespace-nowrap">
+                      <td className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400 tabular-nums sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 z-10 whitespace-nowrap">
                         {item.recordedAt}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
@@ -100,7 +100,7 @@ export default function HistoryTab({ setActiveTab }) {
                       <td className="px-4 py-3 font-semibold text-slate-900 dark:text-slate-100 whitespace-nowrap">
                         {item.dcName}
                       </td>
-                      <td className="px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-300">
+                      <td className="px-4 py-3 tabular-nums text-xs text-slate-700 dark:text-slate-300">
                         {item.details}
                       </td>
                       <td className="px-4 py-3 text-center whitespace-nowrap">
@@ -149,14 +149,14 @@ export default function HistoryTab({ setActiveTab }) {
 
                   <div className="space-y-1">
                     <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">{item.dcName}</h4>
-                    <p className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800/40 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-700 leading-relaxed">
+                    <p className="text-xs tabular-nums text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800/40 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-700 leading-relaxed">
                       {item.details}
                     </p>
                   </div>
 
                   <div className="pt-2 border-t border-slate-200/60 dark:border-slate-700 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                     <span>Waktu:</span>
-                    <span className="font-mono">{item.recordedAt}</span>
+                    <span className="tabular-nums">{item.recordedAt}</span>
                   </div>
                 </div>
               ))}

@@ -649,7 +649,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                   </div>
                 </div>
                 <div className="text-right pl-3 shrink-0">
-                  <span className="font-mono font-bold text-sm text-slate-900 dark:text-slate-100 block">
+                  <span className="tabular-nums font-bold text-sm text-slate-900 dark:text-slate-100 block">
                     {gridFactor.toFixed(3)}
                   </span>
                   <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block">
@@ -687,7 +687,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                         value={plnCustomerNumber}
                         onChange={(e) => setPlnCustomerNumber(e.target.value)}
                         placeholder="538100912401"
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs tabular-nums font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                       />
                     </div>
 
@@ -701,7 +701,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                         value={invoiceRef}
                         onChange={(e) => setInvoiceRef(e.target.value)}
                         placeholder={`INV-PLN-${selectedDC.name.replace(/\s+/g, '')}-01`}
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs font-mono font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-xs tabular-nums font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                       />
                     </div>
                   </div>
@@ -717,7 +717,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                       Emisi dari input ini
                     </span>
                   </div>
-                  <span className="text-xs font-mono font-extrabold text-amber-400 bg-amber-950/60 border border-amber-800/80 px-2.5 py-0.5 rounded-full">
+                  <span className="text-xs tabular-nums font-extrabold text-amber-400 bg-amber-950/60 border border-amber-800/80 px-2.5 py-0.5 rounded-full">
                     +{liveCalculation.emissionTon.toFixed(3)} tCO₂e
                   </span>
                 </div>
@@ -725,31 +725,31 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   <div>
                     <span className="text-[10px] text-slate-300 block">Dari PLN</span>
-                    <strong className="text-slate-100 font-mono text-xs">
+                    <strong className="text-slate-100 tabular-nums text-xs">
                       {liveCalculation.mwh.toFixed(2)} MWh
                     </strong>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 block">Faktor Grid</span>
-                    <strong className="text-slate-100 font-mono text-xs">
+                    <strong className="text-slate-100 tabular-nums text-xs">
                       {liveCalculation.gridFactor.toFixed(3)} t/MWh
                     </strong>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 block">Emisi Scope 2</span>
-                    <strong className="text-amber-400 font-mono font-bold text-xs">
+                    <strong className="text-amber-400 tabular-nums font-bold text-xs">
                       +{liveCalculation.emissionTon.toFixed(3)} tCO₂e
                     </strong>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 block">Est. Tagihan</span>
-                    <strong className="text-slate-100 font-mono text-xs">
+                    <strong className="text-slate-100 tabular-nums text-xs">
                       Rp {liveCalculation.costJuta.toFixed(1)} Jt
                     </strong>
                   </div>
                 </div>
 
-                <div className="text-[10px] font-mono text-slate-400 bg-slate-800/60 px-2.5 py-1.5 rounded-lg border border-slate-800">
+                <div className="text-[10px] tabular-nums text-slate-400 bg-slate-800/60 px-2.5 py-1.5 rounded-lg border border-slate-800">
                   Verifikasi: <strong className="text-slate-200">{liveCalculation.formula}</strong>
                 </div>
               </div>
@@ -839,19 +839,19 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                       <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Total Baris</span>
-                      <strong className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">
+                      <strong className="text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                         {previewResult.totalRows || 0}
                       </strong>
                     </div>
                     <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
                       <span className="text-[10px] text-emerald-700 dark:text-emerald-300 block">Valid</span>
-                      <strong className="text-sm font-bold text-emerald-700 dark:text-emerald-300 font-mono">
+                      <strong className="text-sm font-bold text-emerald-700 dark:text-emerald-300 tabular-nums">
                         {previewResult.validCount || 0}
                       </strong>
                     </div>
                     <div className="p-2 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20">
                       <span className="text-[10px] text-rose-700 dark:text-rose-300 block">Error</span>
-                      <strong className="text-sm font-bold text-rose-700 dark:text-rose-300 font-mono">
+                      <strong className="text-sm font-bold text-rose-700 dark:text-rose-300 tabular-nums">
                         {previewResult.errorCount || 0}
                       </strong>
                     </div>

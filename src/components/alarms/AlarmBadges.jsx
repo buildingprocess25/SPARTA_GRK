@@ -25,7 +25,7 @@ export default function AlarmBadges({ sourceTab = 'plts', onClick, className = '
   const badges = compact ? (
     <>
       {faultCount > 0 && (
-        <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] px-1 shadow-xs transition animate-pulse">
+        <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] px-1 shadow-xs transition">
           <AlertOctagon size={10} className="shrink-0 mr-0.5" />
           {faultCount}
         </span>
@@ -40,7 +40,7 @@ export default function AlarmBadges({ sourceTab = 'plts', onClick, className = '
   ) : (
     <>
       {faultCount > 0 && (
-        <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] px-2 py-0.5 shadow-xs transition animate-pulse">
+        <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] px-2 py-0.5 shadow-xs transition">
           <AlertOctagon size={11} className="shrink-0" />
           <span>{faultCount} Fault</span>
         </span>

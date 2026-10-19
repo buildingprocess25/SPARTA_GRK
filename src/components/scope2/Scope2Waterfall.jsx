@@ -99,7 +99,7 @@ export default function Scope2Waterfall({ summary }) {
                   {step.title}
                 </span>
                 <span
-                  className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded shrink-0 ${
+                  className={`text-[10px] tabular-nums font-bold px-1.5 py-0.5 rounded shrink-0 ${
                     step.isResult
                       ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-500/30'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-slate-700'

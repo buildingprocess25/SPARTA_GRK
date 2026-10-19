@@ -372,7 +372,7 @@ export default function Header({
                       {roleConfig.badge}
                     </span>
                     {activeRoleOverride && (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      <span className="text-[10px] tabular-nums px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
                         Mode Preview
                       </span>
                     )}
@@ -471,13 +471,13 @@ export default function Header({
                         <User size={15} className="text-emerald-600 dark:text-emerald-400" />
                         <span>Data Akun</span>
                       </div>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{profileData.nip}</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 tabular-nums">{profileData.nip}</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                       <div>
                         <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Username</span>
-                        <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">@{currentUser?.username || '—'}</span>
+                        <span className="tabular-nums font-bold text-emerald-700 dark:text-emerald-400">@{currentUser?.username || '—'}</span>
                       </div>
                       <div>
                         <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Peran Sistem</span>
@@ -677,9 +677,9 @@ export default function Header({
                               <Database size={14} className="text-blue-600 dark:text-blue-400" />
                               Database PostgreSQL
                             </span>
-                            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="size-2 rounded-full bg-emerald-500" />
                           </div>
-                          <div className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                          <div className="text-xs tabular-nums font-bold text-emerald-600 dark:text-emerald-400">
                             Terhubung (Latency {healthData?.database?.latencyMs || '3'} ms)
                           </div>
                           <p className="text-[10px] text-slate-500 dark:text-slate-400">
@@ -695,7 +695,7 @@ export default function Header({
                             </span>
                             <span className="size-2 rounded-full bg-emerald-500" />
                           </div>
-                          <div className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
+                          <div className="text-xs tabular-nums font-bold text-slate-800 dark:text-slate-200">
                             37 DC Inverter Online
                           </div>
                           <p className="text-[10px] text-slate-500 dark:text-slate-400">
@@ -788,7 +788,7 @@ export default function Header({
                           Pendaftaran Akun Pengguna Baru
                         </span>
                         <span className="text-[10px] text-slate-500 bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
-                          Password default: <strong className="text-blue-600 dark:text-blue-400 font-mono">ptsat123</strong>
+                          Password default: <strong className="text-blue-600 dark:text-blue-400 tabular-nums">ptsat123</strong>
                         </span>
                       </div>
 
@@ -798,7 +798,7 @@ export default function Header({
                             Username Login <span className="text-rose-500">*</span>
                           </label>
                           <div className="relative">
-                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-xs z-10">@</span>
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 tabular-nums text-xs z-10">@</span>
                             <Input
                               type="text"
                               required
@@ -988,7 +988,7 @@ export default function Header({
                                   <span className="font-bold text-xs text-slate-900 dark:text-slate-100 truncate">
                                     {usr.displayName || `@${usr.username}`}
                                   </span>
-                                  <span className="text-[10px] text-slate-400 font-mono">(@{usr.username})</span>
+                                  <span className="text-[10px] text-slate-400 tabular-nums">(@{usr.username})</span>
                                 </div>
                                 <p className="text-[10px] sm:text-[11px] text-slate-500 truncate">
                                   {usr.nip && usr.nip !== '—' ? `${usr.nip} · ` : ''}{usr.dept || rInfo.badge}

@@ -256,11 +256,11 @@ export default function WaterRecycleTab() {
                       <div className="font-semibold text-slate-900 dark:text-slate-100">{row.name}</div>
                     </td>
                     <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{row.region || '—'}</td>
-                    <td className="px-4 py-3 font-mono text-right text-slate-800 dark:text-slate-200">{formatNum(row.volumeM3)} m³</td>
-                    <td className="px-4 py-3 font-mono text-right text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-500/10">
+                    <td className="px-4 py-3 tabular-nums text-right text-slate-800 dark:text-slate-200">{formatNum(row.volumeM3)} m³</td>
+                    <td className="px-4 py-3 tabular-nums text-right text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50/30 dark:bg-emerald-500/10">
                       {formatNum(row.emissionAvoidedTon, 3)} tCO₂e
                     </td>
-                    <td className="px-4 py-3 font-mono text-right text-slate-600 dark:text-slate-400">
+                    <td className="px-4 py-3 tabular-nums text-right text-slate-600 dark:text-slate-400">
                       Rp {formatNum(row.costSavedRupiah / 1_000_000, 2)} Jt
                     </td>
                   </tr>
@@ -272,13 +272,13 @@ export default function WaterRecycleTab() {
                 <tr>
                   <td className="sticky bottom-0 left-0 z-20 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3 text-slate-900 dark:text-slate-100">TOTAL</td>
                   <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3"></td>
-                  <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100">
+                  <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 tabular-nums text-slate-900 dark:text-slate-100">
                     {formatNum(filteredRows.reduce((s, r) => s + r.volumeM3, 0))} m³
                   </td>
-                  <td className="sticky bottom-0 z-10 bg-emerald-100 dark:bg-emerald-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-emerald-700 dark:text-emerald-300">
+                  <td className="sticky bottom-0 z-10 bg-emerald-100 dark:bg-emerald-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 tabular-nums text-emerald-700 dark:text-emerald-300">
                     {formatNum(filteredRows.reduce((s, r) => s + r.emissionAvoidedTon, 0), 3)} tCO₂e
                   </td>
-                  <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100">
+                  <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 tabular-nums text-slate-900 dark:text-slate-100">
                     Rp {formatNum(filteredRows.reduce((s, r) => s + r.costSavedRupiah, 0) / 1_000_000, 2)} Jt
                   </td>
                 </tr>

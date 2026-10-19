@@ -44,7 +44,7 @@ export function TableRow({ children, className = '', clickable = false, ...props
 
 export function TableCell({ children, className = '', align = 'left', isNumber = false, ...props }) {
   const alignClass = align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left';
-  const numClass = isNumber ? 'font-mono tabular-nums' : '';
+  const numClass = isNumber ? 'tabular-nums' : '';
 
   return (
     <td

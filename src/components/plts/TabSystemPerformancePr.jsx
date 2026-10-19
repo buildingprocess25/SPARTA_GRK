@@ -220,7 +220,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
           <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
             <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block">Kinerja panel (PR)</span>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl font-black text-blue-700 dark:text-blue-300 font-mono">{summaryMetrics.avgPr}%</span>
+              <span className="text-xl font-black text-blue-700 dark:text-blue-300 tabular-nums">{summaryMetrics.avgPr}%</span>
               
             </div>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
@@ -234,7 +234,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
               <InfoHint size={12} title="PR jika panel tidak panas" text="Panel surya bekerja kurang efisien saat panas. Angka ini memperkirakan PR jika suhu panel 25°C. Suhu panel dihitung dari data cuaca (model King/Sandia), bukan diukur sensor, jadi bisa meleset beberapa derajat." />
             </span>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl font-black text-emerald-700 dark:text-emerald-300 font-mono">{summaryMetrics.avgPrCorr}%</span>
+              <span className="text-xl font-black text-emerald-700 dark:text-emerald-300 tabular-nums">{summaryMetrics.avgPrCorr}%</span>
               <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">pada 25°C</span>
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
           <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
             <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block">Rata-rata {activeParam.label.toLowerCase()}</span>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl font-black text-red-600 dark:text-red-400 font-mono">{summaryMetrics.avgParam}</span>
+              <span className="text-xl font-black text-red-600 dark:text-red-400 tabular-nums">{summaryMetrics.avgParam}</span>
               <span className="text-[11px] font-bold text-red-700 dark:text-red-300">{activeParam.unit}</span>
             </div>
           </div>
@@ -253,8 +253,8 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
               <InfoHint size={12} title="Hubungan dengan PR" text="Angka -1 sampai +1 (korelasi Pearson). Mendekati -1: makin tinggi nilainya, makin turun PR. Mendekati +1: keduanya naik bersama. Dekat 0: tidak ada hubungan jelas." />
             </span>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className={`text-xl font-black font-mono ${correlation?.r < 0 ? 'text-amber-700 dark:text-amber-400' : 'text-blue-700 dark:text-blue-300'}`}>
-                {correlation?.r !== null ? (correlation.r > 0 ? `+${correlation.r.toFixed(2)}` : correlation.r.toFixed(2)) : '—'}
+              <span className={`text-xl font-black tabular-nums ${correlation?.r < 0 ? 'text-amber-700 dark:text-amber-400' : 'text-blue-700 dark:text-blue-300'}`}>
+                {correlation?.r !== null ? (correlation.r > 0 ? `+${formatNum(correlation.r, 2)}` : formatNum(correlation.r, 2)) : '—'}
               </span>
               <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">({correlation?.strength || '—'})</span>
             </div>

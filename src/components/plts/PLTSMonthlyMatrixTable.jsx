@@ -10,6 +10,7 @@ import InfoHint from '@/components/ui/InfoHint';
 import { CustomSelect } from '@/components/ui/select';
 import { CONVERSION_CONFIG } from '@/lib/solar/conversionConfig';
 import { isDcLocation } from '@/lib/solar/plantMap';
+import { formatNum } from '@/data/sustainabilityData';
 
 const MONTH_NAMES = [
   'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
@@ -372,7 +373,7 @@ export default function PLTSMonthlyMatrixTable({
                   { value: 'ALL', label: 'Semua DC' },
                   ...plantList.map(p => ({
                     value: p.dcId,
-                    label: `${p.canonicalName} (${p.capacityKwp?.toFixed(1)} kWp)`,
+                    label: `${p.canonicalName} (${formatNum(p.capacityKwp, 1)} kWp)`,
                   })),
                 ]}
               />
@@ -489,7 +490,7 @@ export default function PLTSMonthlyMatrixTable({
                 return (
                   <td
                     key={idx}
-                    className={`font-mono text-right px-2 py-2.5 text-slate-600 dark:text-slate-400 ${
+                    className={`tabular-nums text-right px-2 py-2.5 text-slate-600 dark:text-slate-400 ${
                       isHighlight ? 'bg-amber-50/40 dark:bg-amber-500/10 font-semibold' : isDimmed ? 'opacity-40 text-slate-500 dark:text-slate-400' : ''
                     }`}
                   >
@@ -497,19 +498,19 @@ export default function PLTSMonthlyMatrixTable({
                   </td>
                 );
               })}
-              <td className="font-mono font-bold text-right bg-slate-50/80 dark:bg-slate-800/40 px-3 py-2.5 text-slate-900 dark:text-slate-100 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums font-bold text-right bg-slate-50/80 dark:bg-slate-800/40 px-3 py-2.5 text-slate-900 dark:text-slate-100 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.targetYtdKwh * unitMultiplier, unitDecimals)}
               </td>
-              <td className="font-mono font-bold text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-800 dark:text-slate-200">
+              <td className="tabular-nums font-bold text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-800 dark:text-slate-200">
                 {formatVal(totals.targetEoyKwh * unitMultiplier, unitDecimals)}
               </td>
-              <td rowSpan={3} className="font-mono font-black text-center text-emerald-700 dark:text-emerald-300 text-sm align-middle bg-emerald-50/40 dark:bg-emerald-500/10 border-l border-slate-200 dark:border-slate-700 px-3">
+              <td rowSpan={3} className="tabular-nums font-black text-center text-emerald-700 dark:text-emerald-300 text-sm align-middle bg-emerald-50/40 dark:bg-emerald-500/10 border-l border-slate-200 dark:border-slate-700 px-3">
                 {formatVal(totals.progressEoyPct, 2)}%
                 <span className="block text-[9px] font-normal text-emerald-600 dark:text-emerald-400 mt-0.5">
                   dari target setahun
                 </span>
               </td>
-              <td rowSpan={3} className="font-mono font-bold text-right text-slate-800 dark:text-slate-200 align-middle bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
+              <td rowSpan={3} className="tabular-nums font-bold text-right text-slate-800 dark:text-slate-200 align-middle bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.projectedEoyKwh ? totals.projectedEoyKwh * unitMultiplier : null, unitDecimals)}
                 <span className="block text-[9px] font-normal text-slate-500 dark:text-slate-400 mt-0.5">
                   {unit}
@@ -529,7 +530,7 @@ export default function PLTSMonthlyMatrixTable({
                 return (
                   <td
                     key={idx}
-                    className={`font-mono text-right px-2 py-2.5 font-bold ${
+                    className={`tabular-nums text-right px-2 py-2.5 font-bold ${
                       val !== null ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-500 dark:text-slate-400 italic text-[11px]'
                     } ${isHighlight ? 'bg-amber-50/40 dark:bg-amber-500/10' : isDimmed ? 'opacity-40 text-slate-500 dark:text-slate-400' : ''}`}
                     title={val === null ? (m.month <= currentMonth ? 'Data belum masuk' : 'Bulan belum berjalan') : undefined}
@@ -538,10 +539,10 @@ export default function PLTSMonthlyMatrixTable({
                   </td>
                 );
               })}
-              <td className="font-mono font-black text-right bg-emerald-50/60 dark:bg-emerald-500/10 px-3 py-2.5 text-emerald-800 dark:text-emerald-300 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums font-black text-right bg-emerald-50/60 dark:bg-emerald-500/10 px-3 py-2.5 text-emerald-800 dark:text-emerald-300 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.actualYtdKwh * unitMultiplier, unitDecimals)}
               </td>
-              <td className="font-mono text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-500 dark:text-slate-400">
+              <td className="tabular-nums text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-500 dark:text-slate-400">
                 —
               </td>
             </tr>
@@ -558,18 +559,18 @@ export default function PLTSMonthlyMatrixTable({
                 return (
                   <td
                     key={idx}
-                    className={`font-mono text-right px-2 py-2.5 ${getAchievementBadgeStyle(pct)} ${
+                    className={`tabular-nums text-right px-2 py-2.5 ${getAchievementBadgeStyle(pct)} ${
                       isHighlight ? 'ring-1 ring-amber-300' : isDimmed ? 'opacity-40' : ''
                     }`}
                   >
-                    {pct !== null ? `${pct.toFixed(1)}%` : '—'}
+                    {pct !== null ? `${formatNum(pct, 1)}%` : '—'}
                   </td>
                 );
               })}
-              <td className={`font-mono text-right px-3 py-2.5 border-l border-slate-200 dark:border-slate-700 ${getAchievementBadgeStyle(totals.achievementYtdPct)}`}>
-                {totals.achievementYtdPct !== null ? `${totals.achievementYtdPct.toFixed(2)}%` : '—'}
+              <td className={`tabular-nums text-right px-3 py-2.5 border-l border-slate-200 dark:border-slate-700 ${getAchievementBadgeStyle(totals.achievementYtdPct)}`}>
+                {totals.achievementYtdPct !== null ? `${formatNum(totals.achievementYtdPct, 2)}%` : '—'}
               </td>
-              <td className="font-mono text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-500 dark:text-slate-400">
+              <td className="tabular-nums text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-500 dark:text-slate-400">
                 —
               </td>
             </tr>
@@ -598,24 +599,24 @@ export default function PLTSMonthlyMatrixTable({
                 return (
                   <td
                     key={idx}
-                    className={`font-mono text-right px-2 py-2.5 font-bold ${
+                    className={`tabular-nums text-right px-2 py-2.5 font-bold ${
                       pr !== null ? (pr >= 80 ? 'text-emerald-700 dark:text-emerald-300' : pr >= 75 ? 'text-amber-700 dark:text-amber-300' : 'text-rose-700 dark:text-rose-300') : 'text-slate-500 dark:text-slate-400'
                     } ${isHighlight ? 'bg-amber-50/40 dark:bg-amber-500/10' : isDimmed ? 'opacity-40 text-slate-500 dark:text-slate-400' : ''}`}
                   >
-                    {pr !== null ? `${pr.toFixed(1)}%` : '—'}
+                    {pr !== null ? `${formatNum(pr, 1)}%` : '—'}
                   </td>
                 );
               })}
-              <td className="font-mono font-bold text-right bg-slate-50/80 dark:bg-slate-800/40 px-3 py-2.5 text-emerald-800 dark:text-emerald-300 border-l border-slate-200 dark:border-slate-700">
-                {totals.avgPrPct ? `${totals.avgPrPct.toFixed(1)}%` : '—'}
+              <td className="tabular-nums font-bold text-right bg-slate-50/80 dark:bg-slate-800/40 px-3 py-2.5 text-emerald-800 dark:text-emerald-300 border-l border-slate-200 dark:border-slate-700">
+                {totals.avgPrPct ? `${formatNum(totals.avgPrPct, 1)}%` : '—'}
               </td>
-              <td className="font-mono text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-500 dark:text-slate-400">
+              <td className="tabular-nums text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-500 dark:text-slate-400">
                 —
               </td>
-              <td className="font-mono text-center bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums text-center bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
                 —
               </td>
-              <td className="font-mono text-right bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums text-right bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
                 —
               </td>
             </tr>
@@ -627,21 +628,21 @@ export default function PLTSMonthlyMatrixTable({
               {monthlyRows.map((m, idx) => {
                 const isDimmed = m.month > selectedThroughMonth;
                 return (
-                  <td key={idx} className={`font-mono text-right px-2 py-2 text-slate-500 dark:text-slate-400 text-[11px] ${isDimmed ? 'opacity-40' : ''}`}>
+                  <td key={idx} className={`tabular-nums text-right px-2 py-2 text-slate-500 dark:text-slate-400 text-[11px] ${isDimmed ? 'opacity-40' : ''}`}>
                     80.0%
                   </td>
                 );
               })}
-              <td className="font-mono text-right bg-slate-50/80 dark:bg-slate-800/40 px-3 py-2 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums text-right bg-slate-50/80 dark:bg-slate-800/40 px-3 py-2 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
                 80.0%
               </td>
-              <td className="font-mono text-right bg-white dark:bg-slate-900 px-3 py-2 text-slate-500 dark:text-slate-400">
+              <td className="tabular-nums text-right bg-white dark:bg-slate-900 px-3 py-2 text-slate-500 dark:text-slate-400">
                 80.0%
               </td>
-              <td className="font-mono text-center bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums text-center bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
                 —
               </td>
-              <td className="font-mono text-right bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums text-right bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
                 —
               </td>
             </tr>
@@ -666,7 +667,7 @@ export default function PLTSMonthlyMatrixTable({
                 return (
                   <td
                     key={idx}
-                    className={`font-mono text-right px-2 py-2.5 text-slate-600 dark:text-slate-400 ${
+                    className={`tabular-nums text-right px-2 py-2.5 text-slate-600 dark:text-slate-400 ${
                       isHighlight ? 'bg-amber-50/40 dark:bg-amber-500/10 font-semibold' : isDimmed ? 'opacity-40 text-slate-500 dark:text-slate-400' : ''
                     }`}
                   >
@@ -674,16 +675,16 @@ export default function PLTSMonthlyMatrixTable({
                   </td>
                 );
               })}
-              <td className="font-mono font-bold text-right bg-slate-50/80 dark:bg-slate-800/40 px-3 py-2.5 text-slate-900 dark:text-slate-100 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums font-bold text-right bg-slate-50/80 dark:bg-slate-800/40 px-3 py-2.5 text-slate-900 dark:text-slate-100 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(activeCapacityKwp, 1)}
               </td>
-              <td className="font-mono font-bold text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-900 dark:text-slate-100">
+              <td className="tabular-nums font-bold text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-900 dark:text-slate-100">
                 {formatVal(activeCapacityKwp, 1)}
               </td>
-              <td className="font-mono text-center bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums text-center bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
                 —
               </td>
-              <td className="font-mono text-right bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums text-right bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 text-slate-500 dark:text-slate-400 border-l border-slate-200 dark:border-slate-700">
                 —
               </td>
             </tr>
@@ -708,7 +709,7 @@ export default function PLTSMonthlyMatrixTable({
                 return (
                   <td
                     key={idx}
-                    className={`font-mono text-right px-2 py-2.5 text-slate-700 dark:text-slate-300 ${
+                    className={`tabular-nums text-right px-2 py-2.5 text-slate-700 dark:text-slate-300 ${
                       isHighlight ? 'bg-amber-50/40 dark:bg-amber-500/10 font-semibold' : isDimmed ? 'opacity-40 text-slate-500 dark:text-slate-400' : ''
                     }`}
                   >
@@ -716,16 +717,16 @@ export default function PLTSMonthlyMatrixTable({
                   </td>
                 );
               })}
-              <td className="font-mono font-black text-right bg-emerald-50/60 dark:bg-emerald-500/10 px-3 py-2.5 text-emerald-800 dark:text-emerald-300 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums font-black text-right bg-emerald-50/60 dark:bg-emerald-500/10 px-3 py-2.5 text-emerald-800 dark:text-emerald-300 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.emissionYtdTon, 2)}
               </td>
-              <td className="font-mono font-bold text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-700 dark:text-slate-300">
+              <td className="tabular-nums font-bold text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-700 dark:text-slate-300">
                 {formatVal(totals.emissionEoyTargetTon, 2)}
               </td>
-              <td className="font-mono font-bold text-center text-emerald-700 dark:text-emerald-300 bg-emerald-50/30 dark:bg-emerald-500/10 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums font-bold text-center text-emerald-700 dark:text-emerald-300 bg-emerald-50/30 dark:bg-emerald-500/10 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.progressEoyPct, 2)}%
               </td>
-              <td className="font-mono text-right text-slate-700 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums text-right text-slate-700 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.emissionEoyProjectedTon, 2)}
               </td>
             </tr>
@@ -750,7 +751,7 @@ export default function PLTSMonthlyMatrixTable({
                 return (
                   <td
                     key={idx}
-                    className={`font-mono text-right px-2 py-2.5 text-slate-700 dark:text-slate-300 ${
+                    className={`tabular-nums text-right px-2 py-2.5 text-slate-700 dark:text-slate-300 ${
                       isHighlight ? 'bg-amber-50/40 dark:bg-amber-500/10 font-semibold' : isDimmed ? 'opacity-40 text-slate-500 dark:text-slate-400' : ''
                     }`}
                   >
@@ -758,16 +759,16 @@ export default function PLTSMonthlyMatrixTable({
                   </td>
                 );
               })}
-              <td className="font-mono font-black text-right bg-slate-50/80 dark:bg-slate-800/40 px-3 py-2.5 text-slate-900 dark:text-slate-100 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums font-black text-right bg-slate-50/80 dark:bg-slate-800/40 px-3 py-2.5 text-slate-900 dark:text-slate-100 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.coalYtdTon, 1)}
               </td>
-              <td className="font-mono font-bold text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-700 dark:text-slate-300">
+              <td className="tabular-nums font-bold text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-700 dark:text-slate-300">
                 {formatVal(totals.coalEoyTargetTon, 1)}
               </td>
-              <td className="font-mono font-bold text-center text-slate-700 dark:text-slate-300 bg-slate-50/40 dark:bg-slate-800/40 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums font-bold text-center text-slate-700 dark:text-slate-300 bg-slate-50/40 dark:bg-slate-800/40 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.progressEoyPct, 2)}%
               </td>
-              <td className="font-mono text-right text-slate-700 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums text-right text-slate-700 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.coalEoyProjectedTon, 1)}
               </td>
             </tr>
@@ -792,7 +793,7 @@ export default function PLTSMonthlyMatrixTable({
                 return (
                   <td
                     key={idx}
-                    className={`font-mono text-right px-2 py-2.5 text-slate-700 dark:text-slate-300 ${
+                    className={`tabular-nums text-right px-2 py-2.5 text-slate-700 dark:text-slate-300 ${
                       isHighlight ? 'bg-amber-50/40 dark:bg-amber-500/10 font-semibold' : isDimmed ? 'opacity-40 text-slate-500 dark:text-slate-400' : ''
                     }`}
                   >
@@ -800,16 +801,16 @@ export default function PLTSMonthlyMatrixTable({
                   </td>
                 );
               })}
-              <td className="font-mono font-black text-right bg-emerald-50/60 dark:bg-emerald-500/10 px-3 py-2.5 text-emerald-800 dark:text-emerald-300 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums font-black text-right bg-emerald-50/60 dark:bg-emerald-500/10 px-3 py-2.5 text-emerald-800 dark:text-emerald-300 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.treeYtdCount, 0)}
               </td>
-              <td className="font-mono font-bold text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-700 dark:text-slate-300">
+              <td className="tabular-nums font-bold text-right bg-white dark:bg-slate-900 px-3 py-2.5 text-slate-700 dark:text-slate-300">
                 {formatVal(totals.treeEoyTargetCount, 0)}
               </td>
-              <td className="font-mono font-bold text-center text-emerald-700 dark:text-emerald-300 bg-emerald-50/30 dark:bg-emerald-500/10 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums font-bold text-center text-emerald-700 dark:text-emerald-300 bg-emerald-50/30 dark:bg-emerald-500/10 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.progressEoyPct, 2)}%
               </td>
-              <td className="font-mono text-right text-slate-700 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
+              <td className="tabular-nums text-right text-slate-700 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-800/40 px-3 py-2.5 border-l border-slate-200 dark:border-slate-700">
                 {formatVal(totals.treeEoyProjectedCount, 0)}
               </td>
             </tr>

@@ -910,7 +910,7 @@ export default function PLTSTab() {
                 </button>
 
                 {showTechnicalDetails && (
-                  <div className="mt-2.5 p-3 rounded-xl bg-amber-100/80 dark:bg-amber-500/20 border border-amber-300/80 dark:border-amber-500/40 font-mono text-[11px] text-amber-950 dark:text-amber-100 space-y-1 select-all">
+                  <div className="mt-2.5 p-3 rounded-xl bg-amber-100/80 dark:bg-amber-500/20 border border-amber-300/80 dark:border-amber-500/40 tabular-nums text-[11px] text-amber-950 dark:text-amber-100 space-y-1 select-all">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                       <div><span className="text-amber-800 dark:text-amber-300 font-semibold">Kode Error:</span> {syncErrorDetails?.errorCode || 'N/A'}</div>
                       <div><span className="text-amber-800 dark:text-amber-300 font-semibold">HTTP Status:</span> {syncErrorDetails?.statusCode || 'N/A'}</div>
@@ -1172,10 +1172,10 @@ export default function PLTSTab() {
                 trend={
                   <div className="space-y-1">
                     <div className="flex items-center gap-1.5 flex-wrap text-xs">
-                      <span>{dashboardData?.summary?.achievementPct != null ? `${dashboardData.summary.achievementPct.toFixed(1)}% dari target` : (dashboardData?.summary?.energyBalance?.target?.achievementPct != null ? `${dashboardData.summary.energyBalance.target.achievementPct.toFixed(1)}% dari target` : '—')}</span>
+                      <span>{dashboardData?.summary?.achievementPct != null ? `${formatNum(dashboardData.summary.achievementPct, 1)}% dari target` : (dashboardData?.summary?.energyBalance?.target?.achievementPct != null ? `${dashboardData.summary.energyBalance.target.achievementPct.toFixed(1)}% dari target` : '—')}</span>
                       {dashboardData?.summary?.pr?.valuePct != null && (
                         <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
-                          Kinerja {dashboardData.summary.pr.valuePct.toFixed(1)}%
+                          Kinerja {formatNum(dashboardData.summary.pr.valuePct, 1)}%
                           <InfoHint title="Kinerja panel (PR)" text="Perkiraan seberapa baik panel mengubah sinar matahari jadi listrik, dibanding kondisi ideal. Di atas 75% tergolong baik." size={11} />
                         </span>
                       )}
@@ -1312,7 +1312,7 @@ export default function PLTSTab() {
                                         target: 'Target PLTS',
                                       };
                                       return (
-                                        <div key={idx} className="font-mono text-xs flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400">
+                                        <div key={idx} className="tabular-nums text-xs flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400">
                                           <div className="flex items-center gap-1.5 font-sans">
                                             <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
                                             <span>{nameMap[entry.dataKey] || entry.name}:</span>
@@ -1326,7 +1326,7 @@ export default function PLTSTab() {
                                   </div>
                                   {currentPoint && currentPoint.cumAvoidedEmissionTon != null && (
                                     <div className="pt-1.5 mt-1 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 space-y-0.5">
-                                      <div className="flex justify-between items-center font-mono">
+                                      <div className="flex justify-between items-center tabular-nums">
                                         <span className="text-slate-500 dark:text-slate-400 font-sans">Kumulatif YTD:</span>
                                         <strong className="text-emerald-700 dark:text-emerald-300 font-semibold">{Number(currentPoint.cumAvoidedEmissionTon).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} tCO₂e</strong>
                                       </div>
@@ -1386,7 +1386,7 @@ export default function PLTSTab() {
                       <span className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
                         <Zap size={14} className="text-slate-500 dark:text-slate-400" /> PLN (Grid)
                       </span>
-                      <span className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">{dynamicEnergyBreakdown.plnPercentage}%</span>
+                      <span className="text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums">{dynamicEnergyBreakdown.plnPercentage}%</span>
                     </div>
                     <div className="h-2.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                       <div
@@ -1402,7 +1402,7 @@ export default function PLTSTab() {
                       <span className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-300">
                         <Sun size={14} className="text-amber-500" /> PLTS (Solar)
                       </span>
-                      <span className="text-sm font-bold text-amber-700 dark:text-amber-300 font-mono">{dynamicEnergyBreakdown.pltsPercentage}%</span>
+                      <span className="text-sm font-bold text-amber-700 dark:text-amber-300 tabular-nums">{dynamicEnergyBreakdown.pltsPercentage}%</span>
                     </div>
                     <div className="h-2.5 rounded-full bg-amber-50 dark:bg-amber-500/10 overflow-hidden border border-amber-100/60 dark:border-amber-500/20">
                       <div
@@ -1419,7 +1419,7 @@ export default function PLTSTab() {
                 <div className="font-bold text-amber-800 dark:text-amber-300 text-[11px]">
                   Target 2027
                 </div>
-                <div className="text-amber-900 font-bold text-sm">
+                <div className="text-amber-900 dark:text-amber-100 font-bold text-sm">
                   PLTS memenuhi minimal 20% kebutuhan listrik DC
                 </div>
                 <div className="text-amber-700 dark:text-amber-300 text-[11px] pt-0.5">
@@ -1566,7 +1566,7 @@ export default function PLTSTab() {
             </div>
 
             {/* Data Table */}
-            <div className="relative max-h-[70vh] sm:max-h-[560px] overflow-auto overscroll-contain [scrollbar-width:thin] rounded-2xl border border-slate-100 dark:border-slate-800 mt-2 shadow-[inset_0_-10px_10px_-10px_rgba(0,0,0,0.02)]">
+            <div className="relative max-h-[70vh] sm:max-h-[560px] overflow-auto overscroll-contain rounded-2xl border border-slate-100 dark:border-slate-800 mt-2 shadow-[inset_0_-10px_10px_-10px_rgba(0,0,0,0.02)]">
               <table className="min-w-[1100px] w-full text-left text-xs border-separate border-spacing-0">
                 <thead className="text-white text-xs">
                   <tr>
@@ -1617,19 +1617,19 @@ export default function PLTSTab() {
                             {dc.grid || dc.gridRegion}
                           </span>
                         </td>
-                        <td className="text-right px-4 py-3 font-mono text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800">
+                        <td className="text-right px-4 py-3 tabular-nums text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800">
                           {dc.plnConsumptionMWh !== null ? formatNum(dc.plnConsumptionMWh) : <span className="text-slate-300 dark:text-slate-600" title="Belum ada laporan konsumsi PLN untuk periode ini">—</span>}
                         </td>
-                        <td className="text-center px-4 py-3 font-mono text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                          {typeof dc.factor === 'number' ? dc.factor.toFixed(3) : (dc.gridFactor ? Number(dc.gridFactor).toFixed(3) : '—')}
+                        <td className="text-center px-4 py-3 tabular-nums text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                          {typeof dc.factor === 'number' ? formatNum(dc.factor, 3) : (dc.gridFactor ? formatNum(Number(dc.gridFactor), 3) : '—')}
                         </td>
-                        <td className="text-right px-4 py-3 font-mono font-bold text-amber-700 dark:text-amber-300 bg-amber-50/30 dark:bg-amber-500/10 border-b border-slate-100 dark:border-slate-800">
+                        <td className="text-right px-4 py-3 tabular-nums font-bold text-amber-700 dark:text-amber-300 bg-amber-50/30 dark:bg-amber-500/10 border-b border-slate-100 dark:border-slate-800">
                           {dc.scope2EmissionTon !== null ? formatNum(dc.scope2EmissionTon) : <span className="text-amber-300 dark:text-amber-700/60" title="Belum ada laporan konsumsi PLN untuk periode ini">—</span>}
                         </td>
-                        <td className="text-right px-4 py-3 font-mono text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800">
+                        <td className="text-right px-4 py-3 tabular-nums text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800">
                           {dc.pltsProdMWh > 0 ? formatNum(dc.pltsProdMWh) : <span className="text-slate-300">—</span>}
                         </td>
-                        <td className="text-right px-4 py-3 font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50/30 dark:bg-emerald-500/10 border-b border-slate-100 dark:border-slate-800">
+                        <td className="text-right px-4 py-3 tabular-nums font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50/30 dark:bg-emerald-500/10 border-b border-slate-100 dark:border-slate-800">
                           {dc.avoidedEmissionTon > 0 ? formatNum(dc.avoidedEmissionTon) : <span className="text-slate-300">—</span>}
                         </td>
                       </tr>
@@ -1646,15 +1646,15 @@ export default function PLTSTab() {
                   <tfoot className="bg-slate-100 dark:bg-slate-800 font-bold">
                     <tr>
                       <td colSpan={2} className="sticky bottom-0 left-0 z-30 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3 text-slate-900 dark:text-slate-100 text-right shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">Total</td>
-                      <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">
+                      <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 tabular-nums text-slate-900 dark:text-slate-100 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">
                         {hasAnyPln ? formatNum(totalPlnMWh) : <span className="text-slate-300 dark:text-slate-600">—</span>}
                       </td>
                       <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-center px-4 py-3 text-slate-500 dark:text-slate-400 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">—</td>
-                      <td className="sticky bottom-0 z-10 bg-amber-100 dark:bg-amber-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-amber-700 dark:text-amber-300 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">
+                      <td className="sticky bottom-0 z-10 bg-amber-100 dark:bg-amber-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 tabular-nums text-amber-700 dark:text-amber-300 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">
                         {hasAnyScope2 ? formatNum(totalScope2Ton) : <span className="text-amber-300 dark:text-amber-700/60">—</span>}
                       </td>
-                      <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">{formatNum(totalPltsMWh)}</td>
-                      <td className="sticky bottom-0 z-10 bg-emerald-100 dark:bg-emerald-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-emerald-700 dark:text-emerald-300 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">{formatNum(totalAvoidedTon)}</td>
+                      <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 tabular-nums text-slate-900 dark:text-slate-100 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">{formatNum(totalPltsMWh)}</td>
+                      <td className="sticky bottom-0 z-10 bg-emerald-100 dark:bg-emerald-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 tabular-nums text-emerald-700 dark:text-emerald-300 shadow-[0_-2px_4px_rgba(0,0,0,0.08)]">{formatNum(totalAvoidedTon)}</td>
                     </tr>
                   </tfoot>
                 )}

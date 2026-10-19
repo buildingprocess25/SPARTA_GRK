@@ -63,7 +63,7 @@ export default function TabSupportingParameters({ filters }) {
             <Sun size={16} aria-hidden="true" />
           </div>
           <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-amber-900 dark:text-amber-200 font-mono">
+            <span className="text-2xl font-black text-amber-900 dark:text-amber-200 tabular-nums">
               {formatNum(data?.climate?.avgRadiationKwhM2, 1, 1)}
             </span>
             <span className="text-xs font-bold text-amber-700 dark:text-amber-300">kWh/m²</span>
@@ -87,14 +87,14 @@ export default function TabSupportingParameters({ filters }) {
           {data?.climate?.avgModuleTempC != null ? (
             <div className="mt-2 flex items-baseline gap-2.5 flex-wrap">
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-black text-rose-600 dark:text-rose-400 font-mono">
+                <span className="text-2xl font-black text-rose-600 dark:text-rose-400 tabular-nums">
                   {formatNum(data?.climate?.avgModuleTempC, 1, 1)}
                 </span>
                 <span className="text-xs font-bold text-rose-700 dark:text-rose-300">°C</span>
               </div>
               <span className="text-slate-300 dark:text-slate-600 text-sm">/</span>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-black text-sky-600 dark:text-sky-400 font-mono">
+                <span className="text-2xl font-black text-sky-600 dark:text-sky-400 tabular-nums">
                   {formatNum(data?.climate?.avgPrecipitationMm, 0, 1)}
                 </span>
                 <span className="text-xs font-bold text-sky-700 dark:text-sky-300">mm</span>
@@ -117,7 +117,7 @@ export default function TabSupportingParameters({ filters }) {
             <CheckCircle2 size={16} aria-hidden="true" />
           </div>
           <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-emerald-900 dark:text-emerald-200 font-mono">
+            <span className="text-2xl font-black text-emerald-900 dark:text-emerald-200 tabular-nums">
               {data?.climate?.totalMeasurements != null ? formatNum(data.climate.totalMeasurements, 0, 0) : '—'}
             </span>
             <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">catatan</span>

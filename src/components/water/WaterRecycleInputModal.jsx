@@ -341,7 +341,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
               value={proofRef}
               onChange={(e) => setProofRef(e.target.value)}
               placeholder={`Contoh: WR-${selectedDC?.code || 'DC'}-${periodMonth}26-001`}
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-xs tabular-nums text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
             />
           </div>
 
@@ -354,22 +354,22 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
                   Hasil dari input ini
                 </span>
               </div>
-              <span className="text-xs font-mono font-extrabold text-cyan-400 bg-cyan-950/60 border border-cyan-800/80 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs tabular-nums font-extrabold text-cyan-400 bg-cyan-950/60 border border-cyan-800/80 px-2.5 py-0.5 rounded-full">
                 {liveCalc.volumeM3.toLocaleString('id-ID')} m³
               </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
               <div>
                 <span className="text-[10px] text-slate-300 block">Volume</span>
-                <strong className="text-slate-100 font-mono text-xs">{liveCalc.volumeM3.toLocaleString('id-ID')} m³</strong>
+                <strong className="text-slate-100 tabular-nums text-xs">{liveCalc.volumeM3.toLocaleString('id-ID')} m³</strong>
               </div>
               <div>
                 <span className="text-[10px] text-slate-300 block">Emisi dicegah</span>
-                <strong className="text-emerald-400 font-mono font-bold text-xs">{liveCalc.co2AvoidedTon.toFixed(3)} tCO₂e</strong>
+                <strong className="text-emerald-400 tabular-nums font-bold text-xs">{liveCalc.co2AvoidedTon.toFixed(3)} tCO₂e</strong>
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 block">Biaya Dihemat</span>
-                <strong className="text-cyan-300 font-mono font-bold text-xs">Rp {(liveCalc.costSavedJuta * 1_000_000).toLocaleString('id-ID')}</strong>
+                <strong className="text-cyan-300 tabular-nums font-bold text-xs">Rp {(liveCalc.costSavedJuta * 1_000_000).toLocaleString('id-ID')}</strong>
               </div>
             </div>
           </div>

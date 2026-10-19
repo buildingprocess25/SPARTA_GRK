@@ -53,7 +53,7 @@ export function ChartTooltipCard({ title, items = [], footer = null, className =
         {items.map((item, idx) => (
           <div
             key={idx}
-            className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 font-mono"
+            className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 tabular-nums"
             style={item.color ? { color: item.color } : undefined}
           >
             <div className="flex items-center gap-1.5">

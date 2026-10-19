@@ -198,7 +198,7 @@ export const ChartTooltipContent = React.forwardRef(function ChartTooltipContent
                   {itemConfig?.label || item.name}
                 </span>
               </div>
-              <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
+              <span className="tabular-nums font-bold text-slate-900 dark:text-slate-100">
                 {formatter && item?.value !== undefined
                   ? formatter(item.value, item.name, item, index, item.payload)
                   : typeof item.value === 'number'

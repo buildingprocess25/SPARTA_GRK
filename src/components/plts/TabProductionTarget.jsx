@@ -229,7 +229,7 @@ export default function TabProductionTarget({ filters }) {
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748b' }} />
                 <YAxis
                   tick={{ fontSize: 10, fill: '#64748b' }}
-                  tickFormatter={(v) => v >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : `${(v / 1000).toFixed(0)}k`}
+                  tickFormatter={(v) => v >= 1e6 ? `${formatNum(v / 1e6, 1)} jt` : `${formatNum(v / 1000, 0)} rb`}
                   unit=" kWh"
                   width={75}
                 />
@@ -280,15 +280,15 @@ export default function TabProductionTarget({ filters }) {
                         {row.month}
                         {row.partial && <span className="text-[9px] text-amber-600 dark:text-amber-400 font-normal ml-1">(sebagian)</span>}
                       </td>
-                      <td className="p-2.5 text-right font-mono font-bold text-slate-900 dark:text-slate-100">
+                      <td className="p-2.5 text-right tabular-nums font-bold text-slate-900 dark:text-slate-100">
                         {row.actualKwh != null ? formatNum(row.actualKwh, 0, 0) : '—'}
                       </td>
-                      <td className="p-2.5 text-right font-mono text-purple-700 dark:text-purple-300">
+                      <td className="p-2.5 text-right tabular-nums text-purple-700 dark:text-purple-300">
                         {row.targetKwh != null ? formatNum(row.targetKwh, 0, 0) : (
                           <span className="text-slate-500 dark:text-slate-400 font-sans text-[10px]">Belum ada target</span>
                         )}
                       </td>
-                      <td className="p-2.5 text-right font-mono">
+                      <td className="p-2.5 text-right tabular-nums">
                         {row.achievementPct != null ? (
                           <span
                             className={`inline-block font-bold px-1.5 py-0.5 rounded text-[10px] ${
@@ -360,7 +360,7 @@ export default function TabProductionTarget({ filters }) {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748b' }} />
                   <YAxis
-                    tickFormatter={(v) => unit === 'MWh' ? `${v}` : `${(v / 1000).toFixed(0)}k`}
+                    tickFormatter={(v) => unit === 'MWh' ? formatNum(v, 0) : `${formatNum(v / 1000, 0)} rb`}
                     unit={` ${unit}`}
                     tick={{ fontSize: 10, fill: '#64748b' }}
                     width={75}
@@ -383,7 +383,7 @@ export default function TabProductionTarget({ filters }) {
                                 <span className="size-2 rounded-full bg-blue-500" />
                                 Tahun 2025 ({row.plantCount2025} plant):
                               </span>
-                              <strong className="font-mono text-slate-900 dark:text-slate-100">
+                              <strong className="tabular-nums text-slate-900 dark:text-slate-100">
                                 {row.val2025 != null ? `${formatNum(row.val2025, unitDecimals, unitDecimals)} ${unit}` : 'Tidak ada data'}
                               </strong>
                             </div>
@@ -392,14 +392,14 @@ export default function TabProductionTarget({ filters }) {
                                 <span className="size-2 rounded-full bg-amber-500" />
                                 Tahun 2026 ({row.plantCount2026} plant):
                               </span>
-                              <strong className="font-mono text-slate-900 dark:text-slate-100">
+                              <strong className="tabular-nums text-slate-900 dark:text-slate-100">
                                 {row.val2026 != null ? `${formatNum(row.val2026, unitDecimals, unitDecimals)} ${unit}` : 'Tidak ada data'}
                               </strong>
                             </div>
                             {row.diffVal != null && (
                               <div className="border-t border-slate-100 dark:border-slate-800 pt-1.5 flex items-center justify-between font-medium">
                                 <span className="text-slate-500 dark:text-slate-400">Pertumbuhan YoY:</span>
-                                <span className={`font-mono font-bold ${row.diffVal >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                                <span className={`tabular-nums font-bold ${row.diffVal >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                                   {row.diffVal >= 0 ? '+' : ''}{formatNum(row.diffVal, unitDecimals, unitDecimals)} {unit}
                                   {row.diffPct != null && ` (${row.diffPct >= 0 ? '+' : ''}${formatNum(row.diffPct, 1, 1)}%)`}
                                 </span>
@@ -463,26 +463,26 @@ export default function TabProductionTarget({ filters }) {
                   {yoyChartRows.map((row) => (
                     <tr key={row.yearMonth} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="p-2.5 font-bold text-slate-800 dark:text-slate-200">{row.month}</td>
-                      <td className="p-2.5 text-right font-mono text-blue-700 dark:text-blue-300 font-medium">
+                      <td className="p-2.5 text-right tabular-nums text-blue-700 dark:text-blue-300 font-medium">
                         {row.val2025 != null ? formatNum(row.val2025, unitDecimals, unitDecimals) : <span className="text-slate-500 dark:text-slate-400 font-sans">—</span>}
                       </td>
-                      <td className="p-2.5 text-center font-mono text-slate-500 dark:text-slate-400 text-[10px]">
+                      <td className="p-2.5 text-center tabular-nums text-slate-500 dark:text-slate-400 text-[10px]">
                         {row.plantCount2025 > 0 ? `${row.plantCount2025} plant` : '—'}
                       </td>
-                      <td className="p-2.5 text-right font-mono text-amber-700 dark:text-amber-300 font-bold">
+                      <td className="p-2.5 text-right tabular-nums text-amber-700 dark:text-amber-300 font-bold">
                         {row.val2026 != null ? formatNum(row.val2026, unitDecimals, unitDecimals) : <span className="text-slate-500 dark:text-slate-400 font-sans">—</span>}
                       </td>
-                      <td className="p-2.5 text-center font-mono text-slate-500 dark:text-slate-400 text-[10px]">
+                      <td className="p-2.5 text-center tabular-nums text-slate-500 dark:text-slate-400 text-[10px]">
                         {row.plantCount2026 > 0 ? `${row.plantCount2026} plant` : '—'}
                       </td>
-                      <td className="p-2.5 text-right font-mono font-bold">
+                      <td className="p-2.5 text-right tabular-nums font-bold">
                         {row.diffVal != null ? (
                           <span className={row.diffVal >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}>
                             {row.diffVal >= 0 ? '+' : ''}{formatNum(row.diffVal, unitDecimals, unitDecimals)}
                           </span>
                         ) : '—'}
                       </td>
-                      <td className="p-2.5 text-right font-mono">
+                      <td className="p-2.5 text-right tabular-nums">
                         {row.diffPct != null ? (
                           <span
                             className={`inline-block font-bold px-1.5 py-0.5 rounded text-[10px] ${
@@ -501,22 +501,22 @@ export default function TabProductionTarget({ filters }) {
                 <tfoot className="bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-slate-100 border-t border-slate-300 dark:border-slate-600">
                   <tr>
                     <td className="p-2.5">Total YTD</td>
-                    <td className="p-2.5 text-right font-mono text-blue-800 dark:text-blue-300">
+                    <td className="p-2.5 text-right tabular-nums text-blue-800 dark:text-blue-300">
                       {yoyTotals.total2025 != null ? formatNum(yoyTotals.total2025, unitDecimals, unitDecimals) : '—'}
                     </td>
-                    <td className="p-2.5 text-center font-mono text-[10px] text-slate-600 dark:text-slate-400">—</td>
-                    <td className="p-2.5 text-right font-mono text-amber-800 dark:text-amber-300">
+                    <td className="p-2.5 text-center tabular-nums text-[10px] text-slate-600 dark:text-slate-400">—</td>
+                    <td className="p-2.5 text-right tabular-nums text-amber-800 dark:text-amber-300">
                       {yoyTotals.total2026 != null ? formatNum(yoyTotals.total2026, unitDecimals, unitDecimals) : '—'}
                     </td>
-                    <td className="p-2.5 text-center font-mono text-[10px] text-slate-600 dark:text-slate-400">—</td>
-                    <td className="p-2.5 text-right font-mono">
+                    <td className="p-2.5 text-center tabular-nums text-[10px] text-slate-600 dark:text-slate-400">—</td>
+                    <td className="p-2.5 text-right tabular-nums">
                       {yoyTotals.diffTotal != null ? (
                         <span className={yoyTotals.diffTotal >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}>
                           {yoyTotals.diffTotal >= 0 ? '+' : ''}{formatNum(yoyTotals.diffTotal, unitDecimals, unitDecimals)}
                         </span>
                       ) : '—'}
                     </td>
-                    <td className="p-2.5 text-right font-mono">
+                    <td className="p-2.5 text-right tabular-nums">
                       {yoyTotals.growthTotal != null ? (
                         <span
                           className={`inline-block font-black px-1.5 py-0.5 rounded text-[10px] ${

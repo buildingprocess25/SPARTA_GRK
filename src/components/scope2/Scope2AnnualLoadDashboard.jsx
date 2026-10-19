@@ -113,14 +113,14 @@ function Scope2ChartTooltip({ active, payload, label }) {
 
       <div className="space-y-1">
         <div className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold">Listrik (MWh)</div>
-        <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 font-mono">
+        <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 tabular-nums">
           <span className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-slate-400 shrink-0" />
             <span className="text-slate-600 dark:text-slate-400 font-sans">Dibeli PLN:</span>
           </span>
           <strong className="text-slate-900 dark:text-slate-100">{row?.electricityMwh != null ? `${show(row.electricityMwh)} MWh` : '—'}</strong>
         </div>
-        <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 font-mono">
+        <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 tabular-nums">
           <span className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-amber-500 shrink-0" />
             <span className="text-slate-600 dark:text-slate-400 font-sans">PLTS:</span>
@@ -128,7 +128,7 @@ function Scope2ChartTooltip({ active, payload, label }) {
           <strong className="text-amber-700 dark:text-amber-400">{row?.selfMwh != null ? `${show(row.selfMwh)} MWh` : '—'}</strong>
         </div>
         {row?.loadMwh != null && (
-          <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400 text-[11px] font-mono pt-0.5 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400 text-[11px] tabular-nums pt-0.5 border-t border-slate-100 dark:border-slate-800">
             <span className="font-sans">Total kebutuhan:</span>
             <span>{show(row.loadMwh)} MWh</span>
           </div>
@@ -137,7 +137,7 @@ function Scope2ChartTooltip({ active, payload, label }) {
 
       <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800 space-y-1">
         <div className="text-[11px] text-rose-700 dark:text-rose-400 font-semibold">Emisi (tCO₂e)</div>
-        <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 font-mono">
+        <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 tabular-nums">
           <span className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-rose-500 shrink-0" />
             <span className="text-slate-600 dark:text-slate-400 font-sans">Bulan ini:</span>
@@ -145,7 +145,7 @@ function Scope2ChartTooltip({ active, payload, label }) {
           <strong className="text-rose-700 dark:text-rose-400">{row?.emissionTon != null ? `${show(row.emissionTon)} tCO₂e` : '—'}</strong>
         </div>
         {row?.cumulativeEmissionTon != null && (
-          <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 text-[11px] font-mono">
+          <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 text-[11px] tabular-nums">
             <span className="text-slate-600 dark:text-slate-400 font-sans">Sejak Januari:</span>
             <strong className="text-rose-600 dark:text-rose-400">{show(row.cumulativeEmissionTon)} tCO₂e</strong>
           </div>
@@ -438,7 +438,7 @@ export default function Scope2AnnualLoadDashboard() {
           />
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-500/10 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-500/20 text-xs font-semibold shrink-0">
             <span className="text-rose-700 dark:text-rose-300 font-medium">Faktor emisi rata-rata:</span>
-            <span className="font-bold font-mono">{formatFactor(summary.weightedFactorKgPerKwh)} tCO₂e/MWh</span>
+            <span className="font-bold tabular-nums">{formatFactor(summary.weightedFactorKgPerKwh)} tCO₂e/MWh</span>
           </div>
         </div>
       </div>
@@ -534,7 +534,7 @@ export default function Scope2AnnualLoadDashboard() {
                     <td className="p-3 text-right">{show(row.loadMwh)} MWh</td>
                     <td className="p-3 text-right">{show(row.selfMwh)} MWh</td>
                     <td className="p-3 text-right">{show(row.electricityMwh)} MWh</td>
-                    <td className="p-3 text-right font-semibold text-rose-700">{show(row.emissionTon)} tCO₂e</td>
+                    <td className="p-3 text-right font-semibold text-rose-700 dark:text-rose-300">{show(row.emissionTon)} tCO₂e</td>
                     <td className="p-3 text-right">{row.plantCount}/{row.monitoredCount}</td>
                     <td className="p-3 text-right">{row.changePct === null ? '—' : `${row.changePct > 0 ? '+' : ''}${show(row.changePct)}%`}</td>
                   </tr>
@@ -579,10 +579,10 @@ export default function Scope2AnnualLoadDashboard() {
               {ranking.map((row, index) => (
                 <tr key={row.psId} onClick={() => setSelectedPlant(row)} tabIndex="0" onKeyDown={event => { if (event.key === 'Enter') setSelectedPlant(row); }} className={`cursor-pointer border-b dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 focus:bg-blue-50 dark:focus:bg-blue-500/10 focus:outline-none ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : ''}`}>
                   <td className="p-3 font-semibold text-slate-900 dark:text-slate-100">{row.dcName}</td>
-                  <td className="p-3 font-mono text-slate-600 dark:text-slate-400">{row.grid}</td>
-                  <td className="p-3 text-right font-mono font-medium text-slate-700 dark:text-slate-300">{formatFactor(row.emissionFactor)}</td>
-                  <td className="p-3 text-right font-mono text-slate-700 dark:text-slate-300">{show(row.electricityEnergyKwh / 1_000)}</td>
-                  <td className="p-3 text-right font-mono font-bold text-rose-700 dark:text-rose-400">{show(row.scope2EmissionTon)}</td>
+                  <td className="p-3 tabular-nums text-slate-600 dark:text-slate-400">{row.grid}</td>
+                  <td className="p-3 text-right tabular-nums font-medium text-slate-700 dark:text-slate-300">{formatFactor(row.emissionFactor)}</td>
+                  <td className="p-3 text-right tabular-nums text-slate-700 dark:text-slate-300">{show(row.electricityEnergyKwh / 1_000)}</td>
+                  <td className="p-3 text-right tabular-nums font-bold text-rose-700 dark:text-rose-400">{show(row.scope2EmissionTon)}</td>
                 </tr>
               ))}
             </tbody>
@@ -611,11 +611,11 @@ export default function Scope2AnnualLoadDashboard() {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-xl bg-rose-50 dark:bg-rose-500/10 p-4 border border-rose-100 dark:border-rose-500/20">
           <p className="text-xs text-rose-700 dark:text-rose-300 font-medium">Total emisi</p>
-          <p className="mt-1 text-xl font-bold font-mono text-rose-900 dark:text-rose-200">{show(summary.scope2EmissionTon)} tCO₂e</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-rose-900 dark:text-rose-200">{show(summary.scope2EmissionTon)} tCO₂e</p>
         </div>
         <div className="rounded-xl bg-slate-50 dark:bg-slate-800/40 p-4 border border-slate-200/60 dark:border-slate-700/60">
           <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Rata-rata per bulan</p>
-          <p className="mt-1 text-xl font-bold font-mono text-slate-900 dark:text-slate-100">{show(averageEmission)} tCO₂e</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-slate-900 dark:text-slate-100">{show(averageEmission)} tCO₂e</p>
         </div>
         <div className="rounded-xl bg-slate-50 dark:bg-slate-800/40 p-4 border border-slate-200/60 dark:border-slate-700/60">
           <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Bulan tertinggi / terendah</p>
@@ -623,7 +623,7 @@ export default function Scope2AnnualLoadDashboard() {
         </div>
         <div className="rounded-xl bg-slate-50 dark:bg-slate-800/40 p-4 border border-slate-200/60 dark:border-slate-700/60">
           <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Proyeksi akhir tahun</p>
-          <p className="mt-1 text-xl font-bold font-mono text-slate-900 dark:text-slate-100">{show(projection.baseAnnual)} tCO₂e</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-slate-900 dark:text-slate-100">{show(projection.baseAnnual)} tCO₂e</p>
         </div>
       </div>
 

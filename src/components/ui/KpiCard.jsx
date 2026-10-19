@@ -71,7 +71,7 @@ export default function KpiCard({
 
   return (
     <div
-      className={`relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 sm:p-5 flex flex-col justify-between h-full shadow-2xs dark:shadow-none interactive-card min-w-0 has-[[data-popover-open="true"]]:z-50 has-[[data-popover-open="true"]]:relative ${themeConfig.accentBorder} ${className}`}
+      className={`@container relative rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 sm:p-5 flex flex-col justify-between h-full shadow-2xs dark:shadow-none interactive-card min-w-0 has-[[data-popover-open="true"]]:z-50 has-[[data-popover-open="true"]]:relative ${themeConfig.accentBorder} ${className}`}
       {...props}
     >
       {/* Top Row: Label & Optional Info Hint */}
@@ -89,14 +89,14 @@ export default function KpiCard({
         )}
       </div>
 
-      {/* Middle Row: Big Number & Unit - anchored directly below label for uniform baseline */}
+      {/* Middle Row: big number and unit; the number scales with the card width so the unit stays on its line */}
       <div className="flex-1 flex items-baseline flex-wrap content-start mt-0.5">
         {React.isValidElement(value) ? (
           <div className="w-full">{value}</div>
         ) : (
           <>
             <span
-              className={`text-[26px] sm:text-[28px] font-extrabold tracking-tight tabular-nums transition-all duration-300 ${themeConfig.numberColor}`}
+              className={`text-[21px] @[13rem]:text-[24px] @[15.5rem]:text-[28px] font-extrabold tracking-tight tabular-nums transition-all duration-300 ${themeConfig.numberColor}`}
             >
               {value != null ? value : '—'}
             </span>

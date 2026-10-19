@@ -217,7 +217,7 @@ export default function IsolarReportUploadCard({ onImported }) {
                 <p className="font-semibold text-amber-800 dark:text-amber-300">
                   {result.restatementsKept.length} angka berbeda dari laporan yang sudah tersimpan, jadi angka lama dipertahankan:
                 </p>
-                <ul className="mt-1 space-y-0.5 pl-6 list-disc font-mono text-[11px]">
+                <ul className="mt-1 space-y-0.5 pl-6 list-disc tabular-nums text-[11px]">
                   {result.restatementsKept.map((item) => (
                     <li key={`${item.yearMonth}-${item.plantName}`}>
                       {item.plantName}, {monthLabel(item.yearMonth)}: file {item.reportKwh} kWh, tersimpan {item.savedKwh} kWh

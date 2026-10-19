@@ -37,6 +37,11 @@ import {
 } from '@/data/sustainabilityData';
 import { getYearToDateMonths } from '@/lib/reportingMonths';
 
+// A month with no records is a gap in the chart, not a zero; a zero makes the curved line dive below the axis.
+function withGaps(trend = [], presenceKey, keys) {
+  return (trend || []).map(m => (Number(m[presenceKey]) > 0 ? m : { ...m, ...Object.fromEntries(keys.map(k => [k, null])) }));
+}
+
 export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveSubScope }) {
   const [isInputModalOpen, setIsInputModalOpen] = useState(false);
 
@@ -465,7 +470,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
         <div className="w-full h-80 lg:h-96 pt-2">
           <ResponsiveContainer width="100%" height="100%">
             {activeSubScope === 'scope1' ? (
-              <ComposedChart data={scope1Slice?.monthlyTrend || []} margin={{ top: 12, right: 16, left: 16, bottom: 4 }}>
+              <ComposedChart data={withGaps(scope1Slice?.monthlyTrend, 'liters', ['liters', 'emissionTon'])} margin={{ top: 12, right: 16, left: 16, bottom: 4 }}>
                 <CartesianGrid {...CHART_GRID_PROPS} />
                 <XAxis dataKey="month" {...CHART_AXIS_PROPS} />
                 <YAxis
@@ -493,7 +498,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1 mb-1">
                             <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {label}</span>
                           </div>
-                          <div className="space-y-1 font-mono">
+                          <div className="space-y-1 tabular-nums">
                             {payload.map((entry, idx) => (
                               <div key={idx} className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400">
                                 <div className="flex items-center gap-1.5 font-sans">
@@ -550,7 +555,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                               </span>
                             )}
                           </div>
-                          <div className="space-y-1 font-mono">
+                          <div className="space-y-1 tabular-nums">
                             {payload.map((entry, idx) => (
                               <div key={idx} className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400">
                                 <div className="flex items-center gap-1.5 font-sans">
@@ -671,16 +676,16 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     <tr key={row.id} className={`border-b border-slate-100 dark:border-slate-800 hover:bg-blue-50/60 dark:hover:bg-slate-800 transition-colors ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900'}`}>
                       <td className={`sticky left-0 z-10 px-4 py-3 border-r border-slate-100 dark:border-slate-800 ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900'}`}>
                         <div className="font-semibold text-slate-900 dark:text-slate-100">{row.name}</div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400">{row.facilityType || '—'}</div>
+                        {row.facilityType && <div className="text-[10px] text-slate-500 dark:text-slate-400">{row.facilityType}</div>}
                       </td>
                       <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{row.region || '—'} {row.grid ? `(${row.grid})` : ''}</td>
-                      <td className="px-4 py-3 font-mono text-right text-slate-800 dark:text-slate-200">
+                      <td className="px-4 py-3 tabular-nums text-right text-slate-800 dark:text-slate-200">
                         {row.liters > 0 ? `${formatNum(row.liters)} L` : <span className="text-slate-300 dark:text-slate-600">—</span>}
                       </td>
-                      <td className="px-4 py-3 font-mono text-right text-amber-700 dark:text-amber-300 font-bold bg-amber-50/30 dark:bg-amber-500/10">
+                      <td className="px-4 py-3 tabular-nums text-right text-amber-700 dark:text-amber-300 font-bold bg-amber-50/30 dark:bg-amber-500/10">
                         +{formatNum(row.emissionTon, 2)} tCO₂e
                       </td>
-                      <td className="px-4 py-3 font-mono text-right text-slate-600 dark:text-slate-400">
+                      <td className="px-4 py-3 tabular-nums text-right text-slate-600 dark:text-slate-400">
                         Rp {formatNum(row.costRupiah / 1_000_000, 2)} Jt
                       </td>
                     </tr>
@@ -692,13 +697,13 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                   <tr>
                     <td className="sticky bottom-0 left-0 z-20 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3 text-slate-900 dark:text-slate-100">TOTAL</td>
                     <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3"></td>
-                    <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100">
+                    <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 tabular-nums text-slate-900 dark:text-slate-100">
                       {formatNum(filteredScope1Rows.reduce((s, r) => s + r.liters, 0))} L
                     </td>
-                    <td className="sticky bottom-0 z-10 bg-amber-100 dark:bg-amber-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-amber-700 dark:text-amber-300">
+                    <td className="sticky bottom-0 z-10 bg-amber-100 dark:bg-amber-950 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 tabular-nums text-amber-700 dark:text-amber-300">
                       +{formatNum(filteredScope1Rows.reduce((s, r) => s + r.emissionTon, 0), 2)} tCO₂e
                     </td>
-                    <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 font-mono text-slate-900 dark:text-slate-100">
+                    <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 tabular-nums text-slate-900 dark:text-slate-100">
                       Rp {formatNum(filteredScope1Rows.reduce((s, r) => s + r.costRupiah, 0) / 1_000_000, 2)} Jt
                     </td>
                   </tr>
@@ -739,14 +744,14 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                             </div>
                           </td>
                           <td className="px-4 py-3">{branch.region} ({branch.grid})</td>
-                          <td className="px-4 py-3 font-mono">{branch.emissionFactor} tCO₂/MWh</td>
-                          <td className="px-4 py-3 font-mono font-bold text-right text-amber-800 dark:text-amber-200">
+                          <td className="px-4 py-3 tabular-nums">{branch.emissionFactor} tCO₂/MWh</td>
+                          <td className="px-4 py-3 tabular-nums font-bold text-right text-amber-800 dark:text-amber-200">
                             {formatNum(officeKwh + whKwh + bulkyKwh + depoKwh + tokoKwh)} kWh
                           </td>
-                          <td className="px-4 py-3 font-mono font-bold text-right text-red-600 dark:text-red-400">
+                          <td className="px-4 py-3 tabular-nums font-bold text-right text-red-600 dark:text-red-400">
                             +{formatNum(((officeKwh + whKwh + bulkyKwh + depoKwh + tokoKwh) * branch.emissionFactor) / 1000, 1)} tCO₂e
                           </td>
-                          <td className="px-4 py-3 font-mono text-right text-slate-700 dark:text-slate-300">
+                          <td className="px-4 py-3 tabular-nums text-right text-slate-700 dark:text-slate-300">
                             Rp {formatNum(((officeKwh + whKwh + bulkyKwh + depoKwh + tokoKwh) * 1400) / 1000000, 1)} Juta
                           </td>
                         </tr>
@@ -757,10 +762,10 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                             <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-medium">↳ {branch.office.name}</td>
                             <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 text-blue-700 dark:text-blue-300 font-semibold text-[11px] border border-blue-100 dark:border-blue-500/20">Office</span></td>
                             <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{branch.office.areaSqm} m²</td>
-                            <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300">{formatNum(officeKwh)} kWh</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((officeKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum((officeKwh * 1400) / 1000000, 2)} Jt</td>
+                            <td className="px-4 py-2.5 tabular-nums text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-slate-700 dark:text-slate-300">{formatNum(officeKwh)} kWh</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((officeKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-slate-600 dark:text-slate-400">Rp {formatNum((officeKwh * 1400) / 1000000, 2)} Jt</td>
                           </tr>
                         )}
 
@@ -769,10 +774,10 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                             <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-medium">↳ {branch.warehouse.subTypes.wh.name}</td>
                             <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px] border border-emerald-100 dark:border-emerald-500/20">WH Utama</span></td>
                             <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{branch.warehouse.subTypes.wh.areaSqm} m²</td>
-                            <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300">{formatNum(whKwh)} kWh</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((whKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum((whKwh * 1400) / 1000000, 2)} Jt</td>
+                            <td className="px-4 py-2.5 tabular-nums text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-slate-700 dark:text-slate-300">{formatNum(whKwh)} kWh</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((whKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-slate-600 dark:text-slate-400">Rp {formatNum((whKwh * 1400) / 1000000, 2)} Jt</td>
                           </tr>
                         )}
 
@@ -781,10 +786,10 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                             <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-medium">↳ {branch.warehouse.subTypes.bulky.name}</td>
                             <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px] border border-emerald-100 dark:border-emerald-500/20">Bulky WH</span></td>
                             <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{branch.warehouse.subTypes.bulky.areaSqm} m²</td>
-                            <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300">{formatNum(bulkyKwh)} kWh</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((bulkyKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum((bulkyKwh * 1400) / 1000000, 2)} Jt</td>
+                            <td className="px-4 py-2.5 tabular-nums text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-slate-700 dark:text-slate-300">{formatNum(bulkyKwh)} kWh</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((bulkyKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-slate-600 dark:text-slate-400">Rp {formatNum((bulkyKwh * 1400) / 1000000, 2)} Jt</td>
                           </tr>
                         )}
 
@@ -793,10 +798,10 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                             <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-medium">↳ {branch.warehouse.subTypes.depo.name}</td>
                             <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px] border border-emerald-100 dark:border-emerald-500/20">Depo Transit</span></td>
                             <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{branch.warehouse.subTypes.depo.areaSqm} m²</td>
-                            <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300">{formatNum(depoKwh)} kWh</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((depoKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum((depoKwh * 1400) / 1000000, 2)} Jt</td>
+                            <td className="px-4 py-2.5 tabular-nums text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-slate-700 dark:text-slate-300">{formatNum(depoKwh)} kWh</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((depoKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-slate-600 dark:text-slate-400">Rp {formatNum((depoKwh * 1400) / 1000000, 2)} Jt</td>
                           </tr>
                         )}
 
@@ -805,10 +810,10 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                             <td className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 px-4 py-2.5 pl-8 z-10 border-r border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-medium">↳ {branch.toko.name}</td>
                             <td className="px-4 py-2.5"><span className="inline-flex rounded-full bg-purple-50 dark:bg-purple-500/10 px-2 py-0.5 text-purple-700 dark:text-purple-300 font-semibold text-[11px] border border-purple-100 dark:border-purple-500/20">Jaringan Toko</span></td>
                             <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{branch.toko.storeCount} Toko Ritel</td>
-                            <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300">{formatNum(tokoKwh)} kWh</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((tokoKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
-                            <td className="px-4 py-2.5 font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum((tokoKwh * 1400) / 1000000, 2)} Jt</td>
+                            <td className="px-4 py-2.5 tabular-nums text-slate-500 dark:text-slate-400">{branch.emissionFactor}</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-slate-700 dark:text-slate-300">{formatNum(tokoKwh)} kWh</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-red-600 dark:text-red-400 font-semibold">+{formatNum((tokoKwh * branch.emissionFactor) / 1000, 2)} tCO₂e</td>
+                            <td className="px-4 py-2.5 tabular-nums text-right text-slate-600 dark:text-slate-400">Rp {formatNum((tokoKwh * 1400) / 1000000, 2)} Jt</td>
                           </tr>
                         )}
                       </React.Fragment>

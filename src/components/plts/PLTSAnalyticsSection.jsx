@@ -127,7 +127,7 @@ function SafePrBarTooltip({ active, payload }) {
         <p className="font-bold text-slate-100 border-b border-slate-700 pb-1">{data.name}</p>
         <div className="flex justify-between items-center text-slate-300">
           <span>Perkiraan PR (audit):</span>
-          <strong className="text-emerald-400 font-mono text-sm">
+          <strong className="text-emerald-400 tabular-nums text-sm">
             {data.pr !== null && data.pr !== undefined ? `${data.pr}%` : '—'}
           </strong>
         </div>
@@ -138,11 +138,11 @@ function SafePrBarTooltip({ active, payload }) {
         )}
         <div className="flex justify-between items-center text-slate-400 text-[11px]">
           <span>Kapasitas:</span>
-          <span className="font-mono">{data.installedKwp} kWp</span>
+          <span className="tabular-nums">{data.installedKwp} kWp</span>
         </div>
         <div className="flex justify-between items-center text-slate-400 text-[11px]">
           <span>Produksi (audit):</span>
-          <span className="font-mono">{data.monthYieldMwh} MWh</span>
+          <span className="tabular-nums">{data.monthYieldMwh} MWh</span>
         </div>
         <p className="text-[9px] text-slate-400 pt-1 border-t border-slate-800">
           Sumber: audit April 2026, bukan data langsung
@@ -175,7 +175,7 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, 
           <div className="bg-blue-950/60 border border-blue-800/60 rounded-lg p-2 space-y-1">
             <div className="flex justify-between items-center text-slate-200">
               <span className="text-xs text-blue-300">Rata-rata (menurut kapasitas):</span>
-              <strong className="text-blue-100 font-mono text-sm">{avgVal !== null && avgVal !== undefined ? avgVal : '—'} {unitSuffix}</strong>
+              <strong className="text-blue-100 tabular-nums text-sm">{avgVal !== null && avgVal !== undefined ? avgVal : '—'} {unitSuffix}</strong>
             </div>
             <p className="text-[10px] text-blue-300">Total produksi ÷ total kapasitas</p>
           </div>
@@ -197,23 +197,23 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, 
           <div className="space-y-1 bg-slate-800/60 rounded-lg p-2 border border-slate-700/50">
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-400">Maksimum:</span>
-              <strong className="text-emerald-400 font-mono">{maxVal !== null && maxVal !== undefined ? maxVal : '—'} {unitSuffix}</strong>
+              <strong className="text-emerald-400 tabular-nums">{maxVal !== null && maxVal !== undefined ? maxVal : '—'} {unitSuffix}</strong>
             </div>
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-400">Minimum:</span>
-              <strong className="text-rose-400 font-mono">{minVal !== null && minVal !== undefined ? minVal : '—'} {unitSuffix}</strong>
+              <strong className="text-rose-400 tabular-nums">{minVal !== null && minVal !== undefined ? minVal : '—'} {unitSuffix}</strong>
             </div>
             {rangeDiff !== null && (
               <div className="flex justify-between items-center text-[10px] text-slate-300 pt-1 border-t border-slate-700/60">
                 <span className="text-slate-300">Selisih:</span>
-                <span className="font-mono text-slate-200 font-semibold">{rangeDiff} {unitSuffix}</span>
+                <span className="tabular-nums text-slate-200 font-semibold">{rangeDiff} {unitSuffix}</span>
               </div>
             )}
           </div>
           {avgVal !== null && avgVal !== undefined && (
             <div className="flex justify-between items-center text-[11px] text-blue-300 px-1 pt-0.5">
               <span>Rata-rata:</span>
-              <strong className="font-mono">{avgVal} {unitSuffix}</strong>
+              <strong className="tabular-nums">{avgVal} {unitSuffix}</strong>
             </div>
           )}
         </div>
@@ -244,7 +244,7 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, 
       <div className="bg-slate-900/95 text-white rounded-xl p-3.5 shadow-2xl border border-slate-700/80 text-xs space-y-2 min-w-[240px] max-w-[320px] backdrop-blur-md">
         <div className="flex items-center justify-between border-b border-slate-700/80 pb-1.5">
           <span className="font-bold text-slate-100 text-sm">{label}</span>
-          <span className="text-[10px] text-slate-400 font-mono">{plantEntries.length} PLTS</span>
+          <span className="text-[10px] text-slate-400 tabular-nums">{plantEntries.length} PLTS</span>
         </div>
 
         {hoveredEntry && (
@@ -254,7 +254,7 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, 
                 <span className="size-2.5 rounded-full shrink-0 shadow-xs" style={{ backgroundColor: hoveredEntry.color }} />
                 <span className="font-bold text-white truncate">{hoveredEntry.name}</span>
               </div>
-              <strong className="text-blue-200 font-mono text-sm">{hoveredEntry.value} {unitSuffix}</strong>
+              <strong className="text-blue-200 tabular-nums text-sm">{hoveredEntry.value} {unitSuffix}</strong>
             </div>
             <span className="text-[9px] text-blue-300 font-semibold block">Lokasi dipilih</span>
           </div>
@@ -272,7 +272,7 @@ function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, 
                 return (
                   <div
                     key={idx}
-                    className={`flex justify-between items-center text-[11px] font-mono py-0.5 px-1.5 rounded transition-colors ${isThisHovered ? 'bg-blue-500/25 text-white font-bold' : 'text-slate-300 hover:bg-slate-800/50'
+                    className={`flex justify-between items-center text-[11px] tabular-nums py-0.5 px-1.5 rounded transition-colors ${isThisHovered ? 'bg-blue-500/25 text-white font-bold' : 'text-slate-300 hover:bg-slate-800/50'
                       }`}
                   >
                     <div className="flex items-center gap-1.5 truncate max-w-[170px]">
@@ -356,7 +356,7 @@ export function getDCBadges(dc, selectedMetric) {
     badges.push({
       id: 'fault',
       label: 'Fault',
-      className: 'bg-red-600 text-white border-red-700 font-bold shadow-xs animate-pulse',
+      className: 'bg-red-600 text-white border-red-700 font-bold shadow-xs',
       tooltip: `Status vendor: Terdeteksi gangguan kritis hardware inverter (${dc.faultCount || 1} fault aktif)`
     });
   }
@@ -544,7 +544,7 @@ const DCRowItem = React.memo(function DCRowItem({
       </div>
 
       <div className="text-right shrink-0 pl-2">
-        <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+        <span className="tabular-nums font-bold text-slate-800 dark:text-slate-200">
           {dc.isUnderConstruction ? (
             <span className="text-slate-500 dark:text-slate-400 font-normal italic text-[11px]">Dalam Pembangunan</span>
           ) : isExcludedFromRanking && selectedMetric !== 'pr' ? (
@@ -1291,7 +1291,7 @@ export default function PLTSAnalyticsSection({
           <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between text-xs shrink-0 bg-slate-50 dark:bg-slate-800/40 p-2.5 rounded-xl mt-2 gap-1.5">
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-slate-500 dark:text-slate-400 font-medium">Rata-rata Tertimbang ({rankedChosenCount} plant):</span>
-              <strong className="font-mono text-blue-700 dark:text-blue-300 font-bold">
+              <strong className="tabular-nums text-blue-700 dark:text-blue-300 font-bold">
                 {computedAverageMetricValue !== null && computedAverageMetricValue !== undefined
                   ? `${computedAverageMetricValue} ${activeMetricMeta.unit}`
                   : '—'}
@@ -1938,7 +1938,7 @@ export default function PLTSAnalyticsSection({
                                     </span>
                                   )}
                                   {d.inverterStats?.totalCount > 0 && (
-                                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono border border-slate-200 dark:border-slate-700" title={`${d.inverterStats.totalCount} Inverter terpasang`}>
+                                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 tabular-nums border border-slate-200 dark:border-slate-700" title={`${d.inverterStats.totalCount} Inverter terpasang`}>
                                       {d.inverterStats.totalCount} Inv
                                     </span>
                                   )}
@@ -1948,17 +1948,17 @@ export default function PLTSAnalyticsSection({
                                     </span>
                                   )}
                                 </div>
-                                <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">{d.dcId}</span>
+                                <span className="text-[10px] tabular-nums text-slate-500 dark:text-slate-400">{d.dcId}</span>
                               </div>
                             </div>
                           </td>
                           <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
                             {d.region || <span className="text-slate-500 dark:text-slate-400">—</span>}
                           </td>
-                          <td className="px-3 py-3 font-mono text-right text-slate-800 dark:text-slate-200 font-bold">
+                          <td className="px-3 py-3 tabular-nums text-right text-slate-800 dark:text-slate-200 font-bold">
                             {d.installedKwp !== null && d.installedKwp !== undefined ? `${d.installedKwp} kWp` : '—'}
                           </td>
-                          <td className="px-3 py-3 font-mono text-right text-slate-900 dark:text-slate-100 font-bold">
+                          <td className="px-3 py-3 tabular-nums text-right text-slate-900 dark:text-slate-100 font-bold">
                             {d.isUnderConstruction ? (
                               <span className="text-slate-500 dark:text-slate-400 font-normal italic text-[11px]">Dalam Pembangunan</span>
                             ) : d.productionMwh !== null && d.productionMwh !== undefined ? (
@@ -1969,12 +1969,12 @@ export default function PLTSAnalyticsSection({
                               '—'
                             )}
                           </td>
-                          <td className="px-3 py-3 font-mono text-right text-blue-700 dark:text-blue-300 font-bold">
+                          <td className="px-3 py-3 tabular-nums text-right text-blue-700 dark:text-blue-300 font-bold">
                             {d.isUnderConstruction ? '—' : (d.specificYield !== null && d.specificYield !== undefined ? formatNum(d.specificYield, 1) : '—')}
                           </td>
                           {/* Proxy PR */}
                           {isAuditBaselineEnabled && (
-                            <td className="px-3 py-3 font-mono text-right">
+                            <td className="px-3 py-3 tabular-nums text-right">
                               {d.prPct !== null && d.prPct !== undefined ? (
                                 <span
                                   className="inline-flex items-center gap-1 font-bold text-slate-700 dark:text-slate-300"
@@ -1991,7 +1991,7 @@ export default function PLTSAnalyticsSection({
                             </td>
                           )}
                           {/* Portal PR Manual */}
-                          <td className="px-3 py-3 font-mono text-right">
+                          <td className="px-3 py-3 tabular-nums text-right">
                             {d.portalPrManual ? (
                               <div className="flex flex-col items-end">
                                 <span className="font-bold text-slate-900 dark:text-slate-100 inline-flex items-center gap-1">
@@ -2004,9 +2004,9 @@ export default function PLTSAnalyticsSection({
                                   per {d.portalPrManual.formattedDate}
                                 </span>
                                 {d.historicalMonthlyPr !== null && (
-                                  <span className={`text-[9px] font-mono ${(d.historicalMonthlyPr - d.portalPrManual.prPercent) > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400'
+                                  <span className={`text-[9px] tabular-nums ${(d.historicalMonthlyPr - d.portalPrManual.prPercent) > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400'
                                     }`}>
-                                    Δ {((d.historicalMonthlyPr - d.portalPrManual.prPercent) >= 0 ? '+' : '') + (d.historicalMonthlyPr - d.portalPrManual.prPercent).toFixed(1)} pt
+                                    Δ {((d.historicalMonthlyPr - d.portalPrManual.prPercent) >= 0 ? '+' : '') + formatNum(d.historicalMonthlyPr - d.portalPrManual.prPercent, 1)} pt
                                   </span>
                                 )}
                               </div>
@@ -2015,7 +2015,7 @@ export default function PLTSAnalyticsSection({
                             )}
                           </td>
                           {/* Inverter Temperature (p4) */}
-                          <td className="px-3 py-3 font-mono text-right text-slate-700 dark:text-slate-300">
+                          <td className="px-3 py-3 tabular-nums text-right text-slate-700 dark:text-slate-300">
                             {d.inverterStats?.tempMax !== null && d.inverterStats?.tempMax !== undefined ? (
                               <div className="flex flex-col items-end" title="suhu internal inverter">
                                 <span className="font-bold text-slate-800 dark:text-slate-200">
@@ -2029,10 +2029,10 @@ export default function PLTSAnalyticsSection({
                               <span className="text-slate-500 dark:text-slate-400 text-xs">—</span>
                             )}
                           </td>
-                          <td className="px-3 py-3 font-mono text-right text-slate-600 dark:text-slate-400">
+                          <td className="px-3 py-3 tabular-nums text-right text-slate-600 dark:text-slate-400">
                             {d.isUnderConstruction ? '—' : (d.capacityFactor !== null && d.capacityFactor !== undefined ? `${d.capacityFactor}%` : '—')}
                           </td>
-                          <td className="px-3 py-3 font-mono text-right text-emerald-700 dark:text-emerald-300 font-semibold">
+                          <td className="px-3 py-3 tabular-nums text-right text-emerald-700 dark:text-emerald-300 font-semibold">
                             {d.isUnderConstruction ? (
                               '—'
                             ) : d.emissionTon !== null && d.emissionTon !== undefined ? (
@@ -2130,30 +2130,30 @@ export default function PLTSAnalyticsSection({
                     TOTAL & RERATA ({tableDisplayItems.length} Lokasi)
                   </td>
                   <td className="px-3 py-3 text-slate-300 font-normal">Nasional</td>
-                  <td className="px-3 py-3 font-mono text-right text-amber-300 font-bold">
+                  <td className="px-3 py-3 tabular-nums text-right text-amber-300 font-bold">
                     {formatNum(tableDisplayItems.reduce((acc, d) => acc + (d.installedKwp || 0), 0), 2)} kWp
                   </td>
-                  <td className="px-3 py-3 font-mono text-right text-emerald-300 font-bold">
+                  <td className="px-3 py-3 tabular-nums text-right text-emerald-300 font-bold">
                     {formatNum(tableDisplayItems.reduce((acc, d) => acc + (d.productionMwh || d.monthYieldMwh || d.monthlyYieldMwh || 0), 0), 2)} MWh
                   </td>
-                  <td className="px-3 py-3 font-mono text-right text-blue-300 font-bold">
+                  <td className="px-3 py-3 tabular-nums text-right text-blue-300 font-bold">
                     {Number((tableDisplayItems.filter(d => !d.isUnderConstruction && d.specificYield > 0).reduce((acc, d) => acc + d.specificYield, 0) / Math.max(1, tableDisplayItems.filter(d => !d.isUnderConstruction && d.specificYield > 0).length)).toFixed(1))}
                   </td>
                   {isAuditBaselineEnabled && (
-                    <td className="px-3 py-3 font-mono text-right text-emerald-300 font-bold">
+                    <td className="px-3 py-3 tabular-nums text-right text-emerald-300 font-bold">
                       {Number((tableDisplayItems.reduce((acc, d) => acc + (d.historicalMonthlyPr || d.prPct || 0), 0) / Math.max(1, tableDisplayItems.filter(d => (d.historicalMonthlyPr || d.prPct) > 0).length)).toFixed(1))}%
                     </td>
                   )}
-                  <td className="px-3 py-3 font-mono text-right text-slate-400">
+                  <td className="px-3 py-3 tabular-nums text-right text-slate-400">
                     —
                   </td>
-                  <td className="px-3 py-3 font-mono text-right text-slate-400">
+                  <td className="px-3 py-3 tabular-nums text-right text-slate-400">
                     —
                   </td>
-                  <td className="px-3 py-3 font-mono text-right text-slate-300">
+                  <td className="px-3 py-3 tabular-nums text-right text-slate-300">
                     {Number((tableDisplayItems.filter(d => !d.isUnderConstruction && d.capacityFactor > 0).reduce((acc, d) => acc + d.capacityFactor, 0) / Math.max(1, tableDisplayItems.filter(d => !d.isUnderConstruction && d.capacityFactor > 0).length)).toFixed(2))}%
                   </td>
-                  <td className="px-3 py-3 font-mono text-right text-emerald-300 font-bold">
+                  <td className="px-3 py-3 tabular-nums text-right text-emerald-300 font-bold">
                     {formatNum(tableDisplayItems.filter(d => !d.isUnderConstruction).reduce((acc, d) => acc + (d.emissionTon || d.co2Ton || 0), 0), 2)} t
                   </td>
                   <td className="px-3 py-3 text-center text-[10px] text-slate-400">
@@ -2213,7 +2213,7 @@ export default function PLTSAnalyticsSection({
                         <div className="flex items-start justify-between gap-2 mb-2 pb-2 border-b border-slate-100 dark:border-slate-800">
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 block">{psId}</span>
+                              <span className="text-[10px] tabular-nums font-bold text-slate-500 dark:text-slate-400 block">{psId}</span>
                               {st.isDataStale && (
                                 <span className="text-[9px] px-1 py-0.2 rounded bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 font-bold">
                                   Usang
@@ -2244,27 +2244,27 @@ export default function PLTSAnalyticsSection({
                         <div className="space-y-1.5 py-1 text-xs">
                           <div className="flex justify-between items-center py-0.5 border-b border-slate-100/60 dark:border-slate-800">
                             <span className="text-slate-500 dark:text-slate-400 text-[11px]">Daya Live</span>
-                            <strong className="font-mono text-amber-600 dark:text-amber-400 font-bold">
+                            <strong className="tabular-nums text-amber-600 dark:text-amber-400 font-bold">
                               {currentKw !== null && currentKw !== undefined ? `${currentKw} kW` : <span className="text-slate-500 dark:text-slate-400 font-normal">Offline / null</span>}
                             </strong>
                           </div>
                           <div className="flex justify-between items-center py-0.5 border-b border-slate-100/60 dark:border-slate-800">
                             <span className="text-slate-500 dark:text-slate-400 text-[11px]">Yield Hari Ini</span>
-                            <strong className="font-mono text-emerald-700 dark:text-emerald-300 font-bold">{todayKwh} kWh</strong>
+                            <strong className="tabular-nums text-emerald-700 dark:text-emerald-300 font-bold">{todayKwh} kWh</strong>
                           </div>
                           <div className="flex justify-between items-center py-0.5 border-b border-slate-100/60 dark:border-slate-800">
                             <span className="text-slate-500 dark:text-slate-400 text-[11px]">Specific Yield (sebagian)</span>
-                            <strong className="font-mono text-blue-700 dark:text-blue-300 font-bold">
+                            <strong className="tabular-nums text-blue-700 dark:text-blue-300 font-bold">
                               {st.todaySpecificYield !== null && st.todaySpecificYield !== undefined ? `${st.todaySpecificYield} kWh/kWp` : '—'}
                             </strong>
                           </div>
                           <div className="flex justify-between items-center py-0.5 border-b border-slate-100/60 dark:border-slate-800">
                             <span className="text-slate-500 dark:text-slate-400 text-[11px]">Kapasitas API</span>
-                            <strong className="font-mono text-slate-900 dark:text-slate-100 font-bold">{installedKwp} kWp</strong>
+                            <strong className="tabular-nums text-slate-900 dark:text-slate-100 font-bold">{installedKwp} kWp</strong>
                           </div>
                           <div className="flex justify-between items-center py-0.5 border-b border-slate-100/60 dark:border-slate-800">
                             <span className="text-slate-500 dark:text-slate-400 text-[11px]">Suhu Inverter</span>
-                            <strong className="font-mono text-slate-700 dark:text-slate-300 font-bold">
+                            <strong className="tabular-nums text-slate-700 dark:text-slate-300 font-bold">
                               {st.inverterStats?.tempMax !== null && st.inverterStats?.tempMax !== undefined
                                 ? `${st.inverterStats.tempMax} ℃`
                                 : (st.inverterTemp && st.inverterTemp !== 'Belum tersedia' ? st.inverterTemp : '—')}
@@ -2290,7 +2290,7 @@ export default function PLTSAnalyticsSection({
                         <div className="flex flex-col gap-0.5 pt-2 mt-1 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-500 dark:text-slate-400">
                           <div className="flex justify-between items-center">
                             <span>Data terakhir:</span>
-                            <span className="text-slate-600 dark:text-slate-400 font-mono font-medium">{formatWibTime(st.lastUpdate)}</span>
+                            <span className="text-slate-600 dark:text-slate-400 tabular-nums font-medium">{formatWibTime(st.lastUpdate)}</span>
                           </div>
                           <span className="text-[9px] text-slate-500 dark:text-slate-400 italic">
                             Data inverter dilaporkan tiap 5 menit; sinkron dashboard tiap 30 menit
@@ -2343,7 +2343,7 @@ export default function PLTSAnalyticsSection({
                             <td className="px-3 py-2.5 font-bold text-slate-900 dark:text-slate-100">
                               <div className="flex items-center gap-1.5 flex-wrap">
                                 <span>{psName}</span>
-                                <span className="font-mono text-slate-500 dark:text-slate-400 text-[10px] font-normal">({psId})</span>
+                                <span className="tabular-nums text-slate-500 dark:text-slate-400 text-[10px] font-normal">({psId})</span>
                                 {st.isDataStale && (
                                   <span className="text-[9px] px-1 py-0.2 rounded bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 font-bold">
                                     Usang
@@ -2368,20 +2368,20 @@ export default function PLTSAnalyticsSection({
                                 {status}
                               </span>
                             </td>
-                            <td className="px-3 py-2.5 font-mono text-right text-amber-600 dark:text-amber-400 font-bold">
+                            <td className="px-3 py-2.5 tabular-nums text-right text-amber-600 dark:text-amber-400 font-bold">
                               {currentKw !== null && currentKw !== undefined ? `${currentKw} kW` : <span className="text-slate-500 dark:text-slate-400 font-normal">Offline / null</span>}
                             </td>
-                            <td className="px-3 py-2.5 font-mono text-right text-emerald-700 dark:text-emerald-300 font-bold">{todayKwh} kWh</td>
-                            <td className="px-3 py-2.5 font-mono text-right text-blue-700 dark:text-blue-300 font-bold">
+                            <td className="px-3 py-2.5 tabular-nums text-right text-emerald-700 dark:text-emerald-300 font-bold">{todayKwh} kWh</td>
+                            <td className="px-3 py-2.5 tabular-nums text-right text-blue-700 dark:text-blue-300 font-bold">
                               {st.todaySpecificYield !== null && st.todaySpecificYield !== undefined ? `${st.todaySpecificYield} kWh/kWp` : '—'}
                             </td>
-                            <td className="px-3 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300">{installedKwp} kWp</td>
-                            <td className="px-3 py-2.5 font-mono text-right text-slate-700 dark:text-slate-300 text-[11px]">
+                            <td className="px-3 py-2.5 tabular-nums text-right text-slate-700 dark:text-slate-300">{installedKwp} kWp</td>
+                            <td className="px-3 py-2.5 tabular-nums text-right text-slate-700 dark:text-slate-300 text-[11px]">
                               {st.inverterStats?.tempMax !== null && st.inverterStats?.tempMax !== undefined
                                 ? `${st.inverterStats.tempMax} ℃`
                                 : (st.inverterTemp && st.inverterTemp !== 'Belum tersedia' ? st.inverterTemp : '—')}
                             </td>
-                            <td className="px-3 py-2.5 text-center text-slate-500 dark:text-slate-400 font-mono text-[10px]">{st.lastUpdate || 'Baru saja'}</td>
+                            <td className="px-3 py-2.5 text-center text-slate-500 dark:text-slate-400 tabular-nums text-[10px]">{st.lastUpdate || 'Baru saja'}</td>
                           </tr>
                         );
                       })}

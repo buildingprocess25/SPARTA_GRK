@@ -239,7 +239,7 @@ export function SelectGroup({ children, className = '', ...props }) {
 export function SelectLabel({ children, className = '', ...props }) {
   return (
     <div
-      className={`px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 ${className}`}
+      className={`px-2.5 py-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 ${className}`}
       {...props}
     >
       {children}

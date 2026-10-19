@@ -3,6 +3,8 @@
 import { Search } from 'lucide-react';
 import { CustomSelect } from '@/components/ui/select';
 
+const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
 export default function Scope2Filters({ filters, grids, plants, onChange }) {
   const set = (key, value) => onChange({ ...filters, [key]: value });
 
@@ -11,6 +13,10 @@ export default function Scope2Filters({ filters, grids, plants, onChange }) {
     { value: 'month', label: 'Satu bulan' },
     { value: 'range', label: 'Rentang bulan' },
   ];
+
+  // Native month inputs follow the browser language ("January 2026"); a select keeps the labels Indonesian.
+  const year = String(filters.from || filters.month || filters.to || new Date().getFullYear()).slice(0, 4);
+  const monthOptions = MONTHS.map((name, i) => ({ value: `${year}-${String(i + 1).padStart(2, '0')}`, label: `${name} ${year}` }));
 
   const gridOptions = [
     { value: 'all', label: 'Semua wilayah' },
@@ -35,34 +41,17 @@ export default function Scope2Filters({ filters, grids, plants, onChange }) {
       {filters.period === 'month' ? (
         <div>
           <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 block mb-1">Bulan</label>
-          <input
-            type="month"
-            value={filters.month || ''}
-            onChange={event => set('month', event.target.value)}
-            className="w-full h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 dark:text-slate-200 px-3 py-1.5 text-xs shadow-2xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <CustomSelect value={filters.month || ''} onChange={event => set('month', event.target.value)} options={monthOptions} />
         </div>
       ) : (
         <>
           <div>
             <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 block mb-1">Dari</label>
-            <input
-              type="month"
-              disabled={filters.period !== 'range'}
-              value={filters.from || ''}
-              onChange={event => set('from', event.target.value)}
-              className="w-full h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 dark:text-slate-200 px-3 py-1.5 text-xs shadow-2xs disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <CustomSelect value={filters.from || ''} onChange={event => set('from', event.target.value)} options={monthOptions} disabled={filters.period !== 'range'} />
           </div>
           <div>
             <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 block mb-1">Sampai</label>
-            <input
-              type="month"
-              disabled={filters.period !== 'range'}
-              value={filters.to || ''}
-              onChange={event => set('to', event.target.value)}
-              className="w-full h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 dark:text-slate-200 px-3 py-1.5 text-xs shadow-2xs disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <CustomSelect value={filters.to || ''} onChange={event => set('to', event.target.value)} options={monthOptions} disabled={filters.period !== 'range'} />
           </div>
         </>
       )}
