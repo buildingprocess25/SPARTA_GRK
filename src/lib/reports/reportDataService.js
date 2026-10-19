@@ -234,11 +234,11 @@ export function exportCsvReport(reportData, filename) {
     ...(withScope3 ? ['Scope 3 - Perjalanan Dinas (tCO2e)'] : []),
     'Total Emisi Dihasilkan (tCO2e)',
     'Produksi PLTS (kWh)',
-    'Emisi Ditekan - PLTS (tCO2e)',
-    'Emisi Ditekan - Air (tCO2e)',
-    'Total Emisi Ditekan (tCO2e)',
-    'Emisi Bersih (tCO2e)',
-    'Persentase Ditekan (%)'
+    'Pengurangan Emisi - PLTS (tCO2e)',
+    'Pengurangan Emisi - Air (tCO2e)',
+    'Total Pengurangan Emisi (tCO2e)',
+    'Total Emisi Akhir (tCO2e)',
+    'Persentase Penurunan (%)'
   ];
 
   const rows = trend.map(t => [

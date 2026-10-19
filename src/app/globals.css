@@ -37,7 +37,7 @@
   --chart-grid: #F1F5F9;
   --chart-axis: #64748B;
   --chart-axis-line: #E2E8F0;
-  /* "Net" series (eg. Emisi Bersih line) - was hardcoded #0F172A (near-black)
+  /* "Net" series (eg. Total Emisi Akhir line) - was hardcoded #0F172A (near-black)
      in CHART_PALETTE.net, which in dark mode sat almost invisible against
      the card's own near-black background. Light mode keeps the same
      near-black for a confident "this is the headline number" look; dark

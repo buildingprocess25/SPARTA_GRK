@@ -120,7 +120,7 @@ export default function EmissionCalculatorPage() {
       const XLSX = await import('xlsx');
       const rows = entries.map(entry => ({ Sumber: CATEGORY_MAP[entry.category]?.title, Jenis: entry.kind === 'addition' ? 'Penambah' : 'Pengurangan', Entri: entry.label, 'kgCO2e': entry.calculated.kgCo2e ?? '', Status: entry.calculated.status, 'ID Faktor': entry.factorSnapshots?.map(item => item.id).join('; '), 'Nilai Faktor': entry.factorSnapshots?.map(item => item.value ?? '').join('; '), Versi: entry.factorSnapshots?.map(item => item.version).join('; ') }));
       const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(rows), 'Rekap Emisi');
-      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet([{ Metrik: 'Total Penambah kgCO2e', Nilai: summary.totalAdditionKg }, { Metrik: 'Total Pengurangan kgCO2e', Nilai: summary.totalReductionKg }, { Metrik: 'Emisi Bersih kgCO2e', Nilai: summary.netKg }]), 'Ringkasan');
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet([{ Metrik: 'Total Emisi Dihasilkan kgCO2e', Nilai: summary.totalAdditionKg }, { Metrik: 'Total Pengurangan Emisi kgCO2e', Nilai: summary.totalReductionKg }, { Metrik: 'Total Emisi Akhir kgCO2e', Nilai: summary.netKg }]), 'Ringkasan');
       const bytes = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' }); downloadBlob(new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'rekap-kalkulator-emisi.xlsx');
     } catch { setNotice('Rekap Excel gagal dibuat. Coba ulangi atau gunakan cetak PDF.'); }
   };
