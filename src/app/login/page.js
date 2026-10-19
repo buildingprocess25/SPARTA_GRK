@@ -3,6 +3,7 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, User, Eye, EyeOff, LogIn } from 'lucide-react';
+import { SESSION_IDLE_TIMEOUT_MS } from '@/lib/sessionPolicy';
 
 function LoginForm() {
   const router = useRouter();
@@ -78,6 +79,12 @@ function LoginForm() {
           <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 text-center mb-5">
             SPARTA Sustainability Dashboard
           </h1>
+
+          {!error && searchParams.get('reason') === 'idle' && (
+            <div role="status" className="mb-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 text-xs text-slate-700 dark:text-slate-300">
+              Anda keluar otomatis karena tidak ada aktivitas selama {SESSION_IDLE_TIMEOUT_MS / 60_000} menit. Silakan masuk lagi.
+            </div>
+          )}
 
           {error && (
             <div className="mb-4 rounded-lg border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-3 py-2 text-xs text-rose-700 dark:text-rose-300">

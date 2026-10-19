@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { findUser, verifyPassword, createSessionToken, SESSION_COOKIE, SESSION_MAX_AGE_SECONDS } from '@/lib/auth.js';
+import { findUser, verifyPassword, createSessionToken, sessionCookieOptions, SESSION_COOKIE, SESSION_MAX_AGE_SECONDS } from '@/lib/auth.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,18 +54,13 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Username atau password salah.' }, { status: 401 });
     }
 
-    const token = createSessionToken(user.username);
+    const exp = Date.now() + SESSION_MAX_AGE_SECONDS * 1000;
+    const token = createSessionToken(user.username, { exp });
     const response = NextResponse.json({
       success: true,
       user: { username: user.username, displayName: user.displayName },
     });
-    response.cookies.set(SESSION_COOKIE, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: SESSION_MAX_AGE_SECONDS,
-    });
+    response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions(exp));
     return response;
   } catch (error) {
     console.error('[auth/login] error:', error.message);

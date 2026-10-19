@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isSessionPayloadActive } from './lib/sessionPolicy.js';
 
 /**
  * Route guard for the 2-account login (see src/lib/auth.js). Runs on the
@@ -43,8 +44,7 @@ async function verifySessionTokenEdge(token, secret) {
     if (!valid) return null;
 
     const payload = JSON.parse(new TextDecoder().decode(base64urlToBytes(payloadStr)));
-    if (!payload?.u || !payload?.exp || Date.now() > payload.exp) return null;
-    return payload.u;
+    return isSessionPayloadActive(payload) ? payload.u : null;
   } catch (_) {
     return null;
   }

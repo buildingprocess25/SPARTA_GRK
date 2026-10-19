@@ -10,6 +10,7 @@
  */
 import crypto from 'crypto';
 import prisma from './prisma.js';
+import { isSessionPayloadActive } from './sessionPolicy.js';
 
 export const SESSION_COOKIE = 'sparta_session';
 export const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60; // 7 days
@@ -123,14 +124,35 @@ export function verifyPassword(password, stored) {
 }
 
 /** Signed "payload.signature" token, both base64url. Verified in middleware.js (Edge runtime) using Web Crypto - keep the signing scheme (HMAC-SHA256 over the raw payload string) in sync if this changes. */
-export function createSessionToken(username) {
-  const payload = { u: username, exp: Date.now() + SESSION_MAX_AGE_SECONDS * 1000 };
+/**
+ * `exp` caps the session at 7 days from login; `act` is the last user activity and expires the session after
+ * SESSION_IDLE_TIMEOUT_MS. A refresh keeps `exp` and moves `act`, so activity never extends the 7-day cap.
+ */
+export function createSessionToken(username, { exp } = {}) {
+  const now = Date.now();
+  const payload = { u: username, exp: exp || now + SESSION_MAX_AGE_SECONDS * 1000, act: now };
   const payloadStr = Buffer.from(JSON.stringify(payload)).toString('base64url');
   const signature = crypto.createHmac('sha256', getSessionSecret()).update(payloadStr).digest('base64url');
   return `${payloadStr}.${signature}`;
 }
 
+/** Cookie options for a session token; maxAge follows the token's remaining absolute lifetime. */
+export function sessionCookieOptions(exp) {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: Math.max(0, Math.floor((exp - Date.now()) / 1000)),
+  };
+}
+
 export function verifySessionToken(token) {
+  return readSessionToken(token)?.u || null;
+}
+
+/** @returns {{u: string, exp: number, act: number} | null} the payload of a valid, non-idle token */
+export function readSessionToken(token) {
   if (!token || typeof token !== 'string' || !token.includes('.')) return null;
   const [payloadStr, signature] = token.split('.');
   if (!payloadStr || !signature) return null;
@@ -140,8 +162,7 @@ export function verifySessionToken(token) {
   if (sigBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(sigBuf, expectedBuf)) return null;
   try {
     const payload = JSON.parse(Buffer.from(payloadStr, 'base64url').toString('utf8'));
-    if (!payload?.u || !payload?.exp || Date.now() > payload.exp) return null;
-    return payload.u;
+    return isSessionPayloadActive(payload) ? payload : null;
   } catch (_) {
     return null;
   }
