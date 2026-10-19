@@ -87,3 +87,11 @@ scripts/populate-fault-history-from-evidence.mjs
 # Autosave & backup files
 .~lock.#
 *.bak
+
+# graphify (generated knowledge graph, cache, local paths)
+graphify-out/
+**/graphify-out/
+
+# Claude Code local settings (graphify hooks use machine-specific paths)
+.claude/settings.json
+.claude/settings.local.json
