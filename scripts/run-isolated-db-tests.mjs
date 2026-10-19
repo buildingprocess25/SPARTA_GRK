@@ -45,10 +45,10 @@ console.log('RUNNING ISOLATED DATABASE MUTATION TESTS (Guarded Schema: test_alfa
 console.log('================================================================================\n');
 
 const testScripts = [
-  'scripts/test-inverter-temperature-foundation.mjs',
-  'scripts/test-scheduler-and-snapshots.mjs',
-  'scripts/test-calculator-and-sustainability.mjs',
-  'scripts/test-excel-upload-and-templates.mjs',
+  'scripts/tests/test-inverter-temperature-foundation.mjs',
+  'scripts/tests/test-scheduler-and-snapshots.mjs',
+  'scripts/tests/test-calculator-and-sustainability.mjs',
+  'scripts/tests/test-excel-upload-and-templates.mjs',
 ];
 
 for (const script of testScripts) {

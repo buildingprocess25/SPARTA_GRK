@@ -29,7 +29,7 @@ const schema = effective.searchParams.get('schema') || 'public';
 console.log(JSON.stringify({ host: effective.hostname, database, schema, looks_pooled: looksPooled, same_host_database_user_as_production: sameIdentity }));
 if (looksPooled || sameIdentity || !/test/i.test(database + schema)) throw new Error('Guard database test menolak target efektif');
 
-const result = spawnSync(process.execPath, ['scripts/test-inverter-temperature-foundation.mjs'], {
+const result = spawnSync(process.execPath, ['scripts/tests/test-inverter-temperature-foundation.mjs'], {
   cwd: process.cwd(), stdio: 'inherit',
   env: {
     ...process.env,

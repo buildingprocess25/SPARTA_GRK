@@ -3,10 +3,10 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const allowed = new Set([
-  'scripts/test-database-and-workbook-reconciliation.mjs',
-  'scripts/test-master-facilities-and-audit.mjs',
-  'scripts/test-final-suite.mjs',
-  'scripts/diagnose-prisma-client-connectivity.mjs',
+  'scripts/tests/test-database-and-workbook-reconciliation.mjs',
+  'scripts/tests/test-master-facilities-and-audit.mjs',
+  'scripts/tests/test-final-suite.mjs',
+  'scripts/audits/diagnose-prisma-client-connectivity.mjs',
 ]);
 const target = process.argv[2];
 const rootIndex = process.argv.indexOf('--root');

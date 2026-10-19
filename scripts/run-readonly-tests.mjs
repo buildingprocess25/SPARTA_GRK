@@ -5,10 +5,10 @@ console.log('RUNNING READ-ONLY POPULATED DATASET TESTS (Database & Workbook Asse
 console.log('================================================================================\n');
 
 const testScripts = [
-  'scripts/test-readonly-enforcement.mjs',
-  'scripts/test-database-and-workbook-reconciliation.mjs',
-  'scripts/test-master-facilities-and-audit.mjs',
-  'scripts/test-final-suite.mjs',
+  'scripts/tests/test-readonly-enforcement.mjs',
+  'scripts/tests/test-database-and-workbook-reconciliation.mjs',
+  'scripts/tests/test-master-facilities-and-audit.mjs',
+  'scripts/tests/test-final-suite.mjs',
 ];
 
 for (const script of testScripts) {

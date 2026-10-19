@@ -5,13 +5,13 @@ console.log('RUNNING UNIT & PURE LOGIC TESTS (npm test)');
 console.log('================================================================================\n');
 
 const unitTestScripts = [
-  ['scripts/test-lint-verification.mjs'],
-  ['scripts/test-units-and-denylist.mjs'],
-  ['scripts/test-metrics-and-cilacap.mjs'],
-  ['scripts/test-proxy-pr-audit.mjs'],
-  ['scripts/test-carbon-reconciliation.mjs'],
-  ['scripts/test-fault-status-synthetic.mjs'],
-  ['scripts/test-anti-production-guard.mjs'],
+  ['scripts/tests/test-lint-verification.mjs'],
+  ['scripts/tests/test-units-and-denylist.mjs'],
+  ['scripts/tests/test-metrics-and-cilacap.mjs'],
+  ['scripts/tests/test-proxy-pr-audit.mjs'],
+  ['scripts/tests/test-carbon-reconciliation.mjs'],
+  ['scripts/tests/test-fault-status-synthetic.mjs'],
+  ['scripts/tests/test-anti-production-guard.mjs'],
   ['--test', 'src/lib/scope2/__tests__/annualLoadReport.test.mjs'],
   ['--test', 'src/lib/scope2/__tests__/energyReconciliation.test.mjs'],
   ['--test', 'src/lib/scope2/__tests__/analytics.test.mjs'],
@@ -62,16 +62,16 @@ console.log('\n-----------------------------------------------------------------
 console.log('📌 DAFTAR TEST SUITE YANG TIDAK DIJALANKAN DALAM `npm test`:');
 console.log('--------------------------------------------------------------------------------');
 console.log('1. [Kategori 3: Isolated DB Mutation Tests]');
-console.log('   - scripts/test-inverter-temperature-foundation.mjs');
-console.log('   - scripts/test-scheduler-and-snapshots.mjs');
-console.log('   - scripts/test-calculator-and-sustainability.mjs');
-console.log('   - scripts/test-excel-upload-and-templates.mjs');
+console.log('   - scripts/tests/test-inverter-temperature-foundation.mjs');
+console.log('   - scripts/tests/test-scheduler-and-snapshots.mjs');
+console.log('   - scripts/tests/test-calculator-and-sustainability.mjs');
+console.log('   - scripts/tests/test-excel-upload-and-templates.mjs');
 console.log('   Alasan: Memerlukan DB test terisolasi (test_alfa) dengan izin mutasi data.');
 console.log('   Perintah untuk menjalankan: npm run test:db:isolated\n');
 console.log('2. [Kategori 2: Read-Only Populated Database Tests]');
-console.log('   - scripts/test-database-and-workbook-reconciliation.mjs');
-console.log('   - scripts/test-master-facilities-and-audit.mjs');
-console.log('   - scripts/test-final-suite.mjs');
+console.log('   - scripts/tests/test-database-and-workbook-reconciliation.mjs');
+console.log('   - scripts/tests/test-master-facilities-and-audit.mjs');
+console.log('   - scripts/tests/test-final-suite.mjs');
 console.log('   Alasan: Menguji asersi data riil 39 plant / workbook / master facilities yang telah terisi.');
 console.log('   Perintah untuk menjalankan: npm run test:data:readonly\n');
 console.log('💡 Jalankan seluruh suite lengkap dengan: npm run test:all');
