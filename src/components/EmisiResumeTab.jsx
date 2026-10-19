@@ -30,6 +30,7 @@ import { Button } from '@/components/ui/button';
 import InfoHint from '@/components/ui/InfoHint';
 import MainScope2Bridge from '@/components/scope2/MainScope2Bridge';
 import MainScope1Bridge from '@/components/scope1/MainScope1Bridge';
+import MainScope3Bridge from '@/components/scope3/MainScope3Bridge';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
 import {
   fetchAnnualReportData,
@@ -539,6 +540,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
 
       {/* scope2Bridge: canonical connection to Scope 2 and PLTS without double counting */}
       <MainScope2Bridge onNavigate={handleNav} />
+
+      <MainScope3Bridge onNavigate={handleNav} />
 
       {/* Hidden unless NEXT_PUBLIC_FEATURE_EMISSION_CALCULATOR=true; the calculator code stays in place. */}
       {isEmissionCalculatorEnabled && (

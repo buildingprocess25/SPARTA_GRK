@@ -48,6 +48,20 @@ export const dialogPresets = Object.freeze({
     confirmLabel: 'Simpan Batch',
     cancelLabel: 'Periksa Lagi',
   },
+  simpanScope3: {
+    variant: 'info',
+    title: 'Simpan data Scope 3?',
+    description: 'Pastikan tanggal, KUU, rute, dan biaya perjalanan sudah benar.',
+    confirmLabel: 'Simpan Data',
+    cancelLabel: 'Periksa Lagi',
+  },
+  simpanBatchScope3: {
+    variant: 'info',
+    title: 'Simpan file Scope 3?',
+    description: 'Jurnal BPDL mengganti data jurnal di bulan yang sama. Baris template ditambahkan; baris yang sudah pernah diunggah dilewati.',
+    confirmLabel: 'Simpan',
+    cancelLabel: 'Periksa Lagi',
+  },
   simpanBatchScope2: {
     variant: 'info',
     title: 'Simpan batch Scope 2?',

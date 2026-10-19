@@ -4,11 +4,11 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 export const Table = React.forwardRef(function Table(
-  { className = '', ...props },
+  { className = '', containerClassName = '', ...props },
   ref
 ) {
   return (
-    <div className="relative w-full overflow-auto">
+    <div className={cn('relative w-full overflow-auto', containerClassName)}>
       <table
         ref={ref}
         className={cn('w-full caption-bottom text-xs border-collapse', className)}

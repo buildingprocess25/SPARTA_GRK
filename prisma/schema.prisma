@@ -454,6 +454,36 @@ model FuelActivity {
   @@map("fuel_activity")
 }
 
+/// Scope 3 Category 6: one GL journal line from the BPDL (perjalanan dinas) accounts 611402 / 621402
+model BusinessTravelEntry {
+  id               String   @id @default(cuid())
+  journalCode      String   @unique @map("journal_code")
+  accountingDate   String   @map("accounting_date")
+  yearMonth        String   @map("year_month")
+  kuu              String
+  kuuSource        String?  @map("kuu_source")
+  account          String
+  costCenter       String?  @map("cost_center")
+  journalType      String?  @map("journal_type")
+  description      String
+  amountRupiah     Float    @map("amount_rupiah")
+  category         String
+  route            String?
+  legCount         Int      @default(0) @map("leg_count")
+  distanceKm       Float    @default(0) @map("distance_km")
+  isInternational  Boolean  @default(false) @map("is_international")
+  emissionKg       Float    @default(0) @map("emission_kg")
+  emissionTon      Float    @default(0) @map("emission_ton")
+  emissionStatus   String   @map("emission_status")
+  sourceFile       String   @map("source_file")
+  importedAt       DateTime @default(now()) @map("imported_at") @db.Timestamptz(6)
+  metadata         Json     @default("{}")
+
+  @@index([yearMonth])
+  @@index([kuu])
+  @@map("business_travel_entry")
+}
+
 /// Water Meter and Recycling Records
 model WaterActivity {
   id                 String   @id @default(cuid())

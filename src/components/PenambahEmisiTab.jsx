@@ -24,6 +24,7 @@ import CardBox from '@/components/ui/CardBox';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import Scope2AnnualLoadDashboard from '@/components/scope2/Scope2AnnualLoadDashboard';
 import Scope1InputModal from '@/components/scope1/Scope1InputModal';
+import Scope3TravelDashboard from '@/components/scope3/Scope3TravelDashboard';
 import InputDataButton from '@/components/ui/InputDataButton';
 import { Input } from '@/components/ui/input';
 import { CustomSelect } from '@/components/ui/select';
@@ -126,6 +127,9 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
 
   if (activeSubScope === 'scope2') {
     return <Scope2AnnualLoadDashboard />;
+  }
+  if (activeSubScope === 'scope3') {
+    return <Scope3TravelDashboard />;
   }
 
   return (

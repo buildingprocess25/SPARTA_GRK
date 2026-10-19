@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   LayoutDashboard, TrendingDown, TrendingUp, History,
-  X, ShieldCheck, ChevronDown, Sun, Droplets, Fuel, Zap, PanelLeftClose
+  X, ShieldCheck, ChevronDown, Sun, Droplets, Fuel, Zap, Plane, PanelLeftClose
 } from 'lucide-react';
 import AlarmBadges from '@/components/alarms/AlarmBadges';
 import { getProfileFor, getInitials } from '@/lib/profileMeta';
@@ -22,10 +22,11 @@ const navItems = [
         id: 'penambah',
         label: 'Sumber Emisi',
         icon: TrendingUp,
-        badge: 'Scope 1 & 2',
+        badge: 'Scope 1-3',
         subItems: [
           { id: 'scope1', label: 'Scope 1', icon: Fuel, colorClass: 'text-rose-500' },
-          { id: 'scope2', label: 'Scope 2', icon: Zap, colorClass: 'text-amber-500' }
+          { id: 'scope2', label: 'Scope 2', icon: Zap, colorClass: 'text-amber-500' },
+          { id: 'scope3', label: 'Scope 3', icon: Plane, colorClass: 'text-indigo-500' }
         ]
       },
       {

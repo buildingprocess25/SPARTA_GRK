@@ -16,7 +16,7 @@ export default function Home() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [penambahSubScope, setPenambahSubScope] = useState('scope1'); // 'scope1' | 'scope2'
+  const [penambahSubScope, setPenambahSubScope] = useState('scope1'); // 'scope1' | 'scope2' | 'scope3'
   const [pengurangSubTab, setPengurangSubTab] = useState('plts');     // 'plts' | 'water'
 
   useEffect(() => {
