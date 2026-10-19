@@ -6,8 +6,10 @@ import {
   finishTravelEntry, parseCsvRows, parseLedgerAmount, parseLedgerDate, parseRouteField, parseTravelLedgerRows,
 } from './travelLedger.js';
 
-// Node's ESM interop exposes SSF only on the default export; bundlers expose it on the namespace.
-const SSF = XLSX.SSF ?? XLSX.default?.SSF;
+// Node's ESM interop exposes SSF only on the default export; bundlers expose it on the namespace and have no default.
+// Reading `.default` through a plain object keeps webpack from rejecting the missing export at build time.
+const xlsxModule = Object(XLSX);
+const SSF = xlsxModule.SSF ?? xlsxModule.default?.SSF;
 
 export const SOURCE_KIND = Object.freeze({ MANUAL: 'MANUAL', TEMPLATE: 'TEMPLATE' });
 
