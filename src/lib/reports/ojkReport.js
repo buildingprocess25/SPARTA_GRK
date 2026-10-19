@@ -1,4 +1,4 @@
-import { buildCombinedMonthlyTrend } from './reportDataService.js';
+import { buildCombinedMonthlyTrend, scope3ForReport } from './reportDataService.js';
 
 function formatRupiahNum(value) {
   if (value === null || value === undefined || isNaN(value)) return 0;
@@ -13,6 +13,7 @@ function round(value, decimals = 3) {
 export function buildOjkWorkbookData(reportData) {
   const { year, periodLabel, scope1, water, emissions, pltsSummary } = reportData;
   const trend = buildCombinedMonthlyTrend(reportData);
+  const scope3 = scope3ForReport(reportData);
 
   const totalScope1Genset = scope1.genset.summary.totalEmissionTon || 0;
   const totalScope1Vehicle = scope1.vehicle.summary.totalEmissionTon || 0;
@@ -20,7 +21,8 @@ export function buildOjkWorkbookData(reportData) {
 
   const totalPlnMwh = round(emissions.data.reduce((s, d) => s + (d.plnConsumptionMWh || 0), 0), 2);
   const totalScope2 = round(emissions.data.reduce((s, d) => s + (d.scope2EmissionTon || 0), 0));
-  const totalEmission = round(totalScope1 + totalScope2);
+  const totalScope3 = scope3 ? round(scope3.totalTon) : 0;
+  const totalEmission = round(totalScope1 + totalScope2 + totalScope3);
 
   const totalPltsAvoided = round(emissions.data.reduce((s, d) => s + (d.avoidedEmissionTon || 0), 0));
   const totalWaterAvoided = round(water.summary.totalEmissionAvoidedTon || 0);
@@ -43,7 +45,7 @@ export function buildOjkWorkbookData(reportData) {
   const totalCostSavingRupiah = pltsCostSavingRupiah + waterCostSavingRupiah;
 
   // 1. Ikhtisar Kinerja Aspek Lingkungan Hidup (Poin B POJK 51/2017)
-  const ikhtisarKinerja = [
+  const ikhtisarRows = [
     { No: 1, Indikator: 'Nama Emiten / Perusahaan Publik', Nilai: 'PT Sumber Alfaria Trijaya Tbk (AMRT)', Satuan: '—', 'Dasar Regulasi': 'POJK 51/2017 Lampiran II' },
     { No: 2, Indikator: 'Periode Laporan Keberlanjutan', Nilai: periodLabel || `Tahun ${year}`, Satuan: '—', 'Dasar Regulasi': 'POJK 51/2017 Poin A' },
     { No: 3, Indikator: 'Total Konsumsi Listrik dari Jaringan PLN', Nilai: totalPlnMwh, Satuan: 'MWh', 'Dasar Regulasi': 'POJK 51/2017 Poin F.5' },
@@ -51,7 +53,8 @@ export function buildOjkWorkbookData(reportData) {
     { No: 5, Indikator: 'Total Konsumsi BBM Kendaraan Dinas & Operasional', Nilai: round(scope1.vehicle.summary.totalLiters || 0, 1), Satuan: 'Liter', 'Dasar Regulasi': 'POJK 51/2017 Poin F.5' },
     { No: 6, Indikator: 'Total Emisi GRK Cakupan 1 (Scope 1 - Emisi Langsung)', Nilai: totalScope1, Satuan: 'tCO2e', 'Dasar Regulasi': 'POJK 51/2017 Poin F.11' },
     { No: 7, Indikator: 'Total Emisi GRK Cakupan 2 (Scope 2 - Emisi Tidak Langsung Listrik)', Nilai: totalScope2, Satuan: 'tCO2e', 'Dasar Regulasi': 'POJK 51/2017 Poin F.11' },
-    { No: 8, Indikator: 'Total Seluruh Emisi GRK Dihasilkan (Scope 1 + Scope 2)', Nilai: totalEmission, Satuan: 'tCO2e', 'Dasar Regulasi': 'POJK 51/2017 Poin F.11' },
+    ...(scope3 ? [{ Indikator: 'Total Emisi GRK Cakupan 3 (Scope 3 - Perjalanan Dinas, Penerbangan)', Nilai: totalScope3, Satuan: 'tCO2e', 'Dasar Regulasi': 'POJK 51/2017 Poin F.11 (sukarela)' }] : []),
+    { No: 8, Indikator: `Total Seluruh Emisi GRK Dihasilkan (${scope3 ? 'Scope 1 + Scope 2 + Scope 3' : 'Scope 1 + Scope 2'})`, Nilai: totalEmission, Satuan: 'tCO2e', 'Dasar Regulasi': 'POJK 51/2017 Poin F.11' },
     { No: 9, Indikator: 'Penurunan Emisi GRK dari PLTS Atap (Energi Ramah Lingkungan)', Nilai: totalPltsAvoided, Satuan: 'tCO2e', 'Dasar Regulasi': 'POJK 51/2017 Poin F.6 & F.11' },
     { No: 10, Indikator: 'Penurunan Emisi GRK dari Pengolahan Daur Ulang Air', Nilai: totalWaterAvoided, Satuan: 'tCO2e', 'Dasar Regulasi': 'POJK 51/2017 Poin F.8 & F.11' },
     { No: 11, Indikator: 'Total Emisi GRK yang Berhasil Ditekan (Aksi Mitigasi Hijau)', Nilai: totalAvoided, Satuan: 'tCO2e', 'Dasar Regulasi': 'POJK 51/2017 Poin F.11' },
@@ -65,6 +68,8 @@ export function buildOjkWorkbookData(reportData) {
     { No: 19, Indikator: 'Jumlah Fasilitas yang Mengoperasikan PLTS Atap', Nilai: emissions.data.filter(d => d.pltsProdMWh > 0 || d.installedKwp > 0).length, Satuan: 'Lokasi DC', 'Dasar Regulasi': 'POJK 51/2017 Poin F.6' },
     { No: 20, Indikator: 'Jumlah Fasilitas yang Mengoperasikan IPAL Daur Ulang Air', Nilai: water.summary.facilityCount || 0, Satuan: 'Lokasi DC', 'Dasar Regulasi': 'POJK 51/2017 Poin F.8' },
   ];
+  // Numbered after the optional Scope 3 row is placed, so the sequence never skips.
+  const ikhtisarKinerja = ikhtisarRows.map(({ No: _previous, ...row }, i) => ({ No: i + 1, ...row }));
 
   // 2. Kinerja Emisi GRK (Poin F.11)
   const kinerjaEmisi = trend.map((m, i) => ({
@@ -74,6 +79,7 @@ export function buildOjkWorkbookData(reportData) {
     'Cakupan 1 - Kendaraan (tCO2e)': m.scope1VehicleTon,
     'Total Cakupan 1 (tCO2e)': m.scope1Ton,
     'Cakupan 2 - Listrik PLN (tCO2e)': m.scope2Ton,
+    ...(scope3 ? { 'Cakupan 3 - Perjalanan Dinas (tCO2e)': m.scope3Ton ?? 'Belum ada data' } : {}),
     'Total Emisi GRK Dihasilkan (tCO2e)': m.totalAdditionTon,
     'Emisi Ditekan - PLTS (tCO2e)': m.pltsAvoidedTon,
     'Emisi Ditekan - Air (tCO2e)': m.waterAvoidedTon,
@@ -130,7 +136,7 @@ export function buildOjkWorkbookData(reportData) {
       { name: 'Konservasi Air (Poin F.8)', rows: kinerjaAir },
       { name: 'Rincian Fasilitas & Wilayah', rows: rincianFasilitas },
     ],
-    filename: `Sustainability_Report_OJK_Alfamart_${safePeriod}.xlsx`,
+    filename: `Sustainability_Report_OJK_Alfamart_${safePeriod}${scope3 ? '_dengan-Scope3' : ''}.xlsx`,
   };
 }
 

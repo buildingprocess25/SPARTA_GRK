@@ -38,7 +38,7 @@ const KUU_METRICS = {
       { key: 'internationalTon', label: 'Penerbangan internasional', color: CHART_PALETTE.emissionLight },
     ],
     total: row => row.emissionTon,
-    format: v => `${formatNum(v, 2)} t`,
+    format: v => `${formatNum(v, 2)} tCO₂e`,
   },
   cost: {
     label: 'Biaya',
@@ -48,7 +48,7 @@ const KUU_METRICS = {
       { key: 'otherJuta', label: 'Uang saku, hotel & lainnya', color: CHART_PALETTE.pln },
     ],
     total: row => row.flightJuta + row.otherJuta,
-    format: v => `Rp ${formatNum(v, 1)} jt`,
+    format: v => `Rp ${formatNum(v, 1)} Jt`,
   },
   distance: {
     label: 'Jarak',
@@ -312,7 +312,7 @@ export default function Scope3TravelDashboard() {
                     <YAxis yAxisId="rp" tickLine={false} axisLine={false} width={56} tickFormatter={v => formatYAxisNumber(v)} />
                     <YAxis yAxisId="ton" orientation="right" tickLine={false} axisLine={false} width={44} tickFormatter={v => `${formatYAxisNumber(v)} t`} />
                     <ChartTooltip
-                      content={<ChartTooltipContent formatter={(value, name) => (value == null ? 'belum ada data' : name === 'emissionTon' ? `${formatNum(value, 2)} t` : `Rp ${formatNum(value, 1)} jt`)} />}
+                      content={<ChartTooltipContent formatter={(value, name) => (value == null ? 'belum ada data' : name === 'emissionTon' ? `${formatNum(value, 2)} tCO₂e` : `Rp ${formatNum(value, 1)} Jt`)} />}
                     />
                     <ChartLegend content={<ChartLegendContent />} />
                     <Bar yAxisId="rp" dataKey="flightJuta" stackId="cost" fill="var(--color-flightJuta)" maxBarSize={40} isAnimationActive={false} />
@@ -347,7 +347,7 @@ export default function Scope3TravelDashboard() {
                           </span>
                         </span>
                         <span className="text-right shrink-0">
-                          <span className="block font-mono font-bold text-slate-900 dark:text-slate-100">{formatNum(b.emissionTon, 2)} t</span>
+                          <span className="block tabular-nums font-bold text-slate-900 dark:text-slate-100">{formatNum(b.emissionTon, 2)} tCO₂e</span>
                           <span className="block text-[11px] text-slate-500 dark:text-slate-400">{formatNum((b.emissionTon / bandTotalTon) * 100, 1)}%</span>
                         </span>
                       </li>
@@ -459,7 +459,7 @@ export default function Scope3TravelDashboard() {
 
             <div className="rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
               <Table className="min-w-[760px] text-xs" containerClassName="max-h-[560px]">
-                <TableHeader className="sticky top-0 z-20 bg-slate-900 dark:bg-slate-950 [&_th]:text-white [&_th]:normal-case [&_th]:tracking-normal [&_th]:text-xs">
+                <TableHeader className="sticky top-0 z-20 bg-slate-900 dark:bg-slate-950 [&_th]:text-white">
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="sticky left-0 z-30 bg-slate-900 dark:bg-slate-950">{view === 'kuu' ? 'KUU' : 'Rute'}</TableHead>
                     <TableHead className="text-right">Tiket</TableHead>
@@ -493,24 +493,24 @@ export default function Scope3TravelDashboard() {
                     </TableRow>
                   ) : rows.map(row => (
                     <TableRow key={row.key}>
-                      <TableHead scope="row" className="sticky left-0 z-10 bg-white dark:bg-slate-900 normal-case tracking-normal text-xs font-semibold text-slate-900 dark:text-slate-100">
+                      <TableHead scope="row" className="sticky left-0 z-10 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-900 dark:text-slate-100">
                         {view === 'kuu' ? row.key : routeLabel(row.key)}
                         {view === 'route' && row.isInternational && <span className="ml-2 rounded border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700 dark:text-indigo-300">Internasional</span>}
                       </TableHead>
-                      <TableCell className="font-mono text-right">{formatNum(row.ticketCount)}</TableCell>
-                      {view === 'route' && <TableCell className="font-mono text-right">{formatNum(row.ticketCount ? row.distanceKm / row.ticketCount : 0)} km</TableCell>}
-                      <TableCell className="font-mono text-right">{formatNum(row.distanceKm)} km</TableCell>
-                      <TableCell className="font-mono text-right font-bold text-amber-700 dark:text-amber-300">{formatNum(row.emissionTon, 2)}</TableCell>
-                      <TableCell className="font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum(row.flightRupiah / 1_000_000, 1)} Jt</TableCell>
-                      {showOtherCost && <TableCell className="font-mono text-right text-slate-600 dark:text-slate-400">Rp {formatNum((row.otherRupiah ?? 0) / 1_000_000, 1)} Jt</TableCell>}
-                      {showOtherCost && <TableCell className="font-mono text-right font-semibold">Rp {formatNum((row.totalRupiah ?? row.flightRupiah) / 1_000_000, 1)} Jt</TableCell>}
+                      <TableCell className="tabular-nums text-right">{formatNum(row.ticketCount)}</TableCell>
+                      {view === 'route' && <TableCell className="tabular-nums text-right">{formatNum(row.ticketCount ? row.distanceKm / row.ticketCount : 0)} km</TableCell>}
+                      <TableCell className="tabular-nums text-right">{formatNum(row.distanceKm)} km</TableCell>
+                      <TableCell className="tabular-nums text-right font-bold text-amber-700 dark:text-amber-300">{formatNum(row.emissionTon, 2)}</TableCell>
+                      <TableCell className="tabular-nums text-right text-slate-600 dark:text-slate-400">Rp {formatNum(row.flightRupiah / 1_000_000, 1)} Jt</TableCell>
+                      {showOtherCost && <TableCell className="tabular-nums text-right text-slate-600 dark:text-slate-400">Rp {formatNum((row.otherRupiah ?? 0) / 1_000_000, 1)} Jt</TableCell>}
+                      {showOtherCost && <TableCell className="tabular-nums text-right font-semibold">Rp {formatNum((row.totalRupiah ?? row.flightRupiah) / 1_000_000, 1)} Jt</TableCell>}
                     </TableRow>
                   ))}
                 </TableBody>
                 {!loading && rows.length > 0 && (
                   <TableFooter className="sticky bottom-0 z-20">
                     <TableRow className="hover:bg-transparent">
-                      <TableHead scope="row" className="sticky left-0 z-30 bg-slate-100 dark:bg-slate-800 normal-case tracking-normal text-xs font-bold text-slate-900 dark:text-slate-100">Total</TableHead>
+                      <TableHead scope="row" className="sticky left-0 z-30 bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100">Total</TableHead>
                       {[
                         formatNum(rows.reduce((sum, r) => sum + r.ticketCount, 0)),
                         ...(view === 'route' ? [''] : []),
@@ -522,7 +522,7 @@ export default function Scope3TravelDashboard() {
                           `Rp ${formatNum(rows.reduce((sum, r) => sum + (r.totalRupiah ?? r.flightRupiah), 0) / 1_000_000, 1)} Jt`,
                         ] : []),
                       ].map((cell, i) => (
-                        <TableCell key={i} className="bg-slate-100 dark:bg-slate-800 font-mono font-bold text-right">{cell}</TableCell>
+                        <TableCell key={i} className="bg-slate-100 dark:bg-slate-800 tabular-nums font-bold text-right">{cell}</TableCell>
                       ))}
                     </TableRow>
                   </TableFooter>

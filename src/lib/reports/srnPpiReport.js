@@ -1,4 +1,4 @@
-import { buildCombinedMonthlyTrend } from './reportDataService.js';
+import { buildCombinedMonthlyTrend, scope3ForReport } from './reportDataService.js';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../solar/conversionConfig.js';
 
 function formatRupiahNum(value) {
@@ -14,13 +14,16 @@ function round(value, decimals = 3) {
 export function buildSrnPpiWorkbookData(reportData) {
   const { year, periodLabel, scope1, water, emissions, pltsSummary } = reportData;
   const trend = buildCombinedMonthlyTrend(reportData);
+  const scope3 = scope3ForReport(reportData);
 
   const totalScope1Genset = scope1.genset.summary.totalEmissionTon || 0;
   const totalScope1Vehicle = scope1.vehicle.summary.totalEmissionTon || 0;
   const totalScope1 = round(totalScope1Genset + totalScope1Vehicle);
 
   const totalScope2 = round(emissions.data.reduce((s, d) => s + (d.scope2EmissionTon || 0), 0));
-  const totalAddition = round(totalScope1 + totalScope2);
+  const totalScope3 = scope3 ? round(scope3.totalTon) : 0;
+  const totalAddition = round(totalScope1 + totalScope2 + totalScope3);
+  const scopeLabel = scope3 ? 'Scope 1, 2 & 3' : 'Scope 1 & 2';
 
   const totalPltsAvoided = round(emissions.data.reduce((s, d) => s + (d.avoidedEmissionTon || 0), 0));
   const totalWaterAvoided = round(water.summary.totalEmissionAvoidedTon || 0);
@@ -50,7 +53,8 @@ export function buildSrnPpiWorkbookData(reportData) {
     { Parameter: '  - Solar Genset Cadangan', Nilai: round(totalScope1Genset), Satuan: 'tCO2e' },
     { Parameter: '  - BBM Kendaraan Operasional', Nilai: round(totalScope1Vehicle), Satuan: 'tCO2e' },
     { Parameter: 'Total Emisi Scope 2 (Emisi Tidak Langsung Listrik PLN)', Nilai: totalScope2, Satuan: 'tCO2e' },
-    { Parameter: 'Total Seluruh Emisi Dihasilkan (Scope 1 & 2)', Nilai: totalAddition, Satuan: 'tCO2e' },
+    ...(scope3 ? [{ Parameter: 'Total Emisi Scope 3 (Kategori 6 - Perjalanan Dinas, Penerbangan)', Nilai: totalScope3, Satuan: 'tCO2e' }] : []),
+    { Parameter: `Total Seluruh Emisi Dihasilkan (${scopeLabel})`, Nilai: totalAddition, Satuan: 'tCO2e' },
     { Parameter: 'Aksi Mitigasi: Emisi Ditekan dari PLTS Atap', Nilai: totalPltsAvoided, Satuan: 'tCO2e' },
     { Parameter: 'Aksi Mitigasi: Emisi Ditekan dari Daur Ulang Air', Nilai: totalWaterAvoided, Satuan: 'tCO2e' },
     { Parameter: 'Total Emisi yang Berhasil Ditekan (Mitigasi)', Nilai: totalAvoided, Satuan: 'tCO2e' },
@@ -144,6 +148,7 @@ export function buildSrnPpiWorkbookData(reportData) {
     'Scope 1 - Kendaraan (tCO2e)': m.scope1VehicleTon,
     'Total Scope 1 (tCO2e)': m.scope1Ton,
     'Scope 2 - Listrik PLN (tCO2e)': m.scope2Ton,
+    ...(scope3 ? { 'Scope 3 - Perjalanan Dinas (tCO2e)': m.scope3Ton ?? 'Belum ada data' } : {}),
     'Total Emisi Dihasilkan (tCO2e)': m.totalAdditionTon,
     'Produksi Listrik PLTS (kWh)': round(m.pltsProdKwh || 0, 0),
     'Emisi Ditekan - PLTS (tCO2e)': m.pltsAvoidedTon,
@@ -182,7 +187,19 @@ export function buildSrnPpiWorkbookData(reportData) {
     { 'Sumber Emisi / Bahan Bakar': 'Grid Sulutgo', 'Nilai Faktor': 0.600, Satuan: 'kgCO2e/kWh', 'Status Legalitas': 'Sementara', 'Dasar Regulasi / Dokumen Acuan': 'Estimasi baseline teknis, menunggu SK penetapan spesifik' },
     { 'Sumber Emisi / Bahan Bakar': 'PLTS Atap (Emisi Terhindar)', 'Nilai Faktor': PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH, Satuan: 'kgCO2e/kWh', 'Status Legalitas': 'Resmi', 'Dasar Regulasi / Dokumen Acuan': 'Faktor emisi pembangkitan bersih terhindar nasional ESDM 2026' },
     { 'Sumber Emisi / Bahan Bakar': 'Daur Ulang Air (Emisi Terhindar)', 'Nilai Faktor': 0.344, Satuan: 'kgCO2e/m³', 'Status Legalitas': 'Metodologi Internal', 'Dasar Regulasi / Dokumen Acuan': 'Prosedur Tetap Pengelolaan Lingkungan IPAL DC Alfamart' },
+    ...(scope3 ? scope3.factors.map(f => ({ 'Sumber Emisi / Bahan Bakar': f.label, 'Nilai Faktor': f.value, Satuan: f.unit, 'Status Legalitas': 'Sementara', 'Dasar Regulasi / Dokumen Acuan': f.source })) : []),
   ];
+
+  // 10. Scope 3 - Perjalanan Dinas (opsional)
+  const dataScope3 = scope3 ? scope3.byKuu.map((r, i) => ({
+    No: i + 1,
+    KUU: r.kuu,
+    'Jumlah Tiket Pesawat': r.ticketCount,
+    'Jarak Terbang (km)': r.distanceKm,
+    'Emisi Scope 3 (tCO2e)': round(r.emissionTon, 3),
+    'Biaya Tiket (Rp)': formatRupiahNum(r.flightRupiah),
+    'Biaya Lain - Uang Saku, Hotel, Transport (Rp)': formatRupiahNum(r.otherRupiah),
+  })) : [];
 
   const safePeriod = String(reportData.period || year).replace(/[^a-zA-Z0-9_-]/g, '_');
 
@@ -192,13 +209,14 @@ export function buildSrnPpiWorkbookData(reportData) {
       { name: 'Scope 1 - Genset', rows: dataGenset },
       { name: 'Scope 1 - Kendaraan', rows: dataKendaraan },
       { name: 'Scope 2 - Listrik PLN', rows: dataListrik },
+      ...(scope3 ? [{ name: 'Scope 3 - Perjalanan Dinas', rows: dataScope3 }] : []),
       { name: 'Mitigasi - PLTS Atap', rows: dataPlts },
       { name: 'Mitigasi - Daur Ulang Air', rows: dataAir },
       { name: 'Data Emisi Bulanan', rows: dataEmisiBulanan },
       { name: 'Tren & Status Emisi', rows: trenStatus },
       { name: 'Faktor Emisi & Regulasi', rows: faktorEmisi },
     ],
-    filename: `SRN-PPI_Alfamart_${safePeriod}.xlsx`,
+    filename: `SRN-PPI_Alfamart_${safePeriod}${scope3 ? '_dengan-Scope3' : ''}.xlsx`,
   };
 }
 

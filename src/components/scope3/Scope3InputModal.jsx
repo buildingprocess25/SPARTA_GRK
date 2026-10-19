@@ -266,7 +266,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                     placeholder="Contoh: Z001"
                     aria-invalid={Boolean(errors.kuu)}
                     aria-describedby={errors.kuu ? 's3-kuu-error' : undefined}
-                    className="font-mono"
+                    className="tabular-nums"
                   />
                   <datalist id="s3-kuu-options">{knownKuu.map(code => <option key={code} value={code} />)}</datalist>
                   <FieldError id="s3-kuu-error">{errors.kuu}</FieldError>
@@ -299,7 +299,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                       placeholder="Kode bandara dipisah tanda minus, misalnya CGK-DPS-CGK"
                       aria-invalid={Boolean(errors.route)}
                       aria-describedby="s3-route-help"
-                      className="font-mono"
+                      className="tabular-nums"
                     />
                     <p id="s3-route-help" className="text-[11px] text-slate-500 dark:text-slate-400">
                       {live?.stops?.length
@@ -341,7 +341,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                     onChange={e => set('amount')(e.target.value)}
                     placeholder="Contoh: 2500000"
                     aria-invalid={Boolean(errors.amount)}
-                    className="font-mono font-bold"
+                    className="tabular-nums font-bold"
                   />
                   <FieldError>{errors.amount}</FieldError>
                 </div>
@@ -361,7 +361,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                   <span className="flex items-center gap-2 text-[11px] font-bold text-slate-200">
                     <Calculator size={14} className="text-indigo-300" aria-hidden="true" /> Emisi dari input ini
                   </span>
-                  <span className="text-xs font-mono font-extrabold text-indigo-200 bg-indigo-950/60 border border-indigo-800/80 px-2.5 py-0.5 rounded-full">
+                  <span className="text-xs tabular-nums font-extrabold text-indigo-200 bg-indigo-950/60 border border-indigo-800/80 px-2.5 py-0.5 rounded-full">
                     {live?.status === EMISSION_STATUS.CALCULATED ? `+${number(live.emissionKg / 1000, 3)} tCO₂e` : '—'}
                   </span>
                 </div>
@@ -370,12 +370,12 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                 ) : live?.status === EMISSION_STATUS.CALCULATED ? (
                   <>
                     <dl className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                      <div><dt className="text-[10px] text-slate-400">Segmen</dt><dd className="font-mono font-bold">{live.legs.length}</dd></div>
-                      <div><dt className="text-[10px] text-slate-400">Jarak</dt><dd className="font-mono font-bold">{number(live.distanceKm)} km</dd></div>
-                      <div><dt className="text-[10px] text-slate-400">Faktor</dt><dd className="font-mono font-bold">{factorFor(live.isInternational)?.value} kg/km</dd></div>
-                      <div><dt className="text-[10px] text-slate-400">Emisi</dt><dd className="font-mono font-bold text-indigo-200">{number(live.emissionKg)} kg</dd></div>
+                      <div><dt className="text-[10px] text-slate-400">Segmen</dt><dd className="tabular-nums font-bold">{live.legs.length}</dd></div>
+                      <div><dt className="text-[10px] text-slate-400">Jarak</dt><dd className="tabular-nums font-bold">{number(live.distanceKm)} km</dd></div>
+                      <div><dt className="text-[10px] text-slate-400">Faktor</dt><dd className="tabular-nums font-bold">{factorFor(live.isInternational)?.value} kg/km</dd></div>
+                      <div><dt className="text-[10px] text-slate-400">Emisi</dt><dd className="tabular-nums font-bold text-indigo-200">{number(live.emissionKg)} kg</dd></div>
                     </dl>
-                    <p className="text-[10px] font-mono text-slate-400 bg-slate-800/60 px-2.5 py-1.5 rounded-lg border border-slate-800">
+                    <p className="text-[10px] tabular-nums text-slate-400 bg-slate-800/60 px-2.5 py-1.5 rounded-lg border border-slate-800">
                       {live.legs.map(leg => `${leg.from}-${leg.to} ${number(leg.km)} km × ${leg.factorValue}`).join(' + ')} = {number(live.emissionKg, 1)} kgCO₂e
                     </p>
                   </>
@@ -447,7 +447,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                   ].map(([label, value, tone]) => (
                     <div key={label} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                       <dt className="text-[10px] text-slate-500 dark:text-slate-400">{label}</dt>
-                      <dd className={`text-sm font-bold font-mono ${tone}`}>{number(value)}</dd>
+                      <dd className={`text-sm font-bold tabular-nums ${tone}`}>{number(value)}</dd>
                     </div>
                   ))}
                 </dl>
@@ -463,14 +463,14 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                       <Table className="text-[11px]">
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="w-16 normal-case tracking-normal">Baris</TableHead>
-                            <TableHead className="normal-case tracking-normal">Masalah</TableHead>
+                            <TableHead className="w-16">Baris</TableHead>
+                            <TableHead >Masalah</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {preview.errors.map(err => (
                             <TableRow key={err.row}>
-                              <TableCell className="font-mono">{err.row}</TableCell>
+                              <TableCell className="tabular-nums">{err.row}</TableCell>
                               <TableCell>{err.message}</TableCell>
                             </TableRow>
                           ))}

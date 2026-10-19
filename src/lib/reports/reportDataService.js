@@ -116,12 +116,14 @@ export async function fetchAnnualReportData({ year, startMonth, endMonth, period
     period = `${targetYear}-${startStr}_${targetYear}-${endStr}`;
   }
 
-  const [scope1Res, waterRes, emissionsRes, pltsSummaryRes] = await Promise.all([
+  const [scope1Res, waterRes, emissionsRes, pltsSummaryRes, scope3Res] = await Promise.all([
     fetch(`/api/scope1?period=${encodeURIComponent(period)}`).then(r => r.json()),
     fetch(`/api/water-recycle?period=${encodeURIComponent(period)}`).then(r => r.json()),
     fetch(`/api/emissions?period=${encodeURIComponent(period)}`).then(r => r.json()),
     fetch(`/api/plts/dashboard/summary?mode=YTD&throughMonth=${endM}`).then(r => r.json()).catch(() => ({ success: false })),
+    fetch(`/api/scope3?period=${encodeURIComponent(period)}`).then(r => r.json()),
   ]);
+  if (!scope3Res.success) throw new Error(`Gagal memuat data Scope 3: ${scope3Res.error}`);
 
   if (!scope1Res.success) throw new Error(`Gagal memuat data Scope 1: ${scope1Res.error}`);
   if (!waterRes.success) throw new Error(`Gagal memuat data Water Recycle: ${waterRes.error}`);
@@ -146,11 +148,26 @@ export async function fetchAnnualReportData({ year, startMonth, endMonth, period
     water: waterRes,
     emissions: emissionsRes,
     pltsSummary: pltsSummaryRes?.success ? pltsSummaryRes.data : null,
+    scope3: scope3Res,
   };
+}
+
+/**
+ * Scope 3 is optional until a regulation requires it: reportData.includeScope3 decides whether
+ * business travel is added to the totals. Months without an imported BPDL journal stay null.
+ */
+export function scope3ForReport(reportData) {
+  if (!reportData.includeScope3 || !reportData.scope3) return null;
+  const imported = new Set(reportData.scope3.availableMonths || []);
+  const byMonth = new Map((reportData.scope3.monthlyTrend || [])
+    .filter(m => imported.has(m.yearMonth))
+    .map(m => [m.yearMonth, m.emissionTon]));
+  return { totalTon: reportData.scope3.summary?.emissionTon || 0, byMonth, byKuu: reportData.scope3.byKuu || [], summary: reportData.scope3.summary, factors: reportData.scope3.factors || [] };
 }
 
 export function buildCombinedMonthlyTrend(reportData) {
   const { scope1, water, emissions } = reportData;
+  const scope3 = scope3ForReport(reportData);
   const months = new Set([
     ...scope1.genset.monthlyTrend.map(m => m.yearMonth),
     ...scope1.vehicle.monthlyTrend.map(m => m.yearMonth),
@@ -172,7 +189,8 @@ export function buildCombinedMonthlyTrend(reportData) {
     const scope1VehicleTon = Number((vehicle?.emissionTon || 0).toFixed(3));
     const scope1Ton = Number((scope1GensetTon + scope1VehicleTon).toFixed(3));
     const scope2Ton = Number((emissionRow?.scope2EmissionTon || 0).toFixed(3));
-    const totalAdditionTon = Number((scope1Ton + scope2Ton).toFixed(3));
+    const scope3Ton = scope3?.byMonth.has(ym) ? Number(scope3.byMonth.get(ym).toFixed(3)) : null;
+    const totalAdditionTon = Number((scope1Ton + scope2Ton + (scope3Ton ?? 0)).toFixed(3));
 
     // Aksi mitigasi per bulan
     const pltsProdKwh = emissionRow?.pltsProdKwh || 0;
@@ -192,6 +210,7 @@ export function buildCombinedMonthlyTrend(reportData) {
       scope1VehicleTon,
       scope1Ton,
       scope2Ton,
+      scope3Ton,
       totalAdditionTon,
       pltsProdKwh,
       pltsAvoidedTon,
@@ -205,12 +224,14 @@ export function buildCombinedMonthlyTrend(reportData) {
 
 export function exportCsvReport(reportData, filename) {
   const trend = buildCombinedMonthlyTrend(reportData);
+  const withScope3 = Boolean(scope3ForReport(reportData));
   const headers = [
     'Bulan',
     'Scope 1 - Genset (tCO2e)',
     'Scope 1 - Kendaraan (tCO2e)',
     'Total Scope 1 (tCO2e)',
     'Scope 2 - Listrik PLN (tCO2e)',
+    ...(withScope3 ? ['Scope 3 - Perjalanan Dinas (tCO2e)'] : []),
     'Total Emisi Dihasilkan (tCO2e)',
     'Produksi PLTS (kWh)',
     'Emisi Ditekan - PLTS (tCO2e)',
@@ -226,6 +247,7 @@ export function exportCsvReport(reportData, filename) {
     t.scope1VehicleTon,
     t.scope1Ton,
     t.scope2Ton,
+    ...(withScope3 ? [t.scope3Ton ?? ''] : []),
     t.totalAdditionTon,
     t.pltsProdKwh,
     t.pltsAvoidedTon,
