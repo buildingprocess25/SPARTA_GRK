@@ -23,3 +23,36 @@ Rules:
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
 - A committed graphify-out/graph.json is rewritten whole on every build, so a large diff to it in a pull request is expected. Do not flag it as churn or suggest skipping the graph rebuild or its hooks.
+
+## Script Organization & Verification Rules
+
+Never create ad-hoc scripts in the root `scripts/` directory. All verification, testing, auditing, and maintenance scripts must be placed in their respective subdirectories:
+
+1. **`scripts/tests/`**: Unit, integration, and verification test scripts.
+   - Naming convention: `test-*.mjs`, `verify-*.mjs`
+   - Purpose: Validating features, functions, APIs, schema validations, and regression checks.
+   - Imports: Use `../../src/...` when importing from source, and `../lib/...` when using shared test helpers.
+   - Runners: Aggregated via `scripts/run-unit-tests.mjs`, `scripts/run-isolated-db-tests.mjs`, `scripts/run-readonly-tests.mjs`, or invoked directly with `node scripts/tests/<script>.mjs`.
+
+2. **`scripts/audits/`**: Inspection, sanity checking, and diagnostics scripts.
+   - Naming convention: `audit-*.mjs`, `check-*.mjs`, `inspect-*.mjs`, `diagnose-*.mjs`
+   - Purpose: Read-only inspection of database records, discrepancy checks, telemetry sanity, and missing data audits.
+   - Imports: Use `../../src/...` and `../lib/...`.
+
+3. **`scripts/data/`**: Data seeding, migration, ingestion, and backfill scripts.
+   - Naming convention: `seed-*.mjs`, `import-*.mjs`, `backfill-*.mjs`, `recalc-*.mjs`
+   - Purpose: Modifying database state, historical backfills, CSV imports, and periodic syncs.
+   - Imports: Use `../../src/...` and `../lib/...`.
+
+4. **`scripts/tools/`**: Measurement, profiling, screenshot, and dump utilities.
+   - Naming convention: `capture-*.mjs`, `dump-*.mjs`, `measure-*.mjs`, `bench-*.mjs`
+   - Purpose: One-off dev tooling, screenshots, performance benchmarks.
+
+5. **Root `scripts/`**: Strictly reserved for daemons (`solar-daemon.mjs`, `sync-isolar.mjs`) and test runner suites (`run-*.mjs`).
+
+### Testing & Verification Commands
+- `pnpm test` or `npm run test`: Runs core unit test suite (`scripts/run-unit-tests.mjs`).
+- `pnpm run test:isolated-db`: Runs tests requiring isolated database context.
+- `pnpm run test:readonly`: Runs tests against readonly database endpoints.
+- `pnpm run test:stabilization`: Runs full test stabilization suite.
+- `pnpm run test:all`: Runs unit tests and isolated DB tests.
