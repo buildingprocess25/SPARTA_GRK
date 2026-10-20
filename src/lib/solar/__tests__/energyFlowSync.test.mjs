@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ENERGY_FLOW_SOURCE, mergeEnergyFlowRows } from '../energyFlowSources.js';
-import { energyFlowRowsFromPoints, syncEnergyFlowFromApi } from '../energyFlowSync.js';
+import { ENERGY_FLOW_SOURCE, mergeEnergyFlowRows } from '../energyFlowSources.ts';
+import { energyFlowRowsFromPoints, syncEnergyFlowFromApi } from '../energyFlowSync.ts';
 
 const row = (source, values) => ({ yearMonth: '202610', psId: 1, yieldKwh: 0, feedInKwh: 0, purchasedKwh: 0, loadKwh: 0, source, ...values });
 

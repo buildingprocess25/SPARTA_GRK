@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {
   aggregateMonthlyHistory,
   getPltsHistory,
-} from '../history.js';
+} from '../history.ts';
 
 const ENTITIES = [
   { dcId: 'DC-A', canonicalName: 'Alpha', sungrowPsIds: [1], grid: 'JAMALI', region: 'Jawa' },

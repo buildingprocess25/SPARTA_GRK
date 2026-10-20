@@ -31,7 +31,7 @@ test('ConfirmDialog is based on BaseModal and provider exposes Promise confirmat
 
 test('toast helpers and presets are centralized', () => {
   const toast = read('../ToastProvider.jsx');
-  const presets = read('../../../lib/dialog-presets.js');
+  const presets = read('../../../lib/dialog-presets.ts');
   for (const variant of ['success', 'error', 'warning', 'info']) {
     assert.match(toast, new RegExp(`${variant}:`));
   }
@@ -57,7 +57,7 @@ test('PLTS input persists production and energy flow to the dashboard data sourc
   const modal = read('../../plts/PLTSInputModal.jsx');
   const pltsTab = read('../../plts/PLTSTab.jsx');
   const route = read('../../../app/api/plts/manual/route.js');
-  const dashboard = read('../../../lib/solar/dashboard.js');
+  const dashboard = read('../../../lib/solar/dashboard.ts');
   assert.match(pltsTab, /plants=\{dashboardData\?\.plants \|\| \[\]\}/);
   assert.match(modal, /\/api\/plts\/manual/);
   assert.match(route, /monthlyYieldObservation\.upsert/);

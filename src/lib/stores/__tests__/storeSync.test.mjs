@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { generateKeyPairSync } from 'node:crypto';
-import { fetchStoreSheetRows, parseStoreRows, storeSheetConfig, StoreSheetAccessError } from '../storeSheet.js';
-import { diffStores } from '../storeSync.js';
+import { fetchStoreSheetRows, parseStoreRows, storeSheetConfig, StoreSheetAccessError } from '../storeSheet.ts';
+import { diffStores } from '../storeSync.ts';
 
 const SHEET = [
   ['Branch', 'Kode Toko', 'Nama Toko', 'F/R', 'Titik Koordinat'],

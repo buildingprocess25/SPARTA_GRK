@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getPltsPerformanceDashboard } from '../../lib/solar/dashboardService.js';
-import { parseDashboardQuery } from '../../lib/solar/dashboard.js';
+import { getPltsPerformanceDashboard } from '../../lib/solar/dashboardService.ts';
+import { parseDashboardQuery } from '../../lib/solar/dashboard.ts';
 
 test('YoY comparison exposes 2025 and 2026 data per month across filtered scope', async () => {
   const data = await getPltsPerformanceDashboard({ mode: 'YTD', throughMonth: 9 }, { skipCache: true });

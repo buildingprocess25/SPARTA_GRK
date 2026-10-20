@@ -4,7 +4,7 @@ import test from 'node:test';
 import {
   normalizeAlarmRecords,
   summarizeAlarms,
-} from '../normalize.js';
+} from '../normalize.ts';
 
 const entities = [
   { dcId: 'DC-A', canonicalName: 'DC Alpha', sungrowPsIds: [101, 102] },

@@ -17,7 +17,7 @@ test('alarm API is a no-store read-only database endpoint', () => {
 });
 
 test('alarm service reads active records and limits its payload', () => {
-  const service = read('../service.js');
+  const service = read('../service.ts');
   assert.match(service, /faultActive\.findMany/);
   assert.match(service, /safeLimit\s*=\s*Math\.min\(Math\.max/);
   assert.match(service, /take:\s*safeLimit/);

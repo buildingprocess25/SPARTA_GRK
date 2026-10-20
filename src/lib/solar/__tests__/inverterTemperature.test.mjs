@@ -5,15 +5,15 @@ import {
   parseDeviceTimeWib,
   resolveScheduledSlot,
   sanitizeError,
-} from '../inverterTemperatureCore.js';
+} from '../inverterTemperatureCore.ts';
 import {
   INVERTER_TEMP_V1,
   buildRatedPowerIndex,
   describeRatedPowerVersioning,
   loadRatedPowerRegistry,
   ratedPowerToWatts,
-} from '../inverterTemperatureConfig.js';
-import { runInverterTemperatureSampler } from '../inverterTemperatureSampler.js';
+} from '../inverterTemperatureConfig.ts';
+import { runInverterTemperatureSampler } from '../inverterTemperatureSampler.ts';
 
 test('sanitasi menghapus secret nested, bearer, basic, URL credential, dan user_account', () => {
   const sanitized = sanitizeError({

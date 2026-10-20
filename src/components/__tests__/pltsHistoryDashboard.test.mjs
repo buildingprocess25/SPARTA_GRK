@@ -2,7 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const source = fs.readFileSync(new URL('../plts/PLTSSummaryCard.jsx', import.meta.url), 'utf8');
+// Sections split into ../plts/summary/ are part of the same dashboard.
+const partsDir = new URL('../plts/summary/', import.meta.url);
+const source = [
+  fs.readFileSync(new URL('../plts/PLTSSummaryCard.jsx', import.meta.url), 'utf8'),
+  ...fs.readdirSync(partsDir).filter((f) => /\.jsx?$/.test(f)).sort()
+    .map((f) => fs.readFileSync(new URL(f, partsDir), 'utf8')),
+].join('\n');
 
 test('dashboard exposes database-backed YoY controls and aligned comparison chart', () => {
   assert.match(source, /compareYears/);

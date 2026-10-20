@@ -5,7 +5,7 @@ import {
   computeCredentialHash,
   getValidToken,
   getTokenPresentationState
-} from '../tokenManager.js';
+} from '../tokenManager.ts';
 
 describe('iSolarCloud Token Management & Reliability Suite', () => {
   test('1. Credential hash correctly detects credential changes without leaking secrets', () => {

@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { calculateEntry, convertFuelActivity, inclusiveDays, summarizeEntries } from '../engine.js';
-import { EMISSION_FACTORS, FACTOR_STATUS, factorByCode } from '../factors.v1.js';
-import { formatEmission, formatTotalEmission } from '../format.js';
+import { calculateEntry, convertFuelActivity, inclusiveDays, summarizeEntries } from '../engine.ts';
+import { EMISSION_FACTORS, FACTOR_STATUS, factorByCode } from '../factors.v1.ts';
+import { formatEmission, formatTotalEmission } from '../format.ts';
 
 const closeTo = (actual, expected, tolerance = 0.005) => assert.ok(Math.abs(actual - expected) <= tolerance, `${actual} ≠ ${expected}`);
 

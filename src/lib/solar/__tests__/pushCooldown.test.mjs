@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { PUSH_COOLDOWN_MS, takePushable } from '../pushCooldown.js';
+import { PUSH_COOLDOWN_MS, takePushable } from '../pushCooldown.ts';
 
 const keyOf = (item) => `${item.psId}:${item.category}`;
 

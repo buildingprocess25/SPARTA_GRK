@@ -4,8 +4,8 @@ import test from 'node:test';
 import {
   buildScope2AnnualLoadDashboard,
   parseAnnualLoadReport,
-} from '../annualLoadReport.js';
-import { loadScope2AnnualLoadDashboard } from '../annualLoadReportServer.js';
+} from '../annualLoadReport.ts';
+import { loadScope2AnnualLoadDashboard } from '../annualLoadReportServer.ts';
 
 const csv2025 = `monthly load consump_Year_2025
 Plant name,Time,Monthly load consumption(kWh)

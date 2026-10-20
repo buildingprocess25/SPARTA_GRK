@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildScope2CanonicalDashboard } from '../dashboardService.js';
+import { buildScope2CanonicalDashboard } from '../dashboardService.ts';
 import * as XLSX from 'xlsx';
-import { buildScope2Csv, buildScope2ExportData, buildScope2WorkbookBytes } from '../export.js';
+import { buildScope2Csv, buildScope2ExportData, buildScope2WorkbookBytes } from '../export.ts';
 
 test('export uses the same filtered canonical rows as dashboard', async () => {
   const dashboard = await buildScope2CanonicalDashboard({ rootDir: process.cwd() });

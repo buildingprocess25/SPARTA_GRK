@@ -1,0 +1,81 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import { AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight, Clipboard, Download, HelpCircle, Search } from 'lucide-react';
+import { EMISSION_FACTORS, FACTOR_STATUS } from '@/lib/calculator/factors.v1.ts';
+import { formatNumber } from '@/lib/calculator/format.ts';
+import { CustomSelect } from '@/components/ui/select';
+
+const PAGE_SIZE = 12;
+const categoryLabels = { fuel: 'Bahan bakar', vehicle: 'Kendaraan', grid: 'Listrik grid', travel: 'Perjalanan', renewable: 'EBT', ev: 'Kendaraan listrik', offset: 'Carbon offset', finance: 'Surat berharga hijau' };
+const statusLabels = { [FACTOR_STATUS.OFFICIAL]: 'Resmi', [FACTOR_STATUS.TEMPORARY]: 'Sementara', [FACTOR_STATUS.NEEDS_FACTOR]: 'Perlu faktor' };
+const statusStyle = { [FACTOR_STATUS.OFFICIAL]: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300', [FACTOR_STATUS.TEMPORARY]: 'bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300', [FACTOR_STATUS.NEEDS_FACTOR]: 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300' };
+const statusIcon = { [FACTOR_STATUS.OFFICIAL]: CheckCircle2, [FACTOR_STATUS.TEMPORARY]: AlertTriangle, [FACTOR_STATUS.NEEDS_FACTOR]: HelpCircle };
+
+function csvCell(value) { return `"${String(value ?? '').replaceAll('"', '""')}"`; }
+
+export default function EmissionFactorsReference() {
+  const [query, setQuery] = useState(''); const [category, setCategory] = useState('all'); const [status, setStatus] = useState('all');
+  const [sort, setSort] = useState({ key: 'name', direction: 'asc' }); const [page, setPage] = useState(1); const [copied, setCopied] = useState('');
+  const summary = useMemo(() => ({ total: EMISSION_FACTORS.length, official: EMISSION_FACTORS.filter(item => item.status === FACTOR_STATUS.OFFICIAL).length, temporary: EMISSION_FACTORS.filter(item => item.status === FACTOR_STATUS.TEMPORARY).length, needs: EMISSION_FACTORS.filter(item => item.status === FACTOR_STATUS.NEEDS_FACTOR).length }), []);
+  const filtered = useMemo(() => {
+    const needle = query.toLocaleLowerCase('id');
+    return EMISSION_FACTORS.filter(item => (category === 'all' || item.category === category) && (status === 'all' || item.status === status) && `${item.name} ${item.category} ${item.source} ${item.locationOrGrid || ''}`.toLocaleLowerCase('id').includes(needle)).sort((a, b) => {
+      const left = a[sort.key] ?? ''; const right = b[sort.key] ?? '';
+      const compared = typeof left === 'number' && typeof right === 'number' ? left - right : String(left).localeCompare(String(right), 'id');
+      return sort.direction === 'asc' ? compared : -compared;
+    });
+  }, [category, query, sort, status]);
+  const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)); const safePage = Math.min(page, pages); const visible = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const changeFilter = setter => value => { setter(value); setPage(1); };
+  const changeSort = key => setSort(current => ({ key, direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc' }));
+  const copy = async factor => { try { await navigator.clipboard.writeText(factor.value === null ? 'Perlu faktor' : String(factor.value)); setCopied(factor.code); } catch { setCopied('error'); } setTimeout(() => setCopied(''), 1200); };
+  const downloadCsv = () => {
+    const header = ['ID', 'Faktor', 'Kategori', 'Nilai', 'Satuan', 'Sumber', 'Tahun', 'Versi', 'Status', 'Catatan'];
+    const rows = filtered.map(item => [item.id, item.name, categoryLabels[item.category], item.value, item.unit, item.source, item.year, item.version, statusLabels[item.status], item.notes]);
+    const csv = `\uFEFF${[header, ...rows].map(row => row.map(csvCell).join(',')).join('\r\n')}`;
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'faktor-emisi-kalkulator.csv'; anchor.click(); URL.revokeObjectURL(url);
+  };
+  const header = (key, label) => <button type="button" onClick={() => changeSort(key)} className="font-bold hover:underline">{label}{sort.key === key ? (sort.direction === 'asc' ? ' ↑' : ' ↓') : ''}</button>;
+
+  return <section className="space-y-4">
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm"><div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Faktor Emisi</h2><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Daftar faktor emisi yang dipakai kalkulator.</p></div><button type="button" onClick={downloadCsv} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 px-4 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"><Download size={17} />Unduh CSV</button></div>
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><div className="rounded-xl bg-slate-900 p-4 text-white"><p className="text-xs font-bold text-slate-300">Jumlah faktor</p><p className="mt-1 text-2xl font-black">{summary.total}</p></div><div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 p-4 text-emerald-900 dark:text-emerald-200"><p className="text-xs font-bold">Resmi</p><p className="mt-1 text-2xl font-black">{summary.official}</p></div><div className="rounded-xl bg-amber-50 dark:bg-amber-500/10 p-4 text-amber-900 dark:text-amber-200"><p className="text-xs font-bold">Sementara</p><p className="mt-1 text-2xl font-black">{summary.temporary}</p></div><div className="rounded-xl bg-rose-50 dark:bg-rose-500/10 p-4 text-rose-900 dark:text-rose-200"><p className="text-xs font-bold">Perlu faktor</p><p className="mt-1 text-2xl font-black">{summary.needs}</p></div></div>
+    </div>
+    <div className="flex gap-2 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4 text-sm text-amber-900 dark:text-amber-200"><AlertTriangle size={18} className="mt-0.5 shrink-0" /><span><strong>Perhatian:</strong> faktor sementara belum boleh dipakai untuk pelaporan resmi. Verifikasi sumber, tahun berlaku, dan batas organisasi terlebih dahulu.</span></div>
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm">
+      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px_180px] items-center">
+        <label className="relative block">
+          <span className="sr-only">Cari faktor emisi</span>
+          <Search size={17} className="absolute left-3 top-3 text-slate-500 dark:text-slate-400" />
+          <input
+            value={query}
+            onChange={event => changeFilter(setQuery)(event.target.value)}
+            placeholder="Cari faktor, sumber, atau grid…"
+            className="w-full h-9 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 pl-10 pr-3 text-xs outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </label>
+        <CustomSelect
+          ariaLabel="Filter kategori"
+          value={category}
+          onChange={event => changeFilter(setCategory)(event.target.value)}
+          options={[
+            { value: 'all', label: 'Semua kategori' },
+            ...Object.entries(categoryLabels).map(([value, label]) => ({ value, label })),
+          ]}
+        />
+        <CustomSelect
+          ariaLabel="Filter status"
+          value={status}
+          onChange={event => changeFilter(setStatus)(event.target.value)}
+          options={[
+            { value: 'all', label: 'Semua status' },
+            ...Object.entries(statusLabels).map(([value, label]) => ({ value, label })),
+          ]}
+        />
+      </div>
+      <div className="mt-4 overflow-x-auto rounded-xl border dark:border-slate-700"><table className="min-w-[1020px] w-full text-sm"><thead className="bg-slate-900 text-white"><tr><th className="p-3 text-left">{header('name', 'Faktor')}</th><th className="p-3 text-left">{header('category', 'Kategori')}</th><th className="p-3 text-left">{header('value', 'Nilai + satuan')}</th><th className="p-3 text-left">Sumber</th><th className="p-3 text-left">{header('year', 'Tahun / versi')}</th><th className="p-3 text-left">{header('status', 'Status')}</th><th className="p-3 text-left">Aksi</th></tr></thead><tbody>{visible.map(item => { const Icon = statusIcon[item.status]; return <tr key={item.code} className="border-b dark:border-slate-800 align-top hover:bg-slate-50 dark:hover:bg-slate-800/60"><td className="p-3"><span className="font-semibold text-slate-900 dark:text-slate-100">{item.name}</span>{item.biogenic && <span className="mt-1 block text-[10px] font-bold text-emerald-700 dark:text-emerald-400">Biogenik</span>}</td><td className="p-3 text-slate-600 dark:text-slate-400">{categoryLabels[item.category]}</td><td className="p-3 font-medium">{item.value === null ? '—' : formatNumber(item.value)} {item.unit}</td><td className="max-w-xs p-3 text-xs text-slate-600 dark:text-slate-400"><span>{item.source}</span><span className="mt-1 block text-slate-500 dark:text-slate-400">{item.notes}</span></td><td className="p-3 text-xs">{item.year}<br />{item.version}</td><td className="p-3"><span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold ${statusStyle[item.status]}`}><Icon size={12} />{statusLabels[item.status]}</span></td><td className="p-3"><button type="button" disabled={item.value === null} onClick={() => copy(item)} className="inline-flex min-h-9 items-center gap-1 rounded-lg border dark:border-slate-700 px-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40"><Clipboard size={13} />{copied === item.code ? 'Tersalin' : copied === 'error' ? 'Gagal menyalin' : 'Salin nilai'}</button></td></tr>; })}</tbody></table>{visible.length === 0 && <p className="p-10 text-center text-sm text-slate-500 dark:text-slate-400">Tidak ada faktor yang cocok.</p>}</div>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600 dark:text-slate-400"><span>Menampilkan {visible.length} dari {filtered.length} faktor</span><div className="flex items-center gap-2"><button type="button" aria-label="Halaman sebelumnya" disabled={safePage === 1} onClick={() => setPage(current => Math.max(1, current - 1))} className="rounded-lg border dark:border-slate-700 p-2 disabled:opacity-40"><ChevronLeft size={16} /></button><span>Halaman {safePage} / {pages}</span><button type="button" aria-label="Halaman berikutnya" disabled={safePage === pages} onClick={() => setPage(current => Math.min(pages, current + 1))} className="rounded-lg border dark:border-slate-700 p-2 disabled:opacity-40"><ChevronRight size={16} /></button></div></div>
+    </div>
+  </section>;
+}

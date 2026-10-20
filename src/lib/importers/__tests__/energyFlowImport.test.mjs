@@ -5,7 +5,7 @@ import {
   diffEnergyFlowRows,
   energyFlowRowsFromDecisions,
   openMonthCutoff,
-} from '../energyFlowImport.js';
+} from '../energyFlowImport.ts';
 
 const OCT_13_WIB = new Date('2026-10-13T10:00:00+07:00');
 

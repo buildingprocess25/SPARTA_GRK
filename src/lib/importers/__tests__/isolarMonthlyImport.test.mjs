@@ -7,7 +7,7 @@ import {
   createPrismaMonthlyImportRepository,
   importIsolarMonthlyReport,
   isClosedYearMonth,
-} from '../isolarMonthlyImport.js';
+} from '../isolarMonthlyImport.ts';
 
 const NOW = new Date('2026-10-01T05:00:00.000Z');
 

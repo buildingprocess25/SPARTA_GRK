@@ -6,7 +6,7 @@ import {
   estimatePanelTemperature,
   calculateTemperatureCorrectedPr,
   calculatePearsonCorrelation,
-} from '../performanceRatio.js';
+} from '../performanceRatio.ts';
 
 describe('Performance Ratio (PR) & Temperature Correction Engine', () => {
   it('1. calculates individual plant PR correctly', () => {

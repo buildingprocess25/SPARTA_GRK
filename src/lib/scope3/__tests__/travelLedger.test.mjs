@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {
   buildTravelEntries, extractRoute, parseLedgerAmount, parseLedgerDate,
   parseTravelLedgerCsv, verifyAccountTotals, EMISSION_STATUS, TRAVEL_CATEGORY,
-} from '../travelLedger.js';
-import { prepareTravelImport, TravelImportError } from '../travelImport.js';
-import { parseTravelUpload } from '../travelTemplate.js';
-import { summarizeTravelEntries } from '../travelSummary.js';
+} from '../travelLedger.ts';
+import { prepareTravelImport, TravelImportError } from '../travelImport.ts';
+import { parseTravelUpload } from '../travelTemplate.ts';
+import { summarizeTravelEntries } from '../travelSummary.ts';
 
 const HEADER = 'J_UU_PEMBUAT,J_UU_CODE,J_ACCOUNTING_DATE,J_MSJC_CODE,J_MSA_AKUN,J_SUB_LEDGER1,J_MSD_CODE,J_REFER10,J_DEBIT,J_CREDIT,SALDO,J_ATTRIB1,J_ATTRIB2,J_ATTRIB3,J_TRANSAKSI,J_CODE';
 

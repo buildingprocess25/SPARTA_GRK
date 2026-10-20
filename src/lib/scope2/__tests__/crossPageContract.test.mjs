@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 
-import { buildScope2CanonicalDashboard } from '../dashboardService.js';
+import { buildScope2CanonicalDashboard } from '../dashboardService.ts';
 
 test('PLTS tab and main dashboard consume the canonical Scope 2 bridge', () => {
   const plts = fs.readFileSync('src/components/plts/PLTSTab.jsx', 'utf8');

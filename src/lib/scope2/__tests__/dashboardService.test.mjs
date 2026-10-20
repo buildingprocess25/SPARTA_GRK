@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildScope2CanonicalDashboard } from '../dashboardService.js';
+import { buildScope2CanonicalDashboard } from '../dashboardService.ts';
 
 test('builds one canonical view model for Scope 2, PLTS and main dashboard', async () => {
   const dashboard = await buildScope2CanonicalDashboard({

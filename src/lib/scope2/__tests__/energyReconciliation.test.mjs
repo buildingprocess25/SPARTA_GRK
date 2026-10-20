@@ -4,7 +4,7 @@ import test from 'node:test';
 import {
   aggregateCanonicalRows,
   reconcilePlantMonth,
-} from '../energyReconciliation.js';
+} from '../energyReconciliation.ts';
 
 const base = {
   yearMonth: '2026-01',

@@ -13,8 +13,8 @@ import {
   calculateNationwideSummary,
   processAllDCAnalytics,
   SOLAR_CONSTANTS
-} from '../processor.js';
-import { CANONICAL_DC_ENTITIES, lookupPlantMetadata } from '../plantMap.js';
+} from '../processor.ts';
+import { CANONICAL_DC_ENTITIES, lookupPlantMetadata } from '../plantMap.ts';
 import aprilDataRaw from '../../../data/monitorPltsApril2026.json' with { type: 'json' };
 
 const rawApiStationsFixture = JSON.parse(fs.readFileSync('.data/raw_station_list.json', 'utf-8'));

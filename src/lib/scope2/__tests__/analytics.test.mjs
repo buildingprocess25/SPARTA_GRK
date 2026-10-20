@@ -10,7 +10,7 @@ import {
   percentile,
   summarizeDistribution,
   yoyLikeForLike,
-} from '../analytics.js';
+} from '../analytics.ts';
 
 const row = (overrides = {}) => ({
   yearMonth: '2026-01', psId: 1, dcName: 'Alfamart DC A', grid: 'JAMALI',

@@ -4,8 +4,8 @@ import {
   validateEndpointGuard,
   evaluateQuota,
   SecurityViolationError,
-} from '../apiClient.js';
-import { ISOLAR_ENDPOINTS_META } from '../endpoints.js';
+} from '../apiClient.ts';
+import { ISOLAR_ENDPOINTS_META } from '../endpoints.ts';
 
 describe('TAHAP 1: Backend Security Guard & Quota Test Suite', () => {
   test('1. Security Guard: Strictly blocks Grid Control and mutating endpoints', () => {
@@ -72,7 +72,7 @@ describe('TAHAP 1: Backend Security Guard & Quota Test Suite', () => {
   });
 
   test('7. Timezone & Production Hours: getWibHour and isWibProductionHour with fake hours (05:29, 05:30, 18:30, 18:31, 23:44 WIB)', async () => {
-    const { getWibHour, isWibProductionHour } = await import('../apiClient.js');
+    const { getWibHour, isWibProductionHour } = await import('../apiClient.ts');
 
     // 05:29 WIB (Before production window 05:30)
     const t0529 = new Date('2026-09-29T05:29:00+07:00');

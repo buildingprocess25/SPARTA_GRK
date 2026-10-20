@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 process.env.AUTH_SESSION_SECRET ||= 'unit-test-secret';
-const { createSessionToken, readSessionToken } = await import('../auth.js');
-const { isSessionPayloadActive, SESSION_IDLE_TIMEOUT_MS } = await import('../sessionPolicy.js');
+const { createSessionToken, readSessionToken } = await import('../auth.ts');
+const { isSessionPayloadActive, SESSION_IDLE_TIMEOUT_MS } = await import('../sessionPolicy.ts');
 
 test('session stays valid until the idle window runs out', () => {
   const payload = readSessionToken(createSessionToken('admin'));

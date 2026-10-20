@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CANONICAL_DC_ENTITIES, isDcLocation } from '../plantMap.js';
+import { CANONICAL_DC_ENTITIES, isDcLocation } from '../plantMap.ts';
 
 test('isDcLocation filters out non-DC locations (Tk. Drive Thru)', () => {
   // 1. Total canonical entities is 39

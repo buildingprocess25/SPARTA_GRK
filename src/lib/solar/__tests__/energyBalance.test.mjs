@@ -4,9 +4,9 @@ import {
   validateEnergyBalanceRow,
   computeEnergyBalance,
   EMISSION_CONFIG
-} from '../energyBalance.js';
-import { OFFICIAL_RKAP_FACTORS, getRkapFactorsForPeriod } from '../rkap-factors.js';
-import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../conversionConfig.js';
+} from '../energyBalance.ts';
+import { OFFICIAL_RKAP_FACTORS, getRkapFactorsForPeriod } from '../rkap-factors.ts';
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../conversionConfig.ts';
 
 test('1. Validates energy balance row: 0 <= E <= P, computes exact S = P - E', () => {
   // Valid row

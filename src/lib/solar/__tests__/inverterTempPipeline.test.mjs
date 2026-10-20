@@ -8,23 +8,23 @@ import {
   aggregateDailyInverterTemp,
   aggregateMonthlyInverterTemp,
   InverterTempAggregationError,
-} from '../inverterTemperatureAggregator.js';
+} from '../inverterTemperatureAggregator.ts';
 import {
   computePearsonCorrelation,
   getInverterTemperaturePerformance,
-} from '../inverterTemperatureService.js';
+} from '../inverterTemperatureService.ts';
 import {
   INVERTER_TEMP_V1,
   getActiveInverterTempMethodVersion,
   setActiveInverterTempMethodVersion,
-} from '../inverterTemperatureConfig.js';
+} from '../inverterTemperatureConfig.ts';
 import {
   sanitizeCellForFormulaInjection,
   formatCsvRow,
   createZipBuffer,
   buildInverterTempXlsx,
   buildInverterTempZipCsv,
-} from '../inverterTemperatureExport.js';
+} from '../inverterTemperatureExport.ts';
 
 test('1. Pengujian batas hari WIB: tolak agregasi hari berjalan dan masa depan', async () => {
   const mockNow = new Date('2026-10-06T12:00:00.000Z'); // 19:00 WIB on 2026-10-06

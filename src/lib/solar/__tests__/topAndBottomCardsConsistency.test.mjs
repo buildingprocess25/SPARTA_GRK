@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getPltsSummaryDashboardWithTiming } from '../dashboardService.js';
-import { summarizePlts } from '../summarize.js';
+import { getPltsSummaryDashboardWithTiming } from '../dashboardService.ts';
+import { summarizePlts } from '../summarize.ts';
 
 test('Top cards and Bottom cards are consistently populated with 37 DC plants and matching metrics', async () => {
   // 1. Top Card service (/api/plts/dashboard/summary)

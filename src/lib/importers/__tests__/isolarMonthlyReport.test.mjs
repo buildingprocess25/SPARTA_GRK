@@ -7,8 +7,8 @@ import {
   EXPECTED_HEADERS,
   parseIsolarMonthlyReport,
   parseIsolarMonthlyReportFile,
-} from '../isolarMonthlyReport.js';
-import { CANONICAL_DC_ENTITIES } from '../../solar/plantMap.js';
+} from '../isolarMonthlyReport.ts';
+import { CANONICAL_DC_ENTITIES } from '../../solar/plantMap.ts';
 
 const root = process.cwd();
 const file2025 = path.join(root, 'Monthly Report_Annual report_20261001111519.csv');
