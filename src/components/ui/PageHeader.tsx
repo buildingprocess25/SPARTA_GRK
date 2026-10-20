@@ -10,7 +10,7 @@ export default function PageHeader({
   badge = null,
   actions = null,
   className = '',
-}) {
+}: { title?: any; subtitle?: any; info?: any; badge?: any; actions?: any; className?: string }) {
   return (
     <div
       className={`flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800 ${className}`}

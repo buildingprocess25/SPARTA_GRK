@@ -16,7 +16,7 @@ const QUALITY_FLAG_TEXT = {
   TEMPORARY_EMISSION_FACTOR: 'faktor emisi masih sementara',
 };
 
-export default function Scope2DcDrawer({ plant, rows, onClose }) {
+export default function Scope2DcDrawer({ plant, rows, onClose }: { plant?: any; rows?: any; onClose?: any }) {
   if (!plant) return null;
   const plantRows = rows.filter(row => row.psId === plant.psId).sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
   const selected = plantRows.at(-1);

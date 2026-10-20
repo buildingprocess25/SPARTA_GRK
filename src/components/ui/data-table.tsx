@@ -10,7 +10,7 @@ export function DataTableColumnHeader({
   sortDirection, // 'asc' | 'desc' | null
   onSort,
   className = '',
-}) {
+}: { title?: any; sortDirection?: any; onSort?: any; className?: string }) {
   return (
     <div className={cn('flex items-center space-x-2', className)}>
       <Button
@@ -39,7 +39,7 @@ export function DataTablePagination({
   pageSize = 10,
   onPageChange,
   className = '',
-}) {
+}: { currentPage?: number; totalPages?: number; totalItems?: number; pageSize?: number; onPageChange?: any; className?: string }) {
   const startItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalItems);
 

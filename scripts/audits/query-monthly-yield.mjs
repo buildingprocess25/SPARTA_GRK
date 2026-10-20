@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';

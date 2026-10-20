@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { buildScope2CanonicalDashboard } from '@/lib/scope2/dashboardService.js';
+import { buildScope2CanonicalDashboard } from '@/lib/scope2/dashboardService.ts';
 
 export const dynamic = 'force-dynamic';
 

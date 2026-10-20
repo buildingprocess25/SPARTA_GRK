@@ -1,6 +1,6 @@
-import { processAllDCAnalytics } from '../../src/lib/solar/processor.js';
-import { getPltsDashboard } from '../../src/lib/solar/dashboardService.js';
-import prisma from '../../src/lib/prisma.js';
+import { processAllDCAnalytics } from '../../src/lib/solar/processor.ts';
+import { getPltsDashboard } from '../../src/lib/solar/dashboardService.ts';
+import prisma from '../../src/lib/prisma.ts';
 
 async function check() {
   const dash = await getPltsDashboard(

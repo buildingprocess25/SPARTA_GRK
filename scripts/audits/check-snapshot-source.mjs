@@ -1,5 +1,5 @@
-import prisma from '../../src/lib/prisma.js';
-import { getPltsSummarySnapshot } from '../../src/lib/solar/dashboardService.js';
+import prisma from '../../src/lib/prisma.ts';
+import { getPltsSummarySnapshot } from '../../src/lib/solar/dashboardService.ts';
 
 async function main() {
   console.log('=== CHECK EXACT GOLDEN SNAPSHOT SOURCE ===\n');

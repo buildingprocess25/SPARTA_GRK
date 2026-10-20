@@ -18,9 +18,9 @@ if (fs.existsSync(envLocalPath)) {
   });
 }
 
-import { PLANT_REGISTRY, lookupPlantMetadata } from '../plantMap.js';
-import { getValidToken } from '../apiClient.js';
-import { QUOTA_CONFIG } from '../endpoints.js';
+import { PLANT_REGISTRY, lookupPlantMetadata } from '../../src/lib/solar/plantMap.ts';
+import { getValidToken } from '../../src/lib/solar/apiClient.ts';
+import { QUOTA_CONFIG } from '../../src/lib/solar/endpoints.ts';
 
 async function generateMappingReport() {
   const baseUrl = process.env.ISOLAR_BASE_URL || 'https://gateway.isolarcloud.com.hk';

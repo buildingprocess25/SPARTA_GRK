@@ -1,8 +1,8 @@
-import prisma from '../../src/lib/prisma.js';
-import { getPltsDashboard } from '../../src/lib/solar/dashboardService.js';
-import { GRID_EMISSION_FACTORS } from '../../src/lib/emission-factors.js';
-import { loadOwnerTargetMatrix } from '../../src/lib/solar/rkapTargets.js';
-import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.js';
+import prisma from '../../src/lib/prisma.ts';
+import { getPltsDashboard } from '../../src/lib/solar/dashboardService.ts';
+import { GRID_EMISSION_FACTORS } from '../../src/lib/emission-factors.ts';
+import { loadOwnerTargetMatrix } from '../../src/lib/solar/rkapTargets.ts';
+import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.ts';
 
 const { matrix: pltsTargetMatrix } = loadOwnerTargetMatrix();
 
@@ -96,7 +96,7 @@ async function generateReport() {
   console.log('2. Kesimpulan Discovery:');
   console.log('   - Data radiasi & suhu yang tersedia di vendor OpenAPI saat ini bersifat sesaat (real-time point), BUKAN integrasi bulanan (kWh/m²).');
   console.log('   - Sesuai aturan 4.5: Nilai sesaat TIDAK diintegrasikan sendiri.');
-  console.log('   - Disediakan fallback importer BMES (scripts/import-bmes-monthly.mjs & src/lib/importers/bmesMonthlyImport.js).');
+  console.log('   - Disediakan fallback importer BMES (scripts/import-bmes-monthly.mjs & src/lib/importers/bmesMonthlyImport.ts).');
   console.log('   - Sebelum file BMES diimpor, UI menampilkan status jujur "Belum tersedia: Membutuhkan radiasi bulanan kWh/m² & suhu modul BMES".');
 
   // (f) TABEL FAKTOR 5.2 DAN SELISIH TOTAL EMISI
@@ -149,18 +149,18 @@ async function generateReport() {
   console.log('\n(i) DAFTAR FILE YANG DIUBAH / DITAMBAHKAN');
   console.log('-'.repeat(100));
   const fileList = [
-    'src/lib/solar/dashboard.js (Core aggregation logic, PR calculation, like-for-like, resolution policy)',
-    'src/lib/solar/dashboardService.js (Database-backed dashboard service, multi-year query)',
+    'src/lib/solar/dashboard.ts (Core aggregation logic, PR calculation, like-for-like, resolution policy)',
+    'src/lib/solar/dashboardService.ts (Database-backed dashboard service, multi-year query)',
     'src/app/api/plts/dashboard/route.js (GET endpoint with validated JSON envelopes, no vendor calls)',
-    'src/lib/solar/rkapTargets.js (RKAP target rows builder & factor stability checker)',
-    'src/lib/solar/rkapTargets.js (Official RKAP factors derived from owner matrix via deriveRkapFactors)',
-    'src/lib/emission-factors.js (Official vs Sementara factor status tagging & reconciliation)',
-    'src/lib/importers/isolarMonthlyImport.js (Source-preserving observation importer)',
-    'src/lib/importers/rkapTargetImport.js (Idempotent RKAP targets importer)',
-    'src/lib/importers/bmesMonthlyImport.js (BMES climate & PR observation importer)',
-    'src/components/plts/PLTSTab.jsx (Shared filter state, lifted query params, integrated tabs)',
-    'src/components/plts/PLTSSummaryCard.jsx (5th PR card, target progress, toggle bar/line, PR column)',
-    'src/components/plts/PLTSPerformanceAnalysis.jsx (4 tab performance card with reconciliation panel)',
+    'src/lib/solar/rkapTargets.ts (RKAP target rows builder & factor stability checker)',
+    'src/lib/solar/rkapTargets.ts (Official RKAP factors derived from owner matrix via deriveRkapFactors)',
+    'src/lib/emission-factors.ts (Official vs Sementara factor status tagging & reconciliation)',
+    'src/lib/importers/isolarMonthlyImport.ts (Source-preserving observation importer)',
+    'src/lib/importers/rkapTargetImport.ts (Idempotent RKAP targets importer)',
+    'src/lib/importers/bmesMonthlyImport.ts (BMES climate & PR observation importer)',
+    'src/components/plts/PLTSTab.tsx (Shared filter state, lifted query params, integrated tabs)',
+    'src/components/plts/PLTSSummaryCard.tsx (5th PR card, target progress, toggle bar/line, PR column)',
+    'src/components/plts/PLTSPerformanceAnalysis.tsx (4 tab performance card with reconciliation panel)',
     'prisma/schema.prisma (TargetMonthly, MonthlyYieldObservation, ClimateMonthly, LoadMonthly)',
     'scripts/test-plts-dashboard-contracts.mjs (14 contract unit tests)',
     'scripts/verify-plts-overview-lock.mjs (33 baseline feature lock verifier)',

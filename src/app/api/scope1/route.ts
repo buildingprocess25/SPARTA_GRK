@@ -1,5 +1,5 @@
-import prisma from '@/lib/prisma.js';
-import { isVehicleFuelRecord } from '@/lib/scope1/fuelCategory.js';
+import prisma from '@/lib/prisma.ts';
+import { isVehicleFuelRecord } from '@/lib/scope1/fuelCategory.ts';
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -142,7 +142,7 @@ export async function GET(req) {
       prisma.facilityMaster.findMany({ where: { isActive: true } }),
     ]);
     const availableMonths = allYearMonths.map(r => r.yearMonth);
-    const facilityById = new Map(facilities.map(f => [f.id, f]));
+    const facilityById = new Map(facilities.map(f => [f.id, f] as const));
 
     const gensetRecords = records.filter(r => !isVehicleFuelRecord(r));
     const vehicleRecords = records.filter(isVehicleFuelRecord);

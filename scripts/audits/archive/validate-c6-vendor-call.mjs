@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { executeIsolarRequest } from '../../src/lib/solar/apiClient.js';
-import { getWibTimeInfo } from '../../src/lib/solar/sync.js';
+import { executeIsolarRequest } from '../../../src/lib/solar/apiClient.ts';
+import { getWibTimeInfo } from '../../../src/lib/solar/sync.ts';
 
 const prisma = new PrismaClient();
 

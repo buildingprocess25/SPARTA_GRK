@@ -14,7 +14,7 @@ export function DropdownMenu({
   className = '',
   placement = 'bottom-start',
   ...props
-}) {
+}: { children?: any; open?: any; onOpenChange?: any; className?: string; placement?: string; [key: string]: any }) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const isOpen = isControlled ? controlledOpen : internalOpen;
@@ -64,7 +64,7 @@ export function DropdownMenu({
   );
 }
 
-export const DropdownMenuTrigger = React.forwardRef(function DropdownMenuTrigger(
+export const DropdownMenuTrigger = React.forwardRef<any, { [key: string]: any } & { asChild?: boolean; children?: any; className?: string; [key: string]: any }>(function DropdownMenuTrigger(
   { asChild = false, children, className = '', ...props },
   forwardedRef
 ) {
@@ -88,7 +88,7 @@ export const DropdownMenuTrigger = React.forwardRef(function DropdownMenuTrigger
   );
 
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
+    return React.cloneElement(children as React.ReactElement<any>, {
       ref: handleRef,
       onClick: handleClick,
       'aria-expanded': isOpen,
@@ -112,7 +112,7 @@ export const DropdownMenuTrigger = React.forwardRef(function DropdownMenuTrigger
   );
 });
 
-export const DropdownMenuContent = React.forwardRef(function DropdownMenuContent(
+export const DropdownMenuContent = React.forwardRef<any, { [key: string]: any } & { className?: string; align?: string; children?: any; [key: string]: any }>(function DropdownMenuContent(
   { className = '', align = 'start', children, ...props },
   forwardedRef
 ) {
@@ -200,7 +200,7 @@ export const DropdownMenuContent = React.forwardRef(function DropdownMenuContent
   );
 });
 
-export function DropdownMenuGroup({ children, className = '', ...props }) {
+export function DropdownMenuGroup({ children, className = '', ...props }: { children?: any; className?: string; [key: string]: any }) {
   return (
     <div role="group" className={`p-0.5 space-y-0.5 ${className}`} {...props}>
       {children}
@@ -208,7 +208,7 @@ export function DropdownMenuGroup({ children, className = '', ...props }) {
   );
 }
 
-export const DropdownMenuItem = React.forwardRef(function DropdownMenuItem(
+export const DropdownMenuItem = React.forwardRef<React.ElementRef<'button'>, React.ComponentPropsWithoutRef<'button'> & { className?: string; inset?: boolean; disabled?: boolean; isDisabled?: boolean; selected?: boolean; children?: any; onClick?: any; [key: string]: any }>(function DropdownMenuItem(
   {
     className = '',
     inset = false,
@@ -259,7 +259,7 @@ export function DropdownMenuLabel({
   inset = false,
   children,
   ...props
-}) {
+}: { className?: string; inset?: boolean; children?: any; [key: string]: any }) {
   return (
     <div
       className={`px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 ${
@@ -272,7 +272,7 @@ export function DropdownMenuLabel({
   );
 }
 
-export function DropdownMenuSeparator({ className = '', ...props }) {
+export function DropdownMenuSeparator({ className = '', ...props }: { className?: string; [key: string]: any }) {
   return (
     <div
       role="separator"
@@ -282,7 +282,7 @@ export function DropdownMenuSeparator({ className = '', ...props }) {
   );
 }
 
-export function DropdownMenuShortcut({ className = '', children, ...props }) {
+export function DropdownMenuShortcut({ className = '', children, ...props }: { className?: string; children?: any; [key: string]: any }) {
   return (
     <span
       className={`ml-auto text-[10px] tracking-widest text-slate-400 dark:text-slate-500 font-mono ${className}`}
@@ -293,7 +293,7 @@ export function DropdownMenuShortcut({ className = '', children, ...props }) {
   );
 }
 
-export function DropdownMenuSub({ children, className = '', ...props }) {
+export function DropdownMenuSub({ children, className = '', ...props }: { children?: any; className?: string; [key: string]: any }) {
   const [subOpen, setSubOpen] = useState(false);
   return (
     <DropdownSubContext.Provider value={{ subOpen, setSubOpen }}>
@@ -314,7 +314,7 @@ export function DropdownMenuSubTrigger({
   inset = false,
   children,
   ...props
-}) {
+}: { className?: string; inset?: boolean; children?: any; [key: string]: any }) {
   const subContext = useContext(DropdownSubContext);
   return (
     <div
@@ -331,7 +331,7 @@ export function DropdownMenuSubTrigger({
   );
 }
 
-export function DropdownMenuSubContent({ className = '', children, ...props }) {
+export function DropdownMenuSubContent({ className = '', children, ...props }: { className?: string; children?: any; [key: string]: any }) {
   const subContext = useContext(DropdownSubContext);
   if (!subContext?.subOpen) return null;
 

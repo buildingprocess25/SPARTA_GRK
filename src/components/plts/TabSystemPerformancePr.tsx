@@ -28,7 +28,7 @@ function formatNum(value, min = 0, max = 2) {
   return Number(value).toLocaleString('id-ID', { minimumFractionDigits: min, maximumFractionDigits: max });
 }
 
-export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
+export default function TabSystemPerformancePr({ filters, onPlantSelect }: { filters?: any; onPlantSelect?: any }) {
   const [selectedYear, setSelectedYear] = useState('2026');
   const [selectedScope, setSelectedScope] = useState('national');
   const [selectedTargetId, setSelectedTargetId] = useState('ALL');
@@ -315,7 +315,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }) {
               />
 
               <Tooltip
-                content={({ active, payload, label }) => {
+                content={({ active, payload, label }: { active?: any; payload?: any; label?: any }) => {
                   if (!active || !payload || !payload.length) return null;
                   const item = payload[0]?.payload;
                   return (

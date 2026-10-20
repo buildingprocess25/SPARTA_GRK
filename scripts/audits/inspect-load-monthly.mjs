@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 async function inspectLoadMonthly() {
   const rows = await prisma.loadMonthly.findMany({

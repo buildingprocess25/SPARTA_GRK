@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { runSync, formatWibTime } from '@/lib/solar/sync.js';
-import { revalidatePltsDashboardCache } from '@/lib/solar/dashboardService.js';
-import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
+import { runSync, formatWibTime } from '@/lib/solar/sync.ts';
+import { revalidatePltsDashboardCache } from '@/lib/solar/dashboardService.ts';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.ts';
 
 export const dynamic = 'force-dynamic';
 

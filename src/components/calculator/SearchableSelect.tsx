@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { CustomSelect } from '@/components/ui/select';
 
-export default function SearchableSelect({ id, label, value, onChange, options, required = true }) {
+export default function SearchableSelect({ id, label, value, onChange, options, required = true }: { id?: any; label?: any; value?: any; onChange?: any; options?: any; required?: boolean }) {
   const [query, setQuery] = useState('');
   const filtered = useMemo(
     () => options.filter(option => option.label.toLocaleLowerCase('id').includes(query.toLocaleLowerCase('id'))),

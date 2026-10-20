@@ -1,8 +1,8 @@
 import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
-import { buildRowEntry, SOURCE_KIND } from '@/lib/scope3/travelTemplate.js';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.ts';
+import { buildRowEntry, SOURCE_KIND } from '@/lib/scope3/travelTemplate.ts';
 
 export const dynamic = 'force-dynamic';
 

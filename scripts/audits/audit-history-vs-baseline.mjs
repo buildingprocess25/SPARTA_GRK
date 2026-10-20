@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.js';
+import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.ts';
 import fs from 'fs';
 import path from 'path';
 

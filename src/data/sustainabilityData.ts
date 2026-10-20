@@ -4,7 +4,7 @@ import { getYearToDateMonths } from '@/lib/reportingMonths';
 export { MASTER_FACILITIES, BRANCH_LIST, FACILITY_TYPES, getFilteredFacilities, findFacilityById };
 
 // Unified facilities list with safe normalized properties
-export const dcLocations = MASTER_FACILITIES.map(fac => ({
+export const dcLocations = MASTER_FACILITIES.map((fac: (typeof MASTER_FACILITIES)[number] & Record<string, any>) => ({
   ...fac,
   grid: fac.grid || fac.gridRegion || 'JAMALI',
   plts: fac.plts || {
@@ -466,7 +466,7 @@ export function getHierarchyElectricityStats({
   facilityType = 'all', // 'all' | 'office' | 'warehouse' | 'toko'
   warehouseSubType = 'all', // 'all' | 'wh' | 'bulky' | 'depo' | 'storeHub'
   selectedMonth = 'ytd' // 'ytd' (0..7) or month index 0..11
-}) {
+}: { branchId?: string; facilityType?: string; warehouseSubType?: string; selectedMonth?: string }) {
   const selectedBranches = branchId === 'all' 
     ? branchHierarchyList 
     : branchHierarchyList.filter(b => b.id === branchId);

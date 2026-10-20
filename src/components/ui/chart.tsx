@@ -4,7 +4,9 @@ import * as React from 'react';
 import * as RechartsPrimitive from 'recharts';
 import { cn } from '@/lib/utils';
 
-const ChartContext = React.createContext(null);
+export type ChartConfig = Record<string, { label?: React.ReactNode; color?: string; theme?: { light?: string; dark?: string }; icon?: React.ComponentType }>;
+
+const ChartContext = React.createContext<{ config: ChartConfig } | null>(null);
 
 export function useChart() {
   const context = React.useContext(ChartContext);
@@ -14,7 +16,7 @@ export function useChart() {
   return context;
 }
 
-export const ChartContainer = React.forwardRef(function ChartContainer(
+export const ChartContainer = React.forwardRef<any, { [key: string]: any } & { id?: any; className?: any; children?: any; config?: any; [key: string]: any }>(function ChartContainer(
   { id, className, children, config = {}, ...props },
   ref
 ) {
@@ -41,7 +43,7 @@ export const ChartContainer = React.forwardRef(function ChartContainer(
       >
         <ChartStyle id={chartId} config={config} />
         {size.width > 0 && size.height > 0 && React.isValidElement(children)
-          ? React.cloneElement(children, { width: size.width, height: size.height })
+          ? React.cloneElement(children as React.ReactElement<any>, { width: size.width, height: size.height })
           : null}
       </div>
     </ChartContext.Provider>
@@ -69,7 +71,7 @@ function useElementSize() {
   return { ...size, ref };
 }
 
-export function ChartStyle({ id, config }) {
+export function ChartStyle({ id, config }: { id?: string; config?: ChartConfig }) {
   const colorConfig = Object.entries(config).filter(
     ([_, item]) => item.theme || item.color
   );
@@ -102,7 +104,7 @@ export function ChartStyle({ id, config }) {
 
 export const ChartTooltip = RechartsPrimitive.Tooltip;
 
-export const ChartTooltipContent = React.forwardRef(function ChartTooltipContent(
+export const ChartTooltipContent = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { active?: any; payload?: any; className?: any; indicator?: string; hideLabel?: boolean; hideIndicator?: boolean; label?: any; labelFormatter?: any; labelClassName?: any; formatter?: any; color?: any; nameKey?: any; labelKey?: any; [key: string]: any }>(function ChartTooltipContent(
   {
     active,
     payload,
@@ -215,7 +217,7 @@ export const ChartTooltipContent = React.forwardRef(function ChartTooltipContent
 
 export const ChartLegend = RechartsPrimitive.Legend;
 
-export const ChartLegendContent = React.forwardRef(function ChartLegendContent(
+export const ChartLegendContent = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { className?: any; hideIcon?: boolean; payload?: any; verticalAlign?: string; nameKey?: any; [key: string]: any }>(function ChartLegendContent(
   { className, hideIcon = false, payload, verticalAlign: _verticalAlign = 'bottom', nameKey },
   ref
 ) {

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 async function main() {
   console.log('=== GENERATING RAW SQL YIELD SOURCE RECONCILIATION ===');

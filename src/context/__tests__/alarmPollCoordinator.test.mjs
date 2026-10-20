@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createAlarmPollCoordinator } from '../alarmPollCoordinator.js';
+import { createAlarmPollCoordinator } from '../alarmPollCoordinator.ts';
 
 test('starting a newer poll aborts the previous request and invalidates its result', () => {
   const coordinator = createAlarmPollCoordinator();

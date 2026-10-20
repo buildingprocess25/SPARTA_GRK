@@ -1,5 +1,5 @@
-import prisma from '../../src/lib/prisma.js';
-import { getPltsDashboard, getPltsPrDashboardWithTiming } from '../../src/lib/solar/dashboardService.js';
+import prisma from '../../src/lib/prisma.ts';
+import { getPltsDashboard, getPltsPrDashboardWithTiming } from '../../src/lib/solar/dashboardService.ts';
 
 function rawStatus(row) {
   const raw = row.raw || {};

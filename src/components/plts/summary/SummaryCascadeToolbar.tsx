@@ -18,7 +18,7 @@ export default function SummaryCascadeToolbar({
   setSelectedDc,
   setSelectedGrid,
   syncUrlParam,
-}) {
+}: { availableDcOptions?: any; data?: any; filteredRows?: any; handleDcChange?: any; handleGridChange?: any; isFiltered?: any; selectedDc?: any; selectedGrid?: any; setActiveChip?: any; setSearchQuery?: any; setSelectedDc?: any; setSelectedGrid?: any; syncUrlParam?: any }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50/70 dark:bg-slate-800/40 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700">
       {/* Wilayah grid */}

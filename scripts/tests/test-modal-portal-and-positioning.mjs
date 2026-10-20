@@ -5,8 +5,8 @@ import path from 'node:path';
 console.log('Testing Modal Portal, Positioning, Scroll-lock, and Accessibility...');
 
 const files = [
-  { name: 'Scope1InputModal', path: 'src/components/scope1/Scope1InputModal.jsx' },
-  { name: 'Scope2InputModal', path: 'src/components/scope2/Scope2InputModal.jsx' }
+  { name: 'Scope1InputModal', path: 'src/components/scope1/Scope1InputModal.tsx' },
+  { name: 'Scope2InputModal', path: 'src/components/scope2/Scope2InputModal.tsx' }
 ];
 
 for (const f of files) {

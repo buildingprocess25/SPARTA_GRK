@@ -6,7 +6,7 @@ import { AlarmProvider } from '@/context/AlarmContext';
 import AlarmDialog from '@/components/alarms/AlarmDialog';
 import IdleSessionGuard from '@/components/IdleSessionGuard';
 
-export default function OverlayProviders({ children }) {
+export default function OverlayProviders({ children }: { children?: any }) {
   return (
     <ToastProvider>
       <AlarmProvider>

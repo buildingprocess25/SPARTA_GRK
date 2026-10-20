@@ -5,8 +5,8 @@ import fs from 'node:fs';
 // Sections split into ../plts/summary/ are part of the same dashboard.
 const partsDir = new URL('../plts/summary/', import.meta.url);
 const source = [
-  fs.readFileSync(new URL('../plts/PLTSSummaryCard.jsx', import.meta.url), 'utf8'),
-  ...fs.readdirSync(partsDir).filter((f) => /\.jsx?$/.test(f)).sort()
+  fs.readFileSync(new URL('../plts/PLTSSummaryCard.tsx', import.meta.url), 'utf8'),
+  ...fs.readdirSync(partsDir).filter((f) => /\.[jt]sx?$/.test(f)).sort()
     .map((f) => fs.readFileSync(new URL(f, partsDir), 'utf8')),
 ].join('\n');
 

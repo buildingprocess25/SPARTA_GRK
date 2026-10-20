@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { CARBON_FACTORS } from '../../src/lib/carbon/carbonEngine.js';
+import { CARBON_FACTORS } from '../../src/lib/carbon/carbonEngine.ts';
 
 const prisma = new PrismaClient();
 

@@ -13,7 +13,7 @@ export default function SummaryYoyComparisonChart({
   setChartType,
   setShowTarget,
   showTarget,
-}) {
+}: { chartType?: any; comparison?: any; comparisonChartData?: any; isNational?: any; setChartType?: any; setShowTarget?: any; showTarget?: any }) {
   return (
     <div className="rounded-2xl border border-blue-100 dark:border-blue-500/20 bg-blue-50/40 dark:bg-blue-500/10 p-4 relative z-0" data-yoy-comparison="true">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
@@ -55,7 +55,7 @@ export default function SummaryYoyComparisonChart({
               width={72}
             />
             <Tooltip
-              content={({ active, payload, label }) => {
+              content={({ active, payload, label }: { active?: any; payload?: any; label?: any }) => {
                 if (active && payload && payload.length) {
                   return (
                     <ChartTooltipCard

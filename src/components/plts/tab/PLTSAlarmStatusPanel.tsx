@@ -6,7 +6,7 @@ export default function PLTSAlarmStatusPanel({
   dashboardData,
   openAlarmPanel,
   pltsAlarms,
-}) {
+}: { dashboardData?: any; openAlarmPanel?: any; pltsAlarms?: any }) {
   return (
     <div
       className={`rounded-2xl border p-4 shadow-2xs transition-colors ${

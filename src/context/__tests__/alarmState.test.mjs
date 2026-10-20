@@ -6,7 +6,7 @@ import {
   identifyAlarmsToNotify,
   pruneReadIds,
   summarizeNotification,
-} from '../alarmState.js';
+} from '../alarmState.ts';
 
 test('identifyAlarmsToNotify treats the first successful poll as baseline and only emits later IDs once', () => {
   const baseline = [

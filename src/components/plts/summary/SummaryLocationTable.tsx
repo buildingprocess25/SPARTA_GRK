@@ -18,7 +18,7 @@ export default function SummaryLocationTable({
   sortDir,
   sortKey,
   totalFooter,
-}) {
+}: { dashboardData?: any; expandedDC?: any; filteredRows?: any; handleSort?: any; isFiltered?: any; isSingleMonth?: any; onSelectLocation?: any; searchQuery?: any; setExpandedDC?: any; setSearchQuery?: any; sortDir?: any; sortKey?: any; totalFooter?: any }) {
   return (
     <div
       data-plts-table-container="true"

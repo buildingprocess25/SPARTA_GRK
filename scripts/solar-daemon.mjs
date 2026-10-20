@@ -39,9 +39,9 @@ const { PrismaClient } = await import('@prisma/client');
 const prisma = new PrismaClient();
 globalThis.prisma = prisma;
 
-const { runSchedulerCycle } = await import('../src/lib/solar/scheduler.js');
-const { captureSnapshot30m, getSnapshotStatusReport, getSnapshotHistory, get30mSlotInfo } = await import('../src/lib/solar/snapshot.js');
-const { formatWibTime, getWibTimeInfo } = await import('../src/lib/solar/sync.js');
+const { runSchedulerCycle } = await import('../src/lib/solar/scheduler.ts');
+const { captureSnapshot30m, getSnapshotStatusReport, getSnapshotHistory, get30mSlotInfo } = await import('../src/lib/solar/snapshot.ts');
+const { formatWibTime, getWibTimeInfo } = await import('../src/lib/solar/sync.ts');
 
 const args = process.argv.slice(2);
 

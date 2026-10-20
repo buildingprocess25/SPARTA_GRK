@@ -12,7 +12,7 @@ export default function ResumeSummaryCards({
   includeScope3,
   realKpiState,
   resumeKPI,
-}) {
+}: { changeIncludeScope3?: any; handleNav?: any; includeScope3?: any; realKpiState?: any; resumeKPI?: any }) {
   return (
     <div className="space-y-3">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

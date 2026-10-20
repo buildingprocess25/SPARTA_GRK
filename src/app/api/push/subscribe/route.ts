@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { saveSubscription } from '@/lib/push.js';
+import { saveSubscription } from '@/lib/push.ts';
 
 export async function POST(request) {
   try {

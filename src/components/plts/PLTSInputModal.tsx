@@ -14,7 +14,7 @@ const MONTHS = [
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
 ];
 
-export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }) {
+export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }: { open?: any; onClose?: any; onSuccess?: any; plants?: any[] }) {
   const confirm = useConfirm();
   const plantOptions = useMemo(() => plants.flatMap((plant) => (
     (plant.psIds || []).map((psId) => ({
@@ -31,7 +31,7 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
   const [productionKwh, setProductionKwh] = useState('');
   const [selfConsumptionKwh, setSelfConsumptionKwh] = useState('');
   const [exportKwh, setExportKwh] = useState('');
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
   ), [selfConsumptionKwh]);
 
   const validate = () => {
-    const next = {};
+    const next: Record<string, any> = {};
     const production = Number(productionKwh);
     const selfUse = Number(selfConsumptionKwh);
     const exported = Number(exportKwh);

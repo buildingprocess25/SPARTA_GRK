@@ -21,7 +21,7 @@ export function SummaryCardsSkeleton() {
   );
 }
 
-export function ChartSkeleton({ height = 'h-[320px]' }) {
+export function ChartSkeleton({ height = 'h-[320px]' }: { height?: string }) {
   return (
     <div className={`w-full ${height} rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-4 flex flex-col justify-between animate-pulse`}>
       <div className="flex items-center justify-between">
@@ -53,7 +53,7 @@ export function TabContentSkeleton() {
   );
 }
 
-export function TableSkeleton({ rows = 6 }) {
+export function TableSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3 animate-pulse">
       <div className="flex justify-between items-center mb-4">

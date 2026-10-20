@@ -1,4 +1,4 @@
-import { buildTravelTemplateWorkbook } from '@/lib/scope3/travelTemplate.js';
+import { buildTravelTemplateWorkbook } from '@/lib/scope3/travelTemplate.ts';
 
 export const dynamic = 'force-dynamic';
 

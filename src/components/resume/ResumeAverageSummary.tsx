@@ -9,7 +9,7 @@ export default function ResumeAverageSummary({
   avgOffsetRatio,
   avgPenambahan,
   avgPengurangan,
-}) {
+}: { avgNet?: any; avgOffsetRatio?: any; avgPenambahan?: any; avgPengurangan?: any }) {
   return (
     <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-4 sm:gap-6 py-3 px-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 rounded-xl text-sm">
       <div className="flex flex-col">

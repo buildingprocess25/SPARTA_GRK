@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma.js';
-import { formatWibTime } from '@/lib/solar/sync.js';
+import prisma from '@/lib/prisma.ts';
+import { formatWibTime } from '@/lib/solar/sync.ts';
 
 export const dynamic = 'force-dynamic';
 

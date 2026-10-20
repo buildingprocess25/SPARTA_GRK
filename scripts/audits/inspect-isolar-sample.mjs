@@ -18,8 +18,8 @@ if (fs.existsSync(envLocalPath)) {
   });
 }
 
-import { getValidToken } from '../apiClient.js';
-import { QUOTA_CONFIG } from '../endpoints.js';
+import { getValidToken } from '../../src/lib/solar/apiClient.ts';
+import { QUOTA_CONFIG } from '../../src/lib/solar/endpoints.ts';
 
 async function inspectSample() {
   const baseUrl = process.env.ISOLAR_BASE_URL || 'https://gateway.isolarcloud.com.hk';

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
-import { buildScope2CanonicalDashboard } from '@/lib/scope2/dashboardService.js';
-import { buildScope2Csv, buildScope2ExportData, buildScope2WorkbookBytes } from '@/lib/scope2/export.js';
+import { buildScope2CanonicalDashboard } from '@/lib/scope2/dashboardService.ts';
+import { buildScope2Csv, buildScope2ExportData, buildScope2WorkbookBytes } from '@/lib/scope2/export.ts';
 
 export const dynamic = 'force-dynamic';
 

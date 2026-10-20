@@ -9,7 +9,7 @@ import InfoHint from '@/components/ui/InfoHint';
 
 const number = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 });
 
-export default function MainScope1Bridge({ onNavigate }) {
+export default function MainScope1Bridge({ onNavigate }: { onNavigate?: any }) {
   const [state, setState] = useState({ loading: true, data: null, error: '' });
   useEffect(() => {
     const controller = new AbortController();

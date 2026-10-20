@@ -11,7 +11,7 @@ export function Command({
   className = '',
   children,
   ...props
-}) {
+}: { className?: string; children?: any; [key: string]: any }) {
   const [search, setSearch] = React.useState('');
 
   return (
@@ -33,7 +33,7 @@ export function Command({
 export function CommandDialog({
   children,
   ...props
-}) {
+}: { children?: any; [key: string]: any }) {
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0 shadow-2xl max-w-xl">
@@ -45,7 +45,7 @@ export function CommandDialog({
   );
 }
 
-export const CommandInput = React.forwardRef(function CommandInput(
+export const CommandInput = React.forwardRef<React.ElementRef<'input'>, React.ComponentPropsWithoutRef<'input'> & { className?: string; [key: string]: any }>(function CommandInput(
   { className = '', ...props },
   ref
 ) {
@@ -71,7 +71,7 @@ export const CommandInput = React.forwardRef(function CommandInput(
   );
 });
 
-export const CommandList = React.forwardRef(function CommandList(
+export const CommandList = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { className?: string; children?: any; [key: string]: any }>(function CommandList(
   { className = '', children, ...props },
   ref
 ) {
@@ -87,7 +87,7 @@ export const CommandList = React.forwardRef(function CommandList(
   );
 });
 
-export const CommandEmpty = React.forwardRef(function CommandEmpty(
+export const CommandEmpty = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { className?: string; [key: string]: any }>(function CommandEmpty(
   { className = '', ...props },
   ref
 ) {
@@ -101,7 +101,7 @@ export const CommandEmpty = React.forwardRef(function CommandEmpty(
   );
 });
 
-export const CommandGroup = React.forwardRef(function CommandGroup(
+export const CommandGroup = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { className?: string; heading?: any; children?: any; [key: string]: any }>(function CommandGroup(
   { className = '', heading, children, ...props },
   ref
 ) {
@@ -122,7 +122,7 @@ export const CommandGroup = React.forwardRef(function CommandGroup(
   );
 });
 
-export const CommandSeparator = React.forwardRef(function CommandSeparator(
+export const CommandSeparator = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { className?: string; [key: string]: any }>(function CommandSeparator(
   { className = '', ...props },
   ref
 ) {
@@ -136,7 +136,7 @@ export const CommandSeparator = React.forwardRef(function CommandSeparator(
   );
 });
 
-export const CommandItem = React.forwardRef(function CommandItem(
+export const CommandItem = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { className?: string; onSelect?: any; onClick?: any; children?: any; [key: string]: any }>(function CommandItem(
   { className = '', onSelect, onClick, children, ...props },
   ref
 ) {
@@ -165,7 +165,7 @@ export const CommandItem = React.forwardRef(function CommandItem(
 export function CommandShortcut({
   className = '',
   ...props
-}) {
+}: { className?: string; [key: string]: any }) {
   return (
     <span
       className={cn('ml-auto text-[10px] tracking-widest text-slate-400 font-mono', className)}

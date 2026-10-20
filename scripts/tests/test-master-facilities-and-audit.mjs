@@ -6,14 +6,14 @@ import {
   calculateScope1FuelEmission,
   calculateScope2ElectricityEmission,
   calculatePLTSAvoidedEmissions
-} from '../../src/lib/carbon/carbonEngine.js';
+} from '../../src/lib/carbon/carbonEngine.ts';
 import {
   MASTER_FACILITIES,
   BRANCH_LIST,
   FACILITY_TYPES,
   getFilteredFacilities,
   findFacilityById
-} from '../../src/lib/master/facilityMaster.js';
+} from '../../src/lib/master/facilityMaster.ts';
 
 const prisma = new PrismaClient();
 

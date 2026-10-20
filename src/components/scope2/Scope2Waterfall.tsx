@@ -5,7 +5,7 @@ import React from 'react';
 const number = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 });
 const factorFormat = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
-export default function Scope2Waterfall({ summary }) {
+export default function Scope2Waterfall({ summary }: { summary?: any }) {
   const totalLoadKwh = summary?.totalLoadKwh || 0;
   const pltsKwh = summary?.totalSelfConsumedKwh || 0;
   const purchasedEnergyKwh = (summary?.purchasedBasisEnergyKwh || 0) + (summary?.loadUpperBoundEnergyKwh || 0);

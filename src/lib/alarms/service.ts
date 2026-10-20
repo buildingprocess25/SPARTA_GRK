@@ -3,7 +3,7 @@ import { CANONICAL_DC_ENTITIES } from '../solar/plantMap.ts';
 import { ALARM_DEFAULT_LIMIT } from './config.ts';
 import { normalizeAlarmRecords, normalizeStationLevelAlarms, summarizeAlarms } from './normalize.ts';
 
-export async function loadActiveAlarms({ limit = ALARM_DEFAULT_LIMIT } = {}) {
+export async function loadActiveAlarms({ limit = ALARM_DEFAULT_LIMIT }: { limit?: number | string | null } = {}) {
   const safeLimit = Math.min(Math.max(Number(limit) || ALARM_DEFAULT_LIMIT, 1), 500);
   const [records, plants] = await Promise.all([
     prisma.faultActive.findMany({

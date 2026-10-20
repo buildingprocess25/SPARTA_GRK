@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
-import { parseIsolarMonthlyReport } from '@/lib/importers/isolarMonthlyReport.js';
-import { createPrismaMonthlyImportRepository, importIsolarMonthlyReport } from '@/lib/importers/isolarMonthlyImport.js';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.ts';
+import { parseIsolarMonthlyReport } from '@/lib/importers/isolarMonthlyReport.ts';
+import { createPrismaMonthlyImportRepository, importIsolarMonthlyReport } from '@/lib/importers/isolarMonthlyImport.ts';
 import {
   closedMonthReport,
   diffEnergyFlowRows,
@@ -11,7 +11,7 @@ import {
   loadExistingEnergyFlowRows,
   openMonthCutoff,
   upsertEnergyFlowRows,
-} from '@/lib/importers/energyFlowImport.js';
+} from '@/lib/importers/energyFlowImport.ts';
 import { revalidatePltsDashboardCache } from '@/lib/solar/dashboardService';
 import { invalidateSummarizeCache } from '@/lib/solar/summarize';
 

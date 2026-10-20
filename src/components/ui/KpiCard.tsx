@@ -65,7 +65,7 @@ export default function KpiCard({
   className = '',
   tooltip = null,
   ...props
-}) {
+}: { label?: any; value?: any; unit?: any; trend?: any; subtitle?: any; icon?: any; theme?: string; infoKey?: any; sourceBadge?: any; className?: string; tooltip?: any; [key: string]: any }) {
   const themeConfig = SEMANTIC_THEMES[theme] || SEMANTIC_THEMES.default;
   const descriptionContent = trend || subtitle;
 

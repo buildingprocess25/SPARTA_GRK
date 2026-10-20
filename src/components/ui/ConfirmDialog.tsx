@@ -12,7 +12,7 @@ const VARIANTS = {
   success: { Icon: CheckCircle2, icon: 'text-emerald-600 dark:text-emerald-400', buttonVariant: 'success' },
 };
 
-export default function ConfirmDialog({ open, options = {}, onConfirm, onCancel, loading = false }) {
+export default function ConfirmDialog({ open, options = {}, onConfirm, onCancel, loading = false }: { open?: any; options?: any; onConfirm?: any; onCancel?: any; loading?: boolean }) {
   const variant = VARIANTS[options.variant] || VARIANTS.info;
   const cancelRef = useRef(null);
   const confirmRef = useRef(null);

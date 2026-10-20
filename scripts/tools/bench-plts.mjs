@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { performance } from 'perf_hooks';
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 const PORT = process.env.PORT || '3005';
 const BASE_URL = `http://127.0.0.1:${PORT}`;

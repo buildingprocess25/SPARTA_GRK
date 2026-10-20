@@ -14,7 +14,7 @@ export default function SummaryChipsToolbar({
   setActiveChip,
   setSearchQuery,
   statusBreakdown,
-}) {
+}: { activeChip?: any; dataAgeMinutes?: any; exportHistoricalCsv?: any; filteredRows?: any; lastSyncTime?: any; onNavigateToIsolar?: any; searchQuery?: any; setActiveChip?: any; setSearchQuery?: any; statusBreakdown?: any }) {
   return (
     <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs">
         {/* Quick Analytical Chips */}

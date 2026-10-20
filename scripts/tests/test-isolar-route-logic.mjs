@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import { readDashboardPayload, getWibTimeInfo, formatWibTime } from '../../src/lib/solar/sync.js';
-import { aggregateRawApiIntoCanonicalDCs, calculateNationwideSummary } from '../../src/lib/solar/processor.js';
-import { QUOTA_CONFIG } from '../../src/lib/solar/endpoints.js';
+import { readDashboardPayload, getWibTimeInfo, formatWibTime } from '../../src/lib/solar/sync.ts';
+import { aggregateRawApiIntoCanonicalDCs, calculateNationwideSummary } from '../../src/lib/solar/processor.ts';
+import { QUOTA_CONFIG } from '../../src/lib/solar/endpoints.ts';
 import aprilDataRaw from '../../src/data/monitorPltsApril2026.json' with { type: 'json' };
 
 const prisma = new PrismaClient();

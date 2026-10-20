@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 async function main() {
   console.log('Checking weather_daily table...');

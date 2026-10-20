@@ -38,7 +38,7 @@ const NO_SCOPE3_MONTHS = Object.freeze({});
 // Scope 3 is voluntary for now; this browser-level choice decides whether it joins the totals and reports.
 const INCLUDE_SCOPE3_KEY = 'sparta_include_scope3';
 
-export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCalculator = false }) {
+export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCalculator = false }: { setActiveTab?: any; navigateTo?: any; initialOpenCalculator?: boolean }) {
   const { scope1, scope2, pltsData, waterData, inputHistory } = useSustainability();
   const [chartMetricView, setChartMetricView] = useState('net'); // 'net' | 'all' | 'penambahan' | 'pengurangan'
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(initialOpenCalculator);

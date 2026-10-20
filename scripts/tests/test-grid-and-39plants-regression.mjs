@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { test, describe } from 'node:test';
-import { CANONICAL_DC_ENTITIES, PLANT_REGISTRY, lookupPlantMetadata } from '../../src/lib/solar/plantMap.js';
-import { GRID_EMISSION_FACTORS, getGridFactor } from '../../src/lib/emission-factors.js';
-import { summarizePlts } from '../../src/lib/solar/summarize.js';
+import { CANONICAL_DC_ENTITIES, PLANT_REGISTRY, lookupPlantMetadata } from '../../src/lib/solar/plantMap.ts';
+import { GRID_EMISSION_FACTORS, getGridFactor } from '../../src/lib/emission-factors.ts';
+import { summarizePlts } from '../../src/lib/solar/summarize.ts';
 
 describe('Regression Tests: Grid Filtering & 39 Independent Plants', () => {
 

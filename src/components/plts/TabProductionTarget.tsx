@@ -17,7 +17,7 @@ function formatNum(value, min = 0, max = 2) {
   return Number(value).toLocaleString('id-ID', { minimumFractionDigits: min, maximumFractionDigits: max });
 }
 
-function EmptyMeasurement({ title, message }) {
+function EmptyMeasurement({ title, message }: { title?: any; message?: any }) {
   return (
     <div className="h-[260px] rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col items-center justify-center px-6 text-center">
       <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{title}: Belum tersedia</p>
@@ -26,7 +26,7 @@ function EmptyMeasurement({ title, message }) {
   );
 }
 
-export default function TabProductionTarget({ filters }) {
+export default function TabProductionTarget({ filters }: { filters?: any }) {
   const { data, loading, error } = usePltsEndpoint('/api/plts/dashboard/performance', filters);
   const [productionViewMode, setProductionViewMode] = useState('actual-vs-target');
   const [reconciliationOpen, setReconciliationOpen] = useState(false);
@@ -55,7 +55,7 @@ export default function TabProductionTarget({ filters }) {
 
   const yoyChartRows = useMemo(() => {
     const yoyMonthlyList = data?.yoy?.monthly || [];
-    const yoyMonthlyMap = new Map(yoyMonthlyList.map((m) => [Number(m.month), m]));
+    const yoyMonthlyMap = new Map<number, Record<string, any>>(yoyMonthlyList.map((m) => [Number(m.month), m] as const));
 
     const sourceRows = (data?.monthly && data.monthly.length > 0)
       ? data.monthly
@@ -367,7 +367,7 @@ export default function TabProductionTarget({ filters }) {
                     width={75}
                   />
                   <Tooltip
-                    content={({ active, payload }) => {
+                    content={({ active, payload }: { active?: any; payload?: any }) => {
                       if (!active || !payload || !payload.length) return null;
                       const row = payload[0]?.payload;
                       if (!row) return null;

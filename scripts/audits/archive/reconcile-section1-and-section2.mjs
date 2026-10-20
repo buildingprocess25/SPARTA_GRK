@@ -1,7 +1,7 @@
-import prisma from '../../src/lib/prisma.js';
-import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.js';
-import { getGridFactor } from '../../src/lib/emission-factors.js';
-import { resolveMonthly, sumEligibleEmissions, buildLikeForLike } from '../../src/lib/solar/dashboard.js';
+import prisma from '../../../src/lib/prisma.ts';
+import { CANONICAL_DC_ENTITIES } from '../../../src/lib/solar/plantMap.ts';
+import { getGridFactor } from '../../../src/lib/emission-factors.ts';
+import { resolveMonthly, sumEligibleEmissions, buildLikeForLike } from '../../../src/lib/solar/dashboard.ts';
 
 async function main() {
   console.log('=== REKONSILIASI BAGIAN 1 & BAGIAN 2 ===\n');

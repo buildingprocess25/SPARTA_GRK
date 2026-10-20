@@ -1,6 +1,6 @@
-import prisma from '../../src/lib/prisma.js';
-import { getGridFactor } from '../../src/lib/emission-factors.js';
-import { resolveMonthly } from '../../src/lib/solar/dashboard.js';
+import prisma from '../../src/lib/prisma.ts';
+import { getGridFactor } from '../../src/lib/emission-factors.ts';
+import { resolveMonthly } from '../../src/lib/solar/dashboard.ts';
 
 async function main() {
   const plants = await prisma.plantMaster.findMany({

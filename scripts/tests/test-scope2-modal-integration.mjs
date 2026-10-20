@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { getGridFactor } from '../../src/lib/emission-factors.js';
+import { getGridFactor } from '../../src/lib/emission-factors.ts';
 
 console.log('Testing Scope 2 Emission Factors & Formulas...');
 
@@ -16,8 +16,8 @@ assert.ok(emisiTco2e > 0, 'Emisi must be greater than 0');
 console.log(`✓ Grid JAMALI factor: ${jamaliFactor} tCO2e/MWh | 150.5 MWh = ${emisiTco2e.toFixed(3)} tCO2e`);
 
 // 2. Check Scope2InputModal exists and has key components
-const modalPath = path.resolve('src/components/scope2/Scope2InputModal.jsx');
-assert.ok(fs.existsSync(modalPath), 'Scope2InputModal.jsx must exist');
+const modalPath = path.resolve('src/components/scope2/Scope2InputModal.tsx');
+assert.ok(fs.existsSync(modalPath), 'Scope2InputModal.tsx must exist');
 const modalContent = fs.readFileSync(modalPath, 'utf8');
 
 assert.ok(modalContent.includes('Input Data Scope 2 — Listrik PLN'), 'Must contain header title');
@@ -29,7 +29,7 @@ assert.ok(modalContent.includes('/api/templates?category=PLN'), 'Must support of
 console.log('✓ Scope2InputModal component contains all required elements and verification hooks');
 
 // 3. Check Scope2AnnualLoadDashboard integration
-const dashboardPath = path.resolve('src/components/scope2/Scope2AnnualLoadDashboard.jsx');
+const dashboardPath = path.resolve('src/components/scope2/Scope2AnnualLoadDashboard.tsx');
 const dashboardContent = fs.readFileSync(dashboardPath, 'utf8');
 
 assert.ok(dashboardContent.includes('Scope2InputModal'), 'Must import Scope2InputModal');
@@ -38,11 +38,11 @@ assert.ok(dashboardContent.includes('Input Data Scope 2'), 'Must have Input Data
 console.log('✓ Scope2AnnualLoadDashboard successfully integrated with reactive refresh state');
 
 // 4. Check Scope 1 beautification
-const scope1ModalPath = path.resolve('src/components/scope1/Scope1InputModal.jsx');
+const scope1ModalPath = path.resolve('src/components/scope1/Scope1InputModal.tsx');
 const scope1ModalContent = fs.readFileSync(scope1ModalPath, 'utf8');
 assert.ok(scope1ModalContent.includes('bg-slate-950/60 backdrop-blur'), 'Scope 1 modal must have glassmorphism styling');
 
-const scope1TabPath = path.resolve('src/components/PenambahEmisiTab.jsx');
+const scope1TabPath = path.resolve('src/components/PenambahEmisiTab.tsx');
 const scope1TabContent = fs.readFileSync(scope1TabPath, 'utf8');
 assert.ok(scope1TabContent.includes('Input Data Scope 1'), 'Scope 1 tab has Input Data button');
 assert.ok(scope1TabContent.includes('bg-slate-900'), 'Scope 1 button upgraded from neon pink to executive dark styling');

@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 
 const mode = process.argv[2] || 'all';
 
 async function testSecurity() {
-  const browserService = await readFile(new URL('../../src/services/isolarCloudService.js', import.meta.url), 'utf8');
+  const browserService = await readFile(new URL('../../src/services/isolarCloudService.ts', import.meta.url), 'utf8');
   const envExample = await readFile(new URL('../../.env.example', import.meta.url), 'utf8');
 
   assert.doesNotMatch(
@@ -24,7 +24,7 @@ async function testSecurity() {
 }
 
 async function testGuards() {
-  const { evaluateCronAuthorization, evaluateMutationAccess } = await import('../../src/lib/server/requestGuards.js');
+  const { evaluateCronAuthorization, evaluateMutationAccess } = await import('../../src/lib/server/requestGuards.ts');
 
   assert.deepEqual(
     evaluateCronAuthorization({ configuredSecret: '', authorization: '' }),
@@ -52,7 +52,7 @@ async function testImports() {
     normalizeWaterPersistence,
     normalizeImportHistoryLimit,
     isSupportedCommitCategory,
-  } = await import('../../src/lib/importers/importContracts.js');
+  } = await import('../../src/lib/importers/importContracts.ts');
 
   assert.deepEqual(
     normalizeWaterPersistence(
@@ -74,13 +74,13 @@ async function testImports() {
   assert.equal(isSupportedCommitCategory('EV'), false);
   assert.equal(isSupportedCommitCategory('EFFICIENCY'), false);
 
-  const route = await readFile(new URL('../../src/app/api/import/batch/route.js', import.meta.url), 'utf8');
+  const route = await readFile(new URL('../../src/app/api/import/batch/route.ts', import.meta.url), 'utf8');
   assert.match(route, /orderBy:\s*\{\s*importedAt:\s*'desc'\s*\}/);
   assert.doesNotMatch(route, /orderBy:\s*\{\s*createdAt:/);
 }
 
 async function testFreshness() {
-  const { resolveTelemetryFreshness, parseFreshnessThreshold } = await import('../../src/lib/solar/freshness.js');
+  const { resolveTelemetryFreshness, parseFreshnessThreshold } = await import('../../src/lib/solar/freshness.ts');
   const now = new Date('2026-10-01T05:00:00.000Z');
 
   assert.equal(parseFreshnessThreshold(undefined), 15);
@@ -115,7 +115,7 @@ async function testFreshness() {
 }
 
 async function testMigrations() {
-  const snapshotSource = await readFile(new URL('../../src/lib/solar/snapshot.js', import.meta.url), 'utf8');
+  const snapshotSource = await readFile(new URL('../../src/lib/solar/snapshot.ts', import.meta.url), 'utf8');
   const baseline = await readFile(new URL('../../prisma/migrations/20261001000000_baseline/migration.sql', import.meta.url), 'utf8');
 
   assert.doesNotMatch(snapshotSource, /\$executeRawUnsafe|CREATE TABLE IF NOT EXISTS/i);
@@ -125,10 +125,15 @@ async function testMigrations() {
 }
 
 async function testResponsiveSafety() {
-  const layout = await readFile(new URL('../../src/app/layout.js', import.meta.url), 'utf8');
-  const page = await readFile(new URL('../../src/app/page.js', import.meta.url), 'utf8');
-  const sidebar = await readFile(new URL('../../src/components/Sidebar.jsx', import.meta.url), 'utf8');
-  const header = await readFile(new URL('../../src/components/Header.jsx', import.meta.url), 'utf8');
+  const layout = await readFile(new URL('../../src/app/layout.tsx', import.meta.url), 'utf8');
+  const page = await readFile(new URL('../../src/app/page.tsx', import.meta.url), 'utf8');
+  const sidebar = await readFile(new URL('../../src/components/Sidebar.tsx', import.meta.url), 'utf8');
+  const headerPartsDir = new URL('../../src/components/header/', import.meta.url);
+  const headerParts = (await readdir(headerPartsDir)).filter((f) => /\.[jt]sx?$/.test(f)).sort();
+  const header = [
+    await readFile(new URL('../../src/components/Header.tsx', import.meta.url), 'utf8'),
+    ...(await Promise.all(headerParts.map((f) => readFile(new URL(f, headerPartsDir), 'utf8')))),
+  ].join('\n');
 
   assert.doesNotMatch(layout, /userScalable:\s*false|maximumScale:\s*1/);
   assert.match(page, /px-4\s+sm:px-6/);
@@ -138,9 +143,9 @@ async function testResponsiveSafety() {
 }
 
 async function testReviewFixes() {
-  const isolarRoute = await readFile(new URL('../../src/app/api/isolar/route.js', import.meta.url), 'utf8');
-  const cronRoute = await readFile(new URL('../../src/app/api/cron/isolar-sync/route.js', import.meta.url), 'utf8');
-  const importRoute = await readFile(new URL('../../src/app/api/import/batch/route.js', import.meta.url), 'utf8');
+  const isolarRoute = await readFile(new URL('../../src/app/api/isolar/route.ts', import.meta.url), 'utf8');
+  const cronRoute = await readFile(new URL('../../src/app/api/cron/isolar-sync/route.ts', import.meta.url), 'utf8');
+  const importRoute = await readFile(new URL('../../src/app/api/import/batch/route.ts', import.meta.url), 'utf8');
   const packageJson = JSON.parse(await readFile(new URL('../../package.json', import.meta.url), 'utf8'));
   const getBody = isolarRoute.split('export async function POST')[0];
   assert.doesNotMatch(getBody, /await runSync/);

@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 /**
  * Repeatable and idempotent seed script to ensure plant operational status and COD dates

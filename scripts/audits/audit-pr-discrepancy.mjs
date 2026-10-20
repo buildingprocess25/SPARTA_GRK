@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { aggregateRawApiIntoCanonicalDCs, processAllDCAnalytics } from '../../src/lib/solar/processor.js';
+import { aggregateRawApiIntoCanonicalDCs, processAllDCAnalytics } from '../../src/lib/solar/processor.ts';
 import aprilDataRaw from '../../src/data/monitorPltsApril2026.json' with { type: 'json' };
 
 const prisma = new PrismaClient();

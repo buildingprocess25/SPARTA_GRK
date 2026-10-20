@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateCronAuthorization } from '../../../lib/server/requestGuards.js';
+import { evaluateCronAuthorization } from '../../../lib/server/requestGuards.ts';
 
 test('Cron Authorization Guard Contract', async (t) => {
   await t.test('rejects if CRON_SECRET is not configured on server', () => {

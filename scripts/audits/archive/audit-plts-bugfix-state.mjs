@@ -1,5 +1,5 @@
-import prisma from '../../src/lib/prisma.js';
-import { getPltsDashboard } from '../../src/lib/solar/dashboardService.js';
+import prisma from '../../../src/lib/prisma.ts';
+import { getPltsDashboard } from '../../../src/lib/solar/dashboardService.ts';
 
 try {
   const [runs, statuses, daily, climateSources, climateSamples, baselineStats, portalPrReferences, dashboard] = await Promise.all([

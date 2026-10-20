@@ -28,7 +28,7 @@ export default function EmissionCalculatorPage() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
   const [entries, setEntries] = useState([]);
-  const [profile, setProfile] = useState(INITIAL_PROFILE);
+  const [profile, setProfile] = useState<Record<string, string>>(INITIAL_PROFILE);
   const [hydrated, setHydrated] = useState(false);
   const [notice, setNotice] = useState('');
 

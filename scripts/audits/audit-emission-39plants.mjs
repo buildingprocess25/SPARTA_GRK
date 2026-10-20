@@ -1,5 +1,5 @@
-import prisma from '../../src/lib/prisma.js';
-import { getGridFactor } from '../../src/lib/emission-factors.js';
+import prisma from '../../src/lib/prisma.ts';
+import { getGridFactor } from '../../src/lib/emission-factors.ts';
 
 async function main() {
   const response = await fetch('http://localhost:3000/api/plts/dashboard/summary?period=2026-01_2026-09&mode=YTD&month=9&throughMonth=9');

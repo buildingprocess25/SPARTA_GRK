@@ -2,7 +2,7 @@ import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionC
 
 export const PLTS_EMISSION_FACTOR_LABEL = String(PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH).replace('.', ',');
 
-export function classifySyncError({ error, status, code, lastSyncTime }) {
+export function classifySyncError({ error, status, code, lastSyncTime }: { error?: any; status?: any; code?: any; lastSyncTime?: any }) {
   const errStr = String(error || '').toLowerCase();
   const codeStr = String(code || '').toUpperCase();
   const statusNum = Number(status) || 0;

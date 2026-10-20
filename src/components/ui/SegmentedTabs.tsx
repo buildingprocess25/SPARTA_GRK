@@ -9,7 +9,7 @@ export default function SegmentedTabs({
   options = [],
   className = '',
   fullWidthOnMobile = true,
-}) {
+}: { value?: any; onChange?: any; options?: any[]; className?: string; fullWidthOnMobile?: boolean }) {
   const visibleOptions = options.filter((opt) => !opt.hidden);
 
   return (

@@ -1,4 +1,4 @@
-import { getCanonicalEnergyRows, getCanonicalMonthlySummary, getCanonicalYtdSummary } from '../../src/lib/energy-data.js';
+import { getCanonicalEnergyRows, getCanonicalMonthlySummary, getCanonicalYtdSummary } from '../../src/lib/energy-data.ts';
 
 async function testSharedLayer() {
   console.log('=== TESTING SHARED DATA LAYER ===');

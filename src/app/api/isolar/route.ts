@@ -6,16 +6,16 @@
  */
 
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma.js';
-import { readDashboardPayload, runSync, isInSyncWindow, formatWibTime, getWibTimeInfo } from '@/lib/solar/sync.js';
-import { aggregateRawApiIntoCanonicalDCs, calculateNationwideSummary } from '@/lib/solar/processor.js';
-import { CANONICAL_DC_ENTITIES } from '@/lib/solar/plantMap.js';
-import { QUOTA_CONFIG } from '@/lib/solar/endpoints.js';
-import { isFeatureEnabled } from '@/lib/solar/conversionConfig.js';
-import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
-import { isTokenRefreshing } from '@/lib/solar/tokenManager.js';
-import { isDbConnectionError, sanitizeErrorMessage } from '@/lib/server/apiError.js';
-import { getYearToDateMonths } from '@/lib/reportingMonths.js';
+import prisma from '@/lib/prisma.ts';
+import { readDashboardPayload, runSync, isInSyncWindow, formatWibTime, getWibTimeInfo } from '@/lib/solar/sync.ts';
+import { aggregateRawApiIntoCanonicalDCs, calculateNationwideSummary } from '@/lib/solar/processor.ts';
+import { CANONICAL_DC_ENTITIES } from '@/lib/solar/plantMap.ts';
+import { QUOTA_CONFIG } from '@/lib/solar/endpoints.ts';
+import { isFeatureEnabled } from '@/lib/solar/conversionConfig.ts';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.ts';
+import { isTokenRefreshing } from '@/lib/solar/tokenManager.ts';
+import { isDbConnectionError, sanitizeErrorMessage } from '@/lib/server/apiError.ts';
+import { getYearToDateMonths } from '@/lib/reportingMonths.ts';
 
 const MANUAL_COOLDOWN_MS = 60_000;
 const CACHE_TTL_MS = 10_000; // 10s micro-cache to protect DB connection pool
@@ -32,7 +32,7 @@ async function loadAuditBaseline() {
 /**
  * Builds the canonical full dashboard payload from DB
  */
-export async function buildFullDashboardPayload(now = new Date()) {
+async function buildFullDashboardPayload(now = new Date()) {
   const isLive = process.env.ISOLAR_MODE === 'live';
   const auditBaselineData = await loadAuditBaseline();
 
@@ -73,8 +73,9 @@ export async function buildFullDashboardPayload(now = new Date()) {
     today_energy_update_time: p.vendorUpdateTime?.toISOString() || null,
   }));
   
-  const canonicalStations = aggregateRawApiIntoCanonicalDCs(rawApiPlants, auditBaselineData);
-  const portalPrMap = new Map((data.portalPrReferences || []).map(r => [Number(r.psId || r.ps_id || r.psid), r]));
+  // Enriched in place below with inverter, fault, PR and history fields.
+  const canonicalStations: Array<ReturnType<typeof aggregateRawApiIntoCanonicalDCs>[number] & Record<string, any>> = aggregateRawApiIntoCanonicalDCs(rawApiPlants, auditBaselineData);
+  const portalPrMap = new Map((data.portalPrReferences || []).map(r => [Number(r.psId || r.ps_id || r.psid), r] as const));
   const invertersList = data.inverters || [];
   const faultsList = data.faults || [];
   const plantPrsList = data.plantPrs || [];
@@ -82,7 +83,7 @@ export async function buildFullDashboardPayload(now = new Date()) {
   const dailyYieldsList = data.dailyYields || [];
   const dailyDayCount = new Set(dailyYieldsList.map((d) => d.dateWib)).size;
   // January through the current month; the current month has no monthly_yield row yet, so it is summed from daily_yield.
-  const reportingMonths = getYearToDateMonths().map(({ yearMonth }, index, all) => {
+  const reportingMonths = getYearToDateMonths().map(({ yearMonth }: { yearMonth?: any }, index, all) => {
     const ym = yearMonth.replace('-', '');
     const isCurrent = index === all.length - 1;
     const days = isCurrent ? dailyDayCount : new Date(Number(ym.slice(0, 4)), Number(ym.slice(4, 6)), 0).getDate();
@@ -150,7 +151,7 @@ export async function buildFullDashboardPayload(now = new Date()) {
 
     const capacity = (dc.installedKwp && dc.installedKwp > 0) ? dc.installedKwp : null;
 
-    const monthlyData = reportingMonths.map(({ ym, days, isCurrent }) => {
+    const monthlyData = reportingMonths.map(({ ym, days, isCurrent }: { ym?: any; days?: any; isCurrent?: any }) => {
       const monthlyRecords = dcMonthly.filter(m => m.yearMonth === ym);
       const matchingRecords = isCurrent && monthlyRecords.length === 0
         ? dcDaily.map(d => ({ energyKwh: Number(d.yieldKwh) || 0 }))

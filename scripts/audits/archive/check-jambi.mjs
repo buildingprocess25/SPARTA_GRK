@@ -1,4 +1,4 @@
-import db from '../../src/lib/prisma.js';
+import db from '../../../src/lib/prisma.ts';
 
 async function main() {
   const flows = await db.$queryRawUnsafe(`

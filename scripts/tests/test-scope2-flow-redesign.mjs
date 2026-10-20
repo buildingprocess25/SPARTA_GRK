@@ -4,8 +4,8 @@ import path from 'node:path';
 
 console.log('Testing Scope 2 Waterfall & Card Flow Redesign...');
 
-const waterfallPath = path.resolve('src/components/scope2/Scope2Waterfall.jsx');
-const dashboardPath = path.resolve('src/components/scope2/Scope2AnnualLoadDashboard.jsx');
+const waterfallPath = path.resolve('src/components/scope2/Scope2Waterfall.tsx');
+const dashboardPath = path.resolve('src/components/scope2/Scope2AnnualLoadDashboard.tsx');
 
 const waterfallContent = fs.readFileSync(waterfallPath, 'utf8');
 const dashboardContent = fs.readFileSync(dashboardPath, 'utf8');

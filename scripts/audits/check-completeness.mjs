@@ -1,5 +1,5 @@
 import fs from 'fs';
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 async function checkCompleteness() {
   const csvLines = fs.readFileSync('Monthly Report_Annual report_20261001111530.csv', 'utf8').trim().split('\n');

@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import prisma from '../../src/lib/prisma.js';
-import { parseIsolarMonthlyReportFile } from '../../src/lib/importers/isolarMonthlyReport.js';
+import prisma from '../../src/lib/prisma.ts';
+import { parseIsolarMonthlyReportFile } from '../../src/lib/importers/isolarMonthlyReport.ts';
 import {
   createPrismaMonthlyImportRepository,
   importIsolarMonthlyReport,
   toPublicImportResult,
-} from '../../src/lib/importers/isolarMonthlyImport.js';
+} from '../../src/lib/importers/isolarMonthlyImport.ts';
 
 const DEFAULT_FILES = [
   'Monthly Report_Annual report_20261001111519.csv',

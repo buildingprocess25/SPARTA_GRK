@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateScope1FuelEmission, CARBON_FACTORS } from '../../src/lib/carbon/carbonEngine.js';
-import { MASTER_FACILITIES } from '../../src/lib/master/facilityMaster.js';
+import { calculateScope1FuelEmission, CARBON_FACTORS } from '../../src/lib/carbon/carbonEngine.ts';
+import { MASTER_FACILITIES } from '../../src/lib/master/facilityMaster.ts';
 import fs from 'node:fs';
 import path from 'node:path';
 
 test('Scope 1 Modal & Input Data Component Verification', async (t) => {
   await t.test('Scope1InputModal.jsx file exists and contains all required UI elements', () => {
-    const filePath = path.resolve('src/components/scope1/Scope1InputModal.jsx');
+    const filePath = path.resolve('src/components/scope1/Scope1InputModal.tsx');
     assert.ok(fs.existsSync(filePath), 'Scope1InputModal.jsx must exist');
     const content = fs.readFileSync(filePath, 'utf-8');
 
@@ -44,7 +44,7 @@ test('Scope 1 Modal & Input Data Component Verification', async (t) => {
   });
 
   await t.test('PenambahEmisiTab.jsx incorporates + Input Data button and modal', () => {
-    const filePath = path.resolve('src/components/PenambahEmisiTab.jsx');
+    const filePath = path.resolve('src/components/PenambahEmisiTab.tsx');
     const content = fs.readFileSync(filePath, 'utf-8');
 
     assert.ok(content.includes('Scope1InputModal'), 'Imports Scope1InputModal');

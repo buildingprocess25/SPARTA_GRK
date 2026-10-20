@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { PrismaClient } from '../../src/generated/prisma/index.js';
 import { requireIsolatedTestDatabase } from '../lib/require-isolated-test-database.mjs';
-import { createPrismaInverterTempRepository } from '../../src/lib/solar/inverterTemperatureRepository.js';
-import { runInverterTemperatureSampler } from '../../src/lib/solar/inverterTemperatureSampler.js';
-import { buildObservation } from '../../src/lib/solar/inverterTemperatureCore.js';
+import { createPrismaInverterTempRepository } from '../../src/lib/solar/inverterTemperatureRepository.ts';
+import { runInverterTemperatureSampler } from '../../src/lib/solar/inverterTemperatureSampler.ts';
+import { buildObservation } from '../../src/lib/solar/inverterTemperatureCore.ts';
 
 requireIsolatedTestDatabase('test-inverter-temperature-foundation');
 const prisma = new PrismaClient();

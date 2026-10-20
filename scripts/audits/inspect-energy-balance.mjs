@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { PLANT_REGISTRY, lookupPlantMetadata } from '../../src/lib/solar/plantMap.js';
+import { PLANT_REGISTRY, lookupPlantMetadata } from '../../src/lib/solar/plantMap.ts';
 
 function parseCsv(filePath) {
   if (!fs.existsSync(filePath)) return [];

@@ -16,7 +16,7 @@ import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 import StorePicker from '@/components/scope1/StorePicker';
 import { CustomSelect } from '@/components/ui/select';
 
-export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCategory = 'GENSET' }) {
+export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCategory = 'GENSET' }: { isOpen?: any; onClose?: any; onSuccess?: any; initialCategory?: string }) {
   const { dcLocations, addDataEntry, refreshData } = useSustainability();
   const confirm = useConfirm();
 
@@ -57,7 +57,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
   // UI state
   const [isGensetDetailsOpen, setIsGensetDetailsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<Record<string, any>>({});
   const [statusMessage, setStatusMessage] = useState(null);
 
   // Excel Upload State
@@ -125,7 +125,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
       factor: ef,
       costJuta: res.costEstimateJuta,
       formula: formulaStr,
-      source: res.factorSource || 'Pedoman Inventarisasi GRK ESDM'
+      source: (res as { factorSource?: string }).factorSource || 'Pedoman Inventarisasi GRK ESDM'
     };
   }, [fuelType, fuelInputMode, fuelLiters, costRupiah, pricePerLiter]);
 
@@ -141,7 +141,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
     : { id: selectedDC.id, name: selectedDC.name, code: selectedDC.code };
 
   const validateManualForm = () => {
-    const errors = {};
+    const errors: Record<string, any> = {};
     if (locationType === 'store' && !selectedStore) {
       errors.facility = 'Pilih toko dari hasil pencarian';
     } else if (locationType === 'facility' && !selectedFacilityId) {

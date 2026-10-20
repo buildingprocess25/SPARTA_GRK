@@ -8,7 +8,7 @@ export default function PLTSLiveStatusHeader({
   handleManualSync,
   isRefreshing,
   isolarLiveState,
-}) {
+}: { cooldownRemaining?: any; handleManualSync?: any; isRefreshing?: any; isolarLiveState?: any }) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors">
       {/* Baris 1: Judul + SATU Status Pill di kiri, Tombol Refresh di kanan */}

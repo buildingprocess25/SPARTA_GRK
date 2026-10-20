@@ -4,7 +4,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import ConfirmDialog from './ConfirmDialog';
 import { ConfirmContext, useConfirmContext } from './ConfirmContext';
 
-export function ConfirmProvider({ children }) {
+export function ConfirmProvider({ children }: { children?: any }) {
   const [request, setRequest] = useState(null);
   const resolverRef = useRef(null);
 

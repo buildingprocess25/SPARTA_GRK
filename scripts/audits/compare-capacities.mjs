@@ -1,5 +1,5 @@
 import fs from 'fs';
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 async function compareCapacities() {
   const raw = JSON.parse(fs.readFileSync('docs/evidence/vendor-20261005-1355/03_getPowerStationList.json', 'utf8'));

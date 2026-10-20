@@ -16,7 +16,7 @@ export default function ResumeReportExport({
   isExportingSrnPpi,
   selectedReportPeriod,
   setSelectedReportPeriod,
-}) {
+}: { availableReportPeriods?: any; exportError?: any; handleExportCsv?: any; handleExportOjk?: any; handleExportSrnPpi?: any; isExportingCsv?: any; isExportingOjk?: any; isExportingSrnPpi?: any; selectedReportPeriod?: any; setSelectedReportPeriod?: any }) {
   return (
     <CardBox className="space-y-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">

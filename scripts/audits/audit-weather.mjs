@@ -1,5 +1,5 @@
-import prisma from '../../src/lib/prisma.js';
-import { WEATHER_LOCATION_REGISTRY } from '../../src/lib/solar/openMeteoService.js';
+import prisma from '../../src/lib/prisma.ts';
+import { WEATHER_LOCATION_REGISTRY } from '../../src/lib/solar/openMeteoService.ts';
 
 async function main() {
   console.log('================================================================================');

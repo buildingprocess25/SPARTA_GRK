@@ -19,9 +19,9 @@ if (fs.existsSync(envLocalPath)) {
 }
 
 const aprilBaseline = JSON.parse(fs.readFileSync(path.join(rootDir, 'src/data/monitorPltsApril2026.json'), 'utf-8'));
-import { PLANT_REGISTRY, lookupPlantMetadata } from '../plantMap.js';
-import { getValidToken } from '../apiClient.js';
-import { QUOTA_CONFIG } from '../endpoints.js';
+import { PLANT_REGISTRY, lookupPlantMetadata } from '../../src/lib/solar/plantMap.ts';
+import { getValidToken } from '../../src/lib/solar/apiClient.ts';
+import { QUOTA_CONFIG } from '../../src/lib/solar/endpoints.ts';
 
 
 async function mapPlants() {

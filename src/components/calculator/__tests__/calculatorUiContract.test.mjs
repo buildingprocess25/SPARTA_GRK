@@ -3,9 +3,9 @@ import fs from 'node:fs';
 import test from 'node:test';
 
 const read = relative => fs.readFileSync(new URL(relative, import.meta.url), 'utf8');
-const sidebar = read('../../Sidebar.jsx'); const page = read('../../../app/page.js'); const calculator = read('../EmissionCalculatorPage.jsx');
-const home = read('../CalculatorHome.jsx'); const entryForm = read('../CalculatorEntryForm.jsx'); const factors = read('../EmissionFactorsReference.jsx'); const recap = read('../CalculatorRecap.jsx');
-const resume = read('../../EmisiResumeTab.jsx');
+const sidebar = read('../../Sidebar.tsx'); const page = read('../../../app/page.tsx'); const calculator = read('../EmissionCalculatorPage.tsx');
+const home = read('../CalculatorHome.tsx'); const entryForm = read('../CalculatorEntryForm.tsx'); const factors = read('../EmissionFactorsReference.tsx'); const recap = read('../CalculatorRecap.tsx');
+const resume = read('../../EmisiResumeTab.tsx');
 
 test('calculator is relocated from sidebar to resume tab and lazy loaded', () => {
   assert.doesNotMatch(sidebar, /id:\s*'calculator'/);

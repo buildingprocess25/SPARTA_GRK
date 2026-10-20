@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.ts';
 import {
   reconcileCarbonBalance,
   CARBON_FACTORS,
@@ -11,9 +11,9 @@ import {
   getGridEmissionFactor
 } from '@/lib/carbon/carbonEngine';
 import { getYearToDateMonths } from '@/lib/reportingMonths';
-import { isVehicleFuelRecord } from '@/lib/scope1/fuelCategory.js';
-import { getCanonicalEnergyRows, getCanonicalMonthlySummary } from '@/lib/energy-data.js';
-import { buildScope2CanonicalDashboard } from '@/lib/scope2/dashboardService.js';
+import { isVehicleFuelRecord } from '@/lib/scope1/fuelCategory.ts';
+import { getCanonicalEnergyRows, getCanonicalMonthlySummary } from '@/lib/energy-data.ts';
+import { buildScope2CanonicalDashboard } from '@/lib/scope2/dashboardService.ts';
 
 // Micro-cache (10 seconds) for performance
 let cachedPayload = null;
@@ -76,7 +76,7 @@ export async function GET(request) {
       orderBy: [{ canonicalName: 'asc' }]
     });
 
-    const pltsByMonth = new Map(pltsMonthly.map(m => [m.yearMonth, m]));
+    const pltsByMonth = new Map(pltsMonthly.map(m => [m.yearMonth, m] as const));
     const pltsMonthlyTrend = monthKeys.map((ym, idx) => {
       const m = pltsByMonth.get(ym);
       const yieldMwh = m ? m.yieldMwh : 0;
@@ -135,7 +135,7 @@ export async function GET(request) {
       };
     });
 
-    const scope2ByMonth = new Map((scope2Dashboard.monthly || []).map(m => [m.yearMonth, m]));
+    const scope2ByMonth = new Map((scope2Dashboard.monthly || []).map(m => [m.yearMonth, m] as const));
     const scope2MonthlyTrend = monthKeys.map((ym, idx) => {
       const m = scope2ByMonth.get(ym);
       return {

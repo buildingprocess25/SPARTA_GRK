@@ -1,5 +1,5 @@
-import prisma from '@/lib/prisma.js';
-import { monthRange, summarizeTravelEntries } from '@/lib/scope3/travelSummary.js';
+import prisma from '@/lib/prisma.ts';
+import { monthRange, summarizeTravelEntries } from '@/lib/scope3/travelSummary.ts';
 
 export const dynamic = 'force-dynamic';
 

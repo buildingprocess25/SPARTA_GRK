@@ -1,4 +1,4 @@
-import { runFullDataIngestionPipeline } from '../src/lib/importers/excelImporter.js';
+import { runFullDataIngestionPipeline } from '../src/lib/importers/excelImporter.ts';
 
 async function main() {
   try {

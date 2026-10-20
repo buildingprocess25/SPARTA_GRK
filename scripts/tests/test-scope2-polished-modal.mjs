@@ -4,7 +4,7 @@ import path from 'node:path';
 
 console.log('Testing Scope 2 Polished Modal Layout & Parity with Scope 1...');
 
-const modalPath = path.resolve('src/components/scope2/Scope2InputModal.jsx');
+const modalPath = path.resolve('src/components/scope2/Scope2InputModal.tsx');
 assert.ok(fs.existsSync(modalPath), 'Scope2InputModal.jsx must exist');
 const content = fs.readFileSync(modalPath, 'utf8');
 

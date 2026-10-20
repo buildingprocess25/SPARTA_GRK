@@ -10,7 +10,7 @@ import { notify } from '@/components/ui/ToastProvider';
 import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 import { CustomSelect } from '@/components/ui/select';
 
-export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
+export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }: { isOpen?: any; onClose?: any; onSuccess?: any }) {
   const confirm = useConfirm();
 
   const [facilitySearch, setFacilitySearch] = useState('');
@@ -27,7 +27,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
   const [proofRef, setProofRef] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<Record<string, any>>({});
   const [statusMessage, setStatusMessage] = useState(null);
 
   const filteredFacilities = useMemo(() => {
@@ -70,7 +70,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }) {
   };
 
   const validate = () => {
-    const errors = {};
+    const errors: Record<string, any> = {};
     if (!selectedFacilityId) errors.facility = 'Pilih lokasi fasilitas / DC';
     const start = parseFloat(meterStart);
     const end = parseFloat(meterEnd);

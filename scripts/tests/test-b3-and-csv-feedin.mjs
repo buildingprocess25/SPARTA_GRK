@@ -1,4 +1,4 @@
-import { executeIsolarRequest } from '../../src/lib/solar/apiClient.js';
+import { executeIsolarRequest } from '../../src/lib/solar/apiClient.ts';
 import fs from 'fs';
 
 async function main() {

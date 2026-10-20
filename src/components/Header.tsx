@@ -18,7 +18,7 @@ export default function Header({
   onToggleMobileSidebar,
   isDesktopSidebarOpen = true,
   onToggleDesktopSidebar,
-}) {
+}: { isProfileOpen?: any; setIsProfileOpen?: any; onToggleMobileSidebar?: any; isDesktopSidebarOpen?: boolean; onToggleDesktopSidebar?: any }) {
   const router = useRouter();
   const [internalProfileOpen, setInternalProfileOpen] = useState(false);
   const isProfileOpen = externalProfileOpen !== undefined ? externalProfileOpen : internalProfileOpen;

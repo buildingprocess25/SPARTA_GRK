@@ -39,7 +39,7 @@ export function formatYAxisNumber(val) {
   return Number(val).toLocaleString('id-ID');
 }
 
-export function ChartTooltipCard({ title, items = [], footer = null, className = '' }) {
+export function ChartTooltipCard({ title, items = [], footer = null, className = '' }: { title?: any; items?: any[]; footer?: any; className?: string }) {
   return (
     <div
       className={`rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 text-xs shadow-xl min-w-[220px] space-y-1.5 select-text ${className}`}
@@ -78,7 +78,7 @@ export function ChartTooltipCard({ title, items = [], footer = null, className =
   );
 }
 
-export function ChartPillLegend({ items = [], className = '' }) {
+export function ChartPillLegend({ items = [], className = '' }: { items?: any[]; className?: string }) {
   return (
     <div
       className={`flex flex-wrap items-center justify-center sm:justify-end gap-2 text-xs text-slate-600 dark:text-slate-400 ${className}`}

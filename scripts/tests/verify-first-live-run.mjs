@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 async function verifyLiveRun() {
   console.log('=== VERIFIKASI HASIL RUN NYATA PERTAMA SINKRONISASI ===\n');

@@ -19,7 +19,7 @@ const THEME_INIT_SCRIPT = `(function () {
   } catch (e) {}
 })();`;
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children?: any }) {
   return (
     <html lang="id" suppressHydrationWarning>
       <body suppressHydrationWarning className="bg-slate-50 text-slate-800 dark:bg-[#0B1220] dark:text-slate-100">

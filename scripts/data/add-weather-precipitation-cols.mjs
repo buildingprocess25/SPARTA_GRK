@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 async function main() {
   console.log('Adding precipitation_mm and module_temp_c to weather_daily...');

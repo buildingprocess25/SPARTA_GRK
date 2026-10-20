@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 async function checkClimateData() {
   console.log('=== CHECK CLIMATE_MONTHLY DATA IN DB ===\n');

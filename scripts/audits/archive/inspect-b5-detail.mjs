@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { summarizePlts } from '../../src/lib/solar/summarize.js';
+import { summarizePlts } from '../../../src/lib/solar/summarize.ts';
 
 const prisma = new PrismaClient();
 

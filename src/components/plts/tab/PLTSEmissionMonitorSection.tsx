@@ -27,7 +27,7 @@ export default function PLTSEmissionMonitorSection({
   totalPltsMWh,
   totalScope2Ton,
   validDcs,
-}) {
+}: { dcSearch?: any; dcTableData?: any; emissionsError?: any; emissionsLoading?: any; emissionsPeriods?: any; hasAnyPln?: any; hasAnyScope2?: any; loadActualEmissions?: any; selectedDcFilter?: any; selectedGridFilter?: any; selectedPeriod?: any; setDcSearch?: any; setSelectedDcFilter?: any; setSelectedGridFilter?: any; setSelectedPeriod?: any; totalAvoidedTon?: any; totalPlnMWh?: any; totalPltsMWh?: any; totalScope2Ton?: any; validDcs?: any }) {
   return (
     <CardBox className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">

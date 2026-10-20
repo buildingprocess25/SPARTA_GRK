@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import prisma from '../../src/lib/prisma.js';
-import { getPltsPerformanceDashboard } from '../../src/lib/solar/dashboardService.js';
+import prisma from '../../src/lib/prisma.ts';
+import { getPltsPerformanceDashboard } from '../../src/lib/solar/dashboardService.ts';
 
 async function runRealIntegrationTest() {
   console.log('=== REAL DATA INTEGRATION TEST: YoY 2025 vs 2026 ===');

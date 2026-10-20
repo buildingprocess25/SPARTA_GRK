@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import prisma from '../../src/lib/prisma.js';
-import { getPltsDashboard } from '../../src/lib/solar/dashboardService.js';
+import prisma from '../../src/lib/prisma.ts';
+import { getPltsDashboard } from '../../src/lib/solar/dashboardService.ts';
 
 function parseCsv(content) {
   const lines = content.split(/\r?\n/).filter(line => line.trim().length > 0);

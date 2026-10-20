@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-export const Table = React.forwardRef(function Table(
+export const Table = React.forwardRef<React.ElementRef<'table'>, React.ComponentPropsWithoutRef<'table'> & { className?: string; containerClassName?: string; [key: string]: any }>(function Table(
   { className = '', containerClassName = '', ...props },
   ref
 ) {
@@ -18,7 +18,7 @@ export const Table = React.forwardRef(function Table(
   );
 });
 
-export const TableHeader = React.forwardRef(function TableHeader(
+export const TableHeader = React.forwardRef<React.ElementRef<'thead'>, React.ComponentPropsWithoutRef<'thead'> & { className?: string; [key: string]: any }>(function TableHeader(
   { className = '', ...props },
   ref
 ) {
@@ -31,7 +31,7 @@ export const TableHeader = React.forwardRef(function TableHeader(
   );
 });
 
-export const TableBody = React.forwardRef(function TableBody(
+export const TableBody = React.forwardRef<React.ElementRef<'tbody'>, React.ComponentPropsWithoutRef<'tbody'> & { className?: string; [key: string]: any }>(function TableBody(
   { className = '', ...props },
   ref
 ) {
@@ -44,7 +44,7 @@ export const TableBody = React.forwardRef(function TableBody(
   );
 });
 
-export const TableFooter = React.forwardRef(function TableFooter(
+export const TableFooter = React.forwardRef<React.ElementRef<'tfoot'>, React.ComponentPropsWithoutRef<'tfoot'> & { className?: string; [key: string]: any }>(function TableFooter(
   { className = '', ...props },
   ref
 ) {
@@ -57,7 +57,7 @@ export const TableFooter = React.forwardRef(function TableFooter(
   );
 });
 
-export const TableRow = React.forwardRef(function TableRow(
+export const TableRow = React.forwardRef<React.ElementRef<'tr'>, React.ComponentPropsWithoutRef<'tr'> & { className?: string; [key: string]: any }>(function TableRow(
   { className = '', ...props },
   ref
 ) {
@@ -73,7 +73,7 @@ export const TableRow = React.forwardRef(function TableRow(
   );
 });
 
-export const TableHead = React.forwardRef(function TableHead(
+export const TableHead = React.forwardRef<React.ElementRef<'th'>, React.ComponentPropsWithoutRef<'th'> & { className?: string; [key: string]: any }>(function TableHead(
   { className = '', ...props },
   ref
 ) {
@@ -89,7 +89,7 @@ export const TableHead = React.forwardRef(function TableHead(
   );
 });
 
-export const TableCell = React.forwardRef(function TableCell(
+export const TableCell = React.forwardRef<React.ElementRef<'td'>, React.ComponentPropsWithoutRef<'td'> & { className?: string; [key: string]: any }>(function TableCell(
   { className = '', ...props },
   ref
 ) {
@@ -102,7 +102,7 @@ export const TableCell = React.forwardRef(function TableCell(
   );
 });
 
-export const TableCaption = React.forwardRef(function TableCaption(
+export const TableCaption = React.forwardRef<React.ElementRef<'caption'>, React.ComponentPropsWithoutRef<'caption'> & { className?: string; [key: string]: any }>(function TableCaption(
   { className = '', ...props },
   ref
 ) {

@@ -1,6 +1,6 @@
 import fs from 'fs';
-import { buildScope2CanonicalDashboard } from '../../src/lib/scope2/dashboardService.js';
-import { aggregateCanonicalRows } from '../../src/lib/scope2/energyReconciliation.js';
+import { buildScope2CanonicalDashboard } from '../../src/lib/scope2/dashboardService.ts';
+import { aggregateCanonicalRows } from '../../src/lib/scope2/energyReconciliation.ts';
 
 async function inspectScope2() {
   const d = await buildScope2CanonicalDashboard();

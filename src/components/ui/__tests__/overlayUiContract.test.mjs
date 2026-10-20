@@ -8,7 +8,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const read = (relative) => fs.readFileSync(path.resolve(here, relative), 'utf8');
 
 test('BaseModal owns portal, viewport positioning, scroll lock, focus trap, and dialog semantics', () => {
-  const source = read('../BaseModal.jsx');
+  const source = read('../BaseModal.tsx');
   assert.match(source, /createPortal/);
   assert.match(source, /document\.body/);
   assert.match(source, /fixed inset-0 z-\[100\]/);
@@ -21,8 +21,8 @@ test('BaseModal owns portal, viewport positioning, scroll lock, focus trap, and 
 });
 
 test('ConfirmDialog is based on BaseModal and provider exposes Promise confirmation', () => {
-  const dialog = read('../ConfirmDialog.jsx');
-  const provider = read('../ConfirmProvider.jsx');
+  const dialog = read('../ConfirmDialog.tsx');
+  const provider = read('../ConfirmProvider.tsx');
   assert.match(dialog, /<BaseModal/);
   assert.match(dialog, /options\.variant === 'danger' \? cancelRef : confirmRef/);
   assert.match(provider, /new Promise/);
@@ -30,7 +30,7 @@ test('ConfirmDialog is based on BaseModal and provider exposes Promise confirmat
 });
 
 test('toast helpers and presets are centralized', () => {
-  const toast = read('../ToastProvider.jsx');
+  const toast = read('../ToastProvider.tsx');
   const presets = read('../../../lib/dialog-presets.ts');
   for (const variant of ['success', 'error', 'warning', 'info']) {
     assert.match(toast, new RegExp(`${variant}:`));
@@ -42,11 +42,11 @@ test('toast helpers and presets are centralized', () => {
 
 test('targeted dashboard components contain no native browser confirm or alert calls', () => {
   const sources = [
-    read('../../calculator/EmissionCalculatorPage.jsx'),
-    read('../../HistoryTab.jsx'),
-    read('../../scope1/Scope1InputModal.jsx'),
-    read('../../scope2/Scope2InputModal.jsx'),
-    read('../../plts/PLTSInputModal.jsx'),
+    read('../../calculator/EmissionCalculatorPage.tsx'),
+    read('../../HistoryTab.tsx'),
+    read('../../scope1/Scope1InputModal.tsx'),
+    read('../../scope2/Scope2InputModal.tsx'),
+    read('../../plts/PLTSInputModal.tsx'),
   ].join('\n');
   assert.doesNotMatch(sources, /window\.(?:confirm|alert)\s*\(/);
   assert.doesNotMatch(sources, /\balert\s*\(/);
@@ -54,9 +54,9 @@ test('targeted dashboard components contain no native browser confirm or alert c
 });
 
 test('PLTS input persists production and energy flow to the dashboard data sources', () => {
-  const modal = read('../../plts/PLTSInputModal.jsx');
-  const pltsTab = read('../../plts/PLTSTab.jsx');
-  const route = read('../../../app/api/plts/manual/route.js');
+  const modal = read('../../plts/PLTSInputModal.tsx');
+  const pltsTab = read('../../plts/PLTSTab.tsx');
+  const route = read('../../../app/api/plts/manual/route.ts');
   const dashboard = read('../../../lib/solar/dashboard.ts');
   assert.match(pltsTab, /plants=\{dashboardData\?\.plants \|\| \[\]\}/);
   assert.match(modal, /\/api\/plts\/manual/);

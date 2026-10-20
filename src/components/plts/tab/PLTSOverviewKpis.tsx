@@ -12,7 +12,7 @@ export default function PLTSOverviewKpis({
   dashboardError,
   dashboardLoading,
   refreshDashboardSummaryAfterSync,
-}) {
+}: { dashboardData?: any; dashboardError?: any; dashboardLoading?: any; refreshDashboardSummaryAfterSync?: any }) {
   return (
     dashboardLoading && !dashboardData ? (
       <SummaryCardsSkeleton />
@@ -33,9 +33,9 @@ export default function PLTSOverviewKpis({
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 relative z-20 has-[[data-popover-open='true']]:z-40">
         <KpiCard
           label="Kapasitas PLTS"
-          value={dashboardData?.summary?.capacityKwp != null ? formatNum(dashboardData.summary.capacityKwp, 2, 2) : '—'}
+          value={dashboardData?.summary?.capacityKwp != null ? formatNum(dashboardData.summary.capacityKwp, 2) : '—'}
           unit="kWp"
-          trend={dashboardData?.summary?.plantCount != null ? `${dashboardData.summary.plantCount} lokasi · ${dashboardData?.summary?.operationalCapacityKwp != null ? formatNum(dashboardData.summary.operationalCapacityKwp, 2, 2) + ' kWp sudah beroperasi' : '—'}` : '—'}
+          trend={dashboardData?.summary?.plantCount != null ? `${dashboardData.summary.plantCount} lokasi · ${dashboardData?.summary?.operationalCapacityKwp != null ? formatNum(dashboardData.summary.operationalCapacityKwp, 2) + ' kWp sudah beroperasi' : '—'}` : '—'}
           icon={Sun}
           theme="plts"
           infoKey="plts_capacity"
@@ -56,7 +56,7 @@ export default function PLTSOverviewKpis({
                 )}
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                Dipakai sendiri {formatNum(dashboardData?.summary?.selfConsumptionMwh ?? dashboardData?.summary?.energyBalance?.selfConsumptionMwh, 2, 2)} MWh &middot; dikirim ke PLN {formatNum(dashboardData?.summary?.feedInMwh ?? dashboardData?.summary?.energyBalance?.feedInMwh, 2, 2)} MWh
+                Dipakai sendiri {formatNum(dashboardData?.summary?.selfConsumptionMwh ?? dashboardData?.summary?.energyBalance?.selfConsumptionMwh, 2)} MWh &middot; dikirim ke PLN {formatNum(dashboardData?.summary?.feedInMwh ?? dashboardData?.summary?.energyBalance?.feedInMwh, 2)} MWh
               </div>
             </div>
           }
@@ -71,7 +71,7 @@ export default function PLTSOverviewKpis({
           trend={
             <div className="text-[11px] text-slate-600 dark:text-slate-400">
               {dashboardData?.summary?.energyBalance?.coverage?.selfConsumptionSharePct != null
-                ? `${formatNum(dashboardData.summary.energyBalance.coverage.selfConsumptionSharePct, 1, 1)}% produksi PLTS dipakai sendiri`
+                ? `${formatNum(dashboardData.summary.energyBalance.coverage.selfConsumptionSharePct, 1)}% produksi PLTS dipakai sendiri`
                 : '—'}
             </div>
           }
@@ -81,16 +81,16 @@ export default function PLTSOverviewKpis({
         />
         <KpiCard
           label="Emisi terhindar"
-          value={dashboardData?.summary?.emission?.emissionTon != null ? formatNum(dashboardData.summary.emission.emissionTon, 2, 2) : '—'}
+          value={dashboardData?.summary?.emission?.emissionTon != null ? formatNum(dashboardData.summary.emission.emissionTon, 2) : '—'}
           unit="tCO₂e"
           trend={
             <div className="space-y-1 whitespace-normal">
               <div className="text-[11px] text-slate-600 dark:text-slate-400 font-medium leading-tight">
-                Target RKAP: <span className="font-semibold text-slate-700 dark:text-slate-300">{dashboardData?.summary?.emission?.targetReferenceTon != null ? `${formatNum(dashboardData.summary.emission.targetReferenceTon, 2, 2)} tCO₂e` : '—'}</span>
+                Target RKAP: <span className="font-semibold text-slate-700 dark:text-slate-300">{dashboardData?.summary?.emission?.targetReferenceTon != null ? `${formatNum(dashboardData.summary.emission.targetReferenceTon, 2)} tCO₂e` : '—'}</span>
               </div>
               <div className="text-[11px] text-emerald-800 dark:text-emerald-300 font-semibold">
                 {dashboardData?.summary?.emission?.coalAvoidedTon != null && dashboardData?.summary?.emission?.treeCount != null
-                  ? <>Setara sekitar {formatNum(dashboardData.summary.emission.coalAvoidedTon, 1, 1)} ton batubara atau {formatNum(dashboardData.summary.emission.treeCount, 0, 0)} pohon</>
+                  ? <>Setara sekitar {formatNum(dashboardData.summary.emission.coalAvoidedTon, 1)} ton batubara atau {formatNum(dashboardData.summary.emission.treeCount, 0)} pohon</>
                   : 'Setara batubara dan pohon: —'}
               </div>
             </div>

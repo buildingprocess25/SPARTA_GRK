@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 import { URL } from 'node:url';
 
 async function verifyReadOnly() {

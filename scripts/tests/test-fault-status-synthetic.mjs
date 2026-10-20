@@ -9,7 +9,7 @@ import {
   classifyVendorPlantStatus,
   resolvePlantStatus,
   classifyLocationStatus,
-} from '../../src/lib/solar/status.js';
+} from '../../src/lib/solar/status.ts';
 
 console.log('================================================================');
 console.log('TEST SUITE: Status Fault & Operational Lifecycle (Sintetis)');

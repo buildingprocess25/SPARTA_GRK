@@ -13,7 +13,7 @@ export default function AnalyticsMatureTable({
   tableDisplayItems,
   tableSortDir,
   toggleExpand,
-}) {
+}: { expandedDCIds?: any; isAuditBaselineEnabled?: any; setTableSortColumn?: any; setTableSortDir?: any; tableDisplayItems?: any; tableSortDir?: any; toggleExpand?: any }) {
   return (
     <table className="w-full text-left text-xs border-collapse">
       <thead className="sticky top-0 bg-slate-900 text-white text-xs z-20 shadow-xs">

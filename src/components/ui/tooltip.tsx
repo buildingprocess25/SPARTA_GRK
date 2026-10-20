@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 const TooltipContext = React.createContext(null);
 
-export function TooltipProvider({ children, delayDuration: _delayDuration = 200 }) {
+export function TooltipProvider({ children, delayDuration: _delayDuration = 200 }: { children?: any; delayDuration?: number }) {
   return <>{children}</>;
 }
 
@@ -14,7 +14,7 @@ export function Tooltip({
   children,
   open: controlledOpen,
   onOpenChange,
-}) {
+}: { children?: any; open?: any; onOpenChange?: any }) {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const isControlled = controlledOpen !== undefined;
   const isOpen = isControlled ? controlledOpen : internalOpen;
@@ -38,7 +38,7 @@ export function Tooltip({
   );
 }
 
-export const TooltipTrigger = React.forwardRef(function TooltipTrigger(
+export const TooltipTrigger = React.forwardRef<any, { [key: string]: any } & { asChild?: boolean; children?: any; className?: string; [key: string]: any }>(function TooltipTrigger(
   { asChild = false, children, className = '', ...props },
   forwardedRef
 ) {
@@ -58,7 +58,7 @@ export const TooltipTrigger = React.forwardRef(function TooltipTrigger(
   const handleMouseLeave = () => context?.setOpen(false);
 
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
+    return React.cloneElement(children as React.ReactElement<any>, {
       ref: handleRef,
       onMouseEnter: handleMouseEnter,
       onMouseLeave: handleMouseLeave,
@@ -84,7 +84,7 @@ export const TooltipTrigger = React.forwardRef(function TooltipTrigger(
   );
 });
 
-export const TooltipContent = React.forwardRef(function TooltipContent(
+export const TooltipContent = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { className?: string; sideOffset?: number; children?: any; [key: string]: any }>(function TooltipContent(
   { className = '', sideOffset = 4, children, ...props },
   ref
 ) {

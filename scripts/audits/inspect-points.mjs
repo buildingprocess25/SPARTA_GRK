@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { ALLOWED_ENDPOINTS, QUOTA_CONFIG } from '../../src/lib/solar/endpoints.js';
+import { ALLOWED_ENDPOINTS, QUOTA_CONFIG } from '../../src/lib/solar/endpoints.ts';
 
 const prisma = new PrismaClient();
 

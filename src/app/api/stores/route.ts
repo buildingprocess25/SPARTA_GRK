@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { assertStoreModels, StoreModelsMissingError } from '@/lib/stores/storeSync.js';
+import { assertStoreModels, StoreModelsMissingError } from '@/lib/stores/storeSync.ts';
 
 export const dynamic = 'force-dynamic';
 

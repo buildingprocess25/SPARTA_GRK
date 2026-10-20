@@ -3,9 +3,9 @@ import {
   ALLOWED_ENDPOINTS,
   PROHIBITED_ENDPOINT_PATTERNS,
   QUOTA_CONFIG
-} from '../../src/lib/solar/endpoints.js';
-import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.js';
-import { UNIT_CONVERSIONS, parsePowerKw, parseEnergyKwh } from '../../src/lib/solar/processor.js';
+} from '../../src/lib/solar/endpoints.ts';
+import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.ts';
+import { UNIT_CONVERSIONS, parsePowerKw, parseEnergyKwh } from '../../src/lib/solar/processor.ts';
 import fs from 'fs';
 import path from 'path';
 

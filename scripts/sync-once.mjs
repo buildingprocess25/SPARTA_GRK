@@ -42,7 +42,7 @@ const prisma = new PrismaClient();
 globalThis.prisma = prisma;
 
 // Import sync module
-const { runSync } = await import('../src/lib/solar/sync.js');
+const { runSync } = await import('../src/lib/solar/sync.ts');
 
 console.log('━━━ iSolarCloud Manual Sync ━━━');
 console.log(`Waktu: ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} WIB`);
@@ -63,7 +63,7 @@ try {
   const dailyCount = await prisma.dailyYield.count();
   
   // Quota info
-  const { getWibTimeInfo } = await import('../src/lib/solar/sync.js');
+  const { getWibTimeInfo } = await import('../src/lib/solar/sync.ts');
   const ti = getWibTimeInfo();
   const hourlyQ = await prisma.quotaCounter.findUnique({
     where: { kind_bucketKey: { kind: 'hourly', bucketKey: ti.hourBucket } }

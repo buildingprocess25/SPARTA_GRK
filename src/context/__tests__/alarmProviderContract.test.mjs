@@ -5,7 +5,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const source = fs.readFileSync(path.resolve(here, '../AlarmContext.jsx'), 'utf8');
+const source = fs.readFileSync(path.resolve(here, '../AlarmContext.tsx'), 'utf8');
 
 test('AlarmProvider owns one baseline for its lifetime and applies each successful payload once', () => {
   assert.match(source, /initialSnapshotCompleteRef/);

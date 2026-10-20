@@ -29,14 +29,15 @@ const TabLoadVsPlts = dynamic(() => import('@/components/plts/TabLoadVsPlts'), {
   ssr: false,
 });
 
-const TABS = [
+const TABS: [string, string, React.ComponentType<{ size?: number; className?: string }>, string][] = [
   ['production', 'Produksi vs Target', BarChart3, '/api/plts/dashboard/performance'],
   ['pr', 'Kinerja panel', Gauge, '/api/plts/dashboard/pr'],
   ['support', 'Cuaca dan suhu', CloudSun, '/api/plts/dashboard/support'],
   ['load', 'Kebutuhan listrik vs PLTS', PlugZap, '/api/plts/dashboard/load'],
 ];
 
-export default function PLTSPerformanceAnalysis({ filters, onPlantSelect }) {
+// PLTSTab also passes data/loading/error; this component fetches per tab and ignores them.
+export default function PLTSPerformanceAnalysis({ filters, onPlantSelect }: { filters?: any; onPlantSelect?: any; data?: any; loading?: boolean; error?: any }) {
   const [tab, setTab] = useState('production');
 
   const handlePrefetch = (endpoint) => {

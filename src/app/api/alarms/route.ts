@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { loadActiveAlarms } from '@/lib/alarms/service.js';
+import { loadActiveAlarms } from '@/lib/alarms/service.ts';
 
 const NO_STORE_HEADERS = { 'Cache-Control': 'no-store, max-age=0' };
 

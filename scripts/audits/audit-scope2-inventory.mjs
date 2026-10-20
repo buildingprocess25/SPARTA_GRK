@@ -19,12 +19,12 @@ function sourceSummary(filename) {
 }
 
 const filesToTrace = [
-  'src/components/PenambahEmisiTab.jsx',
-  'src/components/scope2/Scope2AnnualLoadDashboard.jsx',
-  'src/app/api/scope2/annual-load/route.js',
-  'src/lib/scope2/annualLoadReportServer.js',
-  'src/lib/scope2/annualLoadReport.js',
-  'src/lib/carbon/carbonEngine.js',
+  'src/components/PenambahEmisiTab.tsx',
+  'src/components/scope2/Scope2AnnualLoadDashboard.tsx',
+  'src/app/api/scope2/annual-load/route.ts',
+  'src/lib/scope2/annualLoadReportServer.ts',
+  'src/lib/scope2/annualLoadReport.ts',
+  'src/lib/carbon/carbonEngine.ts',
 ];
 
 const needles = [

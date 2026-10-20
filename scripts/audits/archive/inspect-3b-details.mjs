@@ -5,7 +5,7 @@ const rootDir = process.cwd();
 const baselinePath = path.join(rootDir, 'src/data/monitorPltsApril2026.json');
 const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf-8'));
 
-import { PLANT_REGISTRY, lookupPlantMetadata } from '../plantMap.js';
+import { PLANT_REGISTRY, lookupPlantMetadata } from '../../../src/lib/solar/plantMap.ts';
 
 // Load fixture from .data/raw_station_list.json
 const fixturePath = path.join(rootDir, '.data/raw_station_list.json');

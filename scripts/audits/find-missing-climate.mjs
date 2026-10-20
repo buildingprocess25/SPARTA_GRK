@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 async function checkMissingClimate() {
   const plants = await prisma.plantMaster.findMany();

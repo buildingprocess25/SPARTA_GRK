@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { parseEnergyKwh, parsePowerKw, parseTotalEnergyMwh, UNIT_CONVERSIONS } from '../src/lib/solar/processor.js';
+import { parseEnergyKwh, parsePowerKw, parseTotalEnergyMwh, UNIT_CONVERSIONS } from '../src/lib/solar/processor.ts';
 
 console.log('=== UNIT TEST: ENERGY AND POWER UNIT CONVERSIONS ===\n');
 

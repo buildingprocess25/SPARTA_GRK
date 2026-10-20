@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 try {
   const inserted = await prisma.$executeRawUnsafe(`

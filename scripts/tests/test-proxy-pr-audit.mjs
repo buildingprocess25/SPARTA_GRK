@@ -3,13 +3,13 @@ import fs from 'fs';
 import {
   CANONICAL_DC_ENTITIES,
   PLANT_REGISTRY
-} from '../../src/lib/solar/plantMap.js';
+} from '../../src/lib/solar/plantMap.ts';
 import {
   normalizeProxyPr,
   processAllDCAnalytics,
   SOLAR_CONSTANTS
-} from '../../src/lib/solar/processor.js';
-import { readDashboardPayload } from '../../src/lib/solar/sync.js';
+} from '../../src/lib/solar/processor.ts';
+import { readDashboardPayload } from '../../src/lib/solar/sync.ts';
 
 if (process.env.NEXT_PUBLIC_FEATURE_AUDIT_BASELINE !== 'true') {
   console.log('[SKIP] test-proxy-pr-audit: auditBaseline=false; file baseline tidak dibaca.');

@@ -1,5 +1,5 @@
-import db from '../../src/lib/prisma.js';
-import { CANONICAL_37_DC_IDS } from '../../src/lib/energy-data.js';
+import db from '../../src/lib/prisma.ts';
+import { CANONICAL_37_DC_IDS } from '../../src/lib/energy-data.ts';
 
 async function main() {
   const loads = await db.loadMonthly.findMany({ where: { yearMonth: { gte: '202601', lte: '202609' } } });

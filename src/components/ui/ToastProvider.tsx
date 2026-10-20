@@ -3,10 +3,14 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Info, XCircle, X } from 'lucide-react';
 
-const listeners = new Set();
+export type ToastVariant = 'success' | 'error' | 'warning' | 'info';
+export type ToastInput = string | { title?: string; description?: string; duration?: number; [key: string]: unknown };
+interface ToastRecord { id: number; variant: ToastVariant; duration: number; title?: string; description?: string; [key: string]: unknown }
+
+const listeners = new Set<(toast: ToastRecord) => void>();
 let nextToastId = 1;
 
-function publish(variant, input, description) {
+function publish(variant: ToastVariant, input: ToastInput, description?: string) {
   const payload = typeof input === 'string' ? { title: input, description } : input;
   const toast = { id: nextToastId++, variant, duration: 4000, ...payload };
   listeners.forEach((listener) => listener(toast));
@@ -14,10 +18,10 @@ function publish(variant, input, description) {
 }
 
 export const notify = Object.freeze({
-  success: (input, description) => publish('success', input, description),
-  error: (input, description) => publish('error', input, description),
-  warning: (input, description) => publish('warning', input, description),
-  info: (input, description) => publish('info', input, description),
+  success: (input: ToastInput, description?: string) => publish('success', input, description),
+  error: (input: ToastInput, description?: string) => publish('error', input, description),
+  warning: (input: ToastInput, description?: string) => publish('warning', input, description),
+  info: (input: ToastInput, description?: string) => publish('info', input, description),
 });
 
 export function useToast() {
@@ -32,18 +36,18 @@ const STYLES = {
   info: { Icon: Info, shell: 'border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-950/90', icon: 'text-blue-600 dark:text-blue-400' },
 };
 
-export function ToastProvider({ children }) {
-  const [toasts, setToasts] = useState([]);
+export function ToastProvider({ children }: { children?: any }) {
+  const [toasts, setToasts] = useState<ToastRecord[]>([]);
 
   useEffect(() => {
-    const listener = (toast) => {
+    const listener = (toast: ToastRecord) => {
       setToasts((current) => [...current, toast]);
       window.setTimeout(() => {
         setToasts((current) => current.filter((item) => item.id !== toast.id));
       }, toast.duration);
     };
     listeners.add(listener);
-    return () => listeners.delete(listener);
+    return () => { listeners.delete(listener); };
   }, []);
 
   const dismiss = (id) => setToasts((current) => current.filter((toast) => toast.id !== id));

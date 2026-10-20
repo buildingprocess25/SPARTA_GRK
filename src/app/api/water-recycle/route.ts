@@ -1,5 +1,5 @@
-import prisma from '@/lib/prisma.js';
-import { CANONICAL_DC_ENTITIES } from '@/lib/solar/plantMap.js';
+import prisma from '@/lib/prisma.ts';
+import { CANONICAL_DC_ENTITIES } from '@/lib/solar/plantMap.ts';
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -70,14 +70,14 @@ export async function GET(req) {
       prisma.facilityMaster.findMany({ where: { isActive: true } }),
     ]);
     const availableMonths = allYearMonths.map(r => r.yearMonth);
-    const facilityById = new Map(facilities.map(f => [f.id, f]));
+    const facilityById = new Map<string, Record<string, any>>(facilities.map(f => [f.id, f] as const));
     // Water activity rows were imported in two batches tagged with two
     // different id schemes for the same physical branches - facility_master
     // ids (FAC-DC-...) for the newer import, and the solar/plantMap.js
     // canonical dcIds (DC-...) for an earlier one. Resolve names/region from
     // whichever registry actually has the id, so neither batch falls back to
     // a raw id or bare CSV label.
-    const plantById = new Map(CANONICAL_DC_ENTITIES.map(e => [e.dcId, e]));
+    const plantById = new Map(CANONICAL_DC_ENTITIES.map(e => [e.dcId, e] as const));
 
     const byFacility = new Map();
     for (const r of records) {

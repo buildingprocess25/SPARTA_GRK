@@ -1,6 +1,6 @@
-import prisma from '../../src/lib/prisma.js';
-import { computeEnergyBalance, validateEnergyBalanceRow } from '../../src/lib/solar/energyBalance.js';
-import { OFFICIAL_RKAP_FACTORS, getRkapFactorsForPeriod } from '../../src/lib/solar/rkap-factors.js';
+import prisma from '../../src/lib/prisma.ts';
+import { computeEnergyBalance, validateEnergyBalanceRow } from '../../src/lib/solar/energyBalance.ts';
+import { OFFICIAL_RKAP_FACTORS, getRkapFactorsForPeriod } from '../../src/lib/solar/rkap-factors.ts';
 
 async function main() {
   console.log('=== VERIFIKASI DATA TUGAS 2 REVISI ===\n');

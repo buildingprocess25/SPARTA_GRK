@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { buildCacheKey, buildQueryString, isValidPltsHistoryPeriod } from '../src/lib/solar/cacheKey.js';
+import { buildCacheKey, buildQueryString, isValidPltsHistoryPeriod } from '../src/lib/solar/cacheKey.ts';
 
 console.log('=== UNIT TEST: CACHE KEY BUILDER ===\n');
 

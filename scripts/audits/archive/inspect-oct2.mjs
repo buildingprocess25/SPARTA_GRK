@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../../src/lib/prisma.ts';
 
 async function main() {
   const dailyOct2 = await prisma.dailyYield.findMany({

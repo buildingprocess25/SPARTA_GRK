@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { parseAnnualLoadReport } from '../../src/lib/scope2/annualLoadReport.js';
-import { parseIsolarMonthlyReportFile } from '../../src/lib/importers/isolarMonthlyReport.js';
-import { CANONICAL_DC_ENTITIES, isDcLocation, normalizeName } from '../../src/lib/solar/plantMap.js';
-import { reconcilePlantMonth, aggregateCanonicalRows } from '../../src/lib/scope2/energyReconciliation.js';
-import { CARBON_FACTORS, FACTOR_REGISTRY_PROVENANCE } from '../../src/lib/carbon/carbonEngine.js';
+import { parseAnnualLoadReport } from '../../src/lib/scope2/annualLoadReport.ts';
+import { parseIsolarMonthlyReportFile } from '../../src/lib/importers/isolarMonthlyReport.ts';
+import { CANONICAL_DC_ENTITIES, isDcLocation, normalizeName } from '../../src/lib/solar/plantMap.ts';
+import { reconcilePlantMonth, aggregateCanonicalRows } from '../../src/lib/scope2/energyReconciliation.ts';
+import { CARBON_FACTORS, FACTOR_REGISTRY_PROVENANCE } from '../../src/lib/carbon/carbonEngine.ts';
 
 function factorForGrid(grid) {
   const config = CARBON_FACTORS.GRID[grid] || null;

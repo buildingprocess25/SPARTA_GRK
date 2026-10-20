@@ -18,7 +18,7 @@ export default function ResumeMonthlyTable({
   avgWaterAvoided,
   includeScope3,
   monthlyComparisonData,
-}) {
+}: { avgNet?: any; avgOffsetRatio?: any; avgPenambahan?: any; avgPengurangan?: any; avgPltsAvoided?: any; avgScope1Genset?: any; avgScope1Vehicle?: any; avgScope2?: any; avgScope3?: any; avgWaterAvoided?: any; includeScope3?: any; monthlyComparisonData?: any }) {
   return (
     <div className="rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
       <TableRoot className="w-full text-left text-xs border-collapse">

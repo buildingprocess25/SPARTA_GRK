@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { getWibDateTime, normalizeEnergyKwhRaw } from '../sync-isolar.mjs';
-import prisma from '../../src/lib/prisma.js';
-import { CONVERSION_CONFIG } from '../../src/lib/solar/conversionConfig.js';
-import { getPltsDashboard } from '../../src/lib/solar/dashboardService.js';
+import prisma from '../../src/lib/prisma.ts';
+import { CONVERSION_CONFIG } from '../../src/lib/solar/conversionConfig.ts';
+import { getPltsDashboard } from '../../src/lib/solar/dashboardService.ts';
 
 console.log('=== RUNNING TESTS: SINKRONISASI, PRECEDENCE, TIMEZONE, DAN GOLDEN SNAPSHOT ===\n');
 

@@ -5,7 +5,7 @@ const rootDir = process.cwd();
 const baseline = JSON.parse(fs.readFileSync(path.join(rootDir, 'src/data/monitorPltsApril2026.json'), 'utf-8'));
 const rawPlants = JSON.parse(fs.readFileSync(path.join(rootDir, '.data/raw_station_list.json'), 'utf-8'));
 
-import { PLANT_REGISTRY, lookupPlantMetadata } from '../plantMap.js';
+import { PLANT_REGISTRY, lookupPlantMetadata } from '../../src/lib/solar/plantMap.ts';
 
 let totalApiSum = 0;
 let totalBaselineUniqueSum = 0;

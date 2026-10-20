@@ -8,21 +8,21 @@ import {
   ALARM_STORAGE_VERSION,
   ALARM_MAX_READ_IDS,
   ALARMS_BROWSER_NOTIFICATIONS_ENABLED,
-} from '@/lib/alarms/config.js';
+} from '@/lib/alarms/config.ts';
 import {
   identifyAlarmsToNotify,
   summarizeNotification,
   pruneReadIds,
   filterAlarms,
-} from './alarmState.js';
+} from './alarmState.ts';
 import { useToast } from '@/components/ui/ToastProvider';
-import { createAlarmPollCoordinator } from './alarmPollCoordinator.js';
-import { enablePushNotifications, disablePushNotifications, getExistingPushSubscription, isPushSupported } from '@/lib/pushClient.js';
+import { createAlarmPollCoordinator } from './alarmPollCoordinator.ts';
+import { enablePushNotifications, disablePushNotifications, getExistingPushSubscription, isPushSupported } from '@/lib/pushClient.ts';
 
 const AlarmContext = createContext(null);
 const NOTIFIED_STORAGE_KEY = 'isolar_notified_alarms';
 
-export function AlarmProvider({ children }) {
+export function AlarmProvider({ children }: { children?: any }) {
   const toast = useToast();
 
   const [alarms, setAlarms] = useState([]);
@@ -43,7 +43,7 @@ export function AlarmProvider({ children }) {
     ALARMS_BROWSER_NOTIFICATIONS_ENABLED ? 'default' : 'disabled'
   );
 
-  const notifiedMapRef = useRef({});
+  const notifiedMapRef = useRef<Record<string, any>>({});
   const initialSnapshotCompleteRef = useRef(false);
   const pollTimerRef = useRef(null);
   const pollCoordinatorRef = useRef(null);

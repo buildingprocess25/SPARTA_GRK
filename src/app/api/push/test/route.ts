@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sendPushToAll, isPushConfigured } from '@/lib/push.js';
+import { sendPushToAll, isPushConfigured } from '@/lib/push.ts';
 
 export async function POST(request) {
   if (!isPushConfigured()) {

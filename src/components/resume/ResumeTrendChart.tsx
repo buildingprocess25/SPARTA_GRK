@@ -11,7 +11,7 @@ export default function ResumeTrendChart({
   chartData,
   chartMetricView,
   includeScope3,
-}) {
+}: { avgPenambahan?: any; avgPengurangan?: any; chartData?: any; chartMetricView?: any; includeScope3?: any }) {
   return (
     <div className="w-full pt-2 print:break-inside-avoid">
       <ChartContainer
@@ -43,7 +43,7 @@ export default function ResumeTrendChart({
             width={45}
           />
           <Tooltip
-            content={({ active, payload, label }) => {
+            content={({ active, payload, label }: { active?: any; payload?: any; label?: any }) => {
               if (active && payload && payload.length) {
                 const data = payload[0].payload;
                 const isPartial = data.month?.includes('*') || data.provisional;

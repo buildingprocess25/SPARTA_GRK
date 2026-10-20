@@ -11,7 +11,7 @@ export default function ProfileMaintenanceTab({
   isSuperAdmin,
   maintActionStatus,
   setActiveRoleOverride,
-}) {
+}: { fetchHealth?: any; handleClearCache?: any; handleForceSync?: any; healthData?: any; healthLoading?: any; isSuperAdmin?: any; maintActionStatus?: any; setActiveRoleOverride?: any }) {
   return (
     <div className="space-y-4 animate-in">
       {!isSuperAdmin ? (

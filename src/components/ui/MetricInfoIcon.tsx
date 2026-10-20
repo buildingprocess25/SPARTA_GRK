@@ -14,7 +14,7 @@ export default function MetricInfoIcon({
   placement = 'auto',
   className = '',
   size = 14,
-}) {
+}: { infoKey?: any; overrideInfo?: any; placement?: string; className?: string; size?: number }) {
   const [isOpen, setIsOpen] = useState(false);
   const [coords, setCoords] = useState(null);
   const [mounted, setMounted] = useState(false);

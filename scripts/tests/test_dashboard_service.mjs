@@ -1,5 +1,5 @@
-import { getPltsDashboardData } from '../../src/lib/solar/dashboardService.js';
-import prisma from '../../src/lib/prisma.js';
+import { getPltsDashboardData } from '../../src/lib/solar/dashboardService.ts';
+import prisma from '../../src/lib/prisma.ts';
 
 async function test() {
   try {

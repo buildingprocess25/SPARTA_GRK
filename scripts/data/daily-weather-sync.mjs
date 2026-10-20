@@ -1,4 +1,4 @@
-import { WEATHER_LOCATION_REGISTRY, fetchForecastWeatherForLocation, upsertWeatherDailyRows } from '../../src/lib/solar/openMeteoService.js';
+import { WEATHER_LOCATION_REGISTRY, fetchForecastWeatherForLocation, upsertWeatherDailyRows } from '../../src/lib/solar/openMeteoService.ts';
 
 /**
  * Daily Weather Sync (Runs every morning WIB or on-demand)

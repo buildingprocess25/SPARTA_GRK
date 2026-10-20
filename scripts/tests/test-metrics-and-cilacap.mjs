@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { readDashboardPayload } from '../../src/lib/solar/sync.js';
+import { readDashboardPayload } from '../../src/lib/solar/sync.ts';
 import {
   aggregateRawApiIntoCanonicalDCs,
   calculateNationwideSummary,
@@ -8,8 +8,8 @@ import {
   parseEnergyKwh,
   parseTotalEnergyMwh,
   SOLAR_CONSTANTS
-} from '../../src/lib/solar/processor.js';
-import { CANONICAL_DC_ENTITIES, PLANT_REGISTRY } from '../../src/lib/solar/plantMap.js';
+} from '../../src/lib/solar/processor.ts';
+import { CANONICAL_DC_ENTITIES, PLANT_REGISTRY } from '../../src/lib/solar/plantMap.ts';
 
 const monitorPltsApril2026 = JSON.parse(fs.readFileSync(new URL('../../src/data/monitorPltsApril2026.json', import.meta.url), 'utf-8'));
 

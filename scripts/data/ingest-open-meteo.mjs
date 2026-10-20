@@ -1,4 +1,4 @@
-import { WEATHER_LOCATION_REGISTRY, fetchHistoricalWeatherForLocation, upsertWeatherDailyRows } from '../../src/lib/solar/openMeteoService.js';
+import { WEATHER_LOCATION_REGISTRY, fetchHistoricalWeatherForLocation, upsertWeatherDailyRows } from '../../src/lib/solar/openMeteoService.ts';
 
 async function main() {
   console.log('================================================================');

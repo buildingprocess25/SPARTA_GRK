@@ -9,12 +9,12 @@ import {
   buildLikeForLike,
   sumEligibleEmissions,
   buildPltsDashboardFromRows,
-} from '../../src/lib/solar/dashboard.js';
-import { buildTargetMonthlyRows, deriveRkapFactors } from '../../src/lib/solar/rkapTargets.js';
-import { importRkapTargets } from '../../src/lib/importers/rkapTargetImport.js';
-import { GRID_EMISSION_FACTORS, getGridFactor } from '../../src/lib/emission-factors.js';
-import { getPlnTariff, calculateCostSavings, PLN_TARIFF_DEFAULT } from '../../src/lib/pln-tariff.js';
-import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../../src/lib/solar/conversionConfig.js';
+} from '../../src/lib/solar/dashboard.ts';
+import { buildTargetMonthlyRows, deriveRkapFactors } from '../../src/lib/solar/rkapTargets.ts';
+import { importRkapTargets } from '../../src/lib/importers/rkapTargetImport.ts';
+import { GRID_EMISSION_FACTORS, getGridFactor } from '../../src/lib/emission-factors.ts';
+import { getPlnTariff, calculateCostSavings, PLN_TARIFF_DEFAULT } from '../../src/lib/pln-tariff.ts';
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../../src/lib/solar/conversionConfig.ts';
 
 let passed = 0;
 const tests = [];
@@ -249,7 +249,7 @@ test('PLN tariff calculation computes canonical cost savings in IDR', () => {
 });
 
 test('summary route has JSON envelopes and contains no vendor call', () => {
-  const source = fs.readFileSync(new URL('../../src/app/api/plts/dashboard/summary/route.js', import.meta.url), 'utf8');
+  const source = fs.readFileSync(new URL('../../src/app/api/plts/dashboard/summary/route.ts', import.meta.url), 'utf8');
   assert.match(source, /success:\s*true/);
   assert.match(source, /success:\s*false/);
   assert.match(source, /code:/);
@@ -396,7 +396,7 @@ test('matrix table targets reconcile YTD through selected month and EOY across a
 });
 
 test('conversion config exposes single official parameters and factors', async () => {
-  const { CONVERSION_CONFIG } = await import('../../src/lib/solar/conversionConfig.js');
+  const { CONVERSION_CONFIG } = await import('../../src/lib/solar/conversionConfig.ts');
   assert.equal(CONVERSION_CONFIG.emission.unit, 'tCO₂e');
   assert.equal(CONVERSION_CONFIG.coal.factorKgPerKwh, 0.400);
   assert.equal(CONVERSION_CONFIG.tree.factorKgPerTreePerYear, 21.77);
@@ -404,7 +404,7 @@ test('conversion config exposes single official parameters and factors', async (
 });
 
 test('feature flag audit baseline is off by default and response is clean of baseline fields', async () => {
-  const { isFeatureEnabled } = await import('../../src/lib/solar/conversionConfig.js');
+  const { isFeatureEnabled } = await import('../../src/lib/solar/conversionConfig.ts');
   assert.equal(isFeatureEnabled('auditBaseline'), false);
   const data = buildPltsDashboardFromRows({
     query: { period: '2026-01_2026-09', mode: 'YTD', throughMonth: 9, grid: 'ALL', plant: 'ALL', compareYears: [2025, 2026] },

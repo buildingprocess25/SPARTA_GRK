@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function ChartWrapper({ title, icon: Icon, children }) {
+export default function ChartWrapper({ title, icon: Icon, children }: { title?: any; icon?: any; children?: any }) {
   return (
     <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-[16px] border border-slate-200 dark:border-slate-800 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:shadow-none p-[20px] transition-all duration-300 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] dark:hover:shadow-none">
       <div className="flex items-center gap-2 mb-4">

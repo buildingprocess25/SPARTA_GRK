@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import prisma from '../../src/lib/prisma.js';
-import { executeIsolarRequest } from '../../src/lib/solar/apiClient.js';
+import prisma from '../../src/lib/prisma.ts';
+import { executeIsolarRequest } from '../../src/lib/solar/apiClient.ts';
 
 const outDir = path.resolve('docs/evidence/vendor-section3-and-fault');
 

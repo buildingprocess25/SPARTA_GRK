@@ -43,7 +43,7 @@ function withGaps(trend = [], presenceKey, keys) {
   return (trend || []).map(m => (Number(m[presenceKey]) > 0 ? m : { ...m, ...Object.fromEntries(keys.map(k => [k, null])) }));
 }
 
-export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveSubScope }) {
+export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveSubScope }: { activeSubScope?: string; setActiveSubScope?: any }) {
   const [isInputModalOpen, setIsInputModalOpen] = useState(false);
 
   // Hierarchy filter state
@@ -492,7 +492,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                   label={{ value: 'Emisi (tCO₂e)', angle: 90, position: 'insideRight', offset: 0, style: { fill: CHART_PALETTE.emission, fontSize: 10, textAnchor: 'middle' } }}
                 />
                 <Tooltip
-                  content={({ active, payload, label }) => {
+                  content={({ active, payload, label }: { active?: any; payload?: any; label?: any }) => {
                     if (active && payload && payload.length) {
                       return (
                         <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs space-y-1.5 min-w-[220px] select-text">
@@ -543,7 +543,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                   label={{ value: 'Emisi (tCO₂e)', angle: 90, position: 'insideRight', offset: 0, style: { fill: CHART_PALETTE.emission, fontSize: 10, textAnchor: 'middle' } }}
                 />
                 <Tooltip
-                  content={({ active, payload, label }) => {
+                  content={({ active, payload, label }: { active?: any; payload?: any; label?: any }) => {
                     if (active && payload && payload.length) {
                       const isPartial = label?.includes('*') || label === 'Okt';
                       return (

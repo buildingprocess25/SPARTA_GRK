@@ -4,7 +4,7 @@ import React from 'react';
 import { AlertTriangle, AlertOctagon } from 'lucide-react';
 import { useAlarms } from '@/context/AlarmContext';
 
-export default function AlarmBadges({ sourceTab = 'plts', onClick, className = '', interactive = true, compact = false }) {
+export default function AlarmBadges({ sourceTab = 'plts', onClick, className = '', interactive = true, compact = false }: { sourceTab?: string; onClick?: any; className?: string; interactive?: boolean; compact?: boolean }) {
   const { summary, openPanel } = useAlarms();
   const tabSummary = summary?.byTab?.[sourceTab] || { alertCount: 0, faultCount: 0, activeCount: 0 };
   const { faultCount, alertCount } = tabSummary;

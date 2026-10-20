@@ -26,7 +26,7 @@ export default function PLTSMonthlyMatrixTable({
   dashboardData,
   filters,
   onFilterChange,
-}) {
+}: { dashboardData?: any; filters?: any; onFilterChange?: any }) {
   // Local Controls
   const currentMonth = new Date().getMonth() + 1;
   const [selectedThroughMonth, setSelectedThroughMonth] = useState(filters?.throughMonth || Math.max(1, currentMonth - 1));

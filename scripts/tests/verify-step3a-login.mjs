@@ -18,9 +18,9 @@ if (fs.existsSync(envLocalPath)) {
   });
 }
 
-import { getValidToken } from '../apiClient.js';
-import { getQuotaSnapshot } from '../sync.js';
-import prisma from '../../prisma.js';
+import { getValidToken } from '../../src/lib/solar/apiClient.ts';
+import { getQuotaSnapshot } from '../../src/lib/solar/sync.ts';
+import prisma from '../../src/lib/prisma.ts';
 
 async function runStep3a() {
   const results = {

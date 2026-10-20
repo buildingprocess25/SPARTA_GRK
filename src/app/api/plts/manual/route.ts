@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.ts';
 import { invalidatePltsServerCache } from '@/lib/solar/dashboardService';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
 

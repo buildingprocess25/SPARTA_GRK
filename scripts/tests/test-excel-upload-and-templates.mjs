@@ -7,12 +7,12 @@ import {
   generatePlnTemplate,
   generatePltsTemplate,
   generateWaterTemplate
-} from '../../src/lib/importers/templateGenerator.js';
+} from '../../src/lib/importers/templateGenerator.ts';
 import {
   parseAndValidateUpload,
   commitBatchToDatabase
-} from '../../src/lib/importers/batchUploadProcessor.js';
-import { MASTER_FACILITIES } from '../../src/lib/master/facilityMaster.js';
+} from '../../src/lib/importers/batchUploadProcessor.ts';
+import { MASTER_FACILITIES } from '../../src/lib/master/facilityMaster.ts';
 import { requireIsolatedTestDatabase } from '../lib/require-isolated-test-database.mjs';
 
 const prisma = new PrismaClient();

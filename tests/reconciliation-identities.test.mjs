@@ -5,9 +5,9 @@ import {
   getCanonicalEnergyRows,
   getCanonicalMonthlySummary,
   getCanonicalYtdSummary
-} from '../src/lib/energy-data.js';
-import { buildScope2CanonicalDashboard } from '../src/lib/scope2/dashboardService.js';
-import { getGridFactor } from '../src/lib/emission-factors.js';
+} from '../src/lib/energy-data.ts';
+import { buildScope2CanonicalDashboard } from '../src/lib/scope2/dashboardService.ts';
+import { getGridFactor } from '../src/lib/emission-factors.ts';
 
 test('Identity 1: Produksi = Pakai Sendiri + Ekspor (Feed-in)', async () => {
   const rows = await getCanonicalEnergyRows({ year: 2026, throughMonth: 9 });

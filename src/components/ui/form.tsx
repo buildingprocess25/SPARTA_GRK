@@ -3,13 +3,13 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-const FormItemContext = React.createContext({});
+const FormItemContext = React.createContext<{ id?: string }>({});
 
-export function Form({ children, ...props }) {
+export function Form({ children, ...props }: { children?: any; [key: string]: any }) {
   return <form {...props}>{children}</form>;
 }
 
-export function FormField({ name, render, ...props }) {
+export function FormField({ name, render, ...props }: { name?: any; render?: any; [key: string]: any }) {
   return render({ field: { name, ...props } });
 }
 
@@ -18,7 +18,7 @@ export function useFormField() {
   return itemContext || {};
 }
 
-export const FormItem = React.forwardRef(function FormItem(
+export const FormItem = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { className?: string; [key: string]: any }>(function FormItem(
   { className = '', ...props },
   ref
 ) {
@@ -31,7 +31,7 @@ export const FormItem = React.forwardRef(function FormItem(
   );
 });
 
-export const FormLabel = React.forwardRef(function FormLabel(
+export const FormLabel = React.forwardRef<React.ElementRef<'label'>, React.ComponentPropsWithoutRef<'label'> & { className?: string; error?: any; [key: string]: any }>(function FormLabel(
   { className = '', error, ...props },
   ref
 ) {
@@ -51,7 +51,7 @@ export const FormLabel = React.forwardRef(function FormLabel(
   );
 });
 
-export const FormControl = React.forwardRef(function FormControl(
+export const FormControl = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { [key: string]: any }>(function FormControl(
   { ...props },
   ref
 ) {
@@ -59,7 +59,7 @@ export const FormControl = React.forwardRef(function FormControl(
   return <div ref={ref} id={id} {...props} />;
 });
 
-export const FormDescription = React.forwardRef(function FormDescription(
+export const FormDescription = React.forwardRef<React.ElementRef<'p'>, React.ComponentPropsWithoutRef<'p'> & { className?: string; [key: string]: any }>(function FormDescription(
   { className = '', ...props },
   ref
 ) {
@@ -72,7 +72,7 @@ export const FormDescription = React.forwardRef(function FormDescription(
   );
 });
 
-export const FormMessage = React.forwardRef(function FormMessage(
+export const FormMessage = React.forwardRef<React.ElementRef<'p'>, React.ComponentPropsWithoutRef<'p'> & { className?: string; children?: any; [key: string]: any }>(function FormMessage(
   { className = '', children, ...props },
   ref
 ) {

@@ -1,6 +1,6 @@
 import fs from 'fs';
-import prisma from '../../src/lib/prisma.js';
-import { CANONICAL_DC_ENTITIES, isDcLocation } from '../../src/lib/solar/plantMap.js';
+import prisma from '../../src/lib/prisma.ts';
+import { CANONICAL_DC_ENTITIES, isDcLocation } from '../../src/lib/solar/plantMap.ts';
 
 async function checkPlants() {
   console.log('CANONICAL_DC_ENTITIES count:', CANONICAL_DC_ENTITIES.length);

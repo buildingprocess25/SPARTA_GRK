@@ -34,7 +34,19 @@ const MIN_PLANT_COUNT_FIRST = 30;
 const MIN_PLANT_RATIO = 0.9;
 
 /** Get WIB time info for quota buckets */
-export function getWibTimeInfo(date = new Date()) {
+export interface WibTimeInfo {
+  dateWib: string;
+  monthWib: string;
+  hourBucket: string;
+  monthBucket: string;
+  hour: number;
+  minute: number;
+  // Not produced here; some callers check for them before falling back to monthWib.
+  month?: number;
+  year?: number;
+}
+
+export function getWibTimeInfo(date = new Date()): WibTimeInfo {
   const wibMs = date.getTime() + 7 * 3600_000;
   const wib = new Date(wibMs);
   const iso = wib.toISOString();

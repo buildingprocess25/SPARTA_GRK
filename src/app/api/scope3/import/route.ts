@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
-import { processTravelUpload, TravelImportError } from '@/lib/scope3/travelImport.js';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.ts';
+import { processTravelUpload, TravelImportError } from '@/lib/scope3/travelImport.ts';
 
 export const dynamic = 'force-dynamic';
 

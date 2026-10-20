@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
 
-import prisma from '../../src/lib/prisma.js';
-import { parseIsolarMonthlyReportFile } from '../../src/lib/importers/isolarMonthlyReport.js';
-import { IMPORT_MODULE, IMPORT_SOURCE } from '../../src/lib/importers/isolarMonthlyImport.js';
-import { createPrismaHistoryRepository, getPltsHistory } from '../../src/lib/solar/history.js';
+import prisma from '../../src/lib/prisma.ts';
+import { parseIsolarMonthlyReportFile } from '../../src/lib/importers/isolarMonthlyReport.ts';
+import { IMPORT_MODULE, IMPORT_SOURCE } from '../../src/lib/importers/isolarMonthlyImport.ts';
+import { createPrismaHistoryRepository, getPltsHistory } from '../../src/lib/solar/history.ts';
 
 const FILES = [
   'Monthly Report_Annual report_20261001111519.csv',

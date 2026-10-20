@@ -7,7 +7,7 @@
  *
  * Usage: node scripts/hash-password.mjs <password>
  */
-import { hashPassword } from '../../src/lib/auth.js';
+import { hashPassword } from '../../src/lib/auth.ts';
 
 const password = process.argv[2];
 if (!password) {

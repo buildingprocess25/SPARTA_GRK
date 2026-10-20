@@ -8,7 +8,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const read = (relative) => fs.readFileSync(path.resolve(here, relative), 'utf8');
 
 test('AlarmContext provides global polling, read state sync, and notification controls', () => {
-  const context = read('../../../context/AlarmContext.jsx');
+  const context = read('../../../context/AlarmContext.tsx');
   assert.match(context, /export function AlarmProvider/);
   assert.match(context, /export function useAlarms/);
   assert.match(context, /ALARM_POLL_INTERVAL_MS/);
@@ -21,13 +21,13 @@ test('AlarmContext provides global polling, read state sync, and notification co
 });
 
 test('OverlayProviders embeds AlarmProvider and globally mounts AlarmDialog', () => {
-  const overlay = read('../../ui/OverlayProviders.jsx');
+  const overlay = read('../../ui/OverlayProviders.tsx');
   assert.match(overlay, /AlarmProvider/);
   assert.match(overlay, /AlarmDialog/);
 });
 
 test('AlarmDialog uses BaseModal and exposes filtering, read actions, and notification button', () => {
-  const dialog = read('../AlarmDialog.jsx');
+  const dialog = read('../AlarmDialog.tsx');
   assert.match(dialog, /BaseModal/);
   assert.match(dialog, /Tandai semua sudah dibaca/);
   assert.match(dialog, /Tandai dibaca/);
@@ -40,7 +40,7 @@ test('AlarmDialog uses BaseModal and exposes filtering, read actions, and notifi
 });
 
 test('AlarmBadges renders distinct FAULT and ALERT counters and handles click to open dialog', () => {
-  const badges = read('../AlarmBadges.jsx');
+  const badges = read('../AlarmBadges.tsx');
   assert.match(badges, /useAlarms/);
   assert.match(badges, /faultCount/);
   assert.match(badges, /alertCount/);

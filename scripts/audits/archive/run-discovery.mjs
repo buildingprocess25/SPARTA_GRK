@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.js';
-import { ALLOWED_ENDPOINTS, QUOTA_CONFIG } from '../../src/lib/solar/endpoints.js';
+import { CANONICAL_DC_ENTITIES } from '../../../src/lib/solar/plantMap.ts';
+import { ALLOWED_ENDPOINTS, QUOTA_CONFIG } from '../../../src/lib/solar/endpoints.ts';
 
 const prisma = new PrismaClient();
 

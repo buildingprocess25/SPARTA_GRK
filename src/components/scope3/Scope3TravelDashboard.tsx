@@ -105,7 +105,7 @@ function periodOptions(availableMonths, now = new Date()) {
   return options.filter(o => !seen.has(o.value) && seen.add(o.value));
 }
 
-function ChartCardHeader({ title, action = null }) {
+function ChartCardHeader({ title, action = null }: { title?: any; action?: any }) {
   return (
     <CardHeader className="flex-row flex-wrap items-center justify-between gap-3 space-y-0">
       <CardTitle className="text-base font-bold">{title}</CardTitle>
@@ -227,7 +227,7 @@ export default function Scope3TravelDashboard() {
     const top = all.slice(0, TOP_KUU_IN_CHART);
     const rest = all.slice(TOP_KUU_IN_CHART);
     if (rest.length) {
-      const other = { kuu: `${rest.length} KUU lain` };
+      const other: Record<string, any> = { kuu: `${rest.length} KUU lain` };
       metric.series.forEach(s => { other[s.key] = rest.reduce((sum, r) => sum + (r[s.key] || 0), 0); });
       top.push({ ...other, emissionTon: rest.reduce((s, r) => s + r.emissionTon, 0), distanceKm: rest.reduce((s, r) => s + r.distanceKm, 0), flightJuta: other.flightJuta ?? 0, otherJuta: other.otherJuta ?? 0, ticketCount: rest.reduce((s, r) => s + r.ticketCount, 0) });
     }

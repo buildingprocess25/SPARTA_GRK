@@ -1,6 +1,6 @@
-import prisma from '../../src/lib/prisma.js';
-import { createPrismaRkapTargetRepository, importRkapTargets } from '../../src/lib/importers/rkapTargetImport.js';
-import { deriveRkapFactors } from '../../src/lib/solar/rkapTargets.js';
+import prisma from '../../src/lib/prisma.ts';
+import { createPrismaRkapTargetRepository, importRkapTargets } from '../../src/lib/importers/rkapTargetImport.ts';
+import { deriveRkapFactors } from '../../src/lib/solar/rkapTargets.ts';
 
 const commit = process.argv.includes('--commit');
 

@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../../src/lib/prisma.ts';
 
 async function main() {
   const gorontaloMaster = await prisma.plantMaster.findFirst({ where: { canonicalName: { contains: 'Gorontalo', mode: 'insensitive' } } });

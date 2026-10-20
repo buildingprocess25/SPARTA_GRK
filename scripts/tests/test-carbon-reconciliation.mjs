@@ -8,8 +8,8 @@ import {
   calculatePLTSAvoidedEmissions,
   calculateWaterRecycleImpact,
   reconcileCarbonBalance
-} from '../../src/lib/carbon/carbonEngine.js';
-import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.js';
+} from '../../src/lib/carbon/carbonEngine.ts';
+import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.ts';
 
 console.log('================================================================================');
 console.log('TEST SUITE: CARBON ACCOUNTING, RECONCILIATION & SUSTAINABILITY ENGINE');
@@ -265,7 +265,7 @@ test('All 39 canonical DC entities (representing 39 physical plants) are preserv
 console.log('\n--- 7. PER-PLANT EMISSION FACTOR BOUNDARY AUDIT ---');
 
 test('For every plant, calculated emission / energy never exceeds official grid factor', async () => {
-  const { getGridFactor } = await import('../../src/lib/emission-factors.js');
+  const { getGridFactor } = await import('../../src/lib/emission-factors.ts');
   for (const entity of CANONICAL_DC_ENTITIES) {
     const factorObj = getGridFactor(entity.grid);
     const gridFactor = factorObj?.cmPlts ?? 0;

@@ -3,15 +3,15 @@
 // Without file arguments it picks the newest "Monthly Report_Annual report_*.csv" per year in the project root.
 import fs from 'fs';
 import path from 'path';
-import prisma from '../../src/lib/prisma.js';
-import { parseIsolarMonthlyReportFile } from '../../src/lib/importers/isolarMonthlyReport.js';
-import { createPrismaMonthlyImportRepository, importIsolarMonthlyReport } from '../../src/lib/importers/isolarMonthlyImport.js';
+import prisma from '../../src/lib/prisma.ts';
+import { parseIsolarMonthlyReportFile } from '../../src/lib/importers/isolarMonthlyReport.ts';
+import { createPrismaMonthlyImportRepository, importIsolarMonthlyReport } from '../../src/lib/importers/isolarMonthlyImport.ts';
 import {
   closedMonthReport,
   energyFlowRowsFromDecisions,
   openMonthCutoff,
   upsertEnergyFlowRows,
-} from '../../src/lib/importers/energyFlowImport.js';
+} from '../../src/lib/importers/energyFlowImport.ts';
 
 const REPORT_PATTERN = /^Monthly Report_Annual report_.*\.csv$/i;
 

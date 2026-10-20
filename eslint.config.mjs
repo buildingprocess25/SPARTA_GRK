@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
+import tseslint from 'typescript-eslint';
 
 const eslintConfig = [
   {
@@ -36,6 +37,31 @@ const eslintConfig = [
     rules: {
       'no-undef': 'error',
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-empty': ['warn', { allowEmptyCatch: true }],
+      'no-console': 'off',
+      ...reactHooks.configs.recommended.rules,
+    },
+  },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+      'react-hooks': reactHooks,
+    },
+    languageOptions: {
+      parser: tseslint.parser,
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    rules: {
+      // TypeScript resolves identifiers itself; the base rules misread type-only names.
+      'no-undef': 'off',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       'no-empty': ['warn', { allowEmptyCatch: true }],
       'no-console': 'off',
       ...reactHooks.configs.recommended.rules,

@@ -16,7 +16,7 @@ import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 import { getYearToDateMonths } from '@/lib/reportingMonths';
 import { CustomSelect } from '@/components/ui/select';
 
-export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = [] }) {
+export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = [] }: { isOpen?: any; onClose?: any; onSuccess?: any; plants?: any[] }) {
   const { addDataEntry, refreshData } = useSustainability();
   const confirm = useConfirm();
 
@@ -67,7 +67,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
   // UI state
   const [isAdditionalDataOpen, setIsAdditionalDataOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<Record<string, any>>({});
   const [statusMessage, setStatusMessage] = useState(null);
 
   // Excel state
@@ -85,7 +85,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
   }, [dcList, selectedPsId]);
 
   // Current selected DC
-  const selectedDC = useMemo(() => {
+  const selectedDC = useMemo<{ psId?: any; dcId?: any; name: string; grid: string; factor: number }>(() => {
     return dcList.find(d => String(d.psId) === selectedPsId || d.dcId === selectedPsId) || dcList[0] || {
       name: 'DC Balaraja',
       grid: 'JAMALI',
@@ -139,7 +139,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
 
   // Validation
   const validateForm = () => {
-    const errors = {};
+    const errors: Record<string, any> = {};
     if (!selectedDC) {
       errors.dc = 'Pilih Distribution Center';
     }

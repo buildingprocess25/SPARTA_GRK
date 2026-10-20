@@ -1,4 +1,4 @@
-import { executeIsolarRequest } from '../../src/lib/solar/apiClient.js';
+import { executeIsolarRequest } from '../../src/lib/solar/apiClient.ts';
 
 async function main() {
   console.log('--- Calling getPowerStationList (Call 3 of 3) ---');

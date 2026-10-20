@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma.js';
+import prisma from '@/lib/prisma.ts';
 import { CANONICAL_DC_ENTITIES } from '@/lib/solar/plantMap';
 
 export async function GET() {
@@ -10,7 +10,7 @@ export async function GET() {
     }
   });
 
-  const yieldMap = {};
+  const yieldMap: Record<string, any> = {};
   yields.forEach(y => yieldMap[y.psId] = y._sum.energyKwh);
 
   const report = [];

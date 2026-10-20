@@ -21,7 +21,7 @@ const MODULE_LABELS = {
   efficiency: 'Efisiensi energi',
 };
 
-export default function HistoryTab({ setActiveTab }) {
+export default function HistoryTab({ setActiveTab }: { setActiveTab?: any }) {
   const { inputHistory, deleteHistoryItem, resetToDefault } = useSustainability();
   const confirm = useConfirm();
 

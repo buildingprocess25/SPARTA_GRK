@@ -6,7 +6,7 @@ import { SPARTA_ROLES } from '@/lib/profileMeta';
 export default function ProfileRolesTab({
   effectiveRoleId,
   roleConfig,
-}) {
+}: { effectiveRoleId?: any; roleConfig?: any }) {
   return (
     <div className="space-y-4 animate-in">
       <div className="rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/60 dark:bg-blue-950/20 p-4">

@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../../src/lib/prisma.ts';
 const plants = await prisma.plantLatest.findMany({
   select: { psId: true, name: true, todayIncome: true, raw: true },
   orderBy: { name: 'asc' }

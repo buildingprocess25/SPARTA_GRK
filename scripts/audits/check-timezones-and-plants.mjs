@@ -1,6 +1,6 @@
-import prisma from '../../src/lib/prisma.js';
-import { executeIsolarRequest } from '../../src/lib/solar/apiClient.js';
-import { ISOLAR_ENDPOINTS_META } from '../../src/lib/solar/endpoints.js';
+import prisma from '../../src/lib/prisma.ts';
+import { executeIsolarRequest } from '../../src/lib/solar/apiClient.ts';
+import { ISOLAR_ENDPOINTS_META } from '../../src/lib/solar/endpoints.ts';
 
 async function listPlants() {
   const dbPlants = await prisma.plantMaster.findMany({ orderBy: { canonicalName: 'asc' } });

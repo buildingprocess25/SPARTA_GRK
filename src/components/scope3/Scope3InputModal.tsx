@@ -33,7 +33,7 @@ const EMPTY_FORM = {
   account: TRAVEL_ACCOUNTS[0],
 };
 
-function FieldLabel({ htmlFor, children, required = false }) {
+function FieldLabel({ htmlFor, children, required = false }: { htmlFor?: any; children?: any; required?: boolean }) {
   return (
     <label htmlFor={htmlFor} className="text-xs font-bold text-slate-700 dark:text-slate-300">
       {children} {required && <span className="text-rose-600 dark:text-rose-400" aria-hidden="true">*</span>}
@@ -41,12 +41,12 @@ function FieldLabel({ htmlFor, children, required = false }) {
   );
 }
 
-function FieldError({ id, children }) {
+function FieldError({ id, children }: { id?: any; children?: any }) {
   if (!children) return null;
   return <p id={id} className="text-[11px] font-semibold text-rose-600 dark:text-rose-400">{children}</p>;
 }
 
-function ChoiceCard({ selected, onClick, icon: Icon, title, detail }) {
+function ChoiceCard({ selected, onClick, icon: Icon, title, detail }: { selected?: any; onClick?: any; icon?: any; title?: any; detail?: any }) {
   return (
     <button
       type="button"
@@ -68,11 +68,11 @@ function ChoiceCard({ selected, onClick, icon: Icon, title, detail }) {
   );
 }
 
-export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu = [] }) {
+export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu = [] }: { isOpen?: any; onClose?: any; onSuccess?: any; knownKuu?: any[] }) {
   const confirm = useConfirm();
   const [tab, setTab] = useState('manual');
-  const [form, setForm] = useState(() => ({ ...EMPTY_FORM, date: today() }));
-  const [errors, setErrors] = useState({});
+  const [form, setForm] = useState<Record<string, any>>(() => ({ ...EMPTY_FORM, date: today() }));
+  const [errors, setErrors] = useState<Record<string, any>>({});
   const [status, setStatus] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -88,7 +88,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
   };
   const isFlight = form.kind === 'PESAWAT';
 
-  const live = useMemo(() => {
+  const live = useMemo<Record<string, any> | null>(() => {
     if (!isFlight) return null;
     const stops = parseRouteField(form.route);
     if (stops.length < 2) return { stops, status: 'INCOMPLETE' };
@@ -96,7 +96,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
   }, [isFlight, form.route, form.cabin]);
 
   const validate = () => {
-    const next = {};
+    const next: Record<string, any> = {};
     if (!/^[A-Za-z0-9]{3,6}$/.test(form.kuu.trim())) next.kuu = 'Isi kode KUU 3-6 huruf/angka, misalnya Z001';
     if (!form.date) next.date = 'Tanggal wajib diisi';
     if (!(Number(form.amount) > 0)) next.amount = 'Biaya harus lebih dari 0';

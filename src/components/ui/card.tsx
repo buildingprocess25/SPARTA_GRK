@@ -7,7 +7,7 @@ export function Card({
   size = 'default',
   children,
   ...props
-}) {
+}: { className?: string; size?: string; children?: any; [key: string]: any }) {
   return (
     <div
       data-slot="card"
@@ -24,7 +24,7 @@ export function CardHeader({
   className = '',
   children,
   ...props
-}) {
+}: { className?: string; children?: any; [key: string]: any }) {
   return (
     <div
       data-slot="card-header"
@@ -40,7 +40,7 @@ export function CardTitle({
   className = '',
   children,
   ...props
-}) {
+}: { className?: string; children?: any; [key: string]: any }) {
   return (
     <h3
       data-slot="card-title"
@@ -56,7 +56,7 @@ export function CardDescription({
   className = '',
   children,
   ...props
-}) {
+}: { className?: string; children?: any; [key: string]: any }) {
   return (
     <p
       data-slot="card-description"
@@ -72,7 +72,7 @@ export function CardAction({
   className = '',
   children,
   ...props
-}) {
+}: { className?: string; children?: any; [key: string]: any }) {
   return (
     <div
       data-slot="card-action"
@@ -88,7 +88,7 @@ export function CardContent({
   className = '',
   children,
   ...props
-}) {
+}: { className?: string; children?: any; [key: string]: any }) {
   return (
     <div
       data-slot="card-content"
@@ -104,7 +104,7 @@ export function CardFooter({
   className = '',
   children,
   ...props
-}) {
+}: { className?: string; children?: any; [key: string]: any }) {
   return (
     <div
       data-slot="card-footer"

@@ -13,7 +13,7 @@ export default function SummaryMetricCards({
   kpi,
   statusBreakdown,
   totalFooter,
-}) {
+}: { dashboardData?: any; data?: any; filteredRows?: any; isNational?: any; kpi?: any; statusBreakdown?: any; totalFooter?: any }) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 pt-1 relative z-20 has-[[data-popover-open='true']]:z-40">
               {/* Card 1: Kapasitas */}

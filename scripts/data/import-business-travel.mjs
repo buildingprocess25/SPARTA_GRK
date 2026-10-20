@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import prisma from '../../src/lib/prisma.js';
-import { importTravelLedger, prepareTravelImport } from '../../src/lib/scope3/travelImport.js';
+import prisma from '../../src/lib/prisma.ts';
+import { importTravelLedger, prepareTravelImport } from '../../src/lib/scope3/travelImport.ts';
 
 // Usage: node --env-file=.env scripts/import-business-travel.mjs <BPDL journal.csv> [--apply]
 // Without --apply it only prints what would be stored. Months in the file replace the stored ones.

@@ -4,13 +4,13 @@ import crypto from 'node:crypto';
 import {
   classifyVendorPlantStatus,
   summarizePlantStatuses,
-} from '../../src/lib/solar/status.js';
+} from '../../src/lib/solar/status.ts';
 import {
   calculateWeightedPr,
   isPlantOperationalInMonth,
   buildPltsDashboardFromRows,
-} from '../../src/lib/solar/dashboard.js';
-import { getPltsSummaryDashboardWithTiming } from '../../src/lib/solar/dashboardService.js';
+} from '../../src/lib/solar/dashboard.ts';
+import { getPltsSummaryDashboardWithTiming } from '../../src/lib/solar/dashboardService.ts';
 
 let passed = 0;
 const tests = [];
@@ -123,9 +123,9 @@ test('dashboard PR detail, monthly row and card use one canonical calculation', 
 });
 
 test('audit baseline is not statically imported by flag-off runtime entry points', () => {
-  const route = fs.readFileSync(new URL('../../src/app/api/isolar/route.js', import.meta.url), 'utf8');
-  const tab = fs.readFileSync(new URL('../../src/components/plts/PLTSTab.jsx', import.meta.url), 'utf8');
-  const sustainability = fs.readFileSync(new URL('../../src/data/sustainabilityData.js', import.meta.url), 'utf8');
+  const route = fs.readFileSync(new URL('../../src/app/api/isolar/route.ts', import.meta.url), 'utf8');
+  const tab = fs.readFileSync(new URL('../../src/components/plts/PLTSTab.tsx', import.meta.url), 'utf8');
+  const sustainability = fs.readFileSync(new URL('../../src/data/sustainabilityData.ts', import.meta.url), 'utf8');
   assert.doesNotMatch(route, /^import .*monitorPltsApril2026/m);
   assert.doesNotMatch(tab, /^import PLTSAnalyticsSection/m);
   assert.doesNotMatch(sustainability, /monitorPltsApril2026/);
@@ -135,7 +135,7 @@ test('audit baseline is not statically imported by flag-off runtime entry points
 
 test('sync schema persists status category, reason and checked time without coercing missing energy to zero', () => {
   const schema = fs.readFileSync(new URL('../prisma/schema.prisma', import.meta.url), 'utf8');
-  const syncSource = fs.readFileSync(new URL('../../src/lib/solar/sync.js', import.meta.url), 'utf8');
+  const syncSource = fs.readFileSync(new URL('../../src/lib/solar/sync.ts', import.meta.url), 'utf8');
   assert.match(schema, /statusCategory\s+String/);
   assert.match(schema, /statusReason\s+String/);
   assert.match(schema, /statusCheckedAt\s+DateTime/);

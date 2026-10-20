@@ -8,7 +8,7 @@ import { formatNum } from '@/data/sustainabilityData';
 export default function AnalyticsTelemetryPanel({
   telemetryDisplayItems,
   telemetryViewMode,
-}) {
+}: { telemetryDisplayItems?: any; telemetryViewMode?: any }) {
   return (
     <div className="p-4 space-y-4">
       {/* Header inside tab */}

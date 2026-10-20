@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { performance } from 'perf_hooks';
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 import { requireIsolatedTestDatabase } from '../lib/require-isolated-test-database.mjs';
 
 const PORT = process.env.PORT || '3005';

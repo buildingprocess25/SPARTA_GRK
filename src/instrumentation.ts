@@ -10,7 +10,7 @@ export async function register() {
     // silently took auto-sync down with it.
     let prisma;
     try {
-      prisma = (await import('./lib/prisma.js')).default;
+      prisma = (await import('./lib/prisma.ts')).default;
       console.log('[Instrumentation] Initializing database connection pool...');
       await prisma.$connect();
     } catch (error) {
@@ -20,7 +20,7 @@ export async function register() {
 
     try {
       console.log('[Instrumentation] Seeding login accounts from env (skips any that already exist in DB)...');
-      const { seedAppUsersFromEnv } = await import('./lib/auth.js');
+      const { seedAppUsersFromEnv } = await import('./lib/auth.ts');
       await seedAppUsersFromEnv();
     } catch (error) {
       console.warn('[Instrumentation] Login account seed notice:', error?.message || error);
@@ -28,7 +28,7 @@ export async function register() {
 
     try {
       console.log('[Instrumentation] Initializing connection keep-alive & pool warmup...');
-      const { initDbKeepAliveAndPoolWarmup } = await import('./lib/solar/dashboardService.js');
+      const { initDbKeepAliveAndPoolWarmup } = await import('./lib/solar/dashboardService.ts');
       await initDbKeepAliveAndPoolWarmup();
     } catch (error) {
       console.warn('[Instrumentation] Keep-alive/pool warmup notice:', error?.message || error);
@@ -36,7 +36,7 @@ export async function register() {
 
     try {
       console.log('[Instrumentation] Pre-warming PLTS default dashboard cache...');
-      const { preWarmPltsCache } = await import('./lib/solar/dashboardService.js');
+      const { preWarmPltsCache } = await import('./lib/solar/dashboardService.ts');
       await preWarmPltsCache();
     } catch (error) {
       console.warn('[Instrumentation] Cache pre-warm notice:', error?.message || error);
@@ -46,7 +46,7 @@ export async function register() {
       // In-process so auto-sync does not depend on the external Dokploy cron, which never fired successfully.
       // 10 minutes, not 5: each cycle costs hundreds of DB operations and 5 minutes exhausted the Postgres plan quota.
       console.log('[Instrumentation] Starting in-process iSolar sync daemon (10-minute interval)...');
-      const { startServerDaemon } = await import('./lib/solar/scheduler.js');
+      const { startServerDaemon } = await import('./lib/solar/scheduler.ts');
       startServerDaemon({ intervalMs: 600_000 });
     } catch (error) {
       console.warn('[Instrumentation] Sync daemon start notice:', error?.message || error);
@@ -54,7 +54,7 @@ export async function register() {
 
     try {
       console.log('[Instrumentation] Starting monthly store sync from the Google Sheet...');
-      const { startStoreSyncScheduler } = await import('./lib/stores/storeSync.js');
+      const { startStoreSyncScheduler } = await import('./lib/stores/storeSync.ts');
       startStoreSyncScheduler();
     } catch (error) {
       console.warn('[Instrumentation] Store sync scheduler notice:', error?.message || error);

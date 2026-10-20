@@ -427,7 +427,7 @@ export default function PLTSTab() {
   };
 
 
-  const dashboardPlantByDc = new Map((dashboardData?.plants || []).map(plant => [plant.dcId, plant]));
+  const dashboardPlantByDc = new Map<string, Record<string, any>>((dashboardData?.plants || []).map(plant => [plant.dcId, plant] as const));
 
   // Preserve monitoring rows while sharing the reconciled self-consumption
   // values used by the KPI and monthly chart.

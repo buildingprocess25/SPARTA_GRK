@@ -1,5 +1,5 @@
-import prisma from '../../src/lib/prisma.js';
-import { calculateEnergyBalance } from '../../src/lib/solar/energyBalance.js';
+import prisma from '../../src/lib/prisma.ts';
+import { calculateEnergyBalance } from '../../src/lib/solar/energyBalance.ts';
 
 async function test() {
   const minYm = '202601';

@@ -1,6 +1,6 @@
-import { executeIsolarRequest } from '../../src/lib/solar/apiClient.js';
-import { ISOLAR_ENDPOINTS_META } from '../../src/lib/solar/endpoints.js';
-import prisma from '../../src/lib/prisma.js';
+import { executeIsolarRequest } from '../../src/lib/solar/apiClient.ts';
+import { ISOLAR_ENDPOINTS_META } from '../../src/lib/solar/endpoints.ts';
+import prisma from '../../src/lib/prisma.ts';
 
 async function checkPlantMapping() {
   const stationRes = await executeIsolarRequest(

@@ -1,4 +1,4 @@
-import { buildRatedPowerIndex, loadRatedPowerRegistry } from '../../src/lib/solar/inverterTemperatureConfig.js';
+import { buildRatedPowerIndex, loadRatedPowerRegistry } from '../../src/lib/solar/inverterTemperatureConfig.ts';
 
 const required = ['ISOLAR_BASE_URL', 'ISOLAR_APP_KEY', 'ISOLAR_SECRET_KEY', 'ISOLAR_USER_ACCOUNT', 'ISOLAR_USER_PASSWORD'];
 for (const key of required) if (!process.env[key]) throw new Error(`Missing ${key}`);

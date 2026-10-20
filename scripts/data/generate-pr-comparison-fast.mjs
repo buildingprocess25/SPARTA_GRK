@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 function parseCsv(content) {
   const lines = content.split(/\r?\n/).filter(line => line.trim().length > 0);

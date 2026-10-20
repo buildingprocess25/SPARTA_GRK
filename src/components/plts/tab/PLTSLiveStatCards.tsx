@@ -6,7 +6,7 @@ import { kwhToMwh } from '@/lib/units';
 
 export default function PLTSLiveStatCards({
   isolarLiveState,
-}) {
+}: { isolarLiveState?: any }) {
   // A.2: Don't show "39 Offline" while loading — distinguish loading/error/data
   const isLoading = !isolarLiveState;
   const isError = isolarLiveState?.success === false;

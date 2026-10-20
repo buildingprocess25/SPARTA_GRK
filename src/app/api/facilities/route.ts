@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.ts';
 import { getGridEmissionFactor, getGridEmissionFactorDetails } from '@/lib/carbon/carbonEngine';
 
 /**
@@ -18,7 +18,7 @@ export async function GET(request) {
     const pageSize = parseInt(searchParams.get('pageSize') || '50', 10);
     const fetchAll = searchParams.get('all') === 'true';
 
-    const where = {};
+    const where: Record<string, any> = {};
 
     if (facilityType !== 'all') {
       where.facilityType = facilityType;

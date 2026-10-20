@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createSessionToken, readSessionToken, sessionCookieOptions, SESSION_COOKIE } from '@/lib/auth.js';
-import { SESSION_IDLE_TIMEOUT_MS } from '@/lib/sessionPolicy.js';
+import { createSessionToken, readSessionToken, sessionCookieOptions, SESSION_COOKIE } from '@/lib/auth.ts';
+import { SESSION_IDLE_TIMEOUT_MS } from '@/lib/sessionPolicy.ts';
 
 export const dynamic = 'force-dynamic';
 

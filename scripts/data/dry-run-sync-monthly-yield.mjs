@@ -1,5 +1,5 @@
-import prisma from '../../src/lib/prisma.js';
-import { resolveMonthly, MONTHLY_SOURCE_POLICY } from '../../src/lib/solar/dashboard.js';
+import prisma from '../../src/lib/prisma.ts';
+import { resolveMonthly, MONTHLY_SOURCE_POLICY } from '../../src/lib/solar/dashboard.ts';
 
 async function dryRunSync() {
   console.log('=== DRY-RUN SINKRONISASI TABEL MonthlyYield DARI MonthlyYieldObservation ===\n');

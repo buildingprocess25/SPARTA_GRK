@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.js';
-import { parseEnergyKwh } from '../../src/lib/solar/processor.js';
+import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.ts';
+import { parseEnergyKwh } from '../../src/lib/solar/processor.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

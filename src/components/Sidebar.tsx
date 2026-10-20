@@ -60,7 +60,7 @@ export default function Sidebar({
   navigateTo,
   pengurangSubTab,
   penambahSubScope,
-}) {
+}: { activeTab?: any; setActiveTab?: any; isMobileOpen?: any; setIsMobileOpen?: any; isDesktopOpen?: boolean; onToggleDesktopSidebar?: any; onOpenProfile?: any; navigateTo?: any; pengurangSubTab?: any; penambahSubScope?: any }) {
   const [expandedGroups, setExpandedGroups] = useState({ pengurang: true, penambah: true });
   const closeButtonRef = useRef(null);
   const [currentUser, setCurrentUser] = useState(null);

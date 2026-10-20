@@ -1,6 +1,6 @@
-import prisma from '../../src/lib/prisma.js';
-import { getPltsSummaryDashboardWithTiming } from '../../src/lib/solar/dashboardService.js';
-import { summarizePlts } from '../../src/lib/solar/summarize.js';
+import prisma from '../../src/lib/prisma.ts';
+import { getPltsSummaryDashboardWithTiming } from '../../src/lib/solar/dashboardService.ts';
+import { summarizePlts } from '../../src/lib/solar/summarize.ts';
 
 async function main() {
   console.log('================================================================');

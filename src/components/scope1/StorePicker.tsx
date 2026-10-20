@@ -17,7 +17,7 @@ function formatDate(value) {
 }
 
 /** Search and pick an active store from the store master synced from the Google Sheet. */
-export default function StorePicker({ value, onChange, error }) {
+export default function StorePicker({ value, onChange, error }: { value?: any; onChange?: any; error?: any }) {
   const listId = useId();
   const inputRef = useRef(null);
   const [query, setQuery] = useState('');

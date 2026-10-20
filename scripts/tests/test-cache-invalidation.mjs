@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { getPltsSummaryDashboardWithTiming, revalidatePltsDashboardCache } from '../../src/lib/solar/dashboardService.js';
+import { getPltsSummaryDashboardWithTiming, revalidatePltsDashboardCache } from '../../src/lib/solar/dashboardService.ts';
 
 async function testCacheInvalidation() {
   console.log('================================================================');

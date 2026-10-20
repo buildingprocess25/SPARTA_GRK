@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 async function test() {
   const plants = await prisma.plantMaster.findMany({ select: { dcId: true, canonicalName: true, sungrowPsIds: true } });

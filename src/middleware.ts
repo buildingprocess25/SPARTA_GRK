@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { isSessionPayloadActive } from './lib/sessionPolicy.js';
+import { isSessionPayloadActive } from './lib/sessionPolicy.ts';
 
 /**
- * Route guard for the 2-account login (see src/lib/auth.js). Runs on the
+ * Route guard for the 2-account login (see src/lib/auth.ts). Runs on the
  * Edge runtime, so it can't use Node's `crypto` module - session token
  * verification here is reimplemented with Web Crypto (HMAC-SHA256), kept in
- * sync with createSessionToken()'s signing scheme in src/lib/auth.js.
+ * sync with createSessionToken()'s signing scheme in src/lib/auth.ts.
  */
 
 const SESSION_COOKIE = 'sparta_session';
@@ -79,7 +79,7 @@ export async function middleware(request) {
   }
 
   // Forward the verified username as a request header so route handlers (e.g.
-  // the manual-sync mutation guard in src/lib/server/requestGuards.js) can
+  // the manual-sync mutation guard in src/lib/server/requestGuards.ts) can
   // trust "this request already passed login" without re-verifying the
   // cookie themselves. Must be set on the outgoing *request*, not just the
   // response, or downstream handlers never see it.

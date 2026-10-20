@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { aggregateRawApiIntoCanonicalDCs, calculateNationwideSummary } from '../../src/lib/solar/processor.js';
+import { aggregateRawApiIntoCanonicalDCs, calculateNationwideSummary } from '../../src/lib/solar/processor.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

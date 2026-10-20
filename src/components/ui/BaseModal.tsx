@@ -38,7 +38,7 @@ export default function BaseModal({
   loading = false,
   children,
   initialFocusRef,
-}) {
+}: { open?: any; onClose?: any; title?: any; subtitle?: any; icon?: any; badge?: any; size?: string; footer?: any; dirty?: boolean; loading?: boolean; children?: any; initialFocusRef?: any }) {
   const [mounted, setMounted] = useState(false);
   const dialogRef = useRef(null);
   const previouslyFocusedRef = useRef(null);

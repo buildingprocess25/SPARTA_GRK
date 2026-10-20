@@ -11,7 +11,7 @@ export function Dialog({
   open: controlledOpen,
   onOpenChange,
   children,
-}) {
+}: { open?: any; onOpenChange?: any; children?: any }) {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const isControlled = controlledOpen !== undefined;
   const isOpen = isControlled ? controlledOpen : internalOpen;
@@ -31,7 +31,7 @@ export function Dialog({
   );
 }
 
-export const DialogTrigger = React.forwardRef(function DialogTrigger(
+export const DialogTrigger = React.forwardRef<React.ElementRef<'button'>, React.ComponentPropsWithoutRef<'button'> & { asChild?: boolean; children?: any; onClick?: any; [key: string]: any }>(function DialogTrigger(
   { asChild = false, children, onClick, ...props },
   ref
 ) {
@@ -43,7 +43,7 @@ export const DialogTrigger = React.forwardRef(function DialogTrigger(
   };
 
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
+    return React.cloneElement(children as React.ReactElement<any>, {
       ref,
       onClick: handleClick,
       ...props,
@@ -57,7 +57,7 @@ export const DialogTrigger = React.forwardRef(function DialogTrigger(
   );
 });
 
-export const DialogContent = React.forwardRef(function DialogContent(
+export const DialogContent = React.forwardRef<any, { [key: string]: any } & { className?: string; children?: any; [key: string]: any }>(function DialogContent(
   { className = '', children, ...props },
   ref
 ) {
@@ -114,7 +114,7 @@ export const DialogContent = React.forwardRef(function DialogContent(
   );
 });
 
-export function DialogHeader({ className = '', children, ...props }) {
+export function DialogHeader({ className = '', children, ...props }: { className?: string; children?: any; [key: string]: any }) {
   return (
     <div
       className={cn('flex flex-col space-y-1.5 text-left mb-4', className)}
@@ -125,7 +125,7 @@ export function DialogHeader({ className = '', children, ...props }) {
   );
 }
 
-export function DialogFooter({ className = '', children, ...props }) {
+export function DialogFooter({ className = '', children, ...props }: { className?: string; children?: any; [key: string]: any }) {
   return (
     <div
       className={cn(
@@ -139,7 +139,7 @@ export function DialogFooter({ className = '', children, ...props }) {
   );
 }
 
-export function DialogTitle({ className = '', children, ...props }) {
+export function DialogTitle({ className = '', children, ...props }: { className?: string; children?: any; [key: string]: any }) {
   return (
     <h2
       className={cn('text-base font-bold text-slate-900 dark:text-slate-100 leading-none tracking-tight', className)}
@@ -150,7 +150,7 @@ export function DialogTitle({ className = '', children, ...props }) {
   );
 }
 
-export function DialogDescription({ className = '', children, ...props }) {
+export function DialogDescription({ className = '', children, ...props }: { className?: string; children?: any; [key: string]: any }) {
   return (
     <p
       className={cn('text-xs text-slate-500 dark:text-slate-400 mt-1', className)}

@@ -1,8 +1,8 @@
-import prisma from '../../src/lib/prisma.js';
-import { buildScope2CanonicalDashboard } from '../../src/lib/scope2/dashboardService.js';
-import { getPltsDashboard } from '../../src/lib/solar/dashboardService.js';
-import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.js';
-import { getGridFactor } from '../../src/lib/emission-factors.js';
+import prisma from '../../src/lib/prisma.ts';
+import { buildScope2CanonicalDashboard } from '../../src/lib/scope2/dashboardService.ts';
+import { getPltsDashboard } from '../../src/lib/solar/dashboardService.ts';
+import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.ts';
+import { getGridFactor } from '../../src/lib/emission-factors.ts';
 
 async function diagnose() {
   console.log('=== DIAGNOSING EXACT DISCREPANCIES ===');

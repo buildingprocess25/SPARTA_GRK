@@ -14,7 +14,7 @@ export default function ProfileAccountTab({
   setShowNewPass,
   showCurrentPass,
   showNewPass,
-}) {
+}: { currentUser?: any; handleResetPassword?: any; isChangingPassword?: any; passwordState?: any; profileData?: any; roleConfig?: any; setPasswordState?: any; setShowCurrentPass?: any; setShowNewPass?: any; showCurrentPass?: any; showNewPass?: any }) {
   return (
     <div className="space-y-4 animate-in">
       <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-3">

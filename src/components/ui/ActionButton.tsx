@@ -30,7 +30,7 @@ export default function ActionButton({
   className = '',
   type = 'button',
   ...props
-}) {
+}: { children?: any; label?: any; variant?: string; size?: string; icon?: any; iconPosition?: string; loading?: boolean; disabled?: boolean; className?: string; type?: 'button' | 'submit' | 'reset'; [key: string]: any }) {
   const variantClass = BUTTON_VARIANTS[variant] || BUTTON_VARIANTS.primary;
   const sizeClass = BUTTON_SIZES[size] || BUTTON_SIZES.md;
   const isDisabled = disabled || loading;

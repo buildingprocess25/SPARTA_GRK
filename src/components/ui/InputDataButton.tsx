@@ -12,7 +12,7 @@ export default function InputDataButton({
   className = '',
   disabled = false,
   disabledReason = '',
-}) {
+}: { label?: string; icon?: any; onClick?: any; className?: string; disabled?: boolean; disabledReason?: string }) {
   let mutationsAllowed = true;
   try {
     const sustainability = useSustainability();

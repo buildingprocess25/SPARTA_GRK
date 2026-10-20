@@ -1,5 +1,5 @@
-import { parsePowerKw, parseEnergyKwh, parseTotalEnergyMwh, computeMonthlyMetricsForDC } from '../../src/lib/solar/processor.js';
-import { ALLOWED_ENDPOINTS, PROHIBITED_ENDPOINT_PATTERNS } from '../../src/lib/solar/endpoints.js';
+import { parsePowerKw, parseEnergyKwh, parseTotalEnergyMwh, computeMonthlyMetricsForDC } from '../../src/lib/solar/processor.ts';
+import { ALLOWED_ENDPOINTS, PROHIBITED_ENDPOINT_PATTERNS } from '../../src/lib/solar/endpoints.ts';
 
 let passed = 0;
 let failed = 0;

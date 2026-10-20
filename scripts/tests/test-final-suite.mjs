@@ -1,6 +1,6 @@
 import assert from 'assert';
-import { summarizePlts } from '../../src/lib/solar/summarize.js';
-import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.js';
+import { summarizePlts } from '../../src/lib/solar/summarize.ts';
+import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.ts';
 
 async function runTests() {
   console.log('=== RUNNING FINAL COMPREHENSIVE TEST SUITE ===');

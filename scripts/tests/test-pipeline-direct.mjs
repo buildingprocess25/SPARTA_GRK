@@ -1,5 +1,5 @@
-import { readDashboardPayload } from '../../src/lib/solar/sync.js';
-import { aggregateRawApiIntoCanonicalDCs, calculateNationwideSummary } from '../../src/lib/solar/processor.js';
+import { readDashboardPayload } from '../../src/lib/solar/sync.ts';
+import { aggregateRawApiIntoCanonicalDCs, calculateNationwideSummary } from '../../src/lib/solar/processor.ts';
 import fs from 'fs';
 const monitorPltsApril2026 = JSON.parse(fs.readFileSync(new URL('../../src/data/monitorPltsApril2026.json', import.meta.url), 'utf-8'));
 

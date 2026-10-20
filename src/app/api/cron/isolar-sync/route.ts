@@ -6,9 +6,9 @@
  */
 
 import { NextResponse } from 'next/server';
-import { runSchedulerCycle } from '@/lib/solar/scheduler.js';
-import { getSnapshotStatusReport, getSnapshotHistory } from '@/lib/solar/snapshot.js';
-import { evaluateCronAuthorization } from '@/lib/server/requestGuards.js';
+import { runSchedulerCycle } from '@/lib/solar/scheduler.ts';
+import { getSnapshotStatusReport, getSnapshotHistory } from '@/lib/solar/snapshot.ts';
+import { evaluateCronAuthorization } from '@/lib/server/requestGuards.ts';
 
 function cronAuthResponse(request) {
   const decision = evaluateCronAuthorization({

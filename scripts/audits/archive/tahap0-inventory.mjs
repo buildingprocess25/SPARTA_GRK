@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../../src/lib/prisma.ts';
 
 async function main() {
   console.log('=== INVESTIGASI DATA DATABASE SAAT INI (TAHAP 0) ===\n');

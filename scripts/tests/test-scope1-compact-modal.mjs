@@ -4,8 +4,8 @@ import path from 'node:path';
 
 console.log('Testing Scope 1 Modal Layout & Compactness Improvements...');
 
-const modalPath = path.resolve('src/components/scope1/Scope1InputModal.jsx');
-assert.ok(fs.existsSync(modalPath), 'Scope1InputModal.jsx must exist');
+const modalPath = path.resolve('src/components/scope1/Scope1InputModal.tsx');
+assert.ok(fs.existsSync(modalPath), 'Scope1InputModal.tsx must exist');
 const content = fs.readFileSync(modalPath, 'utf8');
 
 // 1. Modal width (640 - 720px)

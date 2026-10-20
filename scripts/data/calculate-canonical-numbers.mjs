@@ -1,6 +1,6 @@
-import prisma from '../../src/lib/prisma.js';
-import { getGridFactor } from '../../src/lib/emission-factors.js';
-import { isDcLocation } from '../../src/lib/solar/plantMap.js';
+import prisma from '../../src/lib/prisma.ts';
+import { getGridFactor } from '../../src/lib/emission-factors.ts';
+import { isDcLocation } from '../../src/lib/solar/plantMap.ts';
 
 async function run() {
   const flows = await prisma.$queryRawUnsafe(`

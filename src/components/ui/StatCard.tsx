@@ -13,7 +13,7 @@ export default function StatCard({
   infoKey = null,
   className = '',
   ...props
-}) {
+}: { title?: any; value?: any; unit?: any; trendText?: any; icon?: any; theme?: string; sourceBadge?: any; tooltip?: any; infoKey?: any; className?: string; [key: string]: any }) {
   return (
     <KpiCard
       label={title}

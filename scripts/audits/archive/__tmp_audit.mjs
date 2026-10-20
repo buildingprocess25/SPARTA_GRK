@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import puppeteer from 'puppeteer';
 process.env.AUTH_SESSION_SECRET = fs.readFileSync('.env.local', 'utf8').match(/^AUTH_SESSION_SECRET=(.*)$/m)[1].trim().replace(/^["']|["']$/g, '');
-const { createSessionToken } = await import('../../src/lib/auth.js');
+const { createSessionToken } = await import('../../../src/lib/auth.ts');
 const out = process.argv[2];
 const theme = process.argv[3] || 'dark';
 const pages = (process.argv[4] || 'Ringkasan Emisi,Scope 1,Scope 2,Scope 3,PLTS,Daur Ulang Air,Riwayat Audit').split(',');

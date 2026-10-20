@@ -16,13 +16,13 @@
  */
 
 import { performance } from 'perf_hooks';
-import prisma from '../src/lib/prisma.js';
-import { getValidToken, executeIsolarRequest } from '../src/lib/solar/apiClient.js';
-import { ISOLAR_ENDPOINTS_META, QUOTA_CONFIG } from '../src/lib/solar/endpoints.js';
-import { CONVERSION_CONFIG } from '../src/lib/solar/conversionConfig.js';
-import { parseEnergyKwh, parsePowerKw } from '../src/lib/solar/processor.js';
-import { classifyVendorPlantStatus } from '../src/lib/solar/status.js';
-import { acquireLock, releaseLock } from '../src/lib/solar/sync.js';
+import prisma from '../src/lib/prisma.ts';
+import { getValidToken, executeIsolarRequest } from '../src/lib/solar/apiClient.ts';
+import { ISOLAR_ENDPOINTS_META, QUOTA_CONFIG } from '../src/lib/solar/endpoints.ts';
+import { CONVERSION_CONFIG } from '../src/lib/solar/conversionConfig.ts';
+import { parseEnergyKwh, parsePowerKw } from '../src/lib/solar/processor.ts';
+import { classifyVendorPlantStatus } from '../src/lib/solar/status.ts';
+import { acquireLock, releaseLock } from '../src/lib/solar/sync.ts';
 
 const DEFAULT_PORT = process.env.PORT || '3000';
 const REVALIDATE_URL = process.env.REVALIDATE_URL || `http://127.0.0.1:${DEFAULT_PORT}/api/plts/revalidate`;
@@ -107,7 +107,7 @@ export function normalizeEnergyKwhRaw(metricObj) {
 }
 
 // ─── Anti-Overlap Distributed Lock ──────────────────────────────────────────
-// Reuses src/lib/solar/sync.js's acquireLock/releaseLock so this standalone
+// Reuses src/lib/solar/sync.ts's acquireLock/releaseLock so this standalone
 // job and the in-app scheduler (runSync, triggered every 5 min by the daemon
 // / cron) contend for the exact same sync_lock row with one consistent
 // duration, instead of racing with mismatched timeouts.

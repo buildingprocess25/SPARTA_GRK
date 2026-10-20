@@ -22,7 +22,7 @@ const summaryCardClientCache = typeof window !== 'undefined'
   ? (window.__PLTS_OVERVIEW_CLIENT_CACHE__ = window.__PLTS_OVERVIEW_CLIENT_CACHE__ || new Map())
   : new Map();
 
-export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSharedFiltersChange, dashboardData, onNavigateToIsolar }) {
+export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSharedFiltersChange, dashboardData, onNavigateToIsolar }: { onSelectLocation?: any; sharedFilters?: any; onSharedFiltersChange?: any; dashboardData?: any; onNavigateToIsolar?: any }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -285,8 +285,8 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       ? rawHistory
       : (telemetryRows.length > 0 ? telemetryRows : performanceRows);
 
-    const telemetryByDc = new Map(telemetryRows.map(item => [item.dcId, item]));
-    const performanceByDc = new Map(performanceRows.map(item => [item.dcId, item]));
+    const telemetryByDc = new Map<string, Record<string, any>>(telemetryRows.map(item => [item.dcId, item] as const));
+    const performanceByDc = new Map<string, Record<string, any>>(performanceRows.map(item => [item.dcId, item] as const));
     return baseRows.filter(isDcLocation).map(item => {
       const telemetry = telemetryByDc.get(item.dcId) || {};
       const performance = performanceByDc.get(item.dcId) || {};

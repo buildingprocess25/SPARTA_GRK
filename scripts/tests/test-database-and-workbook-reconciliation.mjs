@@ -9,7 +9,7 @@ import {
   calculatePLTSAvoidedEmissions,
   calculateWaterRecycleImpact,
   reconcileCarbonBalance
-} from '../../src/lib/carbon/carbonEngine.js';
+} from '../../src/lib/carbon/carbonEngine.ts';
 
 const prisma = new PrismaClient();
 

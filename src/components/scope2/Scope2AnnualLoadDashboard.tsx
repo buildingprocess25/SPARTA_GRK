@@ -50,7 +50,7 @@ function initialFilters() {
 
 function aggregateMonthly(rows, monitoredCount) {
   let cumulativeEmissionTon = 0;
-  return [...new Set(rows.map(row => row.yearMonth))].sort().map((yearMonth, index, periods) => {
+  return [...new Set<string>(rows.map(row => row.yearMonth))].sort().map((yearMonth, index, periods) => {
     const monthRows = rows.filter(row => row.yearMonth === yearMonth);
     const summary = aggregateCanonicalRows(monthRows);
     const previousRows = index ? rows.filter(row => row.yearMonth === periods[index - 1]) : [];
@@ -93,7 +93,7 @@ function aggregateByPlant(rows) {
   });
 }
 
-function Scope2ChartTooltip({ active, payload, label }) {
+function Scope2ChartTooltip({ active, payload, label }: { active?: any; payload?: any; label?: any }) {
   if (!active || !payload?.length) return null;
   const row = payload[0]?.payload;
   const isPartial = row?.periodStatus === 'partial';
@@ -302,7 +302,7 @@ export default function Scope2AnnualLoadDashboard() {
     return p;
   }, [filteredRows, data]);
 
-  const plants = useMemo(() => canonicalRows.length ? [...new Map(canonicalRows.map(row => [row.psId, row])).values()].sort((a, b) => a.dcName.localeCompare(b.dcName, 'id')) : [], [canonicalRows]);
+  const plants = useMemo(() => canonicalRows.length ? [...new Map<string, Record<string, any>>(canonicalRows.map(row => [row.psId, row] as const)).values()].sort((a, b) => a.dcName.localeCompare(b.dcName, 'id')) : [], [canonicalRows]);
   const grids = useMemo(() => canonicalRows.length ? [...new Set(canonicalRows.map(row => row.grid))].sort() : [], [canonicalRows]);
 
   const ranking = useMemo(() => {
@@ -577,7 +577,7 @@ export default function Scope2AnnualLoadDashboard() {
             </thead>
             <tbody>
               {ranking.map((row, index) => (
-                <tr key={row.psId} onClick={() => setSelectedPlant(row)} tabIndex="0" onKeyDown={event => { if (event.key === 'Enter') setSelectedPlant(row); }} className={`cursor-pointer border-b dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 focus:bg-blue-50 dark:focus:bg-blue-500/10 focus:outline-none ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : ''}`}>
+                <tr key={row.psId} onClick={() => setSelectedPlant(row)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') setSelectedPlant(row); }} className={`cursor-pointer border-b dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 focus:bg-blue-50 dark:focus:bg-blue-500/10 focus:outline-none ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : ''}`}>
                   <td className="p-3 font-semibold text-slate-900 dark:text-slate-100">{row.dcName}</td>
                   <td className="p-3 tabular-nums text-slate-600 dark:text-slate-400">{row.grid}</td>
                   <td className="p-3 text-right tabular-nums font-medium text-slate-700 dark:text-slate-300">{formatFactor(row.emissionFactor)}</td>
@@ -656,7 +656,7 @@ export default function Scope2AnnualLoadDashboard() {
               }}
             />
             <Tooltip
-              content={({ active, payload, label }) => {
+              content={({ active, payload, label }: { active?: any; payload?: any; label?: any }) => {
                 if (active && payload && payload.length) {
                   const item = payload[0];
                   return (

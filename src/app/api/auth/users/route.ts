@@ -1,18 +1,18 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import prisma from '@/lib/prisma.js';
+import prisma from '@/lib/prisma.ts';
 import {
   findUser,
   hashPassword,
   verifySessionToken,
   SESSION_COOKIE,
-} from '@/lib/auth.js';
+} from '@/lib/auth.ts';
 import {
   SPARTA_ROLES,
   PROFILE_BY_USERNAME,
   DEFAULT_PROFILE,
-} from '@/lib/profileMeta.js';
+} from '@/lib/profileMeta.ts';
 
 export const dynamic = 'force-dynamic';
 

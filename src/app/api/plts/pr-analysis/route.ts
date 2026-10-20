@@ -149,7 +149,7 @@ export async function GET(request) {
     const currentYearMonth = '202610';
 
     // Build monthly series for each requested year
-    const yearlySeries = {};
+    const yearlySeries: Record<string, any> = {};
 
     for (const y of years) {
       const series = [];

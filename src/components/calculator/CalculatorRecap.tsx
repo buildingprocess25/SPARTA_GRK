@@ -11,7 +11,7 @@ const HEADLINE_TONE_CLASSES = {
   neutral: 'border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 text-blue-900 dark:text-blue-200',
 };
 
-export default function CalculatorRecap({ profile, entries, summary, days }) {
+export default function CalculatorRecap({ profile, entries, summary, days }: { profile?: any; entries?: any; summary?: any; days?: any }) {
   const denominator = summary.totalAdditionKg + summary.totalReductionKg;
   const additionShare = denominator > 0 ? summary.totalAdditionKg / denominator * 100 : 0;
   const temporaryEntries = entries.filter(entry => (entry.factorSnapshots || [entry.factorSnapshot]).filter(Boolean).some(factor => factor.status === 'TEMPORARY'));

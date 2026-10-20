@@ -12,7 +12,7 @@ export function Tabs({
   className = '',
   children,
   ...props
-}) {
+}: { value?: any; defaultValue?: any; onValueChange?: any; className?: string; children?: any; [key: string]: any }) {
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const isControlled = controlledValue !== undefined;
   const activeValue = isControlled ? controlledValue : internalValue;
@@ -34,7 +34,7 @@ export function Tabs({
   );
 }
 
-export const TabsList = React.forwardRef(function TabsList(
+export const TabsList = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { className?: string; children?: any; [key: string]: any }>(function TabsList(
   { className = '', children, ...props },
   ref
 ) {
@@ -53,7 +53,7 @@ export const TabsList = React.forwardRef(function TabsList(
   );
 });
 
-export const TabsTrigger = React.forwardRef(function TabsTrigger(
+export const TabsTrigger = React.forwardRef<React.ElementRef<'button'>, React.ComponentPropsWithoutRef<'button'> & { value?: any; className?: string; disabled?: boolean; children?: any; onClick?: any; [key: string]: any }>(function TabsTrigger(
   { value, className = '', disabled = false, children, onClick, ...props },
   ref
 ) {
@@ -88,7 +88,7 @@ export const TabsTrigger = React.forwardRef(function TabsTrigger(
   );
 });
 
-export const TabsContent = React.forwardRef(function TabsContent(
+export const TabsContent = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { value?: any; className?: string; children?: any; [key: string]: any }>(function TabsContent(
   { value, className = '', children, ...props },
   ref
 ) {

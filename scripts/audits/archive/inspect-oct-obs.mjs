@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../../src/lib/prisma.ts';
 
 async function main() {
   const obs10 = await prisma.monthlyYieldObservation.findMany({

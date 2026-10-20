@@ -37,8 +37,8 @@ function withUniqueHistoryIds(entries) {
   });
 }
 
-export function SustainabilityProvider({ children }) {
-  const [dcLocations, setDcLocations] = useState(initialDCLocations);
+export function SustainabilityProvider({ children }: { children?: any }) {
+  const [dcLocations, setDcLocations] = useState<Array<(typeof initialDCLocations)[number] & Record<string, any>>>(initialDCLocations);
   const [waterData, setWaterData] = useState(initialWaterData);
   const [pltsData, setPltsData] = useState(initialPltsData);
   const [scope1, setScope1] = useState(initialScope1Data);

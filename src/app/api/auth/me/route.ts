@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { findUser, verifySessionToken, SESSION_COOKIE } from '@/lib/auth.js';
+import { findUser, verifySessionToken, SESSION_COOKIE } from '@/lib/auth.ts';
 
 export async function GET(request) {
   const token = request.cookies.get(SESSION_COOKIE)?.value;

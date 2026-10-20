@@ -1,8 +1,13 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const filePath = new URL('../../src/components/plts/PLTSTab.jsx', import.meta.url);
-const content = fs.readFileSync(filePath, 'utf8');
+// Sections split into ../plts/tab/ are part of PLTSTab.
+const partsDir = new URL('../../src/components/plts/tab/', import.meta.url);
+const content = [
+  fs.readFileSync(new URL('../../src/components/plts/PLTSTab.tsx', import.meta.url), 'utf8'),
+  ...fs.readdirSync(partsDir).filter((f) => /\.[jt]sx?$/.test(f)).sort()
+    .map((f) => fs.readFileSync(new URL(f, partsDir), 'utf8')),
+].join('\n');
 
 // 1. Check chartYAxisMax ensures both left (MWh) and right (tCO2e) axes share identical domain
 assert.ok(content.includes('domain={[0, chartYAxisMax]}'), 'Both axes must use domain={[0, chartYAxisMax]} for 1:1 scale parity');

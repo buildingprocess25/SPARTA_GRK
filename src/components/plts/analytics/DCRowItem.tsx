@@ -19,7 +19,7 @@ export const DCRowItem = React.memo(function DCRowItem({
   onToggle,
   onMouseEnter,
   onMouseLeave
-}) {
+}: { dc?: any; isSelected?: any; isHovered?: any; colorBadge?: any; isExcludedFromRanking?: any; rankDisplay?: any; selectedMetric?: any; activeMetricUnit?: any; hasValidMetric?: any; isOffline?: any; onToggle?: any; onMouseEnter?: any; onMouseLeave?: any }) {
   const isAuditBaselineEnabled = isFeatureEnabled('auditBaseline');
   const name = dc.canonicalName || dc.name;
   const badges = getDCBadges(dc, selectedMetric);

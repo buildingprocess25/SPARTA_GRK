@@ -24,9 +24,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import prisma from '../../src/lib/prisma.js';
-import { importIsolarAnnualReport } from '../../src/lib/importers/isolarAnnualReportImport.js';
-import { importMonitorPltsWorkbook, importMonitorPltsCsv } from '../../src/lib/importers/monitorPltsWorkbookImport.js';
+import prisma from '../../src/lib/prisma.ts';
+import { importIsolarAnnualReport } from '../../src/lib/importers/isolarAnnualReportImport.ts';
+import { importMonitorPltsWorkbook, importMonitorPltsCsv } from '../../src/lib/importers/monitorPltsWorkbookImport.ts';
 
 const args = process.argv.slice(2);
 const isCommit = args.includes('--commit');

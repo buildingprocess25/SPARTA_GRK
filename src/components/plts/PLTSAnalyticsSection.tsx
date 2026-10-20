@@ -24,7 +24,7 @@ export default function PLTSAnalyticsSection({
   baselineData = [],
   lastSyncTime = 'Baru saja',
   quotaStatus = null
-}) {
+}: { stations?: any[]; historicalPlants?: any[]; baselineData?: any[]; lastSyncTime?: string; quotaStatus?: any }) {
   const [isMounted, setIsMounted] = useState(false);
   const isAuditBaselineEnabled = isFeatureEnabled('auditBaseline');
 
@@ -297,7 +297,7 @@ export default function PLTSAnalyticsSection({
   const trendDataset = useMemo(() => {
     return API_MONTHS.map(m => {
       const isDaily = unitMode === 'daily';
-      const monthObj = {
+      const monthObj: Record<string, any> = {
         month: m.label,
         shortMonth: m.short,
         ym: m.ym,

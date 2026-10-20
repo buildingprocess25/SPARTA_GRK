@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { getPltsDashboard } from '../../src/lib/solar/dashboardService.js';
-import prisma from '../../src/lib/prisma.js';
+import { getPltsDashboard } from '../../src/lib/solar/dashboardService.ts';
+import prisma from '../../src/lib/prisma.ts';
 
 async function capture() {
   console.log('Capturing Golden Snapshots for PLTS Dashboard...');

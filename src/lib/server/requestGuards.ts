@@ -13,7 +13,14 @@ export function evaluateCronAuthorization({ configuredSecret, authorization }: {
   return { allowed: true, status: 200, code: null };
 }
 
-export function evaluateMutationAccess({ nodeEnv, hostname, allowManualSync = false }: { nodeEnv?: string; hostname?: string; allowManualSync?: boolean } = {}) {
+export interface MutationDecision {
+  allowed: boolean;
+  status: number;
+  code: string | null;
+  message?: string;
+}
+
+export function evaluateMutationAccess({ nodeEnv, hostname, allowManualSync = false }: { nodeEnv?: string; hostname?: string; allowManualSync?: boolean } = {}): MutationDecision {
   if (allowManualSync) {
     return { allowed: true, status: 200, code: null };
   }
@@ -30,7 +37,7 @@ export function evaluateMutationAccess({ nodeEnv, hostname, allowManualSync = fa
   return { allowed: true, status: 200, code: null };
 }
 
-export function mutationDecisionForRequest(request, { allowManualSync }: { allowManualSync?: boolean } = {}) {
+export function mutationDecisionForRequest(request, { allowManualSync }: { allowManualSync?: boolean } = {}): MutationDecision {
   // A verified login session (see middleware.js + src/lib/auth.ts) is now the
   // primary way to open this up: middleware already rejected the request
   // before it got here if there was no valid session cookie, so the

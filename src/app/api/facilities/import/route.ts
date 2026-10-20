@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.ts';
 import { getGridEmissionFactor, getGridEmissionFactorDetails } from '@/lib/carbon/carbonEngine';
 
 /**

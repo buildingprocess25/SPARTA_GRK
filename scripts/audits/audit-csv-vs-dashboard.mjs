@@ -3,14 +3,14 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import XLSX from 'xlsx';
 
-import { buildScope2CanonicalDashboard } from '../../src/lib/scope2/dashboardService.js';
-import { CANONICAL_DC_ENTITIES, isDcLocation } from '../../src/lib/solar/plantMap.js';
-import { calculateWeightedPr } from '../../src/lib/solar/dashboard.js';
-import { parseIsolarMonthlyReportFile } from '../../src/lib/importers/isolarMonthlyReport.js';
-import { getGridFactor } from '../../src/lib/emission-factors.js';
+import { buildScope2CanonicalDashboard } from '../../src/lib/scope2/dashboardService.ts';
+import { CANONICAL_DC_ENTITIES, isDcLocation } from '../../src/lib/solar/plantMap.ts';
+import { calculateWeightedPr } from '../../src/lib/solar/dashboard.ts';
+import { parseIsolarMonthlyReportFile } from '../../src/lib/importers/isolarMonthlyReport.ts';
+import { getGridFactor } from '../../src/lib/emission-factors.ts';
 
 const root = path.resolve(import.meta.dirname, '../..');
-const outDir = path.join(root, 'docs', 'compare-tmp');
+const outDir = path.join(root, 'docs', 'comparison-csv-vs-dashboard');
 const monthFiles = [
   ['01', 'Monitor PLTS 2026 (3)-JAN 2026.csv'],
   ['02', 'Monitor PLTS 2026 (3)-FEB 2026.csv'],

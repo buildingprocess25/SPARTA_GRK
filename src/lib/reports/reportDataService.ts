@@ -233,7 +233,7 @@ export function buildCombinedMonthlyTrend(reportData) {
   });
 }
 
-export function exportCsvReport(reportData, filename) {
+export function exportCsvReport(reportData, filename?: string) {
   const trend = buildCombinedMonthlyTrend(reportData);
   const withScope3 = Boolean(scope3ForReport(reportData));
   const headers = [

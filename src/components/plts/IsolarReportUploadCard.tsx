@@ -25,7 +25,7 @@ function monthRange(months) {
   return first === last ? first : `${first} s.d. ${last}`;
 }
 
-export default function IsolarReportUploadCard({ onImported }) {
+export default function IsolarReportUploadCard({ onImported }: { onImported?: any }) {
   const { refreshData, mutationsAllowed } = useSustainability();
   const [status, setStatus] = useState('idle'); // 'idle' | 'uploading' | 'done' | 'error'
   const [fileName, setFileName] = useState('');
@@ -37,7 +37,7 @@ export default function IsolarReportUploadCard({ onImported }) {
   const isUploading = status === 'uploading';
   const disabled = isUploading || !mutationsAllowed;
 
-  const closeSummary = ({ restoreFocus = false } = {}) => {
+  const closeSummary = ({ restoreFocus = false }: { restoreFocus?: boolean } = {}) => {
     setStatus('idle');
     setResult(null);
     setIsSummaryHeld(false);

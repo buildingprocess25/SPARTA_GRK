@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { findUser, verifyPassword, changePassword, verifySessionToken, SESSION_COOKIE } from '@/lib/auth.js';
+import { findUser, verifyPassword, changePassword, verifySessionToken, SESSION_COOKIE } from '@/lib/auth.ts';
 
 export const dynamic = 'force-dynamic';
 

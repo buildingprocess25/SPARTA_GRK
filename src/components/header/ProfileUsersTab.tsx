@@ -23,7 +23,7 @@ export default function ProfileUsersTab({
   setShowNewUserPassword,
   showNewUserPassword,
   usersList,
-}) {
+}: { activeRoleOverride?: any; creatingUser?: any; effectiveRoleId?: any; fetchUsers?: any; handleCreateUser?: any; handleDeleteUser?: any; isAddingUser?: any; isSuperAdmin?: any; loadingUsers?: any; newUserForm?: any; setActiveRoleOverride?: any; setIsAddingUser?: any; setNewUserForm?: any; setShowNewUserPassword?: any; showNewUserPassword?: any; usersList?: any }) {
   return (
     <div className="space-y-4 animate-in">
       {/* Top Bar: Judul & Tombol Tambah Pengguna */}

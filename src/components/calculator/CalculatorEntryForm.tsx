@@ -26,20 +26,20 @@ const defaults = {
 const fieldClass = 'mt-1 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-500/20';
 const option = item => ({ value: item.code, label: `${item.label} (${item.value ?? 'perlu faktor'} ${item.unit})` });
 
-function NumberField({ id, label, value, onChange, unit, min = '0', step = 'any', helper }) {
+function NumberField({ id, label, value, onChange, unit, min = '0', step = 'any', helper }: { id?: any; label?: any; value?: any; onChange?: any; unit?: any; min?: string; step?: string; helper?: any }) {
   return <label htmlFor={id} className="block text-sm font-semibold text-slate-700 dark:text-slate-300">{label}<span className="ml-1 text-rose-600 dark:text-rose-400" aria-hidden="true">*</span><div className="relative"><input id={id} type="number" min={min} step={step} required value={value ?? ''} onChange={event => onChange(event.target.value)} className={`${fieldClass} ${unit ? 'pr-24' : ''}`} />{unit && <span className="pointer-events-none absolute right-3 top-3 text-xs text-slate-500 dark:text-slate-400">{unit}</span>}</div>{helper && <span className="mt-1 block text-xs font-normal text-slate-500 dark:text-slate-400">{helper}</span>}</label>;
 }
 
-function DateField({ id, label, value, onChange }) {
+function DateField({ id, label, value, onChange }: { id?: any; label?: any; value?: any; onChange?: any }) {
   return <label htmlFor={id} className="block text-sm font-semibold text-slate-700 dark:text-slate-300">{label}<span className="ml-1 text-rose-600 dark:text-rose-400" aria-hidden="true">*</span><input id={id} type="date" required value={value ?? ''} onChange={event => onChange(event.target.value)} className={fieldClass} /></label>;
 }
 
-function SelectField({ id, label, value, onChange, children, helper }) {
+function SelectField({ id, label, value, onChange, children, helper }: { id?: any; label?: any; value?: any; onChange?: any; children?: any; helper?: any }) {
   const options = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
       return {
-        value: child.props.value,
-        label: child.props.children,
+        value: (child.props as { value?: unknown }).value,
+        label: (child.props as { children?: React.ReactNode }).children,
       };
     }
     return null;
@@ -73,7 +73,7 @@ function travelOptions(type) {
   return factorsByCategory('travel').filter(item => prefixes[type].some(prefix => item.code.startsWith(prefix))).map(option);
 }
 
-export default function CalculatorEntryForm({ categoryId, profile, initialEntry, onSave, onBack, onPrevious, onSkip, onSaveAndNext, isFirst, isLast }) {
+export default function CalculatorEntryForm({ categoryId, profile, initialEntry, onSave, onBack, onPrevious, onSkip, onSaveAndNext, isFirst, isLast }: { categoryId?: any; profile?: any; initialEntry?: any; onSave?: any; onBack?: any; onPrevious?: any; onSkip?: any; onSaveAndNext?: any; isFirst?: any; isLast?: any }) {
   const category = CATEGORY_MAP[categoryId];
   const [values, setValues] = useState(() => initialEntry?.input || freshDefaults(categoryId, profile));
   const [error, setError] = useState('');
@@ -123,7 +123,7 @@ export default function CalculatorEntryForm({ categoryId, profile, initialEntry,
 
   const buildInput = () => {
     const engineCategory = categoryId === 'travel' ? values.travelType : categoryId;
-    const input = { ...values, category: engineCategory, periodStart: profile.periodStart, periodEnd: profile.periodEnd };
+    const input: Record<string, any> = { ...values, category: engineCategory, periodStart: profile.periodStart, periodEnd: profile.periodEnd };
     if (categoryId === 'scope1b' && values.mode === 'distance') input.factorCode = values.vehicleFactorCode;
     return input;
   };

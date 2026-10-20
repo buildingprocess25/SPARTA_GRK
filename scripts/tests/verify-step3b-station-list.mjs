@@ -18,9 +18,9 @@ if (fs.existsSync(envLocalPath)) {
   });
 }
 
-import { getValidToken, executeIsolarRequest } from '../apiClient.js';
-import { getQuotaSnapshot } from '../sync.js';
-import { QUOTA_CONFIG } from '../endpoints.js';
+import { getValidToken, executeIsolarRequest } from '../../src/lib/solar/apiClient.ts';
+import { getQuotaSnapshot } from '../../src/lib/solar/sync.ts';
+import { QUOTA_CONFIG } from '../../src/lib/solar/endpoints.ts';
 
 async function runStep3b() {
   const baseUrl = process.env.ISOLAR_BASE_URL || 'https://gateway.isolarcloud.com.hk';

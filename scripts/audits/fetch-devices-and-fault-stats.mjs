@@ -1,5 +1,5 @@
-import { executeIsolarRequest } from '../../src/lib/solar/apiClient.js';
-import prisma from '../../src/lib/prisma.js';
+import { executeIsolarRequest } from '../../src/lib/solar/apiClient.ts';
+import prisma from '../../src/lib/prisma.ts';
 
 async function main() {
   console.log('=== 1. FETCH DEVICE LIST FOR KOTABUMI (1247367) & BOGOR (1162742) ===');

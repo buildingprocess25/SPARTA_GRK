@@ -19,7 +19,7 @@ export default function AnalyticsTrendChart({
   selectedMetric,
   trendDataset,
   unitMode,
-}) {
+}: { activeChosenCount?: any; activeMetricMeta?: any; chartViewMode?: any; chosenDCs?: any; computedAverageMetricValue?: any; handleSelectAll?: any; hoveredDCId?: any; isMounted?: any; prBarChartData?: any; rankedChosenCount?: any; selectedMetric?: any; trendDataset?: any; unitMode?: any }) {
   return (
     <div className="flex-1 min-h-[320px] w-full pt-3 relative">
       {!isMounted ? (

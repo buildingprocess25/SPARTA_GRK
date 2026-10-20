@@ -5,7 +5,7 @@ import { CustomSelect } from '@/components/ui/select';
 
 const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-export default function Scope2Filters({ filters, grids, plants, onChange }) {
+export default function Scope2Filters({ filters, grids, plants, onChange }: { filters?: any; grids?: any; plants?: any; onChange?: any }) {
   const set = (key, value) => onChange({ ...filters, [key]: value });
 
   const periodOptions = [

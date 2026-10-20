@@ -16,7 +16,7 @@ function formatNum(value, min = 0, max = 2) {
   return Number(value).toLocaleString('id-ID', { minimumFractionDigits: min, maximumFractionDigits: max });
 }
 
-function EmptyMeasurement({ title, message }) {
+function EmptyMeasurement({ title, message }: { title?: any; message?: any }) {
   return (
     <div className="h-[260px] rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col items-center justify-center px-6 text-center">
       <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{title}: Belum tersedia</p>
@@ -25,7 +25,7 @@ function EmptyMeasurement({ title, message }) {
   );
 }
 
-export default function TabLoadVsPlts({ filters }) {
+export default function TabLoadVsPlts({ filters }: { filters?: any }) {
   const { data, loading, error } = usePltsEndpoint('/api/plts/dashboard/load', filters);
   const [loadViewMode, setLoadViewMode] = useState('monthly');
   const [branchLoadLimit, setBranchLoadLimit] = useState(10);

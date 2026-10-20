@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import prisma from '../../src/lib/prisma.js';
-import { calculateScope1FuelEmission } from '../../src/lib/carbon/carbonEngine.js';
-import { isVehicleFuelRecord } from '../../src/lib/scope1/fuelCategory.js';
+import prisma from '../../src/lib/prisma.ts';
+import { calculateScope1FuelEmission } from '../../src/lib/carbon/carbonEngine.ts';
+import { isVehicleFuelRecord } from '../../src/lib/scope1/fuelCategory.ts';
 
 // Usage: node scripts/import-vehicle-fuel-costs.mjs <rekap.csv> [--map <kuu-map.json>] [--year 2026] [--fuel PERTALITE] [--apply]
 // Without --apply it only prints what would change.

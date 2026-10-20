@@ -5,7 +5,7 @@ import { Sun, Moon } from 'lucide-react';
 
 const STORAGE_KEY = 'sparta-theme';
 
-export default function ThemeToggle({ className = '' }) {
+export default function ThemeToggle({ className = '' }: { className?: string }) {
   const [isDark, setIsDark] = useState(null);
 
   useEffect(() => {

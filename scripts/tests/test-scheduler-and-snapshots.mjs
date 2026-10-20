@@ -14,9 +14,9 @@ requireIsolatedTestDatabase('test-scheduler-and-snapshots');
 const prisma = new PrismaClient();
 globalThis.prisma = prisma;
 
-const { get30mSlotInfo, captureSnapshot30m, getSnapshotStatusReport, getSnapshotHistory } = await import('../../src/lib/solar/snapshot.js');
-const { runSchedulerCycle } = await import('../../src/lib/solar/scheduler.js');
-const { getWibTimeInfo, isInSyncWindow } = await import('../../src/lib/solar/sync.js');
+const { get30mSlotInfo, captureSnapshot30m, getSnapshotStatusReport, getSnapshotHistory } = await import('../../src/lib/solar/snapshot.ts');
+const { runSchedulerCycle } = await import('../../src/lib/solar/scheduler.ts');
+const { getWibTimeInfo, isInSyncWindow } = await import('../../src/lib/solar/sync.ts');
 
 let passedTests = 0;
 let totalTests = 0;

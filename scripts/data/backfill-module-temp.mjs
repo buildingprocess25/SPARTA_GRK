@@ -1,4 +1,4 @@
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 async function main() {
   console.log('Backfilling module_temp_c for existing weather_daily rows using Sandia formula...');

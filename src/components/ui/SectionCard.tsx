@@ -15,7 +15,7 @@ export default function SectionCard({
   headerClassName = '',
   contentClassName = '',
   ...props
-}) {
+}: { title?: any; subtitle?: any; infoKey?: any; icon?: any; iconColor?: string; actions?: any; children?: any; className?: string; headerClassName?: string; contentClassName?: string; [key: string]: any }) {
   const hasHeader = Boolean(title || subtitle || actions || Icon);
 
   return (

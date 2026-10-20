@@ -17,7 +17,7 @@ import {
   calculatePLTSAvoidedEmissions,
   calculateWaterRecycleImpact,
   reconcileCarbonBalance
-} from '../../src/lib/carbon/carbonEngine.js';
+} from '../../src/lib/carbon/carbonEngine.ts';
 import { requireIsolatedTestDatabase } from '../lib/require-isolated-test-database.mjs';
 
 const prisma = new PrismaClient();

@@ -80,7 +80,7 @@ export const METRIC_OPTIONS = isFeatureEnabled('auditBaseline')
   : ALL_METRIC_OPTIONS.filter(m => m.sourceType !== 'AUDIT_BASELINE');
 
 // January through the current month; the current month counts only the days elapsed so far.
-export const API_MONTHS = getYearToDateMonths().map(({ yearMonth, label }, index, all) => {
+export const API_MONTHS = getYearToDateMonths().map(({ yearMonth, label }: { yearMonth?: any; label?: any }, index, all) => {
   const [year, month] = yearMonth.split('-').map(Number);
   const isCurrent = index === all.length - 1;
   return {

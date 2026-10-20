@@ -1,10 +1,10 @@
-import prisma from '@/lib/prisma.js';
+import prisma from '@/lib/prisma.ts';
 import { createPrismaHistoryRepository, getPltsHistory } from '@/lib/solar/history';
-import { fetchRawEnergyFlows } from '@/lib/energy-data.js';
-import { factorForGrid } from '@/lib/scope2/dashboardService.js';
-import { CANONICAL_DC_ENTITIES, isDcLocation } from '@/lib/solar/plantMap.js';
-import { isPlantUnderConstruction } from '@/lib/solar/dashboard.js';
-import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig.js';
+import { fetchRawEnergyFlows } from '@/lib/energy-data.ts';
+import { factorForGrid } from '@/lib/scope2/dashboardService.ts';
+import { CANONICAL_DC_ENTITIES, isDcLocation } from '@/lib/solar/plantMap.ts';
+import { isPlantUnderConstruction } from '@/lib/solar/dashboard.ts';
+import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig.ts';
 
 function round(value, digits = 3) {
   if (value === null || value === undefined || !Number.isFinite(Number(value))) return null;
@@ -15,7 +15,7 @@ function round(value, digits = 3) {
  * Sums purchased and self-consumed kWh (energy_flow_monthly, same table Scope 2's
  * dashboard already trusts) per DC across the requested period.
  */
-async function buildEnergyByDc({ year, startYearMonth, endYearMonth }) {
+async function buildEnergyByDc({ year, startYearMonth, endYearMonth }: { year?: any; startYearMonth?: any; endYearMonth?: any }) {
   const flows = await fetchRawEnergyFlows({ year, rootDir: process.cwd() });
   const purchasedByDc = new Map();
   const selfConsumedByDc = new Map();
@@ -35,7 +35,7 @@ async function buildEnergyByDc({ year, startYearMonth, endYearMonth }) {
  * per-DC totals above, so a monthly figure never silently includes a grid
  * whose factor is still unvalidated.
  */
-async function buildMonthlyScope2Trend({ year, startYearMonth, endYearMonth }) {
+async function buildMonthlyScope2Trend({ year, startYearMonth, endYearMonth }: { year?: any; startYearMonth?: any; endYearMonth?: any }) {
   const flows = await fetchRawEnergyFlows({ year, rootDir: process.cwd() });
   // flow.grid comes straight from the plant_master DB column, which stores
   // human labels ("Jamali", "Sulutenggo") rather than the app's canonical
@@ -43,7 +43,7 @@ async function buildMonthlyScope2Trend({ year, startYearMonth, endYearMonth }) {
   // resolve it. Resolve grid via CANONICAL_DC_ENTITIES by dcId instead, the
   // same way the already-trusted Scope 2 dashboard (dashboardService.js)
   // does, rather than trusting the raw column.
-  const entityByDcId = new Map(CANONICAL_DC_ENTITIES.map(e => [e.dcId, e]));
+  const entityByDcId = new Map(CANONICAL_DC_ENTITIES.map(e => [e.dcId, e] as const));
   const byMonth = new Map();
   for (const flow of flows) {
     if (!flow.dcId || flow.storageYearMonth < startYearMonth || flow.storageYearMonth > endYearMonth) continue;
@@ -145,7 +145,7 @@ export async function GET(req) {
       };
     });
 
-    const scope2TrendByMonth = new Map(monthlyScope2Trend.map(m => [m.yearMonth, m]));
+    const scope2TrendByMonth = new Map(monthlyScope2Trend.map(m => [m.yearMonth, m] as const));
     const monthlyTrend = history.months.map(m => {
       const ym = `${m.yearMonth.slice(0, 4)}-${m.yearMonth.slice(4, 6)}`;
       const scope2 = scope2TrendByMonth.get(ym);

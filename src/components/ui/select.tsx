@@ -15,7 +15,7 @@ export function Select({
   className = '',
   children,
   ...props
-}) {
+}: { value?: any; defaultValue?: any; onValueChange?: any; onChange?: any; disabled?: boolean; className?: string; children?: any; [key: string]: any }) {
   const [internalValue, setInternalValue] = useState(defaultValue || '');
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
@@ -78,7 +78,7 @@ export function Select({
   );
 }
 
-export const SelectTrigger = React.forwardRef(function SelectTrigger(
+export const SelectTrigger = React.forwardRef<any, { [key: string]: any } & { className?: string; children?: any; id?: any; [key: string]: any }>(function SelectTrigger(
   { className = '', children, id, ...props },
   forwardedRef
 ) {
@@ -120,7 +120,7 @@ export const SelectTrigger = React.forwardRef(function SelectTrigger(
   );
 });
 
-export function SelectValue({ placeholder = 'Pilih opsi...', children }) {
+export function SelectValue({ placeholder = 'Pilih opsi...', children }: { placeholder?: string; children?: any }) {
   const context = useContext(SelectContext);
   const hasValue = context?.value !== undefined && context?.value !== '' && context?.value !== null;
 
@@ -133,7 +133,7 @@ export function SelectValue({ placeholder = 'Pilih opsi...', children }) {
   );
 }
 
-export const SelectContent = React.forwardRef(function SelectContent(
+export const SelectContent = React.forwardRef<any, { [key: string]: any } & { className?: string; children?: any; [key: string]: any }>(function SelectContent(
   { className = '', children, ...props },
   forwardedRef
 ) {
@@ -228,7 +228,7 @@ export const SelectContent = React.forwardRef(function SelectContent(
   );
 });
 
-export function SelectGroup({ children, className = '', ...props }) {
+export function SelectGroup({ children, className = '', ...props }: { children?: any; className?: string; [key: string]: any }) {
   return (
     <div role="group" className={`p-0.5 space-y-0.5 ${className}`} {...props}>
       {children}
@@ -236,7 +236,7 @@ export function SelectGroup({ children, className = '', ...props }) {
   );
 }
 
-export function SelectLabel({ children, className = '', ...props }) {
+export function SelectLabel({ children, className = '', ...props }: { children?: any; className?: string; [key: string]: any }) {
   return (
     <div
       className={`px-2.5 py-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 ${className}`}
@@ -247,7 +247,7 @@ export function SelectLabel({ children, className = '', ...props }) {
   );
 }
 
-export const SelectItem = React.forwardRef(function SelectItem(
+export const SelectItem = React.forwardRef<React.ElementRef<'div'>, React.ComponentPropsWithoutRef<'div'> & { value?: any; children?: any; disabled?: boolean; className?: string; [key: string]: any }>(function SelectItem(
   { value, children, disabled = false, className = '', ...props },
   ref
 ) {
@@ -282,7 +282,7 @@ export const SelectItem = React.forwardRef(function SelectItem(
   );
 });
 
-export function SelectSeparator({ className = '', ...props }) {
+export function SelectSeparator({ className = '', ...props }: { className?: string; [key: string]: any }) {
   return (
     <div
       role="separator"
@@ -304,7 +304,7 @@ export function CustomSelect({
   contentClassName = '',
   ariaLabel,
   id,
-}) {
+}: { value?: any; onChange?: any; onValueChange?: any; options?: any[]; placeholder?: string; disabled?: boolean; className?: string; triggerClassName?: string; contentClassName?: string; ariaLabel?: any; id?: any }) {
   const normalizedOptions = React.useMemo(() => {
     return options.map((opt) => {
       if (opt && typeof opt === 'object' && 'value' in opt) {

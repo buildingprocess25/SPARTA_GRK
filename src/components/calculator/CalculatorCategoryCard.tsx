@@ -3,7 +3,7 @@
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { formatEmission } from '@/lib/calculator/format.ts';
 
-export default function CalculatorCategoryCard({ category, count, subtotal, onOpen }) {
+export default function CalculatorCategoryCard({ category, count, subtotal, onOpen }: { category?: any; count?: any; subtotal?: any; onOpen?: any }) {
   const Icon = category.icon;
   const reduction = category.kind === 'reduction';
   return <article className={`rounded-2xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${reduction ? 'border-blue-100 dark:border-blue-500/20 bg-blue-50/55 dark:bg-blue-500/10' : 'border-rose-100 dark:border-rose-500/20 bg-rose-50/45 dark:bg-rose-500/10'}`}>

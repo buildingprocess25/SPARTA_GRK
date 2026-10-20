@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-export const Input = React.forwardRef(function Input(
+export const Input = React.forwardRef<React.ElementRef<'input'>, React.ComponentPropsWithoutRef<'input'> & { className?: string; type?: string; [key: string]: any }>(function Input(
   { className = '', type = 'text', ...props },
   ref
 ) {

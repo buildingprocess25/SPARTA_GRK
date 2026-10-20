@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { getPltsDashboard } from '../../src/lib/solar/dashboardService.js';
-import { buildPltsDashboardFromRows, parseDashboardQuery } from '../../src/lib/solar/dashboard.js';
+import { getPltsDashboard } from '../../src/lib/solar/dashboardService.ts';
+import { buildPltsDashboardFromRows, parseDashboardQuery } from '../../src/lib/solar/dashboard.ts';
 import { performance } from 'perf_hooks';
 
 async function main() {

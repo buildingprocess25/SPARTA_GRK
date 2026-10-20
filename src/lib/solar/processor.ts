@@ -700,6 +700,13 @@ export function processAllDCAnalytics({
   selectedMetric = 'specificYield',
   sortDirection = 'desc',
   selectedDCIds = 'all'
+}: {
+  stations?: any[];
+  historicalPlants?: any[];
+  baselineData?: any[];
+  selectedMetric?: string;
+  sortDirection?: string;
+  selectedDCIds?: 'all' | string[];
 }) {
   // If stations is already canonical DCs list from API, use directly; otherwise aggregate
   const canonicalDCs = (stations.length > 0 && stations[0].canonicalName)

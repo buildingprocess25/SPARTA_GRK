@@ -1,6 +1,6 @@
-import prisma from '../../src/lib/prisma.js';
-import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.js';
-import { getGridFactor } from '../../src/lib/emission-factors.js';
+import prisma from '../../src/lib/prisma.ts';
+import { CANONICAL_DC_ENTITIES } from '../../src/lib/solar/plantMap.ts';
+import { getGridFactor } from '../../src/lib/emission-factors.ts';
 
 async function testPlantMath() {
   const flows = await prisma.$queryRawUnsafe(`

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { removeSubscriptionByEndpoint } from '@/lib/push.js';
+import { removeSubscriptionByEndpoint } from '@/lib/push.ts';
 
 export async function POST(request) {
   try {

@@ -14,7 +14,7 @@ export default function PLTSMonthlyEnergyCharts({
   dashboardData,
   dashboardLoading,
   dynamicEnergyBreakdown,
-}) {
+}: { chartData?: any; chartYAxisMax?: any; dashboardData?: any; dashboardLoading?: any; dynamicEnergyBreakdown?: any }) {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
       {/* Kiri: Produksi PLTS vs PLN (xl:col-span-2) */}
@@ -73,7 +73,7 @@ export default function PLTSMonthlyEnergyCharts({
                     width={55}
                   />
                   <Tooltip
-                    content={({ active, payload, label }) => {
+                    content={({ active, payload, label }: { active?: any; payload?: any; label?: any }) => {
                       if (active && payload && payload.length) {
                         const currentPoint = chartData.find(d => d.month === label || d.yearMonth === label);
                         const isPartial = label?.includes('*') || currentPoint?.isPartial;

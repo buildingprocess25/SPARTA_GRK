@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
-import { getStoreSyncStatus, runStoreSync } from '@/lib/stores/storeSync.js';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.ts';
+import { getStoreSyncStatus, runStoreSync } from '@/lib/stores/storeSync.ts';
 
 export const dynamic = 'force-dynamic';
 

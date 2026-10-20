@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import prisma from '../../src/lib/prisma.js';
-import { parseBmesMonthlyRows, importBmesMonthly } from '../../src/lib/importers/bmesMonthlyImport.js';
+import prisma from '../../src/lib/prisma.ts';
+import { parseBmesMonthlyRows, importBmesMonthly } from '../../src/lib/importers/bmesMonthlyImport.ts';
 
 const filePath = process.argv[2];
 const isCommit = process.argv.includes('--commit');

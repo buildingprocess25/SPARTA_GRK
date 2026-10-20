@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { parseAndValidateUpload, commitBatchToDatabase } from '@/lib/importers/batchUploadProcessor';
-import { mutationDecisionForRequest } from '@/lib/server/requestGuards.js';
-import { normalizeImportHistoryLimit } from '@/lib/importers/importContracts.js';
+import { mutationDecisionForRequest } from '@/lib/server/requestGuards.ts';
+import { normalizeImportHistoryLimit } from '@/lib/importers/importContracts.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -113,7 +113,7 @@ export async function GET(request) {
     const moduleFilter = searchParams.get('module');
 
     // Deleted uploads stay in import_batch as an audit trail but are hidden unless asked for.
-    const where = searchParams.get('includeDeleted') === 'true' ? {} : { status: { not: 'DELETED' } };
+    const where: Record<string, any> = searchParams.get('includeDeleted') === 'true' ? {} : { status: { not: 'DELETED' } };
     if (moduleFilter) {
       where.module = { in: moduleFilter.split(',').map((value) => value.trim()).filter(Boolean) };
     }

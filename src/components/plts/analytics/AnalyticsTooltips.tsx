@@ -1,6 +1,6 @@
 'use client';
 
-export function SafePrBarTooltip({ active, payload }) {
+export function SafePrBarTooltip({ active, payload }: { active?: any; payload?: any }) {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
@@ -36,7 +36,7 @@ export function SafePrBarTooltip({ active, payload }) {
 
 // backdrop-blur-md on this tooltip's near-opaque background keeps its text
 // legible when it floats directly over busy chart gridlines/bars.
-export function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, chartViewMode, hoveredDCId }) {
+export function SafeTrendTooltip({ active, payload, label, activeMetricUnit, unitMode, chartViewMode, hoveredDCId }: { active?: any; payload?: any; label?: any; activeMetricUnit?: any; unitMode?: any; chartViewMode?: any; hoveredDCId?: any }) {
   if (active && payload && payload.length) {
     const rawData = payload[0]?.payload || {};
     const unit = activeMetricUnit || '';

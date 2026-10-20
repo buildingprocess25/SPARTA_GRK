@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import prisma from '../../src/lib/prisma.js';
+import prisma from '../../src/lib/prisma.ts';
 
 const workspace = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Z]:)/i, '$1'));
 const baselinePath = path.resolve(workspace, 'src/data/monitorPltsApril2026.json');
@@ -50,7 +50,7 @@ async function main() {
   const now = new Date('2026-10-02T13:00:00.000Z');
   const goldenBefore = goldenHashes();
 
-  const { getPltsDashboard } = await import(`../src/lib/solar/dashboardService.js?before=${Date.now()}`);
+  const { getPltsDashboard } = await import(`../src/lib/solar/dashboardService.ts?before=${Date.now()}`);
   const before = await getPltsDashboard(query, { db: prisma, now, skipCache: true });
   const beforeSignature = dashboardSignature(before);
 
@@ -59,7 +59,7 @@ async function main() {
     try {
       await prisma.$transaction(async (tx) => {
         await tx.plantMaster.updateMany({ data: { baselineInstalledKwp: 0 } });
-        const cold = await import(`../src/lib/solar/dashboardService.js?disabled=${Date.now()}`);
+        const cold = await import(`../src/lib/solar/dashboardService.ts?disabled=${Date.now()}`);
         const after = await cold.getPltsDashboard(query, { db: tx, now, skipCache: true });
         assert.equal(dashboardSignature(after), beforeSignature, 'Angka dashboard berubah saat baseline dinonaktifkan keras');
         throw rollbackMarker;

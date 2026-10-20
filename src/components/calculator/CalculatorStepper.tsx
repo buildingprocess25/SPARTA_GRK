@@ -3,7 +3,7 @@
 import { Check, ChevronRight } from 'lucide-react';
 import { CALCULATOR_CATEGORIES } from './calculatorConfig';
 
-export default function CalculatorStepper({ activeCategory, entries, onSelect }) {
+export default function CalculatorStepper({ activeCategory, entries, onSelect }: { activeCategory?: any; entries?: any; onSelect?: any }) {
   return <nav aria-label="Tahapan kalkulator emisi" className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 shadow-sm">
     <ol className="flex min-w-max items-center gap-1">
       {CALCULATOR_CATEGORIES.map((category, index) => {

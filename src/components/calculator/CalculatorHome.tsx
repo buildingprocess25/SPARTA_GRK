@@ -3,7 +3,7 @@
 import CalculatorCategoryCard from './CalculatorCategoryCard';
 import { CALCULATOR_CATEGORIES } from './calculatorConfig';
 
-export default function CalculatorHome({ entries, onOpen }) {
+export default function CalculatorHome({ entries, onOpen }: { entries?: any; onOpen?: any }) {
   const categoryEntries = id => entries.filter(entry => entry.category === id);
   const totalFor = id => categoryEntries(id).reduce((sum, entry) => sum + (Number.isFinite(entry.calculated?.kgCo2e) ? entry.calculated.kgCo2e : 0), 0);
   return <div className="space-y-8">

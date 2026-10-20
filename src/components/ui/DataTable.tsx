@@ -3,7 +3,7 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export function TableContainer({ children, className = '', ...props }) {
+export function TableContainer({ children, className = '', ...props }: { children?: any; className?: string; [key: string]: any }) {
   return (
     <div
       className={`overflow-x-auto rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs dark:shadow-none ${className}`}
@@ -14,7 +14,7 @@ export function TableContainer({ children, className = '', ...props }) {
   );
 }
 
-export function TableHeader({ children, className = '', dark = true, ...props }) {
+export function TableHeader({ children, className = '', dark = true, ...props }: { children?: any; className?: string; dark?: boolean; [key: string]: any }) {
   return (
     <thead
       className={`${
@@ -29,7 +29,7 @@ export function TableHeader({ children, className = '', dark = true, ...props })
   );
 }
 
-export function TableRow({ children, className = '', clickable = false, ...props }) {
+export function TableRow({ children, className = '', clickable = false, ...props }: { children?: any; className?: string; clickable?: boolean; [key: string]: any }) {
   return (
     <tr
       className={`border-b border-slate-100 dark:border-slate-800 transition-colors ${
@@ -42,7 +42,7 @@ export function TableRow({ children, className = '', clickable = false, ...props
   );
 }
 
-export function TableCell({ children, className = '', align = 'left', isNumber = false, ...props }) {
+export function TableCell({ children, className = '', align = 'left', isNumber = false, ...props }: { children?: any; className?: string; align?: string; isNumber?: boolean; [key: string]: any }) {
   const alignClass = align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left';
   const numClass = isNumber ? 'tabular-nums' : '';
 
@@ -63,7 +63,7 @@ export function TablePagination({
   totalItems = null,
   pageSize = null,
   className = '',
-}) {
+}: { currentPage?: any; pageCount?: any; onPageChange?: any; totalItems?: any; pageSize?: any; className?: string }) {
   return (
     <div
       className={`flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-800/40 rounded-b-2xl ${className}`}
@@ -112,7 +112,7 @@ export default function DataTable({
   children,
   className = '',
   ...props
-}) {
+}: { children?: any; className?: string; [key: string]: any }) {
   return (
     <TableContainer className={className} {...props}>
       <table className="min-w-full w-full text-left text-xs border-collapse">

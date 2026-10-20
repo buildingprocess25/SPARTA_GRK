@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 
 export const RKAP_TARGET_SOURCE = 'SUSTAINABILITY_DATA_OWNER';
+// Persisted as source_ref on RKAP target rows; keep the original value so stored rows stay consistent.
 export const RKAP_TARGET_SOURCE_REF = 'src/data/sustainabilityData.js#pltsTargetMatrix';
 
 function extractObjectLiteral(source, exportName) {
@@ -34,7 +35,7 @@ function extractObjectLiteral(source, exportName) {
 }
 
 export function loadOwnerTargetMatrix() {
-  const sourceUrl = new URL('../../data/sustainabilityData.js', import.meta.url);
+  const sourceUrl = new URL('../../data/sustainabilityData.ts', import.meta.url);
   const source = fs.readFileSync(sourceUrl, 'utf8');
   const literal = extractObjectLiteral(source, 'pltsTargetMatrix');
   const matrix = Function(`"use strict"; return (${literal});`)();

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { calculateWeightedPr, resolvePlantClimate, CO_LOCATED_RADIATION_MAP } from '../../src/lib/solar/dashboard.js';
+import { calculateWeightedPr, resolvePlantClimate, CO_LOCATED_RADIATION_MAP } from '../../src/lib/solar/dashboard.ts';
 import { getPlantLocalDateTime, getPlantTimezone } from '../sync-isolar.mjs';
 
 console.log('=== TEST SUITE: PR ATURAN REVISI, BORROWED RADIATION, & PLACEHOLDER RULES ===\n');

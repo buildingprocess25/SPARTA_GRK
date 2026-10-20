@@ -141,7 +141,7 @@ export function sessionCookieOptions(exp) {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'lax' as const,
     path: '/',
     maxAge: Math.max(0, Math.floor((exp - Date.now()) / 1000)),
   };

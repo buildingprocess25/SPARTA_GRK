@@ -40,7 +40,7 @@ Periode utama: Januari–September 2026; Oktober dipisahkan sebagai parsial.
 | Rekap Corporate Reputation | 218/197 | 28 | Header baris 3; blok empat baris per cabang | MWh; banyak kolom kosong/catatan |
 | Resume | 31/23 | 40 | Beberapa blok header: produksi, CO2, coal, tree | MWh, tCO2e, ton, pohon, persen |
 
-Tidak ditemukan `#REF!`, `#DIV/0!`, `#VALUE!`, `N/A`, atau sel yang diawali `=`. Karena formatnya CSV, rumus spreadsheet sudah menjadi nilai. Terdapat sel kosong, tanda `-`, header bertingkat, dan label tanggal yang berpotensi dikonversi otomatis oleh aplikasi spreadsheet. Rincian hash, ukuran, jumlah baris/kolom, dan header asli tersimpan di [`evidence.json`](compare-tmp/evidence.json).
+Tidak ditemukan `#REF!`, `#DIV/0!`, `#VALUE!`, `N/A`, atau sel yang diawali `=`. Karena formatnya CSV, rumus spreadsheet sudah menjadi nilai. Terdapat sel kosong, tanda `-`, header bertingkat, dan label tanggal yang berpotensi dikonversi otomatis oleh aplikasi spreadsheet. Rincian hash, ukuran, jumlah baris/kolom, dan header asli tersimpan di [`evidence.json`](comparison-csv-vs-dashboard/evidence.json).
 
 ### 2.3 Kamus kolom
 
@@ -154,7 +154,7 @@ Perbedaan produksi 0,32950 MWh seluruhnya berasal dari data Parung yang tidak ma
 | 19 | Feb | Parung | Produksi | 2,86360 | 2,99140 | +0,12780 | +4,463% | SIGNIFIKAN |
 | 20 | Feb | Parung | Pakai sendiri | 2,86336 | 2,99116 | +0,12780 | +4,463% | SIGNIFIKAN |
 
-Lampiran lengkap berisi 1.665 baris: [`per-dc-month-comparison.csv`](compare-tmp/per-dc-month-comparison.csv).
+Lampiran lengkap berisi 1.665 baris: [`per-dc-month-comparison.csv`](comparison-csv-vs-dashboard/per-dc-month-comparison.csv).
 
 ### 3.5 Kapasitas, target, PR, dan Oktober parsial
 
@@ -196,7 +196,7 @@ Lampiran lengkap berisi 1.665 baris: [`per-dc-month-comparison.csv`](compare-tmp
 | Bulan parsial | CSV mentor berhenti Sep | Scope 2 memiliki Okt parsial | Sudah dipisahkan |
 | Faktor emisi sama antarmodul | Tidak berlaku | Gagal: Scope 2 Sulselrabar 0,73 vs registry PLTS ex-post 0,75; `KALSELTENG` tidak menemukan faktor | Perlu satu registry |
 
-Baris pelanggar lengkap neraca dan bukti terstruktur tersedia di [`evidence.json`](compare-tmp/evidence.json). Contoh konkret:
+Baris pelanggar lengkap neraca dan bukti terstruktur tersedia di [`evidence.json`](comparison-csv-vs-dashboard/evidence.json). Contoh konkret:
 
 - Jambi Sep, CSV baris 25: yield 5,31790; feed-in 3,46864; load 2,90332; purchase 0,10225 MWh. Identitas memberi self-use 1,84926 dan purchase 1,05406 MWh, yaitu angka dashboard.
 - Parung Jul, CSV baris 31 seluruh energi nol, sedangkan ekspor vendor mentah memuat produksi/load 0,20170 MWh. Dashboard mengikuti vendor mentah.
@@ -272,8 +272,8 @@ Jadikan ekspor mentah portal/meter yang diarsipkan dan diberi checksum sebagai s
 ## Lampiran yang dibuat
 
 - `docs/comparison-csv-vs-dashboard.md` — laporan ini.
-- `docs/compare-tmp/per-dc-month-comparison.csv` — seluruh 1.665 perbandingan DC-bulan-metrik.
-- `docs/compare-tmp/evidence.json` — profil file, agregat, PR, top mismatch, dan bukti terstruktur.
-- `docs/compare-tmp/compare.mjs` — skrip audit lokal yang hanya membaca sumber dan menulis dua lampiran di folder yang diizinkan.
+- `docs/comparison-csv-vs-dashboard/per-dc-month-comparison.csv` — seluruh 1.665 perbandingan DC-bulan-metrik.
+- `docs/comparison-csv-vs-dashboard/evidence.json` — profil file, agregat, PR, top mismatch, dan bukti terstruktur.
+- `scripts/audits/audit-csv-vs-dashboard.mjs` — skrip audit lokal yang hanya membaca sumber dan menulis dua lampiran di folder yang diizinkan.
 
 Tidak ada file kode aplikasi, konfigurasi, data sumber/CSV, atau database yang diubah. Tidak ada commit, migrasi, maupun operasi insert/update/delete yang dilakukan.

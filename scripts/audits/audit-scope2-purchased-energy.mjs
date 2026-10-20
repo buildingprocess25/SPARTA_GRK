@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { executeIsolarRequest } from '../../src/lib/solar/apiClient.js';
-import { getQuotaSnapshot } from '../../src/lib/solar/sync.js';
+import { executeIsolarRequest } from '../../src/lib/solar/apiClient.ts';
+import { getQuotaSnapshot } from '../../src/lib/solar/sync.ts';
 
 const MAX_CALLS = 8;
 let calls = 0;

@@ -8,7 +8,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const read = (relative) => fs.readFileSync(path.resolve(here, relative), 'utf8');
 
 test('alarm API is a no-store read-only database endpoint', () => {
-  const route = read('../../../app/api/alarms/route.js');
+  const route = read('../../../app/api/alarms/route.ts');
   assert.match(route, /export async function GET/);
   assert.match(route, /loadActiveAlarms/);
   assert.match(route, /Cache-Control['"]\s*:\s*['"]no-store/);

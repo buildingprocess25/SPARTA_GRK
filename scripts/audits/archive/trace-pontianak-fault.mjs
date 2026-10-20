@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { executeIsolarRequest } from '../../src/lib/solar/apiClient.js';
-import prisma from '../../src/lib/prisma.js';
+import { executeIsolarRequest } from '../../../src/lib/solar/apiClient.ts';
+import prisma from '../../../src/lib/prisma.ts';
 
 async function main() {
   console.log('======================================================================');
