@@ -237,17 +237,56 @@ export default function Scope2AnnualLoadDashboard() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      const lower = String(value || '').toLowerCase();
-      if (value !== null && value !== '' && lower !== 'all') {
-        params.set(key, String(value));
-      }
-    });
-    const qs = params.toString();
-    const newUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+    const isDefault =
+      filters.period === 'ytd' &&
+      filters.month === '2026-09' &&
+      filters.from === '2026-01' &&
+      filters.to === '2026-09' &&
+      (filters.grid === 'all' || !filters.grid) &&
+      (filters.dc === 'all' || !filters.dc) &&
+      !filters.q &&
+      Number(filters.tariff) === 1400 &&
+      filters.scope2Basis === 'purchased';
+
+    const url = new URL(window.location.href);
+    const scope2Keys = ['period', 'month', 'from', 'to', 'grid', 'dc', 'q', 'tariff', 'scope2Basis'];
+
+    if (isDefault) {
+      scope2Keys.forEach(k => url.searchParams.delete(k));
+    } else {
+      Object.entries(filters).forEach(([key, value]) => {
+        const lower = String(value || '').toLowerCase();
+        if (value !== null && value !== '' && lower !== 'all') {
+          url.searchParams.set(key, String(value));
+        } else {
+          url.searchParams.delete(key);
+        }
+      });
+    }
+    const qs = url.searchParams.toString();
+    const newUrl = qs ? `${url.pathname}?${qs}` : url.pathname;
     window.history.replaceState(null, '', newUrl);
   }, [filters]);
+
+  useEffect(() => {
+    return () => {
+      if (typeof window === 'undefined') return;
+      const url = new URL(window.location.href);
+      const scope2Keys = ['period', 'month', 'from', 'to', 'grid', 'dc', 'q', 'tariff', 'scope2Basis'];
+      let changed = false;
+      scope2Keys.forEach(k => {
+        if (url.searchParams.has(k)) {
+          url.searchParams.delete(k);
+          changed = true;
+        }
+      });
+      if (changed) {
+        const qs = url.searchParams.toString();
+        const cleanUrl = qs ? `${url.pathname}?${qs}` : url.pathname;
+        window.history.replaceState(null, '', cleanUrl);
+      }
+    };
+  }, []);
 
   const canonicalRows = useMemo(() => data?.canonicalRows || [], [data]);
   const filteredRows = useMemo(() => {

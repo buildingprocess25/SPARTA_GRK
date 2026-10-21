@@ -27,6 +27,16 @@ export default function Home() {
         setIsDesktopSidebarOpen(saved === 'true');
       }
     } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('scope2Basis') || params.has('tariff')) {
+          setActiveTab('penambah');
+          setPenambahSubScope('scope2');
+        }
+      }
+    } catch (_) {}
   }, []);
 
   const toggleDesktopSidebar = () => {
@@ -53,7 +63,6 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Fungsi navigasi cerdas langsung ke sub-tab/scope spesifik
   const navigateTo = (tab, subOption) => {
     setActiveTab(tab);
     if (tab === 'penambah' && subOption) {
@@ -61,6 +70,21 @@ export default function Home() {
     }
     if (tab === 'pengurang' && subOption) {
       setPengurangSubTab(subOption);
+    }
+    if (typeof window !== 'undefined' && (tab !== 'penambah' || subOption !== 'scope2')) {
+      const url = new URL(window.location.href);
+      const scope2Keys = ['period', 'month', 'from', 'to', 'grid', 'dc', 'q', 'tariff', 'scope2Basis'];
+      let changed = false;
+      scope2Keys.forEach(k => {
+        if (url.searchParams.has(k)) {
+          url.searchParams.delete(k);
+          changed = true;
+        }
+      });
+      if (changed) {
+        const cleanUrl = url.searchParams.toString() ? `${url.pathname}?${url.searchParams.toString()}` : url.pathname;
+        window.history.replaceState(null, '', cleanUrl);
+      }
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
