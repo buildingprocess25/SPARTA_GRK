@@ -254,6 +254,7 @@ export default function Scope2AnnualLoadDashboard() {
     if (isDefault) {
       scope2Keys.forEach(k => url.searchParams.delete(k));
     } else {
+      url.searchParams.set('tab', 'scope2');
       Object.entries(filters).forEach(([key, value]) => {
         const lower = String(value || '').toLowerCase();
         if (value !== null && value !== '' && lower !== 'all') {

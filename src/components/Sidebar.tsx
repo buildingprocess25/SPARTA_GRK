@@ -103,7 +103,11 @@ export default function Sidebar({
     if (item.subItems) {
       toggleGroup(item.id);
     } else {
-      setActiveTab(item.id);
+      if (navigateTo) {
+        navigateTo(item.id);
+      } else {
+        setActiveTab(item.id);
+      }
       if (setIsMobileOpen) {
         setIsMobileOpen(false);
       }

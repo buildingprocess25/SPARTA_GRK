@@ -10,6 +10,66 @@ import PenambahEmisiTab from '@/components/PenambahEmisiTab';
 import HistoryTab from '@/components/HistoryTab';
 import { SustainabilityProvider } from '@/context/SustainabilityContext';
 
+const SCOPE2_PARAM_KEYS = ['period', 'month', 'from', 'to', 'grid', 'dc', 'q', 'tariff', 'scope2Basis'];
+
+function parseNavigationState(searchParams) {
+  const tabParam = (searchParams.get('tab') || '').toLowerCase();
+  const scopeParam = (searchParams.get('scope') || '').toLowerCase();
+  const subParam = (searchParams.get('sub') || '').toLowerCase();
+
+  if (tabParam === 'scope1' || tabParam === 'scope2' || tabParam === 'scope3') {
+    return { activeTab: 'penambah', penambahSubScope: tabParam, pengurangSubTab: 'plts' };
+  }
+  if (tabParam === 'plts' || tabParam === 'water') {
+    return { activeTab: 'pengurang', penambahSubScope: 'scope1', pengurangSubTab: tabParam };
+  }
+  if (tabParam === 'history') {
+    return { activeTab: 'history', penambahSubScope: 'scope1', pengurangSubTab: 'plts' };
+  }
+  if (tabParam === 'calculator') {
+    return { activeTab: 'calculator', penambahSubScope: 'scope1', pengurangSubTab: 'plts' };
+  }
+  if (tabParam === 'penambah') {
+    const scope = ['scope1', 'scope2', 'scope3'].includes(scopeParam) ? scopeParam : 'scope1';
+    return { activeTab: 'penambah', penambahSubScope: scope, pengurangSubTab: 'plts' };
+  }
+  if (tabParam === 'pengurang') {
+    const sub = ['plts', 'water'].includes(subParam) ? subParam : 'plts';
+    return { activeTab: 'pengurang', penambahSubScope: 'scope1', pengurangSubTab: sub };
+  }
+  if (searchParams.has('scope2Basis') || searchParams.has('tariff')) {
+    return { activeTab: 'penambah', penambahSubScope: 'scope2', pengurangSubTab: 'plts' };
+  }
+  return { activeTab: 'resume', penambahSubScope: 'scope1', pengurangSubTab: 'plts' };
+}
+
+function syncUrlWithTab(tab, subOption) {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
+
+  if (tab !== 'penambah' || subOption !== 'scope2') {
+    SCOPE2_PARAM_KEYS.forEach(k => url.searchParams.delete(k));
+  }
+  url.searchParams.delete('scope');
+  url.searchParams.delete('sub');
+
+  if (tab === 'resume') {
+    url.searchParams.delete('tab');
+  } else if (tab === 'calculator') {
+    url.searchParams.set('tab', 'calculator');
+  } else if (tab === 'history') {
+    url.searchParams.set('tab', 'history');
+  } else if (tab === 'penambah') {
+    url.searchParams.set('tab', subOption || 'scope1');
+  } else if (tab === 'pengurang') {
+    url.searchParams.set('tab', subOption || 'plts');
+  }
+
+  const qs = url.searchParams.toString();
+  const cleanUrl = qs ? `${url.pathname}?${qs}` : url.pathname;
+  window.history.replaceState(null, '', cleanUrl);
+}
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('resume');
@@ -30,13 +90,24 @@ export default function Home() {
 
     try {
       if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        if (params.has('scope2Basis') || params.has('tariff')) {
-          setActiveTab('penambah');
-          setPenambahSubScope('scope2');
-        }
+        const parsed = parseNavigationState(new URLSearchParams(window.location.search));
+        setActiveTab(parsed.activeTab);
+        setPenambahSubScope(parsed.penambahSubScope);
+        setPengurangSubTab(parsed.pengurangSubTab);
       }
     } catch (_) {}
+  }, []);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (typeof window === 'undefined') return;
+      const parsed = parseNavigationState(new URLSearchParams(window.location.search));
+      setActiveTab(parsed.activeTab);
+      setPenambahSubScope(parsed.penambahSubScope);
+      setPengurangSubTab(parsed.pengurangSubTab);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const toggleDesktopSidebar = () => {
@@ -71,21 +142,7 @@ export default function Home() {
     if (tab === 'pengurang' && subOption) {
       setPengurangSubTab(subOption);
     }
-    if (typeof window !== 'undefined' && (tab !== 'penambah' || subOption !== 'scope2')) {
-      const url = new URL(window.location.href);
-      const scope2Keys = ['period', 'month', 'from', 'to', 'grid', 'dc', 'q', 'tariff', 'scope2Basis'];
-      let changed = false;
-      scope2Keys.forEach(k => {
-        if (url.searchParams.has(k)) {
-          url.searchParams.delete(k);
-          changed = true;
-        }
-      });
-      if (changed) {
-        const cleanUrl = url.searchParams.toString() ? `${url.pathname}?${url.searchParams.toString()}` : url.pathname;
-        window.history.replaceState(null, '', cleanUrl);
-      }
-    }
+    syncUrlWithTab(tab, subOption);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

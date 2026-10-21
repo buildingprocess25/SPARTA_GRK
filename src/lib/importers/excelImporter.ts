@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import prisma from '../prisma.ts';
 import { CANONICAL_DC_ENTITIES, lookupPlantMetadata } from '../solar/plantMap.ts';
-import { CARBON_FACTORS, getGridEmissionFactor } from '../carbon/carbonEngine.ts';
+import { CARBON_FACTORS } from '../carbon/carbonEngine.ts';
 import { GRID_FACTOR_KG_PER_KWH } from '../emission-factors.ts';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../solar/conversionConfig.ts';
 
@@ -259,7 +259,7 @@ export async function seedEmissionFactorRegistry() {
 /**
  * 3. Seed Production Targets (RKAP 2026 Original vs Revised)
  */
-export async function seedProductionTargets(workbookPath?: string) {
+export async function seedProductionTargets(_workbookPath?: string) {
   console.log('[IMPORTER] Seeding Corporate Production Targets from Resume sheet...');
   const targets = [
     // RKAP 2026 Original (Total 5,858 MWh / 5,843 Ton CO2)

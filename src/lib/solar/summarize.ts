@@ -430,11 +430,6 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
 
   // KPIs and location list
   const rawLocations = [];
-  let kpiTotalKwp = 0;
-  let kpiTotalMwh = 0;
-  let kpiTotalCo2 = 0;
-  let normalCount = 0;
-  let attentionCount = 0;
   let unmappedGridCount = 0;
   let unmappedGridMwh = 0;
 
@@ -447,7 +442,6 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
     let co2Ton = null;
     if (factor !== null) {
       co2Ton = Number((productionMwh * factor).toFixed(2));
-      kpiTotalCo2 += co2Ton;
     } else {
       unmappedGridCount++;
       unmappedGridMwh += productionMwh;
@@ -467,9 +461,6 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
       }
     }
 
-    kpiTotalKwp += loc.installedKwp;
-    kpiTotalMwh += productionMwh;
-
     // Run unified 3-way status classifier
     const statusResult = classifyLocationStatus({
       subPlants: loc.subPlants,
@@ -486,12 +477,6 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
       hasAbnormalMonth: loc.hasAbnormalMonth,
       abnormalMonthTooltip: loc.abnormalMonthTooltip,
     });
-
-    if (statusResult.operational.isNormal) {
-      normalCount++;
-    } else {
-      attentionCount++;
-    }
 
     rawLocations.push({
       dcId: loc.dcId,

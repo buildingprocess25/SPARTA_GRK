@@ -2,7 +2,6 @@ import { calculateCostSavings } from '../pln-tariff.ts';
 import { summarizePlantStatuses } from './status.ts';
 import { computeEnergyBalance, validateEnergyBalanceRow } from './energyBalance.ts';
 import { isValidPlantPr, PR_VALID_RANGE } from './prValidity.ts';
-import { OFFICIAL_RKAP_FACTORS, getRkapFactorsForPeriod } from './rkap-factors.ts';
 import { EMISSION_CONSTANTS, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './conversionConfig.ts';
 
 export const MONTHLY_SOURCE_POLICY = Object.freeze({
@@ -968,8 +967,6 @@ export function buildPltsDashboardFromRows({
   const targetYtdMwh = national && targetRows.length === selectedKeys.length
     ? round(targetRows.reduce((sum, row) => sum + Number(row.value), 0))
     : null;
-  const targetYtdKwh = targetYtdMwh !== null ? targetYtdMwh * 1000 : null;
-  const targetEoyKwh = targetEoyMwh !== null ? targetEoyMwh * 1000 : null;
   const progressEoyPct = targetEoyMwh > 0 && productionKwh !== null
     ? Number(((productionKwh / (targetEoyMwh * 1000)) * 100).toFixed(2))
     : null;

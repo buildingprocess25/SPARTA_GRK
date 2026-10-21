@@ -5,7 +5,7 @@
  * Cilacap 1, 2, 3 and Lombok A, B are independent entities without double counting.
  */
 
-import { CANONICAL_DC_ENTITIES, isDcLocation, lookupPlantMetadata, PLANT_REGISTRY } from './plantMap.ts';
+import { CANONICAL_DC_ENTITIES, isDcLocation, lookupPlantMetadata } from './plantMap.ts';
 import { CONVERSION_CONFIG } from './conversionConfig.ts';
 
 export const SOLAR_CONSTANTS = {

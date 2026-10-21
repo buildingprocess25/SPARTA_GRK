@@ -63,7 +63,6 @@ export function computeEnergyBalance(rows = [], options: { startMonth?: number; 
 
   let validRowCount = 0;
   let invalidRowCount = 0;
-  let noFeedInRowCount = 0;
 
   const validPlantIds = new Set();
   const allPlantIds = new Set();
@@ -84,9 +83,7 @@ export function computeEnergyBalance(rows = [], options: { startMonth?: number; 
       if (validation.loadKwh !== null) totalLoadKwh += validation.loadKwh;
       if (validation.purchasedKwh !== null) totalPurchasedKwh += validation.purchasedKwh;
     } else {
-      if (validation.reason === 'FEED_IN_EMPTY') {
-        noFeedInRowCount++;
-      } else {
+      if (validation.reason !== 'FEED_IN_EMPTY') {
         invalidRowCount++;
       }
       // Production is still counted if valid
@@ -135,7 +132,6 @@ export function computeEnergyBalance(rows = [], options: { startMonth?: number; 
 
   // Coal avoided (based on production: 0.4040 t/MWh)
   const coalAvoidedTon = Number(((totalProductionKwh / 1000) * targetCoalFactor).toFixed(1));
-  const coalAvoidedKg = Number((totalProductionKwh * (targetCoalFactor / 1000)).toFixed(1));
 
   // Tree equivalent: 54 pohon/MWh
   const treeCount = Math.round((totalProductionKwh / 1000) * targetTreeFactor);

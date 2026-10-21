@@ -7,8 +7,8 @@
  * 4. Resilient to server restarts and network glitches
  */
 
-import { runSync, isInSyncWindow, getWibTimeInfo, formatWibTime } from './sync.ts';
-import { captureSnapshot30m, get30mSlotInfo, getSnapshotStatusReport } from './snapshot.ts';
+import { runSync, isInSyncWindow, formatWibTime } from './sync.ts';
+import { captureSnapshot30m, get30mSlotInfo } from './snapshot.ts';
 import prisma from '../prisma.ts';
 import { syncEnergyFlowFromApi } from './energyFlowSync.ts';
 import { syncMonthlyPrFromApi } from './prMonthlySync.ts';
@@ -30,7 +30,6 @@ export async function runSchedulerCycle({
 } = {}) {
   const now = new Date();
   const slotInfo = get30mSlotInfo(now);
-  const timeInfo = getWibTimeInfo(now);
   const inWindow = isInSyncWindow(now);
 
   const cycleReport: {

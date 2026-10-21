@@ -19,7 +19,7 @@ import {
   PROHIBITED_ENDPOINT_PATTERNS,
   QUOTA_CONFIG
 } from './endpoints.ts';
-import { parseEnergyKwh, parsePowerKw, parseTotalEnergyMwh } from './processor.ts';
+import { parseEnergyKwh, parsePowerKw } from './processor.ts';
 import { parseFreshnessThreshold, resolveTelemetryFreshness } from './freshness.ts';
 import { classifyVendorPlantStatus } from './status.ts';
 import { isDcLocation, CANONICAL_DC_ENTITIES } from './plantMap.ts';
@@ -29,7 +29,6 @@ import { takePushable } from './pushCooldown.ts';
 const SYNC_WINDOW = { start: 5, end: 18, startMinute: 30, endMinute: 30 };
 // 05:30 - 18:30 WIB
 const LOCK_DURATION_MS = 120_000; // 2 minutes
-const MANUAL_COOLDOWN_MS = 60_000; // 60 seconds
 const MIN_PLANT_COUNT_FIRST = 30;
 const MIN_PLANT_RATIO = 0.9;
 

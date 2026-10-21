@@ -1,6 +1,4 @@
-import prisma from '../prisma.ts';
 import {
-  ISOLAR_ENDPOINTS_META,
   ALLOWED_ENDPOINTS,
   PROHIBITED_ENDPOINT_PATTERNS,
   QUOTA_CONFIG

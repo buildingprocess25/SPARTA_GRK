@@ -1,90 +1,189 @@
-# Alfamart Sustainability Dashboard — Integrasi PLTS iSolarCloud OpenAPI
+# SPARTA GRK
 
-Dokumentasi arsitektur, rekonsiliasi data, pemetaan status resmi, dan manajemen kuota telemetri PLTS Atap Alfamart.
-
----
-
-## 1. Rekonsiliasi Entitas: 36 Lokasi (39 Plant) vs Baseline 41 Baris
-
-| Sumber / Layer | Jumlah Baris/Entitas | Total Kapasitas | Keterangan |
-| :--- | :---: | :---: | :--- |
-| **Sungrow iSolarCloud OpenAPI (Live)** | **39 Plant Fisik** | **5.876,12 kWp** | Seluruh plant fisik yang terdaftar di akun OpenAPI Sungrow. |
-| **Baseline Audit Unik (Baris 1–39)** | **39 Plant Fisik** | **5.748,35 kWp** | Baris 1 s.d. 39 pada file `monitorPltsApril2026.json`. |
-| **Baseline Mentah + Roll-up (Baris 1–41)** | **41 Baris** | **6.039,35 kWp** | **Duplikasi:** Baris 40 (*Lombok* 86 kWp) dan Baris 41 (*Cilacap* 205 kWp) adalah baris agregat roll-up dari sub-plant yang sudah tercantum di baris sebelumnya. |
-| **Entitas Kanonikal Dashboard (UI)** | **36 Lokasi (39 Plant)** | **5.876,12 kWp** | 34 lokasi tunggal + 2 lokasi gabungan multi-plant: Cilacap (1+2+3) dan Lombok (A+B). Sub-plant disajikan sebagai baris rincian tanpa penghitungan ganda. |
+**Sustainability Performance And Reporting Tracking Application**  
+Greenhouse Gas (GRK) Monitoring & Carbon Accounting Dashboard for PT Sumber Alfaria Trijaya Tbk (Alfamart)
 
 ---
 
-## 2. Pemetaan Status Resmi dari Dokumentasi Vendor (Sungrow OpenAPI)
+## Tentang Proyek Ini
 
-Sesuai spesifikasi resmi Sungrow OpenAPI:
+**SPARTA GRK** adalah platform enterprise monitoring keberlanjutan (*sustainability*) dan inventarisasi gas rumah kaca (GRK) untuk seluruh jaringan operasional Distribution Center (DC) Alfamart di Indonesia. 
 
-| Field API | Nilai | Definisi Resmi | Penurunan Badge Dashboard |
-| :--- | :---: | :--- | :--- |
-| **`ps_status`** | `1` | Online (Stasiun Terhubung) | Diturunkan menjadi **Online** |
-| | `0` | Offline (Stasiun Terputus) | Diturunkan menjadi **Offline** (hanya jika `ps_status = 0`) |
-| **`ps_fault_status`** | `3` | Normal | Diturunkan menjadi **Normal** jika tidak ada alarm |
-| | `2` | Alarm | Diturunkan menjadi **Alarm** jika `alarm_count > 0` atau `ps_fault_status = 2` |
-| | `1` | Fault | Diturunkan menjadi **Fault** jika `fault_count > 0` atau `ps_fault_status = 1` |
-| **`alarm_count`** | Integer | Jumlah alarm aktif pada stasiun | Menampilkan jumlah alarm (misal: `Alarm (1)`) |
-| **`fault_count`** | Integer | Jumlah fault/kerusakan aktif | Menampilkan jumlah fault (misal: `Fault (1)`) |
+Platform ini mengintegrasikan pemantauan emisi komprehensif:
+- **Scope 1 (Emisi Langsung)**: Konsumsi solar genset stasioner dan bahan bakar armada kendaraan operasional.
+- **Scope 2 (Emisi Tidak Langsung)**: Konsumsi listrik PLN pada 37 DC, rekonsiliasi energi beban vs listrik yang dibeli, dan faktor emisi grid regional ESDM.
+- **Scope 3 (Emisi Rantai Nilai)**: Emisi perjalanan dinas (*business travel*) mencakup penerbangan, kereta api, hotel, dan transportasi darat.
+- **Pengurangan Emisi**:
+  - **PLTS Atap**: Integrasi telemetri live Sungrow iSolarCloud OpenAPI, telemetri inverter harian, analisis *Performance Ratio* (PR), dan integrasi radiasi cuaca Open-Meteo.
+  - **Daur Ulang Air**: Pemantauan volume pemanfaatan air daur ulang di DC dan emisi terhindar dari pengolahan air bersih.
 
-> **Catatan Status Level Perangkat ("Offline device: 1")**:  
-> Pada beberapa lokasi (misal: Kotabumi dan Bogor), portal iSolarCloud dapat menampilkan catatan "Offline device: 1" meskipun stasiun tetap menghasilkan daya (>60 kW) dan `ps_status = 1`. Hal ini terjadi karena perangkat komunikasi/meter sekunder tidak melapor. Dashboard menerapkan badge *"perangkat tidak melapor"* pada tingkat perangkat jika umur `device_time` > 30 menit pada jam produksi, tanpa mengubah status stasiun menjadi offline.
+Perhitungan emisi mengacu pada standar resmi Kementerian ESDM, Pedoman Inventarisasi GRK Nasional (KLHK), IPCC 2006, serta standar internasional GHG Protocol Corporate Standard.
 
----
-
-## 3. Investigasi Titik Ukur PR (Performance Ratio) Vendor
-
-### Hasil Pengujian Titik Ukur:
-1. **Titik `83023` (PR Vendor Realtime)**: Berdasarkan pengujian empiris langsung pada 39 stasiun, titik `83023` mengembalikan rasio daya terhadap iradiasi sesaat (*instantaneous PR* $= P_{ac} / (P_{dc} \cdot G / 1000)$).
-   - Pada kondisi iradiasi rendah (mis. Manado $G = 6\text{ W/m}^2$), nilai titik `83023` melonjak ke `13.87` (tidak valid).
-   - Pada kondisi iradiasi tinggi (mis. Makassar $G = 748\text{ W/m}^2$), nilai titik `83023` adalah `0.8025` (setara 80,3%).
-   - Titik `83023` **bukan** PR kumulatif harian pembangkit (*Daily Plant PR*).
-2. **Titik `83010` & `83007`**: Mengembalikan nilai string kosong (`""`) atau `null` di seluruh stasiun.
-3. **Kesimpulan**: Tidak ada titik ukur OpenAPI yang secara konsisten cocok dengan Plant PR portal resmi (Manado portal 90% vs raw 13.87; Makassar portal 83% vs raw 0.8025). Oleh karena itu, PR vendor berstatus **"tidak terbukti"** dan kolom PR vendor disembunyikan di UI.
-
-### Status Metrik PR di Dashboard:
-- **Metrik Ranking Utama**: Murni menggunakan **Specific Yield Hari Ini (kWh/kWp)** dan **Equivalent Hours (API Live)**.
-- **Proxy PR**: Estimasi rasio performa bulanan berbasis audit April 2026 ($(\text{Yield April} / (\text{Kapasitas} \times 126\text{ PSH})) \times 100\%$) diberi label eksplisit *"Proxy PR (perkiraan, berbasis audit April 2026)"*.
-- **PR Portal (Manual)**: Disimpan di tabel `portal_pr_reference` sebagai pembanding manual resmi.
+> **Penting Mengenai Entitas DC:**  
+> **Total Distribution Center (DC) Alfamart selalu berjumlah 37.** Akun vendor iSolarCloud memuat 39 plant fisik karena mencakup 2 toko percontohan Drive Thru (tipe `STORE`), yang secara sistematis dikecualikan dari penghitungan DC oleh `isDcLocation()`. DC Gorontalo merupakan salah satu dari 37 DC, namun saat ini belum memiliki instalasi PLTS (berstatus "dalam pembangunan").
 
 ---
 
-## 4. Emisi Karbon & Penghasilan (Income)
+## Fitur Utama
 
-- **Faktor Emisi Implisit Vendor**: Vendor menggunakan faktor implisit $0{,}997\text{ kg CO}_2\text{/kWh}$ (dihitung dari `co2_reduce / yield`).
-- **Faktor Emisi Dashboard Proyek**: Emisi terhindar PLTS dihitung dengan faktor yang sama, **$0{,}997\text{ kg CO}_2\text{/kWh}$**, di semua grid dan semua halaman. Nilainya didefinisikan sekali di `src/lib/solar/conversionConfig.js` (`PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH`). Faktor grid ESDM per wilayah hanya dipakai untuk Scope 2 (listrik PLN).
-- **Mata Uang `today_income`**: Nilai `today_income` yang dikembalikan oleh API Sungrow menggunakan mata uang **INR (Indian Rupee)**, bukan Rupiah (IDR). Field ini **tidak digunakan** di dashboard sustainability.
+1. **Executive Dashboard (Ringkasan Emisi)**
+   - Ikhtisar emisi Scope 1, Scope 2, Scope 3, kontribusi pengurang emisi (PLTS & Air), dan Net Emission ($t\text{CO}_2\text{e}$).
+   - Grafik tren bulanan emisi kumulatif (YTD) dan perbandingan year-over-year (YoY).
+   - Indikator intensitas emisi per meter persegi luas fasilitas dan per karyawan.
+
+2. **Scope 1: Emisi Langsung**
+   - Pemantauan bahan bakar genset cadangan (Solar B35) di DC saat pemadaman.
+   - Pemantauan armada kendaraan operasional (BBM Solar, Dex, B35).
+   - Form input data aktivitas BBM dan kalkulasi otomatis emisi ton $\text{CO}_2\text{e}$.
+
+3. **Scope 2: Emisi Listrik PLN**
+   - Rekonsiliasi energi kanonikal (Beban Total vs Listrik Dibeli PLN vs Self-consumption PLTS).
+   - Diagram alir waterfall interaktif (Beban $\rightarrow$ Dikurangi PLTS $\rightarrow$ Listrik Dibeli $\rightarrow$ Emisi).
+   - Faktor emisi spesifik per sistem ketenagalistrikan (Jawa-Madura-Bali, Sumatera, Kalimantan, Sulawesi, Nusa Tenggara, Maluku, Papua).
+   - Simulator dampak penambahan kapasitas PLTS dan penghematan biaya listrik.
+
+4. **Scope 3: Perjalanan Dinas (Business Travel)**
+   - Kalkulasi emisi tiket pesawat berdasarkan rute bandara (IATA code) dan kelas kabin (DEFRA / ICAO methodology).
+   - Emisi perjalanan kereta api, armada sewa/operasional darat, dan penginapan hotel.
+   - Fitur upload batch template Excel untuk rekonsiliasi data perjalanan bulanan.
+
+5. **Pengurangan Emisi: PLTS & Daur Ulang Air**
+   - **PLTS Atap**: Telemetri live 39 plant fisik (kapasitas terpasang ~5,87 MWp), status koneksi vendor (`ps_status`), status alarm & fault, ranking specific yield ($kWh/kWp$), dan equivalent hours.
+   - **Analisis PR & Cuaca**: Integrasi data radiasi Global Horizontal Irradiation (GHI) dan temperatur ambient dari Open-Meteo API (lisensi CC BY 4.0) untuk koreksi termal panel silikon ($-0{,}45\%/^\circ\text{C}$).
+   - **Daur Ulang Air**: Pelacakan volume air daur ulang ($m^3$) dan emisi pengolahan yang berhasil dihindari.
+
+6. **Kalkulator Emisi & Alat Simulasi**
+   - Alat hitung emisi interaktif untuk memudahkan simulasi skenario dekarbonisasi dan estimasi emisi kegiatan operasional baru.
 
 ---
 
-## 5. Model Kuota & Rate Limiting (Hourly, Daily, & Monthly)
+## Tech Stack
 
-Sesuai spesifikasi resmi Sungrow OpenAPI:
-- **Hourly Limit (`HOURLY_LIMIT`):** **2.000 Call / Jam** (Reset otomatis setiap jam UTC).
-- **Daily Limit (`DAILY_LIMIT`):** **48.000 Call / Hari** (Reset otomatis pukul 00:00 UTC).
-- **Monthly Limit (`MONTHLY_LIMIT`):** **100.000 Call / Bulan** (Reset otomatis tanggal 1 setiap bulan pukul 00:00 UTC).
-
-> **Catatan Penghitungan Bulanan**:  
-> Endpoint `getOpenApiCallInfo` hanya mengembalikan counter `curr_hour_accessed_times` dan `today_accessed_times`. Penghitungan kuota bulanan merupakan **perkiraan akumulasi lokal** dari tabel `quota_counter`.
-
-### Ritme Sinkronisasi dan Kuota:
-- Polling telemetri berjalan setiap **5 menit** pada jam produksi (05:30–18:30 WIB), sedangkan snapshot historis disimpan pada slot **30 menit**. Satu siklus dapat memakai lebih dari satu request karena data stasiun, perangkat, alarm, inverter, dan metrik eksperimental diambil dari endpoint berbeda. Karena itu pemakaian bulanan tidak dihitung sebagai `26 × 30`; gunakan counter aktual pada `quota_counter` dan guard kuota dashboard.
-
----
-
-## 6. Validasi Telemetri: Inverter vs Plant
-
-Pengujian dalam **satu siklus sampling serentak** membuktikan bahwa total daya dan energi dari seluruh inverter (`p24` current power dalam W dan `p1` daily yield dalam Wh; `p4` suhu internal inverter) **100% identik (selisih 0,0%)** dengan metrik stasiun (`curr_power` dan `today_energy`). Selisih 25–40% sebelumnya terjadi semata-mata karena perbedaan waktu pencatatan (asinkron) antar request.
+| Layer | Komponen / Teknologi | Fungsi Utama |
+| :--- | :--- | :--- |
+| **Frontend** | **Next.js 15 (App Router)** | Framework React 19 full-stack dengan Server & Client Components |
+| | **TypeScript 5.x / 6.x** | Strict typing di seluruh `src/` (kode ditulis *erasable syntax*) |
+| | **Tailwind CSS v4** | Sistem styling utilitas modern dengan dark mode adaptif |
+| | **Recharts** | Visualisasi grafik tren emisi, komposisi energi, dan waterfall |
+| | **Lucide React** | Ikonografi UI antarmuka sistem |
+| **Backend** | **Next.js API Routes** | 20+ endpoint RESTful (auth, telemetri, kalkulasi, ekspor laporan) |
+| | **Prisma ORM 5.22** | Relational data mapping, skema database, migrasi aman |
+| | **PostgreSQL 15+** | Basis data relasional utama untuk data historis, kuota, & telemetri |
+| | **Node.js 22 LTS** | Runtime eksekusi backend dan daemon otomatisasi |
+| **Daemon & Cron** | **Solar Daemon (`solar-daemon.mjs`)** | Polling telemetri iSolarCloud per 5 menit pada jam operasional PLTS |
+| | **PR Sync (`sync-isolar.mjs`)** | Sinkronisasi PR bulanan, pembacaan inverter, dan aggregasi cuaca |
 
 ---
 
-## 7. Integrasi Data Cuaca & Lisensi Open-Meteo (CC BY 4.0)
+## Memulai (Quick Start)
 
-Untuk menghitung **Performance Ratio (PR) terbobot kapasitas**, **koreksi temperatur termal silikon modul surya (-0,45%/°C STC 25°C)**, dan **analisis korelasi parameter operasional**:
-- **Penyedia Data**: Open-Meteo Historical Weather API & Forecast API (`https://open-meteo.com/`).
-- **Parameter yang Dikonsumsi**: Global Horizontal Irradiation (GHI, $W/m^2$ dan $kWh/m^2$), Suhu Udara Rata-rata ($^\circ C$), Suhu Udara Siang Hari ($^\circ C$), Kelembapan Udara Rata-rata ($\%$).
-- **Atribusi Lisensi**: Data cuaca disediakan oleh [Open-Meteo.com](https://open-meteo.com/) di bawah lisensi **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
-- **Model Suhu Panel**: Diestimasi menggunakan model Sandia/King: $T_{\text{panel}} = T_{\text{siang}} + \left(\frac{G_{\text{siang}}}{800}\right) \times (\text{NOCT} - 20)$ dengan nominal $\text{NOCT} = 45^\circ\text{C}$.
+### 1. Prasyarat
+- **Node.js**: Versi 22.x LTS atau lebih baru.
+- **Package Manager**: `pnpm` (direkomendasikan) atau `npm`.
+- **Database**: PostgreSQL 15+ yang sudah terpasang dan berjalan.
 
+### 2. Instalasi Dependensi
+```bash
+# Clone repository
+git clone <repository-url>
+cd sparta-grk
+
+# Install dependensi
+pnpm install
+```
+
+### 3. Konfigurasi Environment Variable
+Salin berkas `.env.example` menjadi `.env.local` atau `.env`:
+```bash
+cp .env.example .env.local
+```
+
+Lengkapi konfigurasi utama di `.env.local`:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/sparta_grk?schema=public"
+NEXTAUTH_SECRET="your-secure-random-secret"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Kredensial iSolarCloud OpenAPI (Sungrow)
+ISOLAR_APP_KEY="your-app-key"
+ISOLAR_ACCESS_KEY="your-access-key"
+ISOLAR_SECRET_KEY="your-secret-key"
+ISOLAR_EMAIL="your-account-email"
+ISOLAR_PASSWORD="your-account-password"
+
+# Keamanan Cron & Daemons
+CRON_SECRET="your-cron-secret-token"
+```
+
+### 4. Setup Basis Data (Prisma)
+```bash
+# Generate Prisma Client
+pnpm prisma generate
+
+# Sinkronisasikan skema ke database
+pnpm prisma db push
+
+# (Opsional) Seeding data awal master DC & fasilitas
+node scripts/data/seed-plant-master-status.mjs
+```
+
+### 5. Menjalankan Server Development
+```bash
+pnpm run dev
+```
+Buka peramban di [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Perintah Pengujian & Verifikasi
+
+Proyek ini menerapkan standar kualitas kode yang ketat. Setiap perubahan wajib lulus pemeriksaan tipe data dan pengujian unit:
+
+| Perintah | Deskripsi |
+| :--- | :--- |
+| `pnpm run typecheck` | Menjalankan `tsc --noEmit`. Wajib **0 error** untuk seluruh kode di `src/`. |
+| `pnpm test` | Menjalankan unit test suite utama (`scripts/run-unit-tests.mjs`). |
+| `pnpm run test:isolated-db` | Menjalankan tes integrasi yang memerlukan basis data terisolasi. |
+| `pnpm run test:readonly` | Menjalankan tes verifikasi terhadap data kanonikal read-only. |
+| `pnpm run test:all` | Menjalankan seluruh rangkaian tes (unit test + isolated DB test). |
+
+---
+
+## Struktur Folder Proyek
+
+```text
+├── src/                          # Seluruh kode sumber aplikasi (TypeScript)
+│   ├── app/                      # Next.js App Router (Halaman & API Routes)
+│   ├── components/               # Komponen UI React (Scope 1, 2, 3, PLTS, Resume, Charts)
+│   ├── context/                  # React Context (SustainabilityContext)
+│   ├── lib/                      # Business logic, engines emisi, solar client, Prisma client
+│   └── types/                    # Definisi tipe global TypeScript
+├── scripts/                      # Skrip automasi & daemon (Node.js ESM)
+│   ├── tests/                    # Unit, integration, & regression test scripts
+│   ├── audits/                   # Skrip diagnostik, inspeksi, & pemeriksaan rekonsiliasi data
+│   ├── data/                     # Skrip migrasi data, backfill, & CSV/Excel importers
+│   ├── tools/                    # Profiling, utility dev, & visual regression tools
+│   ├── solar-daemon.mjs          # Daemon background polling telemetri iSolarCloud
+│   └── sync-isolar.mjs           # Runner sinkronisasi vendor iSolarCloud
+├── prisma/                       # Skema database & file migrasi Prisma
+├── docs/                         # Dokumentasi teknis terinci
+│   ├── SPARTA-GRK.md             # Dokumen arsitektur, metodologi emisi, & spesifikasi teknis
+│   └── DEPLOY.md                 # Panduan deployment server produksi & Docker
+└── public/                       # Aset statis, ikon, manifest PWA
+```
+
+---
+
+## Aturan Pengembangan & Kontribusi
+
+1. **Larangan Commit & Push Otomatis**: Seluruh perubahan kode harus ditinggalkan di *working tree* untuk ditinjau dan di-commit langsung oleh pengguna.
+2. **Kanonikal 37 DC**: Total DC Alfamart wajib 37 di seluruh label, laporan, dan dokumen.
+3. **Dokumentasi Selaras dengan Kode**: Setiap modifikasi perilaku, rumus emisi, atau variabel konfigurasi wajib memperbarui dokumen pendukung di [docs/SPARTA-GRK.md](docs/SPARTA-GRK.md).
+4. **Organisasi Skrip**: Dilarang meletakkan skrip ad-hoc di root `scripts/`. Gunakan subdirektori sesuai fungsinya (`scripts/tests/`, `scripts/audits/`, `scripts/data/`, atau `scripts/tools/`).
+
+---
+
+## Lisensi & Atribusi Data
+
+- **Hak Cipta**: © PT Sumber Alfaria Trijaya Tbk (Alfamart). Seluruh hak cipta dilindungi undang-undang.
+- **Atribusi Data Cuaca**: Data radiasi matahari (GHI) dan parameter cuaca disediakan oleh [Open-Meteo.com](https://open-meteo.com/) di bawah lisensi **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
