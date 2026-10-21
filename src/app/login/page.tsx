@@ -3,7 +3,7 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, User, Eye, EyeOff, LogIn, Clock } from 'lucide-react';
-import { SESSION_IDLE_TIMEOUT_MS } from '@/lib/sessionPolicy';
+import { SESSION_DAILY_CUTOFF_HOUR_WIB } from '@/lib/sessionPolicy';
 
 function LoginForm() {
   const router = useRouter();
@@ -80,13 +80,13 @@ function LoginForm() {
             SPARTA Gas Rumah Kaca
           </h1>
 
-          {!error && searchParams.get('reason') === 'idle' && (
+          {!error && searchParams.get('reason') === 'cutoff' && (
             <div role="status" className="mb-4 flex items-start gap-3 rounded-xl border border-amber-200 dark:border-amber-500/25 bg-amber-50 dark:bg-amber-500/10 px-3.5 py-3">
               <Clock size={16} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
               <div className="space-y-0.5">
-                <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">Sesi Anda berakhir</p>
+                <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">Sesi ditutup pukul {SESSION_DAILY_CUTOFF_HOUR_WIB}.00 WIB</p>
                 <p className="text-xs leading-relaxed text-amber-800/90 dark:text-amber-200/80">
-                  Tidak ada aktivitas selama {SESSION_IDLE_TIMEOUT_MS / 60_000} menit. Masuk lagi untuk melanjutkan dari halaman terakhir.
+                  Semua sesi ditutup otomatis setiap hari pukul {SESSION_DAILY_CUTOFF_HOUR_WIB}.00 WIB. Masuk lagi kalau masih perlu melanjutkan.
                 </p>
               </div>
             </div>

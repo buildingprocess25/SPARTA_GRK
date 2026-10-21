@@ -110,17 +110,18 @@ export function summarizeTravelEntries(entries, months) {
     if (isFlight && !calculated) uncalculatedFlights += 1;
     if (isGround && !calculated) uncalculatedGround += 1;
     if ((isFlight || isGround) && !calculated) uncalculatedRupiah += entry.amountRupiah;
-    if (entry.amountRupiah <= 0) continue;
 
-    // Flights join the table only with a readable route; hotel, train and other costs always do, so their filter shows every rupiah.
-    if (isFlight && !calculated) continue;
-    const band = isFlight ? bandOf(entry) : null;
+    // Every entry joins a group, refunds and routeless tickets included, so the table total matches the summary cards.
+    // Only positive, routed flights get a distance band; addEntry counts a trip only when the amount is positive.
+    const band = isFlight && calculated && entry.amountRupiah > 0 ? bandOf(entry) : null;
     if (band) addEntry(byBand.get(band), entry);
     const key = `${entry.category}|${entry.kuu}|${entry.route ?? ''}`;
     if (!groups.has(key)) {
       groups.set(key, { category: entry.category, kuu: entry.kuu, route: entry.route ?? null, band, isInternational: entry.isInternational, bucket: emptyBucket() });
     }
-    addEntry(groups.get(key).bucket, entry);
+    const group = groups.get(key);
+    group.band ??= band;
+    addEntry(group.bucket, entry);
   }
 
   return {

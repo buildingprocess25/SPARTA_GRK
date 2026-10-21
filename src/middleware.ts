@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { isSessionPayloadActive } from './lib/sessionPolicy.ts';
+import { isSessionPayloadActive, nextDailyCutoff } from './lib/sessionPolicy.ts';
 
 /**
  * Route guard for the 2-account login (see src/lib/auth.ts). Runs on the
@@ -50,6 +50,16 @@ async function verifySessionTokenEdge(token, secret) {
   }
 }
 
+// Only picks the login banner text; access was already denied by the verified check above, so the payload is not trusted here.
+function expiredByCutoff(token) {
+  try {
+    const payload = JSON.parse(new TextDecoder().decode(base64urlToBytes(String(token).split('.')[0])));
+    return Boolean(payload?.act) && Date.now() >= nextDailyCutoff(payload.act);
+  } catch (_) {
+    return false;
+  }
+}
+
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
@@ -75,6 +85,7 @@ export async function middleware(request) {
     }
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
+    if (token && expiredByCutoff(token)) loginUrl.searchParams.set('reason', 'cutoff');
     return NextResponse.redirect(loginUrl);
   }
 

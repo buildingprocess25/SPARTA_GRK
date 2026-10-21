@@ -125,8 +125,8 @@ export function verifyPassword(password, stored) {
 
 /** Signed "payload.signature" token, both base64url. Verified in middleware.js (Edge runtime) using Web Crypto - keep the signing scheme (HMAC-SHA256 over the raw payload string) in sync if this changes. */
 /**
- * `exp` caps the session at 7 days from login; `act` is the last user activity and expires the session after
- * SESSION_IDLE_TIMEOUT_MS. A refresh keeps `exp` and moves `act`, so activity never extends the 7-day cap.
+ * `exp` caps the session at 7 days from login; `act` is the sign-in time, and the session also ends at the
+ * first 19.00 WIB after it (see sessionPolicy.ts).
  */
 export function createSessionToken(username, { exp }: { exp?: number } = {}) {
   const now = Date.now();

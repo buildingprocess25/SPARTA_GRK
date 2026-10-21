@@ -6,6 +6,7 @@ import { AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CardBox from '@/components/ui/CardBox';
 import InfoHint from '@/components/ui/InfoHint';
+import { rupiahShort } from '@/lib/units';
 
 const number = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 });
 
@@ -28,6 +29,7 @@ export default function MainScope3Bridge({ onNavigate }: { onNavigate?: any }) {
 
   const { summary, period } = state.data;
   const hasData = Boolean(period);
+  const cost = rupiahShort(summary?.totalRupiah);
 
   return (
     <CardBox className="space-y-4">
@@ -58,8 +60,8 @@ export default function MainScope3Bridge({ onNavigate }: { onNavigate?: any }) {
           <div className="rounded-xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-3.5">
             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Biaya perjalanan dinas</p>
             <div className="mt-2">
-              <strong className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Rp {number.format(summary.totalRupiah / 1_000_000)}</strong>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">Juta</span>
+              <strong className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{cost.value}</strong>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">{cost.unit}</span>
             </div>
           </div>
           <div className="rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/80 dark:bg-indigo-500/10 p-3.5">

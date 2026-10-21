@@ -18,6 +18,7 @@ import Scope3InputModal from '@/components/scope3/Scope3InputModal';
 import { formatNum } from '@/data/sustainabilityData';
 import { AIRPORTS } from '@/lib/scope3/airports';
 import { TRAVEL_CATEGORY } from '@/lib/scope3/travelLedger';
+import { rupiahShort } from '@/lib/units';
 
 const MONTH_NAMES = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 const TOP_KUU_IN_CHART = 10;
@@ -81,13 +82,6 @@ const INPUT_KIND = { [TRAVEL_CATEGORY.FLIGHT]: 'PESAWAT', [TRAVEL_CATEGORY.HOTEL
 const withJuta = row => ({ ...row, ...Object.fromEntries(COST_KEYS.map(k => [k.juta, juta(row[k.rupiah])])) });
 
 const BAND_COLORS = { short: '#E11D48', medium: '#F59E0B', long: '#6366F1', international: '#94A3B8' };
-
-function rupiahShort(value) {
-  const juta = (value || 0) / 1_000_000;
-  return juta >= 1000
-    ? { value: `Rp ${formatNum(juta / 1000, 2)}`, unit: 'Miliar' }
-    : { value: `Rp ${formatNum(juta, 1)}`, unit: 'Juta' };
-}
 
 const routeLabel = route => route.split('-').join(' → ');
 const juta = value => Number(((value || 0) / 1_000_000).toFixed(2));
@@ -184,7 +178,7 @@ export default function Scope3TravelDashboard() {
     : { ...prev, category: value, origin: ALL, destination: ALL, region: ALL, band: ALL }));
 
   const filterOptions = useMemo(() => {
-    const flightStops = groups.filter(g => g.category === TRAVEL_CATEGORY.FLIGHT).map(g => g.route.split('-'));
+    const flightStops = groups.filter(g => g.category === TRAVEL_CATEGORY.FLIGHT && g.route).map(g => g.route.split('-'));
     const airportOption = code => ({ value: code, label: AIRPORTS[code] ? `${code} · ${AIRPORTS[code].name}` : code });
     const origins = [...new Set(flightStops.map(stops => stops[0]))].sort();
     const destinations = [...new Set(flightStops.flatMap(stops => stops.slice(1)))].sort();
@@ -202,7 +196,7 @@ export default function Scope3TravelDashboard() {
     if (filters.category !== ALL && g.category !== filters.category) return false;
     if (filters.kuu !== ALL && g.kuu !== filters.kuu) return false;
     if (!flightFilterActive) return true;
-    if (g.category !== TRAVEL_CATEGORY.FLIGHT) return false;
+    if (g.category !== TRAVEL_CATEGORY.FLIGHT || !g.band) return false;
     const stops = g.route.split('-');
     if (filters.origin !== ALL && stops[0] !== filters.origin) return false;
     // A destination matches any later stop, so CGK-DPS-CGK counts as a trip to DPS.

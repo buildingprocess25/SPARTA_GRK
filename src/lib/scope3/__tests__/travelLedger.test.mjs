@@ -5,7 +5,8 @@ import {
   parseTravelLedgerCsv, verifyAccountTotals, EMISSION_STATUS, TRAVEL_CATEGORY,
 } from '../travelLedger.ts';
 import { prepareTravelImport, TravelImportError } from '../travelImport.ts';
-import { parseTravelUpload } from '../travelTemplate.ts';
+import * as XLSX from 'xlsx';
+import { buildTravelTemplateWorkbook, parseTravelUpload, TEMPLATE_SHEETS } from '../travelTemplate.ts';
 import { summarizeTravelEntries } from '../travelSummary.ts';
 
 const HEADER = 'J_UU_PEMBUAT,J_UU_CODE,J_ACCOUNTING_DATE,J_MSJC_CODE,J_MSA_AKUN,J_SUB_LEDGER1,J_MSD_CODE,J_REFER10,J_DEBIT,J_CREDIT,SALDO,J_ATTRIB1,J_ATTRIB2,J_ATTRIB3,J_TRANSAKSI,J_CODE';
@@ -112,8 +113,10 @@ test('summary groups by KUU and route and counts only positive tickets', () => {
   assert.equal(result.summary.ticketCount, 3);
   assert.equal(result.summary.uncalculatedFlights, 1);
   assert.equal(result.byKuu.length, 3);
-  const flightGroups = result.travelGroups.filter(g => g.category === TRAVEL_CATEGORY.FLIGHT);
-  assert.deepEqual(flightGroups.map(g => `${g.kuu} ${g.route} ${g.band}`).sort(), ['1AZ1 PKU-CGK-PKU medium', 'Z001 CGK-DAC-CGK international']);
+  const routedFlights = result.travelGroups.filter(g => g.category === TRAVEL_CATEGORY.FLIGHT && g.band);
+  assert.deepEqual(routedFlights.map(g => `${g.kuu} ${g.route} ${g.band}`).sort(), ['1AZ1 PKU-CGK-PKU medium', 'Z001 CGK-DAC-CGK international']);
+  // Refunds and routeless tickets stay in the groups, so the table adds up to the summary total.
+  assert.equal(result.travelGroups.reduce((s, g) => s + g.rupiah, 0), result.summary.totalRupiah);
   assert.equal(result.monthlyTrend[0].month, 'Jan');
 
   const bands = Object.fromEntries(result.distanceBands.map(b => [b.id, b.ticketCount]));
@@ -169,6 +172,67 @@ test('journal lines naming hotel or train are classified but keep emission empty
   assert.equal(train.category, TRAVEL_CATEGORY.TRAIN);
   assert.equal(train.emissionStatus, EMISSION_STATUS.NO_QUANTITY);
   assert.equal(allowance.category, TRAVEL_CATEGORY.OTHER);
+});
+
+const xlsxModule = XLSX.default ?? XLSX;
+function workbookBuffer(sheets) {
+  const wb = xlsxModule.utils.book_new();
+  for (const [name, rows] of sheets) xlsxModule.utils.book_append_sheet(wb, xlsxModule.utils.aoa_to_sheet(rows), name);
+  return xlsxModule.write(wb, { type: 'buffer', bookType: 'xlsx' });
+}
+
+test('the downloaded template has one input sheet per kind and no data yet', async () => {
+  const buffer = await buildTravelTemplateWorkbook();
+  const wb = xlsxModule.read(buffer, { type: 'buffer' });
+  assert.deepEqual(wb.SheetNames, ['Pesawat', 'Hotel', 'Kereta Api', 'Lainnya', 'Petunjuk', 'Faktor Emisi', 'Kode Bandara']);
+  for (const def of TEMPLATE_SHEETS) {
+    const header = xlsxModule.utils.sheet_to_json(wb.Sheets[def.name], { header: 1 })[0];
+    assert.deepEqual(header, def.columns.map(c => c.key));
+    assert.ok(!header.includes('JENIS'));
+  }
+  assert.throws(() => parseTravelUpload(buffer, 'kosong.xlsx'), /belum berisi baris data/);
+});
+
+test('each kind sheet sets JENIS; reference sheets and their example rows are skipped', () => {
+  const buffer = workbookBuffer([
+    // A guide placed first, holding a header-like example row, must not be imported.
+    ['Petunjuk', [['Contoh'], ['TANGGAL', 'KUU', 'JENIS', 'BIAYA_RP'], ['2026-01-01', 'Z001', 'PESAWAT', '1']]],
+    ['Pesawat', [['TANGGAL', 'KUU', 'RUTE', 'KELAS', 'NAMA_KARYAWAN', 'KETERANGAN', 'BIAYA_RP', 'AKUN'], ['2026-04-01', 'Z001', 'CGK-DPS-CGK', 'BISNIS', 'Budi', '', '2500000', '']]],
+    ['Hotel', [['TANGGAL', 'KUU', 'MALAM', 'KAMAR', 'KOTA', 'KELAS', 'NAMA_KARYAWAN', 'KETERANGAN', 'BIAYA_RP', 'AKUN'],
+      ['2026-04-01', 'Z001', '2', '', 'Denpasar', '', 'Budi', '', '1400000', ''],
+      ['2026-04-02', 'Z001', '', '', '', '', '', '', '700000', '']]],
+    ['Kereta Api', [['TANGGAL', 'KUU', 'RUTE', 'JARAK_KM', 'KELAS', 'NAMA_KARYAWAN', 'KETERANGAN', 'BIAYA_RP', 'AKUN'], ['2026-04-03', '1AZ1', 'Gambir-Bandung', '150', 'CEPAT', '', '', '300000', '']]],
+    ['Lainnya', [['TANGGAL', 'KUU', 'NAMA_KARYAWAN', 'KETERANGAN', 'BIAYA_RP', 'AKUN']]],
+  ]);
+  const parsed = parseTravelUpload(buffer, 'scope3.xlsx');
+  assert.equal(parsed.format, 'TEMPLATE');
+  assert.deepEqual(parsed.entries.map(e => e.category), [TRAVEL_CATEGORY.FLIGHT, TRAVEL_CATEGORY.HOTEL, TRAVEL_CATEGORY.TRAIN]);
+  assert.deepEqual(parsed.errors.map(e => `${e.sheet} ${e.row}`), ['Hotel 3']);
+  assert.match(parsed.errors[0].message, /MALAM/);
+  const [flight, hotel, train] = parsed.entries;
+  assert.equal(flight.metadata.cabin, 'BUSINESS');
+  assert.equal(flight.metadata.passenger, 'Budi');
+  assert.equal(hotel.route, 'DENPASAR');
+  assert.equal(train.metadata.factorId, 'TRAIN_HIGH_SPEED');
+
+  // Same row text in two kind sheets must not collide in the re-upload dedupe code.
+  assert.equal(new Set(parsed.entries.map(e => e.journalCode)).size, parsed.entries.length);
+  assert.deepEqual(parseTravelUpload(buffer, 'scope3.xlsx').entries.map(e => e.journalCode), parsed.entries.map(e => e.journalCode));
+});
+
+test('a kind sheet missing its required column names the sheet', () => {
+  const buffer = workbookBuffer([['Hotel', [['TANGGAL', 'KUU', 'BIAYA_RP'], ['2026-04-01', 'Z001', '1000']]]]);
+  assert.throws(() => parseTravelUpload(buffer, 'x.xlsx'), /Sheet Hotel: kolom wajib tidak ada: MALAM/);
+});
+
+test('the older single-sheet template with a JENIS column still imports', () => {
+  const buffer = workbookBuffer([['Perjalanan Dinas', [
+    ['TANGGAL', 'KUU', 'JENIS', 'RUTE', 'KELAS', 'NAMA_PENUMPANG', 'KETERANGAN', 'BIAYA_RP', 'AKUN'],
+    ['2026-02-03', 'Z001', 'PESAWAT', 'CGK-DPS', '', 'Ani', '', '1000000', ''],
+  ]]]);
+  const parsed = parseTravelUpload(buffer, 'lama.xlsx');
+  assert.equal(parsed.entries.length, 1);
+  assert.equal(parsed.entries[0].metadata.passenger, 'Ani');
 });
 
 test('summary splits emission and cost by kind and keeps distanceKm flight-only', () => {

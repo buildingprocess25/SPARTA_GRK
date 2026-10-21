@@ -569,7 +569,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                   <FileSpreadsheet size={15} className="text-emerald-600 dark:text-emerald-400" aria-hidden="true" /> Template perjalanan dinas
                 </p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Template memuat kolom pesawat, hotel, dan kereta api. Bisa juga langsung unggah ekspor jurnal BPDL (akun 611402/621402) dalam .xlsx atau .csv.
+                  Satu file berisi sheet Pesawat, Hotel, Kereta Api, dan Lainnya; isi sheet yang dipakai saja. Bisa juga unggah ekspor jurnal BPDL (akun 611402/621402) atau CSV dengan kolom JENIS.
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={() => window.open('/api/scope3/template', '_blank')}>
@@ -642,14 +642,14 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                       <Table className="text-[11px]">
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="w-16">Baris</TableHead>
+                            <TableHead className="w-28">Baris</TableHead>
                             <TableHead >Masalah</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {preview.errors.map(err => (
-                            <TableRow key={err.row}>
-                              <TableCell className="tabular-nums">{err.row}</TableCell>
+                            <TableRow key={`${err.sheet ?? ''}-${err.row}`}>
+                              <TableCell className="tabular-nums whitespace-nowrap">{err.sheet ? `${err.sheet} · ${err.row}` : err.row}</TableCell>
                               <TableCell>{err.message}</TableCell>
                             </TableRow>
                           ))}

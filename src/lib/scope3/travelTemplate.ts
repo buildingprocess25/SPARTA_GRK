@@ -3,7 +3,7 @@ import * as XLSX from 'xlsx';
 import { AIRPORTS } from './airports.ts';
 import {
   CABIN, EMISSION_STATUS, HOTEL_CLASS, TRAIN_CLASS, TRAVEL_ACCOUNTS, TRAVEL_CATEGORY,
-  finishTravelEntry, hotelFactor, parseCsvRows, parseLedgerAmount, parseLedgerDate, parseRouteField, parseStationRoute,
+  finishTravelEntry, flightFactor, hotelFactor, parseCsvRows, parseLedgerAmount, parseLedgerDate, parseRouteField, parseStationRoute,
   parseTravelLedgerRows, trainFactor,
 } from './travelLedger.ts';
 
@@ -14,6 +14,7 @@ const SSF = xlsxModule.SSF ?? xlsxModule.default?.SSF;
 
 export const SOURCE_KIND = Object.freeze({ MANUAL: 'MANUAL', TEMPLATE: 'TEMPLATE' });
 
+// Single-table layout with a JENIS column: still accepted for CSV uploads and for files made with the older template.
 export const TEMPLATE_COLUMNS = Object.freeze([
   { key: 'TANGGAL', required: true, hint: 'Tanggal transaksi, format 2026-01-17 atau 17/01/2026' },
   { key: 'KUU', required: true, hint: 'Kode KUU yang menanggung biaya, misalnya Z001 atau 1AZ1' },
@@ -29,6 +30,66 @@ export const TEMPLATE_COLUMNS = Object.freeze([
   { key: 'BIAYA_RP', required: true, hint: 'Nominal rupiah tanpa titik atau koma, misalnya 2500000' },
   { key: 'AKUN', required: false, hint: '611402 atau 621402 (bawaan 611402)' },
 ]);
+
+type TemplateColumn = { key: string; required: boolean; hint: string; width?: number; options?: string[]; numeric?: 'whole' | 'decimal' };
+
+const COL: Record<string, TemplateColumn> = {
+  TANGGAL: { key: 'TANGGAL', required: true, width: 13, hint: 'Tanggal transaksi, format 2026-01-17 atau 17/01/2026' },
+  KUU: { key: 'KUU', required: true, width: 9, hint: 'Kode KUU yang menanggung biaya, misalnya Z001 atau 1AZ1' },
+  NAMA: { key: 'NAMA_KARYAWAN', required: false, width: 24, hint: 'Nama karyawan yang berangkat (opsional)' },
+  KETERANGAN: { key: 'KETERANGAN', required: false, width: 28, hint: 'Keperluan perjalanan (opsional)' },
+  BIAYA: { key: 'BIAYA_RP', required: true, width: 14, numeric: 'decimal', hint: 'Nominal rupiah tanpa titik atau koma, misalnya 2500000' },
+  AKUN: { key: 'AKUN', required: false, width: 9, hint: '611402 atau 621402 (kosong = 611402)' },
+};
+
+/** The downloadable template: one sheet per kind, each with only the columns that kind needs. The sheet name sets JENIS. */
+export const TEMPLATE_SHEETS = Object.freeze([
+  {
+    name: 'Pesawat',
+    category: TRAVEL_CATEGORY.FLIGHT,
+    rule: 'Satu baris = satu tiket per penumpang. Emisi dihitung dari jarak antar bandara di RUTE.',
+    columns: [
+      COL.TANGGAL, COL.KUU,
+      { key: 'RUTE', required: true, width: 18, hint: 'Kode bandara dipisah tanda minus, misalnya CGK-DPS-CGK. Kode ada di sheet Kode Bandara' },
+      { key: 'KELAS', required: false, width: 12, options: ['EKONOMI', 'BISNIS'], hint: 'EKONOMI atau BISNIS (kosong = EKONOMI)' },
+      COL.NAMA, COL.KETERANGAN, COL.BIAYA, COL.AKUN,
+    ],
+  },
+  {
+    name: 'Hotel',
+    category: TRAVEL_CATEGORY.HOTEL,
+    rule: 'Satu baris = satu pemesanan hotel. Emisi dihitung dari MALAM x KAMAR.',
+    columns: [
+      COL.TANGGAL, COL.KUU,
+      { key: 'MALAM', required: true, width: 9, numeric: 'decimal', hint: 'Jumlah malam menginap, misalnya 3' },
+      { key: 'KAMAR', required: false, width: 9, numeric: 'whole', hint: 'Jumlah kamar (kosong = 1)' },
+      { key: 'KOTA', required: false, width: 16, hint: 'Kota lokasi hotel (opsional), misalnya SURABAYA' },
+      { key: 'KELAS', required: false, width: 14, options: ['BINTANG_1_3', 'BINTANG_4', 'BINTANG_5'], hint: 'BINTANG_1_3, BINTANG_4, atau BINTANG_5 (kosong = rata-rata)' },
+      COL.NAMA, COL.KETERANGAN, COL.BIAYA, COL.AKUN,
+    ],
+  },
+  {
+    name: 'Kereta Api',
+    category: TRAVEL_CATEGORY.TRAIN,
+    rule: 'Satu baris = satu tiket per penumpang. Emisi dihitung dari JARAK_KM.',
+    columns: [
+      COL.TANGGAL, COL.KUU,
+      { key: 'RUTE', required: false, width: 26, hint: 'Nama stasiun dipisah tanda minus (opsional), misalnya GAMBIR-YOGYAKARTA-GAMBIR' },
+      { key: 'JARAK_KM', required: true, width: 11, numeric: 'decimal', hint: 'Total jarak perjalanan dalam km, pulang-pergi dijumlah, misalnya 1024' },
+      { key: 'KELAS', required: false, width: 12, options: ['ANTARKOTA', 'KRL', 'CEPAT'], hint: 'ANTARKOTA, KRL, atau CEPAT (kosong = ANTARKOTA)' },
+      COL.NAMA, COL.KETERANGAN, COL.BIAYA, COL.AKUN,
+    ],
+  },
+  {
+    name: 'Lainnya',
+    category: TRAVEL_CATEGORY.OTHER,
+    rule: 'Uang saku, transport lokal, dan biaya lain. Dicatat biayanya saja, tanpa emisi.',
+    columns: [COL.TANGGAL, COL.KUU, COL.NAMA, COL.KETERANGAN, COL.BIAYA, COL.AKUN],
+  },
+] as { name: string; category: string; rule: string; columns: TemplateColumn[] }[]);
+
+// Reference sheets in the template (and the example rows an earlier template kept in Petunjuk) are never data.
+const REFERENCE_SHEET = /^(PETUNJUK|FAKTOR|KODE_BANDARA)/;
 
 // Re-upload dedupe hashes these columns; hotel and train columns join the hash only when filled,
 // so a file made with the older template still hashes the same as before.
@@ -70,31 +131,35 @@ function parseQuantity(raw) {
   return Number.isFinite(value) ? value : NaN;
 }
 
-function rowsFromUpload(buffer, fileName) {
+function sheetRows(sheet) {
+  if (!sheet?.['!ref']) return [];
+  const range = XLSX.utils.decode_range(sheet['!ref']);
+  const rows = [];
+  for (let r = range.s.r; r <= range.e.r; r += 1) {
+    const row = [];
+    for (let c = range.s.c; c <= range.e.c; c += 1) {
+      const cell = sheet[XLSX.utils.encode_cell({ r, c })];
+      if (!cell) row.push('');
+      // Date cells are serial numbers with a date format; display text depends on the user's locale, the code does not.
+      else if (cell.t === 'n' && cell.z && SSF.is_date(cell.z)) {
+        const d = SSF.parse_date_code(cell.v);
+        row.push(`${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`);
+      } else if (cell.t === 'n') row.push(String(cell.v));
+      else row.push(String(cell.w ?? cell.v ?? ''));
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+
+/** Every sheet of an Excel file in order, or the single unnamed table of a CSV. */
+function sheetsFromUpload(buffer, fileName) {
   if (/\.xlsx?$/i.test(fileName)) {
     const workbook = XLSX.read(buffer, { type: 'buffer', cellNF: true });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    if (!sheet?.['!ref']) return [];
-    const range = XLSX.utils.decode_range(sheet['!ref']);
-    const rows = [];
-    for (let r = range.s.r; r <= range.e.r; r += 1) {
-      const row = [];
-      for (let c = range.s.c; c <= range.e.c; c += 1) {
-        const cell = sheet[XLSX.utils.encode_cell({ r, c })];
-        if (!cell) row.push('');
-        // Date cells are serial numbers with a date format; display text depends on the user's locale, the code does not.
-        else if (cell.t === 'n' && cell.z && SSF.is_date(cell.z)) {
-          const d = SSF.parse_date_code(cell.v);
-          row.push(`${d.y}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`);
-        } else if (cell.t === 'n') row.push(String(cell.v));
-        else row.push(String(cell.w ?? cell.v ?? ''));
-      }
-      rows.push(row);
-    }
-    return rows;
+    return workbook.SheetNames.map(name => ({ name, rows: sheetRows(workbook.Sheets[name]) }));
   }
   const text = buffer.toString('utf8');
-  return parseCsvRows(text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text);
+  return [{ name: null, rows: parseCsvRows(text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text) }];
 }
 
 const normalizeHeader = cell => String(cell).trim().toUpperCase().replace(/\s+/g, '_');
@@ -186,26 +251,23 @@ export function buildRowEntry(fields, { journalCode, sourceFile, journalType }) 
 }
 
 /**
- * Reads an uploaded CSV/Excel file. Two shapes are accepted: the SPARTA Scope 3 template,
- * or the raw BPDL journal export (header J_UU_PEMBUAT), which is checked against its account totals.
+ * Reads one table: a kind sheet (JENIS comes from the sheet name) or a single table with a JENIS column.
+ * Returns null when the rows hold no data table this importer understands.
  */
-export function parseTravelUpload(buffer, fileName) {
-  const rows = rowsFromUpload(buffer, fileName);
-
-  if (rows.some(r => normalizeHeader(r[0] ?? '') === 'J_UU_PEMBUAT')) {
-    return { format: 'JOURNAL', ledger: parseTravelLedgerRows(rows) };
-  }
-
+function parseTable(rows, { fileName, sheetName, category }) {
   const headerIndex = rows.findIndex(r => {
     const headers = r.map(normalizeHeader);
     return headers.includes('TANGGAL') && headers.includes('BIAYA_RP');
   });
-  if (headerIndex < 0) {
-    throw new Error('Kolom TANGGAL dan BIAYA_RP tidak ditemukan. Pakai template Scope 3 atau ekspor jurnal BPDL (kolom J_UU_PEMBUAT).');
-  }
+  if (headerIndex < 0) return null;
   const headers = rows[headerIndex].map(normalizeHeader);
-  const missing = TEMPLATE_COLUMNS.filter(c => c.required && !headers.includes(c.key)).map(c => c.key);
-  if (missing.length) throw new Error(`Kolom wajib tidak ada: ${missing.join(', ')}`);
+  const singleTable = headers.includes('JENIS');
+  const sheetDef = TEMPLATE_SHEETS.find(s => s.category === category);
+  if (!singleTable && !sheetDef) return null;
+
+  const required = (singleTable ? TEMPLATE_COLUMNS : sheetDef.columns).filter(c => c.required).map(c => c.key);
+  const missing = required.filter(key => !headers.includes(key));
+  if (missing.length) throw new Error(`${sheetName ? `Sheet ${sheetName}: k` : 'K'}olom wajib tidak ada: ${missing.join(', ')}`);
   const cell = (row, key) => (headers.includes(key) ? row[headers.indexOf(key)] ?? '' : '');
 
   const entries = [];
@@ -213,72 +275,157 @@ export function parseTravelUpload(buffer, fileName) {
   rows.slice(headerIndex + 1).forEach((row, offset) => {
     if (row.every(c => !String(c).trim())) return;
     const rowNumber = headerIndex + offset + 2;
-    const extra = HASH_EXTRA_KEYS.map(key => cell(row, key));
-    const values = [...HASH_BASE_KEYS.map(key => cell(row, key)), ...(extra.some(v => String(v).trim()) ? extra : [])];
+    let values;
+    if (singleTable) {
+      const extra = HASH_EXTRA_KEYS.map(key => cell(row, key));
+      values = [...HASH_BASE_KEYS.map(key => cell(row, key)), ...(extra.some(v => String(v).trim()) ? extra : [])];
+    } else {
+      values = [sheetName, ...sheetDef.columns.map(c => cell(row, c.key))];
+    }
     const result = buildRowEntry({
       date: cell(row, 'TANGGAL'),
       kuu: cell(row, 'KUU'),
-      kind: cell(row, 'JENIS'),
+      kind: singleTable ? cell(row, 'JENIS') : category,
       route: cell(row, 'RUTE'),
       cabin: cell(row, 'KELAS'),
       nights: cell(row, 'MALAM'),
       rooms: cell(row, 'KAMAR'),
       city: cell(row, 'KOTA'),
       distanceKm: cell(row, 'JARAK_KM'),
-      passenger: cell(row, 'NAMA_PENUMPANG'),
+      passenger: cell(row, 'NAMA_KARYAWAN') || cell(row, 'NAMA_PENUMPANG'),
       note: cell(row, 'KETERANGAN'),
       amount: cell(row, 'BIAYA_RP'),
       account: cell(row, 'AKUN'),
     }, { journalCode: templateCode(fileName, rowNumber, values), sourceFile: fileName, journalType: SOURCE_KIND.TEMPLATE });
-    if (result.error) errors.push({ row: rowNumber, message: result.error });
+    if (result.error) errors.push({ sheet: sheetName, row: rowNumber, message: result.error });
     else entries.push(result.entry);
   });
-  if (!entries.length && !errors.length) throw new Error('Template tidak berisi baris data di bawah header.');
+  return { entries, errors };
+}
+
+/**
+ * Reads an uploaded CSV/Excel file. Accepted shapes: the Scope 3 template with one sheet per kind
+ * (Pesawat, Hotel, Kereta Api, Lainnya), a single table with a JENIS column (CSV or the older template),
+ * or the raw BPDL journal export (header J_UU_PEMBUAT), which is checked against its account totals.
+ */
+export function parseTravelUpload(buffer, fileName) {
+  const sheets = sheetsFromUpload(buffer, fileName);
+
+  const journal = sheets.find(s => s.rows.some(r => normalizeHeader(r[0] ?? '') === 'J_UU_PEMBUAT'));
+  if (journal) return { format: 'JOURNAL', ledger: parseTravelLedgerRows(journal.rows) };
+
+  const entries = [];
+  const errors = [];
+  let tables = 0;
+  for (const sheet of sheets) {
+    const sheetKey = sheet.name ? normalizeHeader(sheet.name) : '';
+    if (REFERENCE_SHEET.test(sheetKey)) continue;
+    const result = parseTable(sheet.rows, { fileName, sheetName: sheet.name, category: KIND_ALIASES[sheetKey] ?? null });
+    if (!result) continue;
+    tables += 1;
+    entries.push(...result.entries);
+    errors.push(...result.errors);
+  }
+  if (!tables) {
+    throw new Error('Tabel data tidak ditemukan. Pakai template Scope 3 (sheet Pesawat, Hotel, Kereta Api, Lainnya), CSV dengan kolom TANGGAL, JENIS, dan BIAYA_RP, atau ekspor jurnal BPDL (kolom J_UU_PEMBUAT).');
+  }
+  if (!entries.length && !errors.length) throw new Error('Template belum berisi baris data. Isi minimal satu baris di sheet Pesawat, Hotel, Kereta Api, atau Lainnya.');
   return { format: 'TEMPLATE', entries, errors };
 }
 
-/** Builds the downloadable .xlsx template: an empty data sheet, column guide, and airport codes. */
-export function buildTravelTemplateWorkbook() {
-  const workbook = XLSX.utils.book_new();
-  const data = XLSX.utils.aoa_to_sheet([TEMPLATE_COLUMNS.map(c => c.key)]);
-  data['!cols'] = TEMPLATE_COLUMNS.map(c => ({ wch: Math.max(14, c.key.length + 4) }));
-  XLSX.utils.book_append_sheet(workbook, data, 'Perjalanan Dinas');
+const TEMPLATE_INPUT_ROWS = 500;
+const HEADER_REQUIRED_FILL = 'FF1E293B';
+const HEADER_OPTIONAL_FILL = 'FF64748B';
 
-  const guide = XLSX.utils.aoa_to_sheet([
-    ['Kolom', 'Wajib', 'Cara mengisi'],
-    ...TEMPLATE_COLUMNS.map(c => [c.key, c.required ? 'Ya' : 'Tidak', c.hint]),
+function addReferenceSheet(workbook, name, rows, widths) {
+  const sheet = workbook.addWorksheet(name);
+  rows.forEach(row => sheet.addRow(row));
+  sheet.columns.forEach((column, i) => { column.width = widths[i] ?? 14; });
+  return sheet;
+}
+
+/**
+ * Builds the downloadable .xlsx template with ExcelJS (SheetJS cannot write dropdowns):
+ * one input sheet per kind with header notes, KELAS dropdowns and number checks, then the reference sheets.
+ */
+export async function buildTravelTemplateWorkbook() {
+  const ExcelJSModule = await import('exceljs');
+  const ExcelJS = ExcelJSModule.default || ExcelJSModule;
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = 'SPARTA Gas Rumah Kaca';
+  workbook.created = new Date();
+
+  for (const def of TEMPLATE_SHEETS) {
+    const sheet = workbook.addWorksheet(def.name, { views: [{ state: 'frozen', ySplit: 1 }] });
+    sheet.columns = def.columns.map(c => ({ header: c.key, key: c.key, width: c.width ?? 14 }));
+    def.columns.forEach((c, i) => {
+      const header = sheet.getCell(1, i + 1);
+      header.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      header.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: c.required ? HEADER_REQUIRED_FILL : HEADER_OPTIONAL_FILL } };
+      header.note = `${c.required ? 'Wajib' : 'Opsional'}. ${c.hint}`;
+      for (let r = 2; r <= TEMPLATE_INPUT_ROWS + 1; r += 1) {
+        const target = sheet.getCell(r, i + 1);
+        if (c.key === 'TANGGAL') target.numFmt = 'yyyy-mm-dd';
+        if (c.key === 'BIAYA_RP') target.numFmt = '#,##0';
+        if (c.options) {
+          target.dataValidation = {
+            type: 'list', allowBlank: true, formulae: [`"${c.options.join(',')}"`],
+            showErrorMessage: true, errorTitle: 'Pilihan tidak dikenal', error: `Pilih salah satu: ${c.options.join(', ')}`,
+          };
+        } else if (c.numeric) {
+          target.dataValidation = {
+            type: c.numeric, operator: 'greaterThan', allowBlank: true, formulae: [0],
+            showErrorMessage: true, errorTitle: 'Angka tidak valid', error: `${c.key} harus angka lebih dari 0`,
+          };
+        }
+      }
+    });
+  }
+
+  const guide = [
+    ['Template Scope 3 · Perjalanan Dinas'],
     [],
-    ['Satu baris = satu tiket pesawat atau kereta per penumpang, satu pemesanan hotel, atau satu pengeluaran lain.'],
-    ['PESAWAT dihitung dari RUTE, HOTEL dari MALAM x KAMAR, KERETA dari JARAK_KM. Baris LAINNYA dicatat biayanya saja.'],
+    ['Isi sheet yang dipakai saja; sheet yang dibiarkan kosong dilewati. Jenis perjalanan diambil dari nama sheet, jadi jangan ganti nama sheet.'],
+    ['Header gelap wajib diisi, header abu-abu opsional. Arahkan kursor ke header untuk melihat cara mengisinya.'],
     [],
-    ['Contoh pengisian'],
-    ['TANGGAL', 'KUU', 'JENIS', 'RUTE', 'KELAS', 'MALAM', 'KAMAR', 'KOTA', 'JARAK_KM', 'BIAYA_RP'],
-    ['2026-02-03', 'Z001', 'PESAWAT', 'CGK-DPS-CGK', 'EKONOMI', '', '', '', '', '2500000'],
-    ['2026-02-03', 'Z001', 'HOTEL', '', 'BINTANG_4', '3', '1', 'DENPASAR', '', '2100000'],
-    ['2026-02-10', '1AZ1', 'KERETA', 'GAMBIR-YOGYAKARTA-GAMBIR', 'ANTARKOTA', '', '', '', '1024', '900000'],
-  ]);
-  guide['!cols'] = [{ wch: 18 }, { wch: 8 }, { wch: 90 }];
-  XLSX.utils.book_append_sheet(workbook, guide, 'Petunjuk');
+    ...TEMPLATE_SHEETS.flatMap(def => [
+      [`Sheet ${def.name}`],
+      [def.rule],
+      ...def.columns.filter(c => ![COL.TANGGAL, COL.KUU, COL.NAMA, COL.KETERANGAN, COL.BIAYA, COL.AKUN].includes(c))
+        .map(c => [`  ${c.key}${c.required ? ' (wajib)' : ''}: ${c.hint}`]),
+      [],
+    ]),
+    ['Kolom yang sama di semua sheet'],
+    ...[COL.TANGGAL, COL.KUU, COL.NAMA, COL.KETERANGAN, COL.BIAYA, COL.AKUN].map(c => [`  ${c.key}${c.required ? ' (wajib)' : ''}: ${c.hint}`]),
+    [],
+    ['Mengunggah ulang file yang sama tidak membuat data dobel.'],
+  ];
+  const guideSheet = addReferenceSheet(workbook, 'Petunjuk', guide, [120]);
+  guideSheet.getCell('A1').font = { bold: true, size: 14 };
+  guide.forEach((row, i) => { if (/^(Sheet |Kolom yang sama)/.test(String(row[0] ?? ''))) guideSheet.getCell(i + 1, 1).font = { bold: true }; });
 
-  const factors = XLSX.utils.aoa_to_sheet([
-    ['JENIS', 'KELAS', 'Faktor emisi', 'Satuan'],
-    ['HOTEL', '(kosong)', hotelFactor(HOTEL_CLASS.AVERAGE)?.value, hotelFactor(HOTEL_CLASS.AVERAGE)?.unit],
-    ['HOTEL', 'BINTANG_1_3', hotelFactor(HOTEL_CLASS.STAR_1_3)?.value, hotelFactor(HOTEL_CLASS.STAR_1_3)?.unit],
-    ['HOTEL', 'BINTANG_4', hotelFactor(HOTEL_CLASS.STAR_4)?.value, hotelFactor(HOTEL_CLASS.STAR_4)?.unit],
-    ['HOTEL', 'BINTANG_5', hotelFactor(HOTEL_CLASS.STAR_5)?.value, hotelFactor(HOTEL_CLASS.STAR_5)?.unit],
-    ['KERETA', 'ANTARKOTA', trainFactor(TRAIN_CLASS.INTERCITY)?.value, trainFactor(TRAIN_CLASS.INTERCITY)?.unit],
-    ['KERETA', 'KRL', trainFactor(TRAIN_CLASS.COMMUTER)?.value, trainFactor(TRAIN_CLASS.COMMUTER)?.unit],
-    ['KERETA', 'CEPAT', trainFactor(TRAIN_CLASS.HIGH_SPEED)?.value, trainFactor(TRAIN_CLASS.HIGH_SPEED)?.unit],
-  ]);
-  factors['!cols'] = [{ wch: 10 }, { wch: 14 }, { wch: 14 }, { wch: 24 }];
-  XLSX.utils.book_append_sheet(workbook, factors, 'Faktor Hotel & Kereta');
+  const factorRow = (kind, label, factor) => [kind, label, factor?.value ?? null, factor?.unit ?? ''];
+  const factorSheet = addReferenceSheet(workbook, 'Faktor Emisi', [
+    ['Sheet', 'KELAS', 'Faktor emisi', 'Satuan'],
+    factorRow('Pesawat', 'EKONOMI, domestik', flightFactor(false, CABIN.ECONOMY)),
+    factorRow('Pesawat', 'EKONOMI, internasional', flightFactor(true, CABIN.ECONOMY)),
+    factorRow('Pesawat', 'BISNIS, domestik', flightFactor(false, CABIN.BUSINESS)),
+    factorRow('Pesawat', 'BISNIS, internasional', flightFactor(true, CABIN.BUSINESS)),
+    factorRow('Hotel', '(kosong) rata-rata', hotelFactor(HOTEL_CLASS.AVERAGE)),
+    factorRow('Hotel', 'BINTANG_1_3', hotelFactor(HOTEL_CLASS.STAR_1_3)),
+    factorRow('Hotel', 'BINTANG_4', hotelFactor(HOTEL_CLASS.STAR_4)),
+    factorRow('Hotel', 'BINTANG_5', hotelFactor(HOTEL_CLASS.STAR_5)),
+    factorRow('Kereta Api', 'ANTARKOTA', trainFactor(TRAIN_CLASS.INTERCITY)),
+    factorRow('Kereta Api', 'KRL', trainFactor(TRAIN_CLASS.COMMUTER)),
+    factorRow('Kereta Api', 'CEPAT', trainFactor(TRAIN_CLASS.HIGH_SPEED)),
+  ], [12, 24, 14, 26]);
+  factorSheet.getRow(1).font = { bold: true };
 
-  const airports = XLSX.utils.aoa_to_sheet([
+  const airportSheet = addReferenceSheet(workbook, 'Kode Bandara', [
     ['Kode', 'Bandara', 'Negara'],
     ...Object.entries(AIRPORTS).map(([code, a]) => [code, a.name, a.country]),
-  ]);
-  airports['!cols'] = [{ wch: 8 }, { wch: 28 }, { wch: 8 }];
-  XLSX.utils.book_append_sheet(workbook, airports, 'Kode Bandara');
+  ], [8, 30, 8]);
+  airportSheet.getRow(1).font = { bold: true };
 
-  return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+  return Buffer.from(await workbook.xlsx.writeBuffer());
 }
