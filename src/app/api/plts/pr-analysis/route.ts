@@ -9,6 +9,7 @@ import {
   PR_CONFIG,
 } from '@/lib/solar/performanceRatio';
 import { WEATHER_LOCATION_REGISTRY } from '@/lib/solar/openMeteoService';
+import { isDcLocation } from '@/lib/solar/plantMap.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +29,7 @@ export async function GET(request) {
     const minYm = `${Math.min(...years)}01`;
     const maxYm = `${Math.max(...years)}12`;
 
-    const plants = await prisma.plantMaster.findMany({
+    const rawPlants = await prisma.plantMaster.findMany({
       select: {
         dcId: true,
         canonicalName: true,
@@ -41,6 +42,9 @@ export async function GET(request) {
       },
       orderBy: { canonicalName: 'asc' },
     });
+
+    // Enforce canonical 37 DC rule: exclude the 2 Drive Thru pilot stores (facilityType STORE)
+    const plants = rawPlants.filter(isDcLocation);
 
     const observations = await prisma.monthlyYieldObservation.findMany({
       where: {
@@ -305,7 +309,7 @@ export async function GET(request) {
       yield_mwh: 'productionMwh',
       capacity_factor: 'capacityFactorPercent',
       specific_yield: 'specificYield',
-      humidity: 'humidityMean',
+      humidityMean: 'humidityMean',
     };
     const targetKey = paramKeyMap[parameter] || 'tempPanelEstimatedC';
 
@@ -318,6 +322,86 @@ export async function GET(request) {
       }));
 
     const correlation = calculatePearsonCorrelation(corrPairs);
+
+    // Compute Soiling Alerts across plants based on latest closed months in primary year
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const soilingAlerts: any[] = [];
+    const primaryYear = years[0];
+
+    for (const p of plants) {
+      if (p.operationalStatus === 'UNDER_CONSTRUCTION') continue;
+      const cap = p.apiInstalledKwp || 0;
+      if (cap <= 0) continue;
+
+      const closedMonthlyPrs: { month: number; pr: number; irrad: number }[] = [];
+
+      for (let m = 1; m <= 12; m++) {
+        const ym = `${primaryYear}${String(m).padStart(2, '0')}`;
+        if (ym >= currentYearMonth) continue; // Skip partial & future months
+
+        let energyKwh = 0;
+        let hasEnergy = false;
+        for (const psId of p.sungrowPsIds || []) {
+          const sources = obsMap.get(`${ym}:${psId}`) || new Map();
+          const resolved = resolveMonthly({
+            reportKwh: sources.get('ISOLAR_REPORT_IMPORT')?.energyKwh,
+            apiHistoryKwh: sources.get('api_history')?.energyKwh,
+            livePartialKwh: sources.get('api_live_partial')?.energyKwh,
+            isCompletedMonth: true,
+          });
+          if (resolved.energyKwh !== null && resolved.energyKwh !== undefined) {
+            energyKwh += resolved.energyKwh;
+            hasEnergy = true;
+          }
+        }
+
+        const sensorEntry = sensorMap.get(`${ym}:${(p.sungrowPsIds || [])[0]}`);
+        const weatherKey = dcToWeatherKey.get(p.dcId) || p.dcId;
+        const wEntry = weatherMonthlyMap.get(`${weatherKey}:${ym}`);
+
+        let irrad = 0;
+        if (sensorEntry && sensorEntry.radiationKwhM2 && sensorEntry.radiationKwhM2 > 0) {
+          irrad = sensorEntry.radiationKwhM2;
+        } else if (wEntry && wEntry.sumGhi > 0) {
+          irrad = Number(wEntry.sumGhi.toFixed(2));
+        }
+
+        if (hasEnergy && energyKwh > 0 && irrad > 0) {
+          const pr = (energyKwh / (cap * irrad)) * 100;
+          closedMonthlyPrs.push({ month: m, pr, irrad });
+        }
+      }
+
+      if (closedMonthlyPrs.length >= 2) {
+        const latest = closedMonthlyPrs[closedMonthlyPrs.length - 1];
+        const prev = closedMonthlyPrs[closedMonthlyPrs.length - 2];
+
+        if (prev.pr > 0 && latest.pr > 0) {
+          const dropPercent = ((prev.pr - latest.pr) / prev.pr) * 100;
+          const dropAbs = prev.pr - latest.pr;
+          // Sunny condition: monthly irradiation >= 80 kWh/m² or at least 85% of previous month's irradiation
+          const isSunny = latest.irrad >= 80 || (latest.irrad >= prev.irrad * 0.85);
+
+          // If PR dropped >= 10% on sunny conditions -> Soiling / Dust suspected
+          if (dropPercent >= 10 && isSunny) {
+            soilingAlerts.push({
+              dcId: p.dcId,
+              name: p.canonicalName,
+              grid: p.grid,
+              previousPr: Number(prev.pr.toFixed(1)),
+              currentPr: Number(latest.pr.toFixed(1)),
+              dropPercent: Number(dropPercent.toFixed(1)),
+              dropAbs: Number(dropAbs.toFixed(1)),
+              monthFrom: `${monthNames[prev.month - 1]} ${primaryYear}`,
+              monthTo: `${monthNames[latest.month - 1]} ${primaryYear}`,
+              irradiationKwhM2: latest.irrad,
+              severity: dropPercent >= 15 ? 'critical' : 'warning',
+              recommendation: 'Perlu Pembersihan Panel (Washing)',
+            });
+          }
+        }
+      }
+    }
 
     return NextResponse.json({
       success: true,
@@ -332,6 +416,7 @@ export async function GET(request) {
       },
       data: {
         series: yearlySeries,
+        soilingAlerts,
         correlation: {
           ...correlation,
           parameter,

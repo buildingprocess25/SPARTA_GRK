@@ -14,6 +14,7 @@ import { DCRowItem } from './analytics/DCRowItem';
 import AnalyticsTelemetryPanel from './analytics/AnalyticsTelemetryPanel';
 import AnalyticsMatureTable from './analytics/AnalyticsMatureTable';
 import AnalyticsTrendChart from './analytics/AnalyticsTrendChart';
+import DailyExecutiveDigest from './analytics/DailyExecutiveDigest';
 import { LineChart, Area } from 'recharts';
 export { normalizeFuzzy, matchesFuzzyQuery, formatWibTime, getDCBadges } from './analytics/analyticsHelpers';
 export { getPlantColor } from './analytics/analyticsConfig';
@@ -1075,6 +1076,13 @@ export default function PLTSAnalyticsSection({
           )}
         </div>
       </CardBox>
+
+      {/* Laporan Ringkasan Harian Otomatis (Daily Executive Digest 18:00 WIB) */}
+      <DailyExecutiveDigest
+        items={allDCItems}
+        lastSyncTime={lastSyncTime}
+        onNavigateToTelemetry={() => setActiveTab('telemetry')}
+      />
     </div>
   );
 }

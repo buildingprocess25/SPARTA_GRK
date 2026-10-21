@@ -22,9 +22,20 @@ import PageHeader from '@/components/ui/PageHeader';
 import KpiCard from '@/components/ui/KpiCard';
 import CardBox from '@/components/ui/CardBox';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
-import Scope2AnnualLoadDashboard from '@/components/scope2/Scope2AnnualLoadDashboard';
-import Scope1InputModal from '@/components/scope1/Scope1InputModal';
-import Scope3TravelDashboard from '@/components/scope3/Scope3TravelDashboard';
+import dynamic from 'next/dynamic';
+import { TabContentSkeleton } from '@/components/plts/PLTSDashboardSkeletons';
+
+const Scope2AnnualLoadDashboard = dynamic(() => import('@/components/scope2/Scope2AnnualLoadDashboard'), {
+  loading: () => <TabContentSkeleton />,
+  ssr: false,
+});
+const Scope1InputModal = dynamic(() => import('@/components/scope1/Scope1InputModal'), {
+  ssr: false,
+});
+const Scope3TravelDashboard = dynamic(() => import('@/components/scope3/Scope3TravelDashboard'), {
+  loading: () => <TabContentSkeleton />,
+  ssr: false,
+});
 import InputDataButton from '@/components/ui/InputDataButton';
 import { Input } from '@/components/ui/input';
 import { CustomSelect } from '@/components/ui/select';

@@ -1,14 +1,32 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import PushPermissionBanner from '@/components/ui/PushPermissionBanner';
-import EmisiResumeTab from '@/components/EmisiResumeTab';
-import PengurangEmisiTab from '@/components/PengurangEmisiTab';
-import PenambahEmisiTab from '@/components/PenambahEmisiTab';
-import HistoryTab from '@/components/HistoryTab';
 import { SustainabilityProvider } from '@/context/SustainabilityContext';
+import { SummaryCardsSkeleton, TabContentSkeleton } from '@/components/plts/PLTSDashboardSkeletons';
+
+const EmisiResumeTab = dynamic(() => import('@/components/EmisiResumeTab'), {
+  loading: () => <SummaryCardsSkeleton />,
+  ssr: false,
+});
+
+const PengurangEmisiTab = dynamic(() => import('@/components/PengurangEmisiTab'), {
+  loading: () => <TabContentSkeleton />,
+  ssr: false,
+});
+
+const PenambahEmisiTab = dynamic(() => import('@/components/PenambahEmisiTab'), {
+  loading: () => <TabContentSkeleton />,
+  ssr: false,
+});
+
+const HistoryTab = dynamic(() => import('@/components/HistoryTab'), {
+  loading: () => <TabContentSkeleton />,
+  ssr: false,
+});
 
 const SCOPE2_PARAM_KEYS = ['period', 'month', 'from', 'to', 'grid', 'dc', 'q', 'tariff', 'scope2Basis'];
 

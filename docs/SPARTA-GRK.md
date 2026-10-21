@@ -332,6 +332,18 @@ T_panel       = T_day + (G / 800) x (NOCT - 20)
 
 Portal iSolarCloud menampilkan angka tetap 90 (95 untuk Karawang) untuk PR yang tidak masuk akal; dashboard menyimpan nilai mentahnya dan menandai bulan di luar 10-100% sebagai sensor iradiasi bermasalah, bukan memakai 90. Sinkronisasi di `prMonthlySync.ts`, batas valid di `prValidity.ts`, agregasi di `dashboard.ts` (`calculateWeightedPr`). Koefisien gamma = -0,45%/°C, NOCT = 45°C (`performanceRatio.ts`).
 
+### Deteksi Soiling (Soiling Alert / Washing Recommendation)
+
+Jika PR suatu DC turun berturut-turut atau mengalami penurunan $\ge 10-15\%$ dibandingkan histori bulan sebelumnya pada kondisi cuaca cerah (iradiasi bulanan $\ge 80\text{ kWh/m}^2$ atau tidak mengalami penurunan iradiasi proporsional), sistem memicu **Soiling Alert** dengan rekomendasi *"Perlu Pembersihan Panel (Washing)"*.
+
+### Laporan Ringkasan Harian (Daily Executive Digest 18:00 WIB)
+
+Pada tab API iSolarCloud (`PLTSAnalyticsSection`), disediakan **Daily Executive Digest** dengan titik cut-off harian pukul 18:00 WIB (akhir jam produksi surya). Menampilkan:
+1. Total produksi harian nasional (MWh & kWh), emisi $\text{CO}_2$ terhindar (ton), dan ekuivalen serapan pohon.
+2. Top 3 DC performa terbaik harian berdasarkan *Specific Yield* ($\text{kWh/kWp}$).
+3. Daftar DC yang membutuhkan atensi teknis / pemeliharaan (offline, alarm proteksi, atau suhu inverter tinggi).
+4. Satu tombol salin cepat berformat rapi WhatsApp untuk kebutuhan memo manajemen / direksi.
+
 ---
 
 ## Struktur Direktori

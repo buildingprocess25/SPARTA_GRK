@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   CartesianGrid, Line, ComposedChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
 } from 'recharts';
 import {
   Gauge, Thermometer, Sun, Zap, Activity, RefreshCw, Layers, MapPin, TrendingDown,
+  Sparkles, Droplets, AlertTriangle, CheckCircle2, ChevronRight
 } from 'lucide-react';
 import { TabContentSkeleton } from './PLTSDashboardSkeletons';
 import InfoHint from '@/components/ui/InfoHint';
@@ -33,11 +34,21 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
   const [selectedScope, setSelectedScope] = useState('national');
   const [selectedTargetId, setSelectedTargetId] = useState('ALL');
   const [selectedParamId, setSelectedParamId] = useState('temp_panel');
-  const [apiData, setApiData] = useState(null);
+  const [apiData, setApiData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchPrAnalysis = async () => {
+  // Client-side cache for instant (0ms) tab and filter responsiveness without lag
+  const cacheRef = useRef<Map<string, any>>(new Map());
+
+  const fetchPrAnalysis = async (force = false) => {
+    const cacheKey = `${selectedYear}_${selectedScope}_${selectedTargetId}`;
+    if (!force && cacheRef.current.has(cacheKey)) {
+      setApiData(cacheRef.current.get(cacheKey));
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
@@ -52,17 +63,20 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
       if (!res.ok || !json.success) {
         throw new Error(json.error || 'Gagal memuat data analitik PR');
       }
+      cacheRef.current.set(cacheKey, json);
       setApiData(json);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message || 'Gagal memuat data analitik PR');
     } finally {
       setLoading(false);
     }
   };
 
+  // Only re-fetch when Year, Scope, or Target DC changes.
+  // Switching selectedParamId does NOT refetch from server (instant client recalculation)
   useEffect(() => {
     fetchPrAnalysis();
-  }, [selectedYear, selectedScope, selectedTargetId, selectedParamId]);
+  }, [selectedYear, selectedScope, selectedTargetId]);
 
   const activeParam = useMemo(() => {
     return PARAM_OPTIONS.find(p => p.id === selectedParamId) || PARAM_OPTIONS[0];
@@ -70,7 +84,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
 
   const seriesData = useMemo(() => {
     const rawList = apiData?.data?.series?.[selectedYear] || [];
-    return rawList.map(item => ({
+    return rawList.map((item: any) => ({
       ...item,
       monthLabel: MONTH_NAMES[item.month - 1] || item.month,
       prPercent: item.isPartial ? null : item.prPercent,
@@ -82,14 +96,14 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
 
   // Averages for Jan-Sep (excluding partial and future months)
   const summaryMetrics = useMemo(() => {
-    const validMonths = seriesData.filter(s => !s.isPartial && !s.isFuture && s.prPercent !== null);
+    const validMonths = seriesData.filter((s: any) => !s.isPartial && !s.isFuture && s.prPercent !== null);
     if (validMonths.length === 0) return null;
 
-    const avgPr = validMonths.reduce((s, m) => s + m.prPercent, 0) / validMonths.length;
-    const avgPrCorr = validMonths.reduce((s, m) => s + (m.prCorrectedPercent || m.prPercent), 0) / validMonths.length;
-    const avgParam = validMonths.reduce((s, m) => s + (m.paramValue || 0), 0) / validMonths.length;
+    const avgPr = validMonths.reduce((s: number, m: any) => s + m.prPercent, 0) / validMonths.length;
+    const avgPrCorr = validMonths.reduce((s: number, m: any) => s + (m.prCorrectedPercent || m.prPercent), 0) / validMonths.length;
+    const avgParam = validMonths.reduce((s: number, m: any) => s + (m.paramValue || 0), 0) / validMonths.length;
     const totalPlants = validMonths[0]?.totalPlantCount || 37;
-    const avgPlants = Math.round(validMonths.reduce((s, m) => s + m.includedPlantCount, 0) / validMonths.length);
+    const avgPlants = Math.round(validMonths.reduce((s: number, m: any) => s + m.includedPlantCount, 0) / validMonths.length);
 
     return {
       avgPr: Number(avgPr.toFixed(1)),
@@ -101,7 +115,44 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
     };
   }, [seriesData]);
 
-  const correlation = apiData?.data?.correlation || null;
+  // Instant client-side Pearson correlation calculation for any selected comparison parameter
+  const correlation = useMemo(() => {
+    const validPairs = seriesData
+      .filter((s: any) => !s.isPartial && !s.isFuture && s.prPercent !== null && s.paramValue !== null)
+      .map((s: any) => ({ x: Number(s.paramValue), y: Number(s.prPercent) }));
+
+    if (validPairs.length < 3) return null;
+    const n = validPairs.length;
+    const sumX = validPairs.reduce((acc, p) => acc + p.x, 0);
+    const sumY = validPairs.reduce((acc, p) => acc + p.y, 0);
+    const sumXY = validPairs.reduce((acc, p) => acc + (p.x * p.y), 0);
+    const sumX2 = validPairs.reduce((acc, p) => acc + (p.x * p.x), 0);
+    const sumY2 = validPairs.reduce((acc, p) => acc + (p.y * p.y), 0);
+
+    const numerator = (n * sumXY) - (sumX * sumY);
+    const denominator = Math.sqrt(((n * sumX2) - (sumX * sumX)) * ((n * sumY2) - (sumY * sumY)));
+    if (!denominator || isNaN(denominator)) return null;
+
+    const r = Number((numerator / denominator).toFixed(2));
+    const absR = Math.abs(r);
+    let strength = 'Sangat Lemah';
+    if (absR >= 0.7) strength = 'Kuat';
+    else if (absR >= 0.4) strength = 'Sedang';
+    else if (absR >= 0.2) strength = 'Lemah';
+
+    return { r, strength, count: n };
+  }, [seriesData]);
+
+  // Soiling Alerts (Dust buildup detection: PR drops >10-15% during sunny months)
+  const soilingAlerts: any[] = useMemo(() => {
+    return apiData?.data?.soilingAlerts || [];
+  }, [apiData]);
+
+  // Specific soiling alert for currently selected DC
+  const currentDcSoilingAlert = useMemo(() => {
+    if (selectedScope !== 'dc' || selectedTargetId === 'ALL') return null;
+    return soilingAlerts.find(a => a.dcId === selectedTargetId);
+  }, [soilingAlerts, selectedScope, selectedTargetId]);
 
   if (loading && !apiData) return <TabContentSkeleton />;
 
@@ -111,7 +162,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
         <p className="text-sm font-bold text-rose-800 dark:text-rose-300">Data kinerja panel belum bisa dimuat</p>
         <p className="text-xs text-rose-600 dark:text-rose-400 mt-1 max-w-md">{error}</p>
         <button
-          onClick={fetchPrAnalysis}
+          onClick={() => fetchPrAnalysis(true)}
           className="mt-4 px-4 py-2 text-xs font-bold text-white bg-rose-700 rounded-xl hover:bg-rose-800 transition"
         >
           Coba lagi
@@ -213,6 +264,63 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
           </div>
         </div>
       </div>
+
+      {/* Soiling Alert Banner for Selected DC */}
+      {currentDcSoilingAlert && (
+        <div 
+          className="flex flex-wrap items-center justify-between gap-3 p-2.5 sm:px-3 sm:py-2 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/40 dark:bg-amber-950/20 text-xs animate-in"
+          data-testid="soiling-alert-banner"
+        >
+          <div className="flex items-center gap-2">
+            <Droplets size={14} className="text-amber-600 dark:text-amber-400 shrink-0" />
+            <span className="font-bold text-amber-900 dark:text-amber-200">
+              Perlu cuci panel:
+            </span>
+            <span className="text-slate-700 dark:text-slate-300">
+              PR turun -{currentDcSoilingAlert.dropPercent}% ({currentDcSoilingAlert.previousPr}% → {currentDcSoilingAlert.currentPr}%) pada cuaca cerah ({currentDcSoilingAlert.monthFrom} – {currentDcSoilingAlert.monthTo}).
+            </span>
+            <InfoHint
+              size={12}
+              title="Indikasi debu (Soiling)"
+              text="PR turun signifikan saat radiasi matahari tetap tinggi (>80 kWh/m²). Terindikasi akumulasi debu/kotoran pada modul PV dan disarankan penjadwalan washing."
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Soiling Watchlist across plants (National / Grid View) */}
+      {selectedScope !== 'dc' && soilingAlerts.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-2.5 p-2.5 sm:px-3 sm:py-2 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/40 dark:bg-amber-950/20 text-xs">
+          <div className="flex flex-wrap items-center gap-2">
+            <Droplets size={14} className="text-amber-600 dark:text-amber-400 shrink-0" />
+            <span className="font-bold text-slate-800 dark:text-slate-200">
+              Indikasi cuci panel ({soilingAlerts.length} DC)
+            </span>
+            <InfoHint
+              size={12}
+              title="Indikasi debu (Soiling)"
+              text="Daftar DC dengan penurunan PR >10% dibanding bulan sebelumnya pada cuaca cerah. Terindikasi akumulasi kotoran pada modul PV dan disarankan penjadwalan pencucian panel."
+            />
+            <div className="flex flex-wrap items-center gap-1.5 ml-1">
+              {soilingAlerts.map(a => (
+                <button
+                  key={a.dcId}
+                  type="button"
+                  onClick={() => {
+                    setSelectedScope('dc');
+                    setSelectedTargetId(a.dcId);
+                  }}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-amber-400 dark:hover:border-amber-500 transition"
+                  title={`Analisis ${a.name} (PR turun -${a.dropPercent}%)`}
+                >
+                  <span>{a.name}</span>
+                  <span className="text-rose-600 dark:text-rose-400 font-bold">-{a.dropPercent}%</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Summary KPI Cards */}
       {summaryMetrics && (
