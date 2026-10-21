@@ -18,23 +18,42 @@ Dokumen ini memuat panduan lengkap penerapan (deployment) aplikasi Dashboard PLT
 
 Pastikan file konfigurasi memiliki izin ketat (`chmod 600 .env`):
 
+Daftar lengkap beserta penjelasannya ada di `.env.example`. Yang wajib untuk produksi:
+
 ```bash
+# Runtime
+NODE_ENV=production
+TZ=Asia/Jakarta            # wajib: jadwal sync, logout 19.00 WIB, dan reset kuota memakai WIB
+PORT=3001
+
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/plts_db?schema=public"
+DATABASE_URL="postgresql://user:password@host:5432/sparta_db?schema=public"
 
-# iSolarCloud OpenAPI Credentials (Server-side ONLY, JANGAN gunakan NEXT_PUBLIC_)
-ISOLAR_APP_KEY="your_app_key_here"
-ISOLAR_ACCESS_KEY="your_access_key_here"
-ISOLAR_GATEWAY_URL="https://api.isolarcloud.com.hk"
-ISOLAR_API_USER_ID="your_user_id"
-ISOLAR_API_TOKEN=""
+# iSolarCloud OpenAPI (server-side saja, JANGAN pakai prefix NEXT_PUBLIC_)
+ISOLAR_MODE=live
+ISOLAR_BASE_URL="https://gateway.isolarcloud.com.hk"
+ISOLAR_APP_KEY=...
+ISOLAR_SECRET_KEY=...
+ISOLAR_USER_ACCOUNT=...
+ISOLAR_USER_PASSWORD=...
 
-# Sync & Revalidation Security
-PORT=3000
-REVALIDATE_URL="http://127.0.0.1:3000/api/plts/revalidate"
-REVALIDATE_SECRET_TOKEN="plts_internal_secret_key_2026"
-CRON_SECRET="plts_internal_secret_key_2026"
+# Autentikasi
+AUTH_SESSION_SECRET=...            # openssl rand -hex 32
+AUTH_ADMIN_PASSWORD_HASH=...       # node scripts/hash-password.mjs "password"
+AUTH_VALENS_PASSWORD_HASH=...
+AUTH_DEFAULT_ACCOUNT_PASSWORD=     # opsional; tanpa ini akun peran bawaan yang belum ada tidak dibuat
+
+# Keamanan cron & revalidasi
+CRON_SECRET=...
+REVALIDATE_SECRET_TOKEN=...
+
+# Web Push
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=...   # juga sebagai Build Arg di Docker
+VAPID_PRIVATE_KEY=...
+VAPID_SUBJECT="mailto:..."
 ```
+
+Tidak ada lagi password bawaan di kode. Akun yang dibuat versi lama dengan password `ptsat123` tetap ada di database; ganti password akun tersebut lewat menu Profil > Akun.
 
 ---
 
@@ -44,15 +63,25 @@ CRON_SECRET="plts_internal_secret_key_2026"
 # 1. Masuk ke direktori proyek
 cd /var/www/plts-dashboard
 
-# 2. Pasang dependensi
+# 2. Pasang dependensi (Dockerfile juga memakai npm ci)
 npm ci
 
-# 3. Jalankan migrasi Prisma
-npx prisma db push
+# 3. Terapkan migrasi Prisma yang belum jalan (prisma/migrations)
+npx prisma migrate deploy
 
 # 4. Build aplikasi Next.js
 npm run build
 ```
+
+**Lockfile.** Pengembangan lokal memakai pnpm (`pnpm-lock.yaml`), sedangkan Dockerfile menjalankan `npm ci` dari `package-lock.json`. Setiap kali menambah atau mengubah dependency, perbarui keduanya (`pnpm install` lalu `npm install --package-lock-only --ignore-scripts`). Kalau tidak, build Docker gagal dengan `npm ci can only install packages when your package.json and package-lock.json are in sync`.
+
+**Migrasi 2026-10-21: `plant_pr_monthly`.** Menyimpan PR bulanan resmi per plant dari iSolarCloud. Setelah `prisma migrate deploy`, isi data awal sekali (sekitar 2 permintaan API):
+
+```bash
+node --env-file=.env scripts/data/backfill-isolar-monthly-pr.mjs 202601
+```
+
+Selanjutnya scheduler menarik PR bulan berjalan dan bulan lalu setiap 3 jam, bersama data energi bulanan. Sebelum migrasi ini diterapkan, dashboard tetap jalan dan memakai PR hitungan lama.
 
 ---
 

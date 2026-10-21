@@ -148,44 +148,32 @@ export function SustainabilityProvider({ children }: { children?: any }) {
     }
   }, []);
 
-  // Load from LocalStorage & Live API
+  // Business numbers (Scope 1/2, PLTS, water, DC list) always come from /api/sustainability. Only the browser-local
+  // input history is kept here: restoring cached numbers first showed stale totals, and kept showing them as real
+  // whenever the backend could not be reached.
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.dcLocations) setDcLocations(parsed.dcLocations);
-        if (parsed.waterData) setWaterData(parsed.waterData);
-        if (parsed.pltsData) setPltsData(parsed.pltsData);
-        if (parsed.scope1) setScope1(parsed.scope1);
-        if (parsed.scope2) setScope2(parsed.scope2);
         if (parsed.inputHistory) setInputHistory(withUniqueHistoryIds(parsed.inputHistory));
       }
     } catch (e) {
-      console.warn('Failed to load sustainability state from localStorage', e);
+      console.warn('Failed to load input history from localStorage', e);
     }
 
     fetchBackendData();
     setIsLoaded(true);
   }, [fetchBackendData]);
 
-  // Sync to LocalStorage
   useEffect(() => {
     if (!isLoaded) return;
     try {
-      const stateToSave = {
-        dcLocations,
-        waterData,
-        pltsData,
-        scope1,
-        scope2,
-        inputHistory,
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ inputHistory }));
     } catch (e) {
-      console.warn('Failed to save sustainability state to localStorage', e);
+      console.warn('Failed to save input history to localStorage', e);
     }
-  }, [dcLocations, waterData, pltsData, scope1, scope2, inputHistory, isLoaded]);
+  }, [inputHistory, isLoaded]);
 
   // Centralized Reconciled KPI calculations using Carbon Engine
   const carbonBalance = useMemo(() => {

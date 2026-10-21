@@ -18,6 +18,8 @@ To update antislop later: `npx antislop-ai --update`, or run `npx antislop-ai` a
 - **Never commit or push.** Do not run `git commit`, `git push`, or anything that creates or publishes commits (including amend, rebase, tags, or PR creation). Leave all changes in the working tree; the user commits and pushes.
 - **`src/` is TypeScript.** Write new files as `.tsx` when they contain JSX and `.ts` otherwise; never add `.js` or `.jsx` files under `src/`. Import `src/lib` modules by their `.ts` path (e.g. `../../src/lib/units.ts`) from scripts and tests, which stay `.mjs` and run on Node 22 type stripping, so keep `src/lib` syntax erasable (no `enum`, `namespace`, or parameter properties) and use `import type` for type-only imports.
 - Run `pnpm run typecheck` after code changes; it must report 0 errors.
+- **Docs follow code.** Any change to behaviour, numbers, data sources, models, env vars or deploy steps updates the matching docs in the same change: `docs/SPARTA-GRK.md` (features, schema, methodology, auth), `docs/DEPLOY.md` and `.env.example` (setup), plus any feature doc it touches.
+- **The DC total is 37** in every label, report and doc. The iSolarCloud account has 39 plants because it includes the 2 Drive Thru pilot stores (`facilityType: 'STORE'`), which `isDcLocation()` excludes. Gorontalo is one of the 37 but has no PLTS yet, so it stays "dalam pembangunan".
 
 ## graphify
 

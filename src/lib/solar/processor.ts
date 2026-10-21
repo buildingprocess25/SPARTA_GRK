@@ -1,7 +1,7 @@
 /**
  * Pure Solar Telemetry & Analytics Processor
  * Single Source of Truth for Solar PV metrics across all UI views and API routes.
- * Supports 39 Canonical DC Entities (1-to-1 with 39 Physical Plants from OpenAPI)
+ * Works on the 37 DC entities (1-to-1 with their OpenAPI plants); the 2 Drive Thru stores in the registry are excluded
  * Cilacap 1, 2, 3 and Lombok A, B are independent entities without double counting.
  */
 
@@ -362,7 +362,7 @@ export function computeMonthlyMetricsForDC({
 }
 
 /**
- * Normalizes raw API response into exactly 39 Canonical DC Entities
+ * Normalizes raw API response into the 37 DC entities (Drive Thru stores filtered out by isDcLocation)
  * Maps each plant 1-to-1 (including independent Cilacap 1/2/3 and Lombok A/B) without double counting
  */
 export function aggregateRawApiIntoCanonicalDCs(rawApiPlants = [], baselineAuditData = []) {

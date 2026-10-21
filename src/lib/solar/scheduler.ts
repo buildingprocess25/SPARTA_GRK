@@ -11,6 +11,7 @@ import { runSync, isInSyncWindow, getWibTimeInfo, formatWibTime } from './sync.t
 import { captureSnapshot30m, get30mSlotInfo, getSnapshotStatusReport } from './snapshot.ts';
 import prisma from '../prisma.ts';
 import { syncEnergyFlowFromApi } from './energyFlowSync.ts';
+import { syncMonthlyPrFromApi } from './prMonthlySync.ts';
 import { invalidatePltsServerCache } from './dashboardService.ts';
 
 /**
@@ -41,6 +42,7 @@ export async function runSchedulerCycle({
     syncResult: Record<string, unknown> | null;
     snapshotResult: Record<string, unknown> | null;
     energyFlowResult?: { status: string; [key: string]: unknown };
+    prMonthlyResult?: { status: string; [key: string]: unknown };
   } = {
     timestamp: now.toISOString(),
     wibTime: formatWibTime(now),
@@ -71,6 +73,14 @@ export async function runSchedulerCycle({
     } catch (err) {
       console.error('[Scheduler] Energy flow sync error:', err.message);
       cycleReport.energyFlowResult = { status: 'failed', error: err.message };
+    }
+    // Monthly Plant PR, same 3-hour throttle; fails on its own without blocking the energy totals.
+    try {
+      cycleReport.prMonthlyResult = await syncMonthlyPrFromApi({ now, force: trigger === 'manual' });
+      if (cycleReport.prMonthlyResult.status === 'success') invalidatePltsServerCache();
+    } catch (err) {
+      console.error('[Scheduler] Monthly PR sync error:', err.message);
+      cycleReport.prMonthlyResult = { status: 'failed', error: err.message };
     }
   }
 

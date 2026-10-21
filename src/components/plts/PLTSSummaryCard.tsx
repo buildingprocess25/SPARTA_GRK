@@ -744,7 +744,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
         statusBreakdown={statusBreakdown}
       />
 
-      {/* Tabel 36 lokasi, head & foot sticky */}
+      {/* Tabel lokasi DC, head & foot sticky */}
       <SummaryLocationTable
         dashboardData={dashboardData}
         expandedDC={expandedDC}

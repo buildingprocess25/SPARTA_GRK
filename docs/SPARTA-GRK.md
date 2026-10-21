@@ -7,7 +7,9 @@ Greenhouse Gas (GRK) Monitoring Dashboard for PT Sumber Alfaria Trijaya Tbk (Alf
 
 ## Tentang Proyek Ini
 
-SPARTA GRK adalah dashboard monitoring keberlanjutan (sustainability) untuk Alfamart yang menghitung dan melacak emisi gas rumah kaca (GRK) dari seluruh operasional Distribution Center (DC) Alfamart di Indonesia. Aplikasi ini mengintegrasikan data telemetri PLTS atap secara real-time dari 39 plant surya di 36 lokasi, menghitung emisi Scope 1, 2, dan 3, serta memantau program daur ulang air.
+SPARTA GRK adalah dashboard monitoring keberlanjutan (sustainability) untuk Alfamart yang menghitung dan melacak emisi gas rumah kaca (GRK) dari seluruh operasional Distribution Center (DC) Alfamart di Indonesia. Aplikasi ini mengintegrasikan data telemetri PLTS atap secara real-time dari **37 DC** (36 beroperasi; DC Gorontalo belum memiliki PLTS), menghitung emisi Scope 1, 2, dan 3, serta memantau program daur ulang air.
+
+> **Jumlah DC selalu 37.** Akun iSolarCloud memuat 39 plant karena ikut berisi 2 toko percontohan Drive Thru (De Mansion dan Gading Serpong). Keduanya bukan DC, ditandai `facilityType: 'STORE'`, dan dikeluarkan dari semua hitungan, total, dan peringkat oleh `isDcLocation()`.
 
 Seluruh perhitungan emisi mengacu pada regulasi resmi Indonesia: SK Dirjen Ketenagalistrikan Kementerian ESDM dan Pedoman Inventarisasi GRK Nasional, serta standar internasional IPCC 2006 dan GHG Protocol.
 
@@ -58,7 +60,7 @@ Proyek ini dibangun menggunakan kombinasi beberapa bahasa pemrograman, bahasa ku
 
 | Layanan | Fungsi |
 |:--|:--|
-| **Sungrow iSolarCloud OpenAPI** | Telemetri real-time 39 plant PLTS: daya, energi, status, alarm, inverter |
+| **Sungrow iSolarCloud OpenAPI** | Telemetri real-time PLTS 37 DC: daya, energi, status, alarm, inverter, energi bulanan, dan PR bulanan resmi |
 | **Open-Meteo API** | Data cuaca historis dan forecast (GHI, suhu, kelembapan) untuk perhitungan Performance Ratio |
 | **Web Push (VAPID)** | Notifikasi browser saat fault atau alarm terdeteksi pada PLTS |
 
@@ -161,16 +163,18 @@ Halaman utama yang menampilkan total emisi GRK Alfamart secara year-to-date:
 - Rekonsiliasi data pemakaian listrik PLN terhadap tarif per golongan
 - Analitik dan visualisasi beban tahunan per DC
 
-#### Scope 3: Emisi Tidak Langsung Lainnya (Perjalanan Dinas)
-- **Import jurnal perjalanan dinas** dari file CSV/XLSX akuntansi (akun 611402 / 621402)
-- Deteksi otomatis rute penerbangan dari deskripsi jurnal (parsing kode bandara IATA)
-- Perhitungan jarak great-circle antar bandara
-- Faktor emisi per km penumpang (ekonomi dan bisnis, domestik dan internasional, dari DEFRA 2024)
-- **Template input manual** untuk entry yang tidak bisa diparsing otomatis
+#### Scope 3: Emisi Tidak Langsung Lainnya (Perjalanan Dinas, Kategori 6)
+- **Empat jenis biaya**: Pesawat, Hotel, Kereta Api, dan Lainnya (uang saku, transport lokal)
+- **Pesawat**: rute dibaca dari kode bandara IATA; jarak great-circle antar bandara × faktor per penumpang-km (ekonomi/bisnis, domestik/internasional, DEFRA)
+- **Hotel**: jumlah malam × jumlah kamar × faktor per kamar-malam (rata-rata, bintang 1-3, 4, atau 5)
+- **Kereta Api**: total jarak km × faktor per penumpang-km (antarkota, KRL, atau kereta cepat)
+- **Input manual** lewat modal, atau **template Excel** satu file dengan sheet terpisah per jenis (Pesawat, Hotel, Kereta Api, Lainnya), lengkap dengan dropdown KELAS dan validasi angka. CSV satu tabel dengan kolom JENIS dan template versi lama tetap diterima
+- **Import jurnal BPDL** (akun 611402 / 621402): baris yang menyebut hotel atau kereta diklasifikasikan ke jenisnya, tetapi emisinya kosong karena jurnal tidak memuat jumlah malam atau km; uang saku BPDL tetap Lainnya
+- Dashboard dengan filter jenis perjalanan, rincian per KUU dan per rute/kota, serta biaya yang dipecah per jenis
 
 ### 3. Pengurangan Emisi: PLTS Atap
 
-Monitoring real-time 39 plant PLTS atap (total 5.876 kWp) di 36 lokasi DC:
+Monitoring real-time PLTS atap di 37 DC (5.778,8 kWp; 36 beroperasi, Gorontalo belum memiliki PLTS):
 
 - **Telemetri langsung**: daya aktual (kW), energi harian (kWh), energi kumulatif (MWh)
 - **Status plant**: Online/Offline, Normal/Alarm/Fault dengan push notification
@@ -179,10 +183,10 @@ Monitoring real-time 39 plant PLTS atap (total 5.876 kWp) di 36 lokasi DC:
 - **Analitik performa**:
   - Specific Yield (kWh/kWp) per plant
   - Equivalent Hours dari API
-  - Performance Ratio (PR) bulanan per plant dan aggregate (capacity-weighted)
+  - Performance Ratio (PR) bulanan per plant langsung dari iSolarCloud (titik `p83023` mode bulanan, identik dengan Annual Report portal), dengan agregat setara cara portal; bulan dengan PR di luar 10-100% (sensor iradiasi bermasalah) tidak dihitung
   - Koreksi temperatur silikon (-0,45%/°C dari STC 25°C) menggunakan model Sandia/King
   - Analisis korelasi cuaca (GHI, suhu, kelembapan) dari Open-Meteo
-- **Matriks bulanan**: tabel 39 plant x 12 bulan dengan yield, load, feed-in, dan PR
+- **Matriks bulanan**: tabel 37 DC x 12 bulan dengan yield, load, feed-in, dan PR
 - **Target RKAP**: tracking realisasi terhadap target produksi perusahaan
 - **Emisi terhindar**: energi PLTS x 0,997 kgCO2/kWh
 - **Ekuivalen lingkungan**: batubara terhindar (0,4 kg/kWh), pohon setara (21,77 kgCO2/pohon/tahun)
@@ -196,16 +200,16 @@ Monitoring real-time 39 plant PLTS atap (total 5.876 kWp) di 36 lokasi DC:
 
 ### 5. Riwayat Audit
 
-- Log seluruh input dan perubahan data emisi
-- Setiap entry memiliki ID unik, timestamp, dan metadata sumber
-- Fitur hapus per entry dan batch
-- Persistensi state di localStorage dengan versioning (v4)
+- Riwayat file yang pernah di-upload (Scope 1, Scope 2, PLTS, air), dibaca dari database
+- Bagian terpisah "Input di browser ini": catatan lokal per browser, berlabel jelas, tidak memengaruhi angka dashboard
+- Seluruh angka bisnis (Scope 1/2, PLTS, air, daftar DC) selalu diambil dari server; browser tidak menyimpan salinan angka tersebut
 
 ### 6. Autentikasi dan Keamanan
 
-- Login 2 akun tetap (admin, viewer) dengan session cookie HMAC-SHA256
+- Akun disimpan di tabel `app_user` (password di-hash), session cookie bertanda tangan HMAC-SHA256
+- Dua akun dari env (`AUTH_ADMIN_*`, `AUTH_VALENS_*`); Admin Super dapat menambah pengguna dengan password awal minimal 8 karakter (tombol "Buat acak" tersedia). Tidak ada password bawaan di kode; akun peran bawaan hanya dibuat bila `AUTH_DEFAULT_ACCOUNT_PASSWORD` diisi
+- **Sesi berakhir otomatis setiap hari pukul 19.00 WIB** (peringatan 5 menit sebelumnya), paling lama 7 hari sejak login. Tidak ada logout karena tidak aktif
 - Middleware Edge Runtime untuk route guard
-- Session policy dengan idle timeout
 - CRON endpoint dilindungi bearer token terpisah
 - Credential API vendor (iSolarCloud, VAPID) hanya server-side
 
@@ -223,23 +227,23 @@ Monitoring real-time 39 plant PLTS atap (total 5.876 kWp) di 36 lokasi DC:
    - Perhitungan emisi tidak menggunakan estimasi kasar, melainkan terikat langsung pada regulasi resmi:
      - **Scope 1**: Pedoman Inventarisasi Gas Rumah Kaca Nasional (Kementerian ESDM).
      - **Scope 2**: SK Dirjen Ketenagalistrikan Kementerian ESDM No. 414.K/TL.04/DJL.4/2024 untuk 8 grid regional (JAMALI, Sumatera, Kalbar, Kalselteng, Sulselrabar, Batam, Lombok, Sulutgo).
-     - **Scope 3**: Standar emisi penerbangan DEFRA/BEIS 2024 dengan diferensiasi kabin (ekonomi vs bisnis) dan jarak Haversine + uplift 50 km.
-   - Dilengkapi tabel jejak audit (`AuditTrail`) dan snapshot multi-sumber (`MonthlyYieldObservation`) sehingga setiap angka dapat ditelusuri riwayat perubahannya saat audit laporan keberlanjutan (ESG).
+     - **Scope 3**: Faktor DEFRA/BEIS untuk penerbangan (dibedakan kabin ekonomi/bisnis, jarak great-circle antar bandara tanpa uplift), hotel per kamar-malam, dan kereta api per penumpang-km.
+   - Dilengkapi snapshot multi-sumber (`MonthlyYieldObservation`) dan riwayat import (`ImportBatch`) sehingga asal setiap angka dapat ditelusuri saat audit laporan keberlanjutan (ESG).
 
 2. **Integrasi Telemetri PLTS Terdistribusi Real-Time**
-   - Menghubungkan 39 plant surya atap dengan total kapasitas 5.876 kWp di 36 Distribution Center (DC) Alfamart di seluruh Indonesia.
+   - Menghubungkan PLTS atap di 37 Distribution Center (DC) Alfamart dengan total kapasitas 5.778,8 kWp (36 beroperasi; Gorontalo belum memiliki PLTS).
    - Daemon sinkronisasi otomatis (`solar-daemon.mjs`) beroperasi secara terjadwal pada jam radiasi matahari (05:30 - 18:30 WIB) dengan interval 5 menit.
    - Memiliki proteksi kuota API (`QuotaCounter`) dengan pembatasan per jam, harian, dan bulanan untuk mencegah lonjakan pemanggilan API ke vendor Sungrow iSolarCloud.
 
 3. **Perhitungan Fisika Energi dan Koreksi Temperatur Silikon**
-   - Menghitung Performance Ratio (PR) berbasis model standar industri Sandia/King.
+   - Memakai PR bulanan resmi iSolarCloud bila tersedia; plant-bulan tanpa PR resmi dihitung dengan PR = E / (kWp × iradiasi) berbasis model standar industri Sandia/King.
    - Mengoreksi koefisien temperatur silikon fotovoltaik (-0,45%/°C dari kondisi uji standar 25°C STC) untuk mencerminkan performa nyata panel di iklim tropis Indonesia.
    - Mengintegrasikan data iradiansi matahari (GHI) dan suhu lingkungan dari Open-Meteo API secara otomatis tanpa perangkat sensor fisik tambahan di tiap DC.
 
 4. **Ekstraksi Otomatis Data Scope 3 dari Jurnal Akuntansi**
    - Modul parser akuntansi CSV/XLSX mampu memproses transaksi akun perjalanan dinas (akun 611402 dan 621402).
-   - Mendeteksi kode bandara IATA (misalnya CGK, SUB, KNO) dari teks deskripsi transaksi jurnal dan memetakan koordinat latitude/longitude bandara.
-   - Mengeliminasi kalkulasi jarak manual antarkota untuk ratusan tiket perjalanan dinas per bulan.
+   - Mendeteksi kode bandara IATA (misalnya CGK, SUB, KNO) dari teks deskripsi transaksi jurnal dan memetakan koordinat latitude/longitude bandara; baris hotel dan kereta diklasifikasikan otomatis.
+   - Mengeliminasi kalkulasi jarak manual antarkota untuk ratusan tiket perjalanan dinas per bulan; hotel dan kereta dilengkapi lewat input manual atau template multi-sheet.
 
 5. **Rekonsiliasi Data Ganda (Dual-Source Reconciliation)**
    - Mendukung dua jalur pencatatan yield bulanan: sinkronisasi otomatis melalui OpenAPI iSolarCloud dan import berkas laporan CSV/Excel bulanan dari portal web vendor.
@@ -253,22 +257,29 @@ Monitoring real-time 39 plant PLTS atap (total 5.876 kWp) di 36 lokasi DC:
 
 ## Database Schema (Model Utama)
 
+Baris per plant mencakup 39 plant iSolarCloud (37 DC + 2 toko Drive Thru); toko Drive Thru tersaring di semua tampilan dan total DC.
+
 | Model | Fungsi | Jumlah Baris Tipikal |
 |:--|:--|:--|
+| `PlantMaster` | Registry plant dan alias nama | 39 |
 | `PlantLatest` | Telemetri terkini per plant PLTS | 39 |
 | `DailyYield` | Snapshot energi harian per plant | 39 x 365 |
 | `MonthlyYield` | Yield bulanan per plant (dari API atau import) | 39 x 12 |
 | `MonthlyYieldObservation` | Multi-source audit trail yield bulanan | variabel |
 | `EnergyFlowMonthly` | Neraca energi bulanan (yield, feed-in, purchased, load) | 39 x 12 |
-| `ClimateMonthly` | Data cuaca bulanan per lokasi plant | 36 x 12 |
+| `PlantPrMonthly` | PR bulanan resmi per plant dari iSolarCloud (nilai mentah) | 39 x 12 |
+| `PlantPr` | PR sesaat dari API (eksperimental, tidak dipakai di dashboard) | 39 |
+| `ClimateMonthly` | Radiasi/suhu bulanan per plant | 39 x 12 |
 | `LoadMonthly` | Beban listrik bulanan per plant | 39 x 12 |
 | `TargetMonthly` | Target RKAP per bulan per metrik | variabel |
 | `SyncRun` | Log setiap siklus sinkronisasi | ~5.000/bulan |
 | `QuotaCounter` | Counter pemakaian kuota API per jam/hari/bulan | variabel |
-| `AlarmEvent` | Riwayat alarm dan fault PLTS | variabel |
-| `Scope3TravelEntry` | Entry emisi perjalanan dinas | variabel |
-| `WaterRecycleEntry` | Data daur ulang air per DC per bulan | variabel |
-| `AppUser` | Akun login (admin, viewer) | 2 |
+| `FaultActive` / `FaultHistory` | Alarm dan fault PLTS aktif serta riwayatnya | variabel |
+| `BusinessTravelEntry` | Transaksi perjalanan dinas Scope 3 (pesawat, hotel, kereta, lainnya) | variabel |
+| `FuelActivity` | Konsumsi BBM Scope 1 | variabel |
+| `WaterActivity` | Data daur ulang air per DC per bulan | variabel |
+| `ImportBatch` | Riwayat file yang di-upload | variabel |
+| `AppUser` | Akun login | variabel |
 | `PushSubscription` | Subscription push notification per device | variabel |
 
 ---
@@ -294,11 +305,12 @@ Emisi (kgCO2e) = Konsumsi Listrik (kWh) x Faktor Emisi Grid Regional (kgCO2e/kWh
 ### Scope 3 Kategori 6 (Perjalanan Dinas)
 
 ```
-Emisi Penerbangan (kgCO2e) = Jarak (km) x Faktor per-km (kgCO2e/km)
-Jarak = Great-circle distance (Haversine) + 50 km (uplift factor)
+Emisi Pesawat (kgCO2e) = Σ segmen [Jarak great-circle antar bandara (km) x Faktor per penumpang-km]
+Emisi Hotel (kgCO2e)   = Malam x Kamar x Faktor per kamar-malam
+Emisi Kereta (kgCO2e)  = Total jarak (km) x Faktor per penumpang-km
 ```
 
-Faktor per-km dari DEFRA 2024, dibedakan domestik/internasional dan ekonomi/bisnis. Detail di `travelLedger.ts` dan `scope3-perjalanan-dinas.md`.
+Jarak penerbangan adalah jarak lurus (Haversine) tanpa tambahan uplift. Segmen yang berangkat atau tiba di luar Indonesia memakai faktor internasional. Transaksi bernominal negatif (refund) mengurangi biaya tetapi tidak mengurangi emisi. Faktor dari katalog `factors.v1.ts` (DEFRA, berstatus sementara). Detail di `travelLedger.ts`, `travelTemplate.ts`, dan `travelSummary.ts`.
 
 ### Pengurangan Emisi (PLTS)
 
@@ -311,12 +323,14 @@ Faktor tunggal nasional untuk semua grid, didefinisikan sekali di `conversionCon
 ### Performance Ratio
 
 ```
-PR_plant = E_actual / (kWp x H_irradiation)
-PR_corrected = PR / (1 + gamma x (T_panel - 25))
-T_panel = T_day + (G / 800) x (NOCT - 20)
+PR_plant      = PR bulanan iSolarCloud (p83023), bila tersedia dan 10% ≤ PR ≤ 100%
+              = E_actual / (kWp x H_irradiation), bila tidak ada PR resmi
+PR_agregat    = Σ E / Σ (E / PR_plant)        (setara Σ E / Σ (kWp x H), cara portal)
+PR_corrected  = PR / (1 + gamma x (T_panel - 25))
+T_panel       = T_day + (G / 800) x (NOCT - 20)
 ```
 
-Koefisien gamma = -0,45%/°C, NOCT = 45°C. Implementasi di `performanceRatio.ts`.
+Portal iSolarCloud menampilkan angka tetap 90 (95 untuk Karawang) untuk PR yang tidak masuk akal; dashboard menyimpan nilai mentahnya dan menandai bulan di luar 10-100% sebagai sensor iradiasi bermasalah, bukan memakai 90. Sinkronisasi di `prMonthlySync.ts`, batas valid di `prValidity.ts`, agregasi di `dashboard.ts` (`calculateWeightedPr`). Koefisien gamma = -0,45%/°C, NOCT = 45°C (`performanceRatio.ts`).
 
 ---
 
@@ -376,7 +390,6 @@ prisma/
 docs/
 ├── DEPLOY.md               # Panduan deployment produksi
 ├── EMISSION_CALCULATION_CANONICAL.md
-├── scope3-perjalanan-dinas.md
 ├── reconciliation.md       # Rekonsiliasi data
 └── ...
 ```
@@ -391,7 +404,8 @@ Aplikasi berjalan di server Linux (Ubuntu/Debian) via Docker atau langsung di No
 - **Runtime**: Node.js 22 LTS
 - **Container**: Docker multi-stage build, output standalone Next.js
 - **Reverse proxy**: Nginx dengan SSL
-- **Sinkronisasi**: `solar-daemon.mjs` sebagai systemd service, polling setiap 5 menit pada jam matahari, sinkronisasi penuh pukul 20:00 WIB
+- **Sinkronisasi**: `solar-daemon.mjs` sebagai systemd service, polling setiap 5 menit pada jam matahari, sinkronisasi penuh pukul 20:00 WIB; energi bulanan dan PR bulanan ditarik setiap 3 jam
+- **Migrasi**: `npx prisma migrate deploy`, lalu sekali `scripts/data/backfill-isolar-monthly-pr.mjs` setelah migrasi `plant_pr_monthly`
 
 Detail lengkap ada di `DEPLOY.md`.
 

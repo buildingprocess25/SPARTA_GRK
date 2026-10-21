@@ -66,18 +66,23 @@ export async function seedAppUsersFromEnv() {
     });
   }
 
-  // Ensure default role accounts exist with default password ptsat123 if not in DB
+  // Missing role accounts are created only with a password the deployment supplies; a password written in the
+  // source would be known to anyone who has read the code. Existing accounts are never touched.
+  const defaultPassword = String(process.env.AUTH_DEFAULT_ACCOUNT_PASSWORD || '');
   for (const acct of DEFAULT_SPARTA_ACCOUNTS) {
     const existing = await prisma.appUser.findUnique({ where: { username: acct.username } });
-    if (!existing) {
-      await prisma.appUser.create({
-        data: {
-          username: acct.username,
-          passwordHash: hashPassword('ptsat123'),
-          displayName: acct.displayName,
-        },
-      });
+    if (existing) continue;
+    if (defaultPassword.length < 8) {
+      console.warn(`[auth] Akun ${acct.username} belum ada dan tidak dibuat: set AUTH_DEFAULT_ACCOUNT_PASSWORD (min. 8 karakter) untuk membuatnya.`);
+      continue;
     }
+    await prisma.appUser.create({
+      data: {
+        username: acct.username,
+        passwordHash: hashPassword(defaultPassword),
+        displayName: acct.displayName,
+      },
+    });
   }
 }
 

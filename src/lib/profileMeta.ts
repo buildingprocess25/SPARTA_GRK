@@ -118,3 +118,13 @@ export function getInitials(displayName) {
   return (words[0][0] + words[1][0]).toUpperCase();
 }
 
+// Look-alike characters (0/O, 1/l/I) are left out because the admin reads the password out to the new user.
+const PASSWORD_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+
+/** A random 12-character initial password for a new account, from the browser's or Node's crypto RNG. */
+export function generateInitialPassword(length = 12) {
+  const bytes = new Uint32Array(length);
+  globalThis.crypto.getRandomValues(bytes);
+  return Array.from(bytes, (n) => PASSWORD_ALPHABET[n % PASSWORD_ALPHABET.length]).join('');
+}
+

@@ -155,7 +155,7 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
       const currentYm = wibYearMonth();
       const currentMonthPrefix = `${currentYm.slice(0, 4)}-${currentYm.slice(4, 6)}-%`;
 
-      const [plants, rawObservations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly, dailyMonthToDate] = await Promise.all([
+      const [plants, rawObservations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly, dailyMonthToDate, officialPr] = await Promise.all([
         db.plantMaster.findMany({
           select: {
             dcId: true,
@@ -256,10 +256,16 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
           WHERE date_wib LIKE ${currentMonthPrefix}
           GROUP BY ps_id
         `.catch(() => []),
+        // Empty until the plant_pr_monthly migration runs; PR then falls back to energy / (kWp x radiation).
+        db.$queryRaw`
+          SELECT year_month as "yearMonth", ps_id as "psId", pr_percent as "prPercent"
+          FROM plant_pr_monthly
+          WHERE year_month BETWEEN ${minYm} AND ${maxYm}
+        `.catch(() => []),
       ]);
 
       const observations = withDailyMonthToDate(rawObservations, dailyMonthToDate, currentYm);
-      return { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly };
+      return { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly, officialPr };
     } finally {
       inFlightPromises.delete(flightKey);
     }
@@ -286,7 +292,7 @@ export async function getPltsDashboard(rawQuery = {}, { db = prisma, now = new D
     Number(String(query.period || '').slice(0, 4)) || query.compareYears.at(-1) || now.getFullYear(),
   ])].sort();
 
-  const { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly } = await fetchPltsRawData({ years, db, simulateLatencyMs });
+  const { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly, officialPr } = await fetchPltsRawData({ years, db, simulateLatencyMs });
 
   const latestByPsId = new Map<number, LatestPlantRow>(latestPlants.map((row) => [Number(row.psId), row] as const));
 
@@ -322,6 +328,7 @@ export async function getPltsDashboard(rawQuery = {}, { db = prisma, now = new D
     statuses: latestPlants,
     energyFlows,
     weatherMonthly,
+    officialPr,
   });
 
   if (!skipCache) {
@@ -374,7 +381,7 @@ async function executeWithTiming(cachePrefix, rawQuery, builderFn, options: Dash
   ])].sort();
 
   const tDbStart = performance.now();
-  const { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly } = await fetchPltsRawData({
+  const { plants, observations, targets, climate, loads, lastSync, latestPlants, energyFlows, weatherMonthly, officialPr } = await fetchPltsRawData({
     years,
     db: options.db || prisma,
     simulateLatencyMs: options.simulateLatencyMs,
@@ -415,6 +422,7 @@ async function executeWithTiming(cachePrefix, rawQuery, builderFn, options: Dash
     statuses: latestPlants,
     energyFlows,
     weatherMonthly,
+    officialPr,
   });
 
   const sliceData = builderFn(fullData);

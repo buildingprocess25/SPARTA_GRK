@@ -4,7 +4,8 @@ import type { DcEntity } from './plantMap.ts';
 import { resolveMonthly, isPlantUnderConstruction } from './dashboard.ts';
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-export const EMISSION_FACTOR_VERSION = 'INTERNAL_CONFIG_VERIFICATION_PENDING';
+// Identifies the factor set (src/lib/emission-factors.ts); each factor's own status (resmi/sementara) travels next to it.
+export const EMISSION_FACTOR_VERSION = 'ESDM_GRID_REGISTRY_2024';
 
 
 function compactYearMonth(value) {

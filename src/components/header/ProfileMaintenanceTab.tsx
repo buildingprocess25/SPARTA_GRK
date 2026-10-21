@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, Lock, Server, RefreshCw, Database } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Lock, Server, RefreshCw, Database } from 'lucide-react';
 
 export default function ProfileMaintenanceTab({
   fetchHealth,
@@ -37,12 +37,17 @@ export default function ProfileMaintenanceTab({
         </div>
       ) : (
         <div className="space-y-4">
-          {maintActionStatus && (
-            <div className="rounded-xl border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 p-3 text-xs font-semibold text-blue-900 dark:text-blue-200 flex items-center gap-2 animate-in">
+          {maintActionStatus && (/gagal|ditolak/i.test(maintActionStatus) ? (
+            <div role="alert" className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-3 text-xs font-semibold text-rose-900 dark:text-rose-200 flex items-center gap-2 animate-in">
+              <AlertCircle size={16} className="text-rose-600 dark:text-rose-400 shrink-0" />
+              <span>{maintActionStatus}</span>
+            </div>
+          ) : (
+            <div role="status" className="rounded-xl border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 p-3 text-xs font-semibold text-blue-900 dark:text-blue-200 flex items-center gap-2 animate-in">
               <CheckCircle2 size={16} className="text-blue-600 dark:text-blue-400 shrink-0" />
               <span>{maintActionStatus}</span>
             </div>
-          )}
+          ))}
 
           {/* Status Telemetri & Server */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">

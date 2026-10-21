@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, User, CheckCircle2, X, Shield, Building2, Phone, BadgeCheck, Menu, LogOut, AlertCircle, PanelLeftClose, PanelLeftOpen, Wrench, Users, Cpu } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
-import { getProfileFor, getInitials, SPARTA_ROLES } from '@/lib/profileMeta';
+import { getProfileFor, getInitials, SPARTA_ROLES, generateInitialPassword } from '@/lib/profileMeta';
 import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { dialogPresets } from '@/lib/dialog-presets';
 import ProfileUsersTab from './header/ProfileUsersTab';
@@ -82,14 +82,28 @@ export default function Header({
 
   const handleForceSync = async () => {
     setMaintActionStatus('Menjalankan sinkronisasi telemetri iSolarCloud...');
+    let message;
     try {
-      await fetch('/api/isolar', { method: 'POST', cache: 'no-store' });
-      setMaintActionStatus('Sinkronisasi telemetri 37 DC berhasil diperbarui.');
+      const res = await fetch('/api/isolar', { method: 'POST', cache: 'no-store' });
+      const json = await res.json().catch(() => ({}));
+      const sync = json?.syncResult;
+      // The route answers 200 even when the vendor call failed or the manual cooldown skipped it, so read syncResult.
+      if (!res.ok || json?.success === false) {
+        message = `Sinkronisasi ditolak: ${json?.error || `server merespons ${res.status}`}`;
+      } else if (sync?.status === 'cooldown_skipped') {
+        message = `Baru saja disinkronkan. Coba lagi dalam ${Math.ceil((json.cooldownRemainingMs || 0) / 1000)} detik.`;
+      } else if (sync?.status === 'failed') {
+        message = `Sinkronisasi gagal: ${sync.error || 'iSolarCloud tidak merespons'}. Data terakhir yang tersimpan tetap ditampilkan.`;
+      } else {
+        message = 'Sinkronisasi telemetri 37 DC berhasil diperbarui.';
+      }
+      // fetchHealth clears the status as its first step, so it runs before the result is shown, not after.
       fetchHealth();
     } catch (_) {
-      setMaintActionStatus('Sinkronisasi selesai diproses.');
+      message = 'Sinkronisasi gagal: koneksi ke server terputus.';
     }
-    setTimeout(() => setMaintActionStatus(null), 4000);
+    setMaintActionStatus(message);
+    setTimeout(() => setMaintActionStatus(null), 6000);
   };
 
   const handleClearCache = () => {
@@ -113,15 +127,16 @@ export default function Header({
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [creatingUser, setCreatingUser] = useState(false);
   const [showNewUserPassword, setShowNewUserPassword] = useState(false);
-  const [newUserForm, setNewUserForm] = useState({
+  const emptyNewUserForm = () => ({
     username: '',
     displayName: '',
-    password: 'ptsat123',
+    password: generateInitialPassword(),
     roleId: 'admin',
     nip: '',
     dept: '',
     division: '',
   });
+  const [newUserForm, setNewUserForm] = useState(emptyNewUserForm);
 
   const fetchUsers = async () => {
     setLoadingUsers(true);
@@ -210,15 +225,7 @@ export default function Header({
       if (res.ok && data?.success) {
         showNotification(data?.message || 'Pengguna berhasil didaftarkan.', 'success');
         setIsAddingUser(false);
-        setNewUserForm({
-          username: '',
-          displayName: '',
-          password: 'ptsat123',
-          roleId: 'admin',
-          nip: '',
-          dept: '',
-          division: '',
-        });
+        setNewUserForm(emptyNewUserForm());
         fetchUsers();
       } else {
         showNotification(data?.error || 'Gagal mendaftarkan pengguna.', 'error');

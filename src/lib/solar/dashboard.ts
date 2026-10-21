@@ -1,6 +1,7 @@
 import { calculateCostSavings } from '../pln-tariff.ts';
 import { summarizePlantStatuses } from './status.ts';
 import { computeEnergyBalance, validateEnergyBalanceRow } from './energyBalance.ts';
+import { isValidPlantPr, PR_VALID_RANGE } from './prValidity.ts';
 import { OFFICIAL_RKAP_FACTORS, getRkapFactorsForPeriod } from './rkap-factors.ts';
 import { EMISSION_CONSTANTS, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './conversionConfig.ts';
 
@@ -197,18 +198,39 @@ export function calculateWeightedPr(rows = []) {
   const anomalies = [];
 
   const eligible = [];
+  let officialCount = 0;
   for (const row of rows) {
     if (row.isOperational === false) {
       excludedBeforeCod++;
       continue;
     }
-    const rad = finiteOrNull(row.radiationKwhM2);
-    const kwp = finiteOrNull(row.capacityKwp);
     const energy = finiteOrNull(row.energyKwh);
     if (energy === null) {
       excludedMissingEnergy++;
       continue;
     }
+
+    // iSolarCloud's own monthly PR wins over the estimate. Since PR = E / (kWp x H), the plant's reference energy is
+    // E / PR, so the aggregate below equals the portal's capacity-weighted PR for these months.
+    const official = finiteOrNull(row.officialPrPct);
+    if (official !== null) {
+      if (!isValidPlantPr(official)) {
+        anomalies.push({
+          plantId: row.plantId || null,
+          yearMonth: row.yearMonth || null,
+          valuePct: official,
+          reason: official > PR_VALID_RANGE.max ? 'PR_ABOVE_100' : 'PR_BELOW_MIN',
+          source: 'ISOLAR_API',
+        });
+        continue;
+      }
+      officialCount++;
+      eligible.push({ energyKwh: energy, referenceKwh: energy / (official / 100) });
+      continue;
+    }
+
+    const rad = finiteOrNull(row.radiationKwhM2);
+    const kwp = finiteOrNull(row.capacityKwp);
     if (rad === null || rad <= 0 || kwp === null || kwp <= 0) {
       excludedNoRadiation++;
       continue;
@@ -223,17 +245,15 @@ export function calculateWeightedPr(rows = []) {
       });
       continue;
     }
-    eligible.push({
-      energyKwh: energy,
-      capacityKwp: kwp,
-      radiationKwhM2: rad,
-    });
+    eligible.push({ energyKwh: energy, referenceKwh: kwp * rad });
   }
 
   if (!eligible.length) {
     return {
       valuePct: null,
       activePlantCount: 0,
+      officialCount: 0,
+      source: 'CALCULATED',
       totalPlantCount: rows.length,
       excludedBeforeCod,
       excludedNoRadiation,
@@ -244,13 +264,15 @@ export function calculateWeightedPr(rows = []) {
   }
 
   const totalEnergy = eligible.reduce((sum, r) => sum + r.energyKwh, 0);
-  const totalTheoretical = eligible.reduce((sum, r) => sum + r.capacityKwp * r.radiationKwhM2, 0);
+  const totalTheoretical = eligible.reduce((sum, r) => sum + r.referenceKwh, 0);
   const valuePct = totalTheoretical > 0 ? (totalEnergy / totalTheoretical) * 100 : null;
   const invalid = valuePct === null || valuePct <= 0 || valuePct > 100;
 
   return {
     valuePct: invalid ? null : Number(valuePct.toFixed(6)),
     activePlantCount: eligible.length,
+    officialCount,
+    source: officialCount === 0 ? 'CALCULATED' : officialCount === eligible.length ? 'ISOLAR_API' : 'MIXED',
     totalPlantCount: rows.length,
     excludedBeforeCod,
     excludedNoRadiation,
@@ -368,8 +390,14 @@ export function buildPltsDashboardFromRows({
   statuses = [],
   energyFlows = [],
   weatherMonthly = [],
+  officialPr = [],
 }) {
   const query = rawQuery?.mode ? rawQuery : parseDashboardQuery(rawQuery);
+  const officialPrIndex = new Map(officialPr.map((row) => [`${row.yearMonth}:${Number(row.psId)}`, Number(row.prPercent)] as const));
+  const officialPrFor = (plant, ym) => {
+    const value = officialPrIndex.get(`${ym}:${Number((plant.sungrowPsIds || [])[0])}`);
+    return Number.isFinite(value) ? value : null;
+  };
   const year = periodYear(query);
   const monthNumbers = selectedMonthNumbers(query);
   const selectedKeys = monthNumbers.map((month) => monthKey(year, month));
@@ -635,6 +663,7 @@ export function buildPltsDashboardFromRows({
         energyKwh,
         capacityKwp: plant.apiInstalledKwp,
         radiationKwhM2: clim.radiationKwhM2,
+        officialPrPct: officialPrFor(plant, ym),
         isOperational,
       };
       prInputs.push(input);
@@ -645,7 +674,7 @@ export function buildPltsDashboardFromRows({
           ? 'BEFORE_COD'
           : energyKwh === null
             ? 'MISSING_ENERGY'
-            : clim.radiationKwhM2 === null
+            : clim.radiationKwhM2 === null && input.officialPrPct === null
               ? 'MISSING_RADIATION'
               : single.anomalies[0]?.reason || null;
       prDetails.push({
@@ -664,6 +693,8 @@ export function buildPltsDashboardFromRows({
         radiationBorrowed: clim.isBorrowed,
         radiationBorrowLabel: clim.borrowLabel,
         prValuePct: single.valuePct,
+        prSource: single.officialCount ? 'ISOLAR_API' : 'CALCULATED',
+        officialPrPct: input.officialPrPct,
         exclusionReason,
       });
     }
@@ -809,6 +840,7 @@ export function buildPltsDashboardFromRows({
           energyKwh: plantProd,
           capacityKwp: plant.apiInstalledKwp,
           radiationKwhM2: clim.radiationKwhM2,
+          officialPrPct: officialPrFor(plant, ym),
           isOperational,
         });
       }

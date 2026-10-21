@@ -7,5 +7,14 @@
     "division": "Operation & Property Division",
     "headOffice": "Alfa Tower lt. 19, Tangerang",
     "joinYear": "2026"
+  },
+  "testting": {
+    "nip": "hai",
+    "roleId": "super_admin",
+    "role": "Super Admin - hai",
+    "dept": "hai",
+    "division": "Operation & Property Division",
+    "headOffice": "Alfa Tower lt. 19, Tangerang",
+    "joinYear": "2026"
   }
 }

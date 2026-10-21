@@ -51,7 +51,13 @@ export default function PLTSOverviewKpis({
                 {dashboardData?.summary?.pr?.valuePct != null && (
                   <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
                     Kinerja {formatNum(dashboardData.summary.pr.valuePct, 1)}%
-                    <InfoHint title="Kinerja panel (PR)" text="Perkiraan seberapa baik panel mengubah sinar matahari jadi listrik, dibanding kondisi ideal. Di atas 75% tergolong baik." size={11} />
+                    <InfoHint
+                      title="Kinerja panel (PR)"
+                      text={dashboardData.summary.pr.source === 'CALCULATED' || !dashboardData.summary.pr.source
+                        ? 'Perkiraan seberapa baik panel mengubah sinar matahari jadi listrik, dibanding kondisi ideal. Di atas 75% tergolong baik.'
+                        : `PR bulanan dari iSolarCloud untuk ${dashboardData.summary.pr.officialCount} plant-bulan, dirata-rata menurut produksinya. Bulan dengan PR di luar 10-100% tidak dihitung karena sensor iradiasinya bermasalah. Di atas 75% tergolong baik.`}
+                      size={11}
+                    />
                   </span>
                 )}
               </div>

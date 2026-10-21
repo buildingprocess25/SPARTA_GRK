@@ -7,7 +7,12 @@
  */
 
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../solar/conversionConfig.ts';
-import { GRID_FACTOR_KG_PER_KWH, DEFAULT_GRID_FACTOR_KG_PER_KWH } from '../emission-factors.ts';
+import { GRID_EMISSION_FACTORS, GRID_FACTOR_KG_PER_KWH, DEFAULT_GRID_FACTOR_KG_PER_KWH } from '../emission-factors.ts';
+
+function gridSourceDoc(grid) {
+  const entry = GRID_EMISSION_FACTORS.find(g => g.grid === grid);
+  return entry ? `${entry.sourceDocument} (status: ${entry.status})` : 'Belum tersedia';
+}
 
 // Emission factors and reference constants
 
@@ -39,25 +44,25 @@ export const CARBON_FACTORS = {
     }
   },
 
-  // Regional Electricity Grid Emission Factors (Scope 2 & PLTS Avoided) in kgCO2e / kWh
-  // sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)
+  // Regional Electricity Grid Emission Factors (Scope 2 & PLTS Avoided) in kgCO2e / kWh.
+  // Source text and status come from the emission-factors registry so labels cannot drift from it again.
   GRID: {
-    JAMALI: { factor: GRID_FACTOR_KG_PER_KWH.JAMALI, label: 'Jawa-Madura-Bali', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
-    KALSELTENG: { factor: GRID_FACTOR_KG_PER_KWH.KALSELTENG, label: 'Kalimantan Selatan & Tengah', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
-    KALBAR: { factor: GRID_FACTOR_KG_PER_KWH.KALBAR, label: 'Kalimantan Barat', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
-    BATAM: { factor: GRID_FACTOR_KG_PER_KWH.BATAM, label: 'Batam', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
-    SULUTGO: { factor: GRID_FACTOR_KG_PER_KWH.SULUTGO, label: 'Sulutgo (Sulawesi Utara & Gorontalo)', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
+    JAMALI: { factor: GRID_FACTOR_KG_PER_KWH.JAMALI, label: 'Jawa-Madura-Bali', sourceDoc: gridSourceDoc('JAMALI') },
+    KALSELTENG: { factor: GRID_FACTOR_KG_PER_KWH.KALSELTENG, label: 'Kalimantan Selatan & Tengah', sourceDoc: gridSourceDoc('KALSELTENG') },
+    KALBAR: { factor: GRID_FACTOR_KG_PER_KWH.KALBAR, label: 'Kalimantan Barat', sourceDoc: gridSourceDoc('KALBAR') },
+    BATAM: { factor: GRID_FACTOR_KG_PER_KWH.BATAM, label: 'Batam', sourceDoc: gridSourceDoc('BATAM') },
+    SULUTGO: { factor: GRID_FACTOR_KG_PER_KWH.SULUTGO, label: 'Sulutgo (Sulawesi Utara & Gorontalo)', sourceDoc: gridSourceDoc('SULUTGO') },
     SUMATERA: {
       factor: GRID_FACTOR_KG_PER_KWH.SUMATERA,
       label: 'Sumatera Interkoneksi',
-      sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)',
+      sourceDoc: gridSourceDoc('SUMATERA'),
       auditNotes: 'Faktor grid Sumatera 0.761 kgCO2e/kWh (pembulatan audit historis 0.77)'
     },
-    LOMBOK: { factor: GRID_FACTOR_KG_PER_KWH.NTB_LOMBOK, label: 'Lombok (NTB)', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
-    NTB_LOMBOK: { factor: GRID_FACTOR_KG_PER_KWH.NTB_LOMBOK, label: 'Lombok (NTB)', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
-    SULSELRABAR: { factor: GRID_FACTOR_KG_PER_KWH.SULSELRABAR, label: 'Sulselrabar (Sulawesi Selatan, Barat, Tenggara)', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' },
-    // Default national average fallback
-    NATIONAL_DEFAULT: { factor: DEFAULT_GRID_FACTOR_KG_PER_KWH, label: 'Rata-rata Nasional', sourceDoc: 'sumber: konfigurasi internal (menunggu verifikasi dokumen resmi)' }
+    LOMBOK: { factor: GRID_FACTOR_KG_PER_KWH.NTB_LOMBOK, label: 'Lombok (NTB)', sourceDoc: gridSourceDoc('NTB_LOMBOK') },
+    NTB_LOMBOK: { factor: GRID_FACTOR_KG_PER_KWH.NTB_LOMBOK, label: 'Lombok (NTB)', sourceDoc: gridSourceDoc('NTB_LOMBOK') },
+    SULSELRABAR: { factor: GRID_FACTOR_KG_PER_KWH.SULSELRABAR, label: 'Sulselrabar (Sulawesi Selatan, Barat, Tenggara)', sourceDoc: gridSourceDoc('SULSELRABAR') },
+    // Used when a site's grid is unknown.
+    NATIONAL_DEFAULT: { factor: DEFAULT_GRID_FACTOR_KG_PER_KWH, label: 'Rata-rata Nasional', sourceDoc: 'Sama dengan faktor grid JAMALI (dipakai bila grid lokasi tidak diketahui)' }
   },
 
 

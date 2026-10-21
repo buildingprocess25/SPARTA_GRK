@@ -284,6 +284,21 @@ model PlantPr {
   @@map("plant_pr")
 }
 
+/// Monthly Plant PR from iSolarCloud (point p83023, monthly query). Matches the portal's Annual Report PR
+/// except where the portal masks implausible values with a fixed 90/95; this table keeps the raw value.
+model PlantPrMonthly {
+  yearMonth String   @map("year_month")
+  psId      Int      @map("ps_id")
+  prPercent Float    @map("pr_percent")
+  source    String   @default("ISOLAR_API")
+  fetchedAt DateTime @default(now()) @map("fetched_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@id([yearMonth, psId])
+  @@index([psId])
+  @@map("plant_pr_monthly")
+}
+
 /// Inverter Realtime Telemetry from getPVInverterRealTimeData
 model InverterLatest {
   deviceSn       String    @id @map("device_sn")

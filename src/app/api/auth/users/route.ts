@@ -108,7 +108,7 @@ export async function POST(request) {
     const body = await request.json().catch(() => ({}));
     const username = String(body.username || '').trim().toLowerCase();
     const displayName = String(body.displayName || '').trim();
-    const rawPassword = String(body.password || '').trim() || 'ptsat123';
+    const rawPassword = String(body.password || '').trim();
     const roleId = String(body.roleId || 'admin').trim();
     const nip = String(body.nip || '').trim() || `ALFA-${Math.floor(10000 + Math.random() * 90000)}-USR`;
     const dept = String(body.dept || '').trim() || 'Dept. Energy Management & ESG';
@@ -117,6 +117,14 @@ export async function POST(request) {
     if (!username || !displayName) {
       return NextResponse.json(
         { success: false, error: 'Username dan Nama Lengkap wajib diisi.' },
+        { status: 400 },
+      );
+    }
+
+    // Same minimum as /api/auth/change-password; there is no shared default password any more.
+    if (rawPassword.length < 8) {
+      return NextResponse.json(
+        { success: false, error: 'Password awal minimal 8 karakter.' },
         { status: 400 },
       );
     }
@@ -170,7 +178,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: `Pengguna @${username} berhasil didaftarkan dengan password default ${rawPassword}.`,
+      message: `Pengguna @${username} berhasil didaftarkan. Sampaikan password awal secara langsung dan minta pengguna menggantinya setelah login.`,
       user: {
         username,
         displayName,

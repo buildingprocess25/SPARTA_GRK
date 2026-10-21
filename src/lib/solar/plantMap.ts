@@ -1,5 +1,6 @@
 /**
- * Central Plant Mapping & Metadata Registry for 36 Canonical DC Locations (representing 39 Physical Sungrow Plants)
+ * Central Plant Mapping & Metadata Registry: 39 Sungrow plants = the 37 DCs (Gorontalo has no PLTS yet) plus the
+ * 2 Drive Thru pilot stores (facilityType STORE), which isDcLocation() keeps out of every DC count and total.
  * Contains structural mapping (ps_id to DC entity) and baseline audit reference data.
  * 34 single locations + 2 multi-plant locations (Cilacap 1, 2, 3 and Lombok A, B).
  * RULE: NO API capacities are hardcoded here. Live/fixture API capacity is dynamically parsed at runtime.

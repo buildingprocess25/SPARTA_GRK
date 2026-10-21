@@ -4,7 +4,7 @@ import { ChevronDown, Eye, EyeOff, LoaderCircle, Users, RefreshCw, Check, UserPl
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { SPARTA_ROLES, PROFILE_BY_USERNAME } from '@/lib/profileMeta';
+import { SPARTA_ROLES, PROFILE_BY_USERNAME, generateInitialPassword } from '@/lib/profileMeta';
 
 export default function ProfileUsersTab({
   activeRoleOverride,
@@ -63,9 +63,6 @@ export default function ProfileUsersTab({
             <span className="text-xs font-bold text-blue-900 dark:text-blue-200 flex items-center gap-1.5">
               <UserPlus size={14} className="text-blue-600" />
               Pendaftaran Akun Pengguna Baru
-            </span>
-            <span className="text-[10px] text-slate-500 bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
-              Password default: <strong className="text-blue-600 dark:text-blue-400 tabular-nums">ptsat123</strong>
             </span>
           </div>
 
@@ -149,25 +146,42 @@ export default function ProfileUsersTab({
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Password Awal
+              <label htmlFor="new-user-password" className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Password Awal <span className="text-rose-500">*</span>
               </label>
-              <div className="relative">
-                <input
-                  type={showNewUserPassword ? 'text' : 'password'}
-                  value={newUserForm.password}
-                  onChange={(e) => setNewUserForm({ ...newUserForm, password: e.target.value })}
-                  placeholder="ptsat123"
-                  className="w-full px-3 py-1.5 pr-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
+              <div className="flex gap-1.5">
+                <div className="relative flex-1">
+                  <input
+                    id="new-user-password"
+                    type={showNewUserPassword ? 'text' : 'password'}
+                    required
+                    minLength={8}
+                    value={newUserForm.password}
+                    onChange={(e) => setNewUserForm({ ...newUserForm, password: e.target.value })}
+                    placeholder="Minimal 8 karakter"
+                    aria-describedby="new-user-password-help"
+                    className="w-full px-3 py-1.5 pr-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs tabular-nums focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewUserPassword(!showNewUserPassword)}
+                    aria-label={showNewUserPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 size-7 inline-flex items-center justify-center rounded text-slate-400 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                  >
+                    {showNewUserPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                </div>
                 <button
                   type="button"
-                  onClick={() => setShowNewUserPassword(!showNewUserPassword)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  onClick={() => { setNewUserForm({ ...newUserForm, password: generateInitialPassword() }); setShowNewUserPassword(true); }}
+                  className="shrink-0 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                 >
-                  {showNewUserPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                  Buat acak
                 </button>
               </div>
+              <p id="new-user-password-help" className="mt-1 text-[10px] text-slate-500 dark:text-slate-400">
+                Sampaikan langsung ke pengguna, lalu minta ganti setelah login pertama.
+              </p>
             </div>
 
             <div>
