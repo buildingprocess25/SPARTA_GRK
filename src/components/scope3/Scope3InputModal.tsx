@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import {
   AlertCircle, AlertTriangle, Calculator, Check, CheckCircle2, Database, Download,
-  FileSpreadsheet, Plane, RefreshCw, UploadCloud, Wallet,
+  FileSpreadsheet, Hotel, Plane, RefreshCw, TrainFront, UploadCloud, Wallet,
 } from 'lucide-react';
 import BaseModal from '@/components/ui/BaseModal';
 import { Button } from '@/components/ui/button';
@@ -16,10 +16,35 @@ import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { notify } from '@/components/ui/ToastProvider';
 import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 import { AIRPORTS } from '@/lib/scope3/airports';
-import { CABIN, EMISSION_STATUS, TRAVEL_ACCOUNTS, flightEmission, flightFactor, parseRouteField } from '@/lib/scope3/travelLedger';
+import {
+  CABIN, EMISSION_STATUS, HOTEL_CLASS, TRAIN_CLASS, TRAVEL_ACCOUNTS,
+  flightEmission, flightFactor, hotelEmission, hotelFactor, parseRouteField, parseStationRoute, trainEmission, trainFactor,
+} from '@/lib/scope3/travelLedger';
 
 const number = (value, digits = 0) => Number(value || 0).toLocaleString('id-ID', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 const today = () => new Date().toISOString().slice(0, 10);
+
+const KINDS = [
+  { value: 'PESAWAT', icon: Plane, title: 'Pesawat', detail: 'Dihitung dari rute bandara' },
+  { value: 'HOTEL', icon: Hotel, title: 'Hotel', detail: 'Dihitung dari kamar-malam' },
+  { value: 'KERETA', icon: TrainFront, title: 'Kereta Api', detail: 'Dihitung dari jarak km' },
+  { value: 'LAINNYA', icon: Wallet, title: 'Lainnya', detail: 'Uang saku, transport lokal' },
+];
+
+const HOTEL_CLASSES = [
+  { value: HOTEL_CLASS.AVERAGE, title: 'Tidak tahu' },
+  { value: HOTEL_CLASS.STAR_1_3, title: 'Bintang 1-3' },
+  { value: HOTEL_CLASS.STAR_4, title: 'Bintang 4' },
+  { value: HOTEL_CLASS.STAR_5, title: 'Bintang 5' },
+];
+
+const TRAIN_CLASSES = [
+  { value: TRAIN_CLASS.INTERCITY, title: 'Antarkota' },
+  { value: TRAIN_CLASS.COMMUTER, title: 'KRL' },
+  { value: TRAIN_CLASS.HIGH_SPEED, title: 'Kereta cepat' },
+];
+
+const AMOUNT_LABEL = { PESAWAT: 'Harga tiket (Rp)', HOTEL: 'Biaya hotel (Rp)', KERETA: 'Harga tiket (Rp)', LAINNYA: 'Biaya (Rp)' };
 
 const EMPTY_FORM = {
   kind: 'PESAWAT',
@@ -27,6 +52,13 @@ const EMPTY_FORM = {
   date: '',
   route: '',
   cabin: CABIN.ECONOMY,
+  nights: '',
+  rooms: '1',
+  city: '',
+  hotelClass: HOTEL_CLASS.AVERAGE,
+  stations: '',
+  distanceKm: '',
+  trainClass: TRAIN_CLASS.INTERCITY,
   passenger: '',
   note: '',
   amount: '',
@@ -53,7 +85,7 @@ function ChoiceCard({ selected, onClick, icon: Icon, title, detail }: { selected
       role="radio"
       aria-checked={selected}
       onClick={onClick}
-      className={`p-3 rounded-xl border-2 text-left transition-colors flex items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+      className={`min-h-11 p-3 rounded-xl border-2 text-left transition-colors flex items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
         selected
           ? 'bg-indigo-50/50 dark:bg-indigo-500/10 border-indigo-500 dark:border-indigo-500/60'
           : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
@@ -68,10 +100,10 @@ function ChoiceCard({ selected, onClick, icon: Icon, title, detail }: { selected
   );
 }
 
-export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu = [] }: { isOpen?: any; onClose?: any; onSuccess?: any; knownKuu?: any[] }) {
+export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu = [], initialKind = 'PESAWAT' }: { isOpen?: any; onClose?: any; onSuccess?: any; knownKuu?: any[]; initialKind?: string }) {
   const confirm = useConfirm();
   const [tab, setTab] = useState('manual');
-  const [form, setForm] = useState<Record<string, any>>(() => ({ ...EMPTY_FORM, date: today() }));
+  const [form, setForm] = useState<Record<string, any>>(() => ({ ...EMPTY_FORM, kind: initialKind, date: today() }));
   const [errors, setErrors] = useState<Record<string, any>>({});
   const [status, setStatus] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,13 +119,17 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
     setErrors(prev => ({ ...prev, [key]: undefined }));
   };
   const isFlight = form.kind === 'PESAWAT';
+  const isHotel = form.kind === 'HOTEL';
+  const isTrain = form.kind === 'KERETA';
 
   const live = useMemo<Record<string, any> | null>(() => {
+    if (isHotel) return hotelEmission({ nights: Number(form.nights), rooms: Number(form.rooms || 1), hotelClass: form.hotelClass });
+    if (isTrain) return { stations: parseStationRoute(form.stations), ...trainEmission({ distanceKm: Number(form.distanceKm), trainClass: form.trainClass }) };
     if (!isFlight) return null;
     const stops = parseRouteField(form.route);
     if (stops.length < 2) return { stops, status: 'INCOMPLETE' };
     return { stops, ...flightEmission(stops, { cabin: form.cabin }) };
-  }, [isFlight, form.route, form.cabin]);
+  }, [isFlight, isHotel, isTrain, form.route, form.cabin, form.nights, form.rooms, form.hotelClass, form.stations, form.distanceKm, form.trainClass]);
 
   const validate = () => {
     const next: Record<string, any> = {};
@@ -104,6 +140,11 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
       if (!live || live.stops.length < 2) next.route = 'Isi minimal dua kode bandara, misalnya CGK-DPS-CGK';
       else if (live.status === EMISSION_STATUS.UNKNOWN_AIRPORT) next.route = `Kode bandara belum dikenal: ${live.unknown.join(', ')}`;
     }
+    if (isHotel) {
+      if (!(Number(form.nights) > 0)) next.nights = 'Isi jumlah malam, misalnya 2';
+      if (!(Number(form.rooms) > 0 && Number.isInteger(Number(form.rooms)))) next.rooms = 'Jumlah kamar minimal 1';
+    }
+    if (isTrain && !(Number(form.distanceKm) > 0)) next.distanceKm = 'Isi total jarak dalam km, misalnya 512';
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -121,7 +162,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
       const res = await fetch('/api/scope3/entries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, kuu: form.kuu.trim().toUpperCase() }),
+        body: JSON.stringify({ ...form, kuu: form.kuu.trim().toUpperCase(), route: isTrain ? form.stations : form.route }),
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.success) throw new Error(json.error || `Server merespons ${res.status}`);
@@ -198,7 +239,8 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
   };
 
   const hasUnsavedChanges = Boolean(
-    form.kuu || form.route || form.passenger || form.note || form.amount || form.kind !== 'PESAWAT' || file,
+    form.kuu || form.route || form.passenger || form.note || form.amount || form.kind !== initialKind
+    || form.nights || form.city || form.stations || form.distanceKm || file,
   );
   const handleCloseRequest = async () => {
     if (isSubmitting || isProcessing) return;
@@ -213,7 +255,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
       open={isOpen}
       onClose={handleCloseRequest}
       title="Input Data Scope 3 · Perjalanan Dinas"
-      subtitle="Catat tiket pesawat dan biaya perjalanan dinas karyawan (Kategori 6 GHG Protocol)."
+      subtitle="Catat tiket pesawat, hotel, kereta api, dan biaya perjalanan dinas lain (Kategori 6 GHG Protocol)."
       icon={<Plane size={20} className="text-indigo-600 dark:text-indigo-400" />}
       size="md"
       loading={isSubmitting || isProcessing}
@@ -249,9 +291,17 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
             <form id="scope3-manual-form" onSubmit={handleManualSubmit} className="space-y-4" noValidate>
               <div className="space-y-1.5">
                 <FieldLabel required>Jenis biaya</FieldLabel>
-                <div role="radiogroup" aria-label="Jenis biaya" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <ChoiceCard selected={isFlight} onClick={() => set('kind')('PESAWAT')} icon={Plane} title="Tiket pesawat" detail="Emisi dihitung dari rute" />
-                  <ChoiceCard selected={!isFlight} onClick={() => set('kind')('LAINNYA')} icon={Wallet} title="Biaya lain" detail="Uang saku, hotel, transport lokal" />
+                <div role="radiogroup" aria-label="Jenis biaya" className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                  {KINDS.map(kind => (
+                    <ChoiceCard
+                      key={kind.value}
+                      selected={form.kind === kind.value}
+                      onClick={() => set('kind')(kind.value)}
+                      icon={kind.icon}
+                      title={kind.title}
+                      detail={kind.detail}
+                    />
+                  ))}
                 </div>
               </div>
 
@@ -329,9 +379,119 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                 </>
               )}
 
+              {isHotel && (
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                      <FieldLabel htmlFor="s3-nights" required>Jumlah malam</FieldLabel>
+                      <Input
+                        id="s3-nights"
+                        type="number"
+                        inputMode="numeric"
+                        min="1"
+                        value={form.nights}
+                        onChange={e => set('nights')(e.target.value)}
+                        placeholder="Contoh: 2"
+                        aria-invalid={Boolean(errors.nights)}
+                        aria-describedby={errors.nights ? 's3-nights-error' : undefined}
+                        className="tabular-nums"
+                      />
+                      <FieldError id="s3-nights-error">{errors.nights}</FieldError>
+                    </div>
+                    <div className="space-y-1">
+                      <FieldLabel htmlFor="s3-rooms" required>Jumlah kamar</FieldLabel>
+                      <Input
+                        id="s3-rooms"
+                        type="number"
+                        inputMode="numeric"
+                        min="1"
+                        step="1"
+                        value={form.rooms}
+                        onChange={e => set('rooms')(e.target.value)}
+                        aria-invalid={Boolean(errors.rooms)}
+                        aria-describedby={errors.rooms ? 's3-rooms-error' : undefined}
+                        className="tabular-nums"
+                      />
+                      <FieldError id="s3-rooms-error">{errors.rooms}</FieldError>
+                    </div>
+                    <div className="space-y-1 col-span-2 sm:col-span-1">
+                      <FieldLabel htmlFor="s3-city">Kota (opsional)</FieldLabel>
+                      <Input id="s3-city" value={form.city} onChange={e => set('city')(e.target.value)} placeholder="Contoh: Surabaya" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <FieldLabel>Kelas hotel</FieldLabel>
+                    <div role="radiogroup" aria-label="Kelas hotel" className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {HOTEL_CLASSES.map(option => (
+                        <ChoiceCard
+                          key={option.value}
+                          selected={form.hotelClass === option.value}
+                          onClick={() => set('hotelClass')(option.value)}
+                          title={option.title}
+                          detail={`${hotelFactor(option.value)?.value} kg/kamar-malam`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {isTrain && (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="space-y-1 sm:col-span-2">
+                      <FieldLabel htmlFor="s3-stations">Stasiun (opsional)</FieldLabel>
+                      <Input
+                        id="s3-stations"
+                        value={form.stations}
+                        onChange={e => set('stations')(e.target.value)}
+                        placeholder="Contoh: Gambir - Yogyakarta - Gambir"
+                        aria-describedby="s3-stations-help"
+                      />
+                      <p id="s3-stations-help" className="text-[11px] text-slate-500 dark:text-slate-400">
+                        {live?.stations?.length ? live.stations.join(' → ') : 'Nama stasiun dipisah tanda minus. Dipakai untuk rincian per rute.'}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <FieldLabel htmlFor="s3-distance" required>Total jarak (km)</FieldLabel>
+                      <Input
+                        id="s3-distance"
+                        type="number"
+                        inputMode="decimal"
+                        min="1"
+                        value={form.distanceKm}
+                        onChange={e => set('distanceKm')(e.target.value)}
+                        placeholder="Contoh: 512"
+                        aria-invalid={Boolean(errors.distanceKm)}
+                        aria-describedby={errors.distanceKm ? 's3-distance-error' : 's3-distance-help'}
+                        className="tabular-nums"
+                      />
+                      <p id="s3-distance-help" className="text-[11px] text-slate-500 dark:text-slate-400">Pulang-pergi dijumlah.</p>
+                      <FieldError id="s3-distance-error">{errors.distanceKm}</FieldError>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <FieldLabel>Jenis kereta</FieldLabel>
+                    <div role="radiogroup" aria-label="Jenis kereta" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {TRAIN_CLASSES.map(option => (
+                        <ChoiceCard
+                          key={option.value}
+                          selected={form.trainClass === option.value}
+                          onClick={() => set('trainClass')(option.value)}
+                          title={option.title}
+                          detail={`${trainFactor(option.value)?.value} kg/penumpang-km`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <FieldLabel htmlFor="s3-amount" required>{isFlight ? 'Harga tiket (Rp)' : 'Biaya (Rp)'}</FieldLabel>
+                  <FieldLabel htmlFor="s3-amount" required>{AMOUNT_LABEL[form.kind]}</FieldLabel>
                   <Input
                     id="s3-amount"
                     type="number"
@@ -362,11 +522,27 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                     <Calculator size={14} className="text-indigo-300" aria-hidden="true" /> Emisi dari input ini
                   </span>
                   <span className="text-xs tabular-nums font-extrabold text-indigo-200 bg-indigo-950/60 border border-indigo-800/80 px-2.5 py-0.5 rounded-full">
-                    {live?.status === EMISSION_STATUS.CALCULATED ? `+${number(live.emissionKg / 1000, 3)} tCO₂e` : '—'}
+                    {live?.status === EMISSION_STATUS.CALCULATED ? `+${number(live.emissionKg / 1000, 3)} tCO₂e` : '-'}
                   </span>
                 </div>
-                {!isFlight ? (
-                  <p className="text-[11px] text-slate-300">Biaya lain dicatat sebagai rupiah saja. Jurnal tidak memuat jumlah malam atau jarak, jadi emisinya tidak dihitung.</p>
+                {form.kind === 'LAINNYA' ? (
+                  <p className="text-[11px] text-slate-300">Uang saku dan transport lokal dicatat sebagai rupiah saja karena tidak ada data jarak, jadi emisinya tidak dihitung.</p>
+                ) : isHotel ? (
+                  live?.status === EMISSION_STATUS.CALCULATED ? (
+                    <p className="text-[10px] tabular-nums text-slate-400 bg-slate-800/60 px-2.5 py-1.5 rounded-lg border border-slate-800">
+                      {number(form.nights)} malam × {number(form.rooms)} kamar × {live.factorValue} kg = {number(live.emissionKg, 1)} kgCO₂e
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-slate-300">Isi jumlah malam untuk melihat perhitungan.</p>
+                  )
+                ) : isTrain ? (
+                  live?.status === EMISSION_STATUS.CALCULATED ? (
+                    <p className="text-[10px] tabular-nums text-slate-400 bg-slate-800/60 px-2.5 py-1.5 rounded-lg border border-slate-800">
+                      {number(live.distanceKm)} km × {live.factorValue} kg/km = {number(live.emissionKg, 1)} kgCO₂e
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-slate-300">Isi total jarak untuk melihat perhitungan.</p>
+                  )
                 ) : live?.status === EMISSION_STATUS.CALCULATED ? (
                   <>
                     <dl className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
@@ -393,7 +569,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                   <FileSpreadsheet size={15} className="text-emerald-600 dark:text-emerald-400" aria-hidden="true" /> Template perjalanan dinas
                 </p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Isi template, atau langsung unggah ekspor jurnal BPDL (akun 611402/621402) dalam .xlsx atau .csv.
+                  Template memuat kolom pesawat, hotel, dan kereta api. Bisa juga langsung unggah ekspor jurnal BPDL (akun 611402/621402) dalam .xlsx atau .csv.
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={() => window.open('/api/scope3/template', '_blank')}>
@@ -452,9 +628,12 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                   ))}
                 </dl>
                 <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                  Baris valid berisi Rp {number(preview.summary.totalRupiah)} biaya dan {number(preview.summary.emissionTon, 2)} tCO₂e dari {number(preview.summary.distanceKm)} km penerbangan
+                  Baris valid berisi Rp {number(preview.summary.totalRupiah)} biaya dan {number(preview.summary.emissionTon, 2)} tCO₂e:
+                  {' '}{number(preview.summary.flightCount)} pesawat ({number(preview.summary.distanceKm)} km),
+                  {' '}{number(preview.summary.hotelCount ?? 0)} hotel, {number(preview.summary.trainCount ?? 0)} kereta api ({number(preview.summary.trainKm ?? 0)} km)
                   {preview.months.length ? `, untuk bulan ${preview.months.join(', ')}` : ''}.
                   {preview.format === 'JOURNAL' && ' Total akun di file cocok dengan jumlah barisnya.'}
+                  {preview.summary.uncalculatedGround > 0 && ` ${number(preview.summary.uncalculatedGround)} baris hotel/kereta dari jurnal tidak memuat malam atau jarak, jadi hanya biayanya yang tercatat.`}
                 </p>
 
                 {preview.errorCount > 0 && (

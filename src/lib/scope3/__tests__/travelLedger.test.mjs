@@ -112,10 +112,84 @@ test('summary groups by KUU and route and counts only positive tickets', () => {
   assert.equal(result.summary.ticketCount, 3);
   assert.equal(result.summary.uncalculatedFlights, 1);
   assert.equal(result.byKuu.length, 3);
-  assert.deepEqual(result.flightGroups.map(g => `${g.kuu} ${g.route} ${g.band}`).sort(), ['1AZ1 PKU-CGK-PKU medium', 'Z001 CGK-DAC-CGK international']);
+  const flightGroups = result.travelGroups.filter(g => g.category === TRAVEL_CATEGORY.FLIGHT);
+  assert.deepEqual(flightGroups.map(g => `${g.kuu} ${g.route} ${g.band}`).sort(), ['1AZ1 PKU-CGK-PKU medium', 'Z001 CGK-DAC-CGK international']);
   assert.equal(result.monthlyTrend[0].month, 'Jan');
 
   const bands = Object.fromEntries(result.distanceBands.map(b => [b.id, b.ticketCount]));
   assert.deepEqual(bands, { short: 0, medium: 1, long: 0, international: 1 });
   assert.equal(result.byKuu.find(k => k.kuu === 'Z001').internationalTon, result.byKuu.find(k => k.kuu === 'Z001').emissionTon);
+});
+
+const GROUND_TEMPLATE = Buffer.from([
+  'TANGGAL,KUU,JENIS,RUTE,KELAS,MALAM,KAMAR,KOTA,JARAK_KM,NAMA_PENUMPANG,KETERANGAN,BIAYA_RP,AKUN',
+  '2026-03-02,Z001,HOTEL,,BINTANG_4,3,2,Surabaya,,,Rakor,2100000,',
+  '2026-03-03,Z001,HOTEL,,,2,,,,,,900000,',
+  '2026-03-04,1AZ1,KERETA,Gambir - Yogyakarta - Gambir,,,,,"1024",,,900000,',
+  '2026-03-05,1AZ1,KERETA,,KRL,,,,40,,,20000,',
+  '2026-03-06,1AZ1,HOTEL,,,,,,,,,500000,',
+  '2026-03-07,1AZ1,KERETA,,ANTARKOTA,,,,,,,300000,',
+  '2026-03-08,1AZ1,HOTEL,,BINTANG_9,1,,,,,,300000,',
+].join('\n'));
+
+test('hotel rows use room-nights and train rows use distance, each with its own factor', () => {
+  const parsed = parseTravelUpload(GROUND_TEMPLATE, 'ground.csv');
+  assert.equal(parsed.entries.length, 4);
+  assert.deepEqual(parsed.errors.map(e => e.row), [6, 7, 8]);
+  assert.match(parsed.errors[0].message, /MALAM/);
+  assert.match(parsed.errors[1].message, /JARAK_KM/);
+  assert.match(parsed.errors[2].message, /KELAS hotel/);
+
+  const [star4, average, intercity, commuter] = parsed.entries;
+  assert.equal(star4.category, TRAVEL_CATEGORY.HOTEL);
+  assert.equal(star4.route, 'SURABAYA');
+  assert.equal(star4.metadata.roomNights, 6);
+  assert.equal(star4.emissionKg, 6 * 30);
+  assert.equal(average.emissionKg, 2 * 30);
+  assert.equal(average.metadata.factorId, 'HOTEL_ROOM_NIGHT');
+
+  assert.equal(intercity.category, TRAVEL_CATEGORY.TRAIN);
+  assert.equal(intercity.route, 'GAMBIR-YOGYAKARTA-GAMBIR');
+  assert.equal(intercity.distanceKm, 1024);
+  assert.ok(Math.abs(intercity.emissionKg - 1024 * 0.041) < 0.01);
+  assert.ok(Math.abs(commuter.emissionKg - 40 * 0.035) < 0.01);
+  assert.equal(commuter.route, null);
+});
+
+test('journal lines naming hotel or train are classified but keep emission empty without quantities', () => {
+  const lines = parseTravelLedgerCsv(csv([
+    'Z001,Z001,05-Feb-26,MJ,611402, ,O900,PBYR HOTEL SANTIKA SBY A.N B," 1,500,000 ", - ," 1,500,000 ",x,y,z,MANUAL,11',
+    'Z001,Z001,06-Feb-26,MJ,611402, ,O900,PBYR TIKET KERETA KAI GMR-YK A.N B," 600,000 ", - ," 600,000 ",x,y,z,MANUAL,12',
+    'Z001,Z001,07-Feb-26,IA,611402,1,O900,PJUM BPDL HOTEL DAN UANG MAKAN A.N B," 900,000 ", - ," 900,000 ",x,y,,BMAR,13',
+  ], { '0611402': ' 3,000,000 ' })).lines;
+  const [hotel, train, allowance] = buildTravelEntries(lines, { sourceFile: 'f.csv' });
+  assert.equal(hotel.category, TRAVEL_CATEGORY.HOTEL);
+  assert.equal(hotel.emissionStatus, EMISSION_STATUS.NO_QUANTITY);
+  assert.equal(hotel.emissionTon, 0);
+  assert.equal(train.category, TRAVEL_CATEGORY.TRAIN);
+  assert.equal(train.emissionStatus, EMISSION_STATUS.NO_QUANTITY);
+  assert.equal(allowance.category, TRAVEL_CATEGORY.OTHER);
+});
+
+test('summary splits emission and cost by kind and keeps distanceKm flight-only', () => {
+  const flights = buildTravelEntries(parseTravelLedgerCsv(SAMPLE).lines, { sourceFile: 'f.csv' });
+  const ground = parseTravelUpload(GROUND_TEMPLATE, 'ground.csv').entries;
+  const result = summarizeTravelEntries([...flights, ...ground], ['2026-01', '2026-03']);
+  const s = result.summary;
+  const flightOnly = summarizeTravelEntries(flights, ['2026-01']).summary;
+
+  assert.equal(s.distanceKm, flightOnly.distanceKm);
+  assert.equal(s.trainKm, 1064);
+  assert.equal(s.roomNights, 8);
+  assert.equal(s.hotelStays, 2);
+  assert.equal(s.trainTrips, 2);
+  assert.equal(s.hotelRupiah, 3000000);
+  assert.equal(s.trainRupiah, 920000);
+  assert.ok(Math.abs(s.emissionTon - (s.flightTon + s.hotelTon + s.trainTon)) < 0.002);
+  assert.equal(s.totalRupiah, flightOnly.totalRupiah + 3920000);
+
+  const hotelGroups = result.travelGroups.filter(g => g.category === TRAVEL_CATEGORY.HOTEL);
+  assert.deepEqual(hotelGroups.map(g => `${g.kuu} ${g.route} ${g.roomNights}`).sort(), ['Z001 SURABAYA 6', 'Z001 null 2']);
+  assert.ok(result.travelGroups.every(g => g.category === TRAVEL_CATEGORY.FLIGHT || g.band === null));
+  assert.ok(result.factors.some(f => f.id === 'HOTEL_ROOM_NIGHT') && result.factors.some(f => f.id === 'TRAIN_INTERCITY'));
 });

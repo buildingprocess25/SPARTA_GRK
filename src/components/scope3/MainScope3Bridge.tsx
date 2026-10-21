@@ -36,7 +36,7 @@ export default function MainScope3Bridge({ onNavigate }: { onNavigate?: any }) {
           <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Scope 3: Perjalanan Dinas</h3>
           <InfoHint
             title="Scope 3: Perjalanan Dinas"
-            text="Emisi tidak langsung dari tiket pesawat perjalanan dinas karyawan (Kategori 6 GHG Protocol), dihitung dari rute di jurnal BPDL. Uang saku dan hotel belum dihitung emisinya."
+            text="Emisi tidak langsung dari perjalanan dinas karyawan (Kategori 6 GHG Protocol): tiket pesawat dari rute, hotel dari kamar-malam, dan kereta api dari jarak km. Uang saku dan transport lokal dicatat biayanya saja."
           />
         </div>
         <Button type="button" variant="outline" size="sm" onClick={() => onNavigate?.('penambah', 'scope3')}>
@@ -63,7 +63,7 @@ export default function MainScope3Bridge({ onNavigate }: { onNavigate?: any }) {
             </div>
           </div>
           <div className="rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/80 dark:bg-indigo-500/10 p-3.5">
-            <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300">Emisi penerbangan</p>
+            <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300">Emisi perjalanan dinas</p>
             <div className="mt-2">
               <strong className="text-xl font-black text-indigo-950 dark:text-indigo-100 tracking-tight">{number.format(summary.emissionTon)}</strong>
               <span className="text-xs font-bold text-indigo-700/80 dark:text-indigo-300 ml-1">tCO₂e</span>

@@ -56,7 +56,7 @@ export function buildSrnPpiWorkbookData(reportData) {
     { Parameter: '  - Solar Genset Cadangan', Nilai: round(totalScope1Genset), Satuan: 'tCO2e' },
     { Parameter: '  - BBM Kendaraan Operasional', Nilai: round(totalScope1Vehicle), Satuan: 'tCO2e' },
     { Parameter: 'Total Emisi Scope 2 (Emisi Tidak Langsung Listrik PLN)', Nilai: totalScope2, Satuan: 'tCO2e' },
-    ...(scope3 ? [{ Parameter: 'Total Emisi Scope 3 (Kategori 6 - Perjalanan Dinas, Penerbangan)', Nilai: totalScope3, Satuan: 'tCO2e' }] : []),
+    ...(scope3 ? [{ Parameter: 'Total Emisi Scope 3 (Kategori 6 - Perjalanan Dinas: Pesawat, Hotel, Kereta Api)', Nilai: totalScope3, Satuan: 'tCO2e' }] : []),
     { Parameter: `Total Seluruh Emisi Dihasilkan (${scopeLabel})`, Nilai: totalAddition, Satuan: 'tCO2e' },
     { Parameter: 'Aksi Mitigasi: Pengurangan Emisi dari PLTS Atap', Nilai: totalPltsAvoided, Satuan: 'tCO2e' },
     { Parameter: 'Aksi Mitigasi: Pengurangan Emisi dari Daur Ulang Air', Nilai: totalWaterAvoided, Satuan: 'tCO2e' },
@@ -197,9 +197,13 @@ export function buildSrnPpiWorkbookData(reportData) {
     KUU: r.kuu,
     'Jumlah Tiket Pesawat': r.ticketCount,
     'Jarak Terbang (km)': r.distanceKm,
+    'Kamar-Malam Hotel': r.roomNights ?? 0,
+    'Jarak Kereta Api (km)': r.trainKm ?? 0,
     'Emisi Scope 3 (tCO2e)': round(r.emissionTon, 3),
-    'Biaya Tiket (Rp)': formatRupiahNum(r.flightRupiah),
-    'Biaya Lain - Uang Saku, Hotel, Transport (Rp)': formatRupiahNum(r.otherRupiah),
+    'Biaya Tiket Pesawat (Rp)': formatRupiahNum(r.flightRupiah),
+    'Biaya Hotel (Rp)': formatRupiahNum(r.hotelRupiah ?? 0),
+    'Biaya Kereta Api (Rp)': formatRupiahNum(r.trainRupiah ?? 0),
+    'Biaya Lain - Uang Saku, Transport Lokal (Rp)': formatRupiahNum(r.otherRupiah),
   })), 'Emisi Scope 3 (tCO2e)') : [];
 
   const komposisi = [
@@ -254,7 +258,7 @@ export function buildSrnPpiWorkbookData(reportData) {
         charts: [topBar('Emisi listrik PLN tertinggi (tCO2e)', 'Nama Distribution Center (DC)', 'Emisi Scope 2 (tCO2e)', 'Emisi (tCO2e)', REPORT_COLORS.scope2)],
       },
       ...(scope3 ? [{
-        name: 'Scope 3 - Perjalanan Dinas', title: 'Scope 3 · Perjalanan dinas (kategori 6) per KUU', notes: [rankedNote, 'Emisi dihitung dari tiket pesawat yang rutenya tercatat; biaya lain dicatat sebagai biaya saja.'], rows: dataScope3, total: true,
+        name: 'Scope 3 - Perjalanan Dinas', title: 'Scope 3 · Perjalanan dinas (kategori 6) per KUU', notes: [rankedNote, 'Emisi dihitung dari rute tiket pesawat, kamar-malam hotel, dan jarak kereta api; uang saku, transport lokal, dan baris tanpa data kuantitas dicatat sebagai biaya saja.'], rows: dataScope3, total: true,
         charts: [topBar('Emisi perjalanan dinas tertinggi (tCO2e)', 'KUU', 'Emisi Scope 3 (tCO2e)', 'Emisi (tCO2e)', REPORT_COLORS.scope3)],
       }] : []),
       {

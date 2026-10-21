@@ -7,15 +7,21 @@ const sum = (rows, key) => rows.reduce((s, r) => s + r[key], 0);
 
 function summarize(entries) {
   const flights = entries.filter(e => e.category === TRAVEL_CATEGORY.FLIGHT);
+  const hotels = entries.filter(e => e.category === TRAVEL_CATEGORY.HOTEL);
+  const trains = entries.filter(e => e.category === TRAVEL_CATEGORY.TRAIN);
   return {
     lineCount: entries.length,
     kuuCount: new Set(entries.map(e => e.kuu)).size,
     totalRupiah: sum(entries, 'amountRupiah'),
     flightCount: flights.length,
     flightRupiah: sum(flights, 'amountRupiah'),
+    hotelCount: hotels.length,
+    trainCount: trains.length,
     emissionTon: Number(sum(entries, 'emissionTon').toFixed(3)),
-    distanceKm: Math.round(sum(entries, 'distanceKm')),
+    distanceKm: Math.round(sum(flights, 'distanceKm')),
+    trainKm: Math.round(sum(trains, 'distanceKm')),
     uncalculatedFlights: flights.filter(e => e.emissionStatus !== EMISSION_STATUS.CALCULATED).length,
+    uncalculatedGround: [...hotels, ...trains].filter(e => e.emissionStatus !== EMISSION_STATUS.CALCULATED).length,
     unknownAirports: [...new Set(flights.flatMap(e => e.metadata.unknownAirports ?? []))],
   };
 }

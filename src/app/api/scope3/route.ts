@@ -48,7 +48,7 @@ export async function GET(req) {
       where: { yearMonth: { gte: period.start, lte: period.end } },
       select: {
         kuu: true, yearMonth: true, category: true, route: true, amountRupiah: true,
-        distanceKm: true, legCount: true, emissionTon: true, emissionStatus: true, isInternational: true,
+        distanceKm: true, legCount: true, emissionTon: true, emissionStatus: true, isInternational: true, metadata: true,
       },
     });
 
