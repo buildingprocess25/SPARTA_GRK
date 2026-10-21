@@ -153,7 +153,7 @@ export default function TabSupportingParameters({ filters }: { filters?: any }) 
                   formatter={(val) => [`${formatNum(val, 1, 1)} kWh/m²`, 'Sinar matahari']}
                   contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '11px', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
                 />
-                <Area type="monotone" dataKey="radiationKwhM2" stroke="#f59e0b" strokeWidth={2.5} fillOpacity={1} fill="url(#iradGrad)" dot={{ r: 4, fill: '#f59e0b' }} />
+                <Area isAnimationActive={false} type="monotone" dataKey="radiationKwhM2" stroke="#f59e0b" strokeWidth={2.5} fillOpacity={1} fill="url(#iradGrad)" dot={{ r: 4, fill: '#f59e0b' }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -207,7 +207,7 @@ export default function TabSupportingParameters({ filters }: { filters?: any }) 
                     }}
                     contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '11px', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
                   />
-                  <Bar
+                  <Bar isAnimationActive={false}
                     yAxisId="rain"
                     dataKey="precipitationMm"
                     fill="#38bdf8"
@@ -215,7 +215,7 @@ export default function TabSupportingParameters({ filters }: { filters?: any }) 
                     radius={[4, 4, 0, 0]}
                     maxBarSize={28}
                   />
-                  <Line
+                  <Line isAnimationActive={false}
                     yAxisId="temp"
                     type="monotone"
                     dataKey="moduleTempC"

@@ -73,21 +73,21 @@ export default function SummaryYoyComparisonChart({
               }}
             />
             {chartType === 'bar' ? <>
-              <Bar dataKey={String(comparison.years[0])} fill={CHART_PALETTE.pln} radius={[4, 4, 0, 0]} animationDuration={800} animationEasing="ease-out">
+              <Bar isAnimationActive={false} dataKey={String(comparison.years[0])} fill={CHART_PALETTE.pln} radius={[4, 4, 0, 0]} animationDuration={800} animationEasing="ease-out">
                 {comparisonChartData.map((d, i) => (
                   <Cell key={`bar-0-${i}`} opacity={d.month?.includes('*') ? PARTIAL_OPACITY : 1} />
                 ))}
               </Bar>
-              <Bar dataKey={String(comparison.years[1])} fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} animationDuration={800} animationEasing="ease-out">
+              <Bar isAnimationActive={false} dataKey={String(comparison.years[1])} fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} animationDuration={800} animationEasing="ease-out">
                 {comparisonChartData.map((d, i) => (
                   <Cell key={`bar-1-${i}`} opacity={d.month?.includes('*') ? PARTIAL_OPACITY : 1} />
                 ))}
               </Bar>
             </> : <>
-              <Line type="monotone" dataKey={String(comparison.years[0])} stroke={CHART_PALETTE.pln} strokeWidth={2.5} dot={{ r: 3 }} animationDuration={800} animationEasing="ease-out" />
-              <Line type="monotone" dataKey={String(comparison.years[1])} stroke={CHART_PALETTE.plts} strokeWidth={2.5} dot={{ r: 3 }} animationDuration={800} animationEasing="ease-out" />
+              <Line isAnimationActive={false} type="monotone" dataKey={String(comparison.years[0])} stroke={CHART_PALETTE.pln} strokeWidth={2.5} dot={{ r: 3 }} animationDuration={800} animationEasing="ease-out" />
+              <Line isAnimationActive={false} type="monotone" dataKey={String(comparison.years[1])} stroke={CHART_PALETTE.plts} strokeWidth={2.5} dot={{ r: 3 }} animationDuration={800} animationEasing="ease-out" />
             </>}
-            {isNational && showTarget && <Line type="monotone" dataKey="target2026" name="Target 2026" stroke={CHART_PALETTE.target} strokeWidth={2} strokeDasharray="4 4" dot={{ r: 3 }} animationDuration={800} animationEasing="ease-out" />}
+            {isNational && showTarget && <Line isAnimationActive={false} type="monotone" dataKey="target2026" name="Target 2026" stroke={CHART_PALETTE.target} strokeWidth={2} strokeDasharray="4 4" dot={{ r: 3 }} animationDuration={800} animationEasing="ease-out" />}
           </ComposedChart>
         </ResponsiveContainer>
       </div>

@@ -357,7 +357,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
               <ReferenceLine yAxisId="left" y={75} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: 'Waspada 75%', fill: '#f59e0b', fontSize: 10, position: 'insideBottomRight' }} />
 
               {/* Blue PR Line */}
-              <Line
+              <Line isAnimationActive={false}
                 yAxisId="left"
                 type="monotone"
                 dataKey="prPercent"
@@ -369,7 +369,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
               />
 
               {/* Red/Colored Parameter Line */}
-              <Line
+              <Line isAnimationActive={false}
                 yAxisId="right"
                 type="monotone"
                 dataKey="paramValue"

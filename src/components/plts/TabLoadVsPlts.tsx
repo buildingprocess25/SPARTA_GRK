@@ -8,11 +8,32 @@ import { TabContentSkeleton } from './PLTSDashboardSkeletons';
 import InfoHint from '@/components/ui/InfoHint';
 import { CustomSelect } from '@/components/ui/select';
 import { kwhToMwh } from '@/lib/units';
+import { CHART_AXIS_PROPS, CHART_GRID_PROPS, ChartTooltipCard } from '@/components/ui/ChartTheme';
+
+const SERIES_LABEL = { loadKwh: 'Listrik PLN', actualKwh: 'Produksi PLTS', productionKwh: 'Produksi PLTS' };
+const SERIES_COLOR = { loadKwh: '#94a3b8', actualKwh: '#f59e0b', productionKwh: '#f59e0b' };
+const BAR_CURSOR = { fill: 'var(--chart-grid)', opacity: 0.6 };
+
+function LoadTooltip({ active, payload, label }: { active?: boolean; payload?: any[]; label?: any }) {
+  if (!active || !payload?.length) return null;
+  const row = payload[0]?.payload;
+  return (
+    <ChartTooltipCard
+      title={label}
+      items={payload.map((p) => ({
+        label: SERIES_LABEL[p.dataKey] ?? p.dataKey,
+        value: `${formatNum(kwhToMwh(p.value), 2, 2)} MWh`,
+        dotColor: SERIES_COLOR[p.dataKey],
+      }))}
+      footer={row?.pltsSharePct != null ? `${formatNum(row.pltsSharePct, 1, 1)}% kebutuhan dipenuhi PLTS` : null}
+    />
+  );
+}
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
 function formatNum(value, min = 0, max = 2) {
-  if (value === null || value === undefined || Number.isNaN(Number(value))) return '—';
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return '-';
   return Number(value).toLocaleString('id-ID', { minimumFractionDigits: min, maximumFractionDigits: max });
 }
 
@@ -45,7 +66,13 @@ export default function TabLoadVsPlts({ filters }: { filters?: any }) {
     });
   }, [data]);
 
-  const branchLoadRows = useMemo(() => data?.branchLoads || [], [data]);
+  // "10 DC terbesar" means the largest electricity demand, so rows are ranked by load, not by the API's alphabetical order.
+  const branchLoadRows = useMemo(
+    () => [...(data?.branchLoads || [])].sort((a, b) => (b.loadKwh ?? -1) - (a.loadKwh ?? -1)),
+    [data],
+  );
+
+  const showAllBranches = loadViewMode === 'by-branch' && branchLoadLimit >= branchLoadRows.length && branchLoadRows.length > 20;
 
   const visibleBranchLoadRows = useMemo(() => {
     if (branchLoadLimit >= branchLoadRows.length) return branchLoadRows;
@@ -59,6 +86,7 @@ export default function TabLoadVsPlts({ filters }: { filters?: any }) {
   };
   const totalLoadKwh = data?.totalLoadKwh;
   const totalProdKwh = data?.productionKwh;
+  const selfConsumptionKwh = data?.selfConsumptionKwh;
 
   if (loading && !data) return <TabContentSkeleton />;
   if (error && !data) return <EmptyMeasurement title="Kebutuhan listrik vs PLTS" message={error} />;
@@ -123,56 +151,52 @@ export default function TabLoadVsPlts({ filters }: { filters?: any }) {
             </div>
           </div>
 
-          <div className="h-[260px] w-full overflow-x-auto">
-            <ResponsiveContainer width="100%" height="100%" minWidth={loadViewMode === 'by-branch' && branchLoadLimit >= 37 ? 900 : undefined}>
+          {/* Only "Semua DC" scrolls sideways, at a fixed inner width. A width that follows a scrollbar which follows the
+              width made the chart resize in a loop, so the plot visibly jumped. Vertical overflow is clipped for the same reason. */}
+          <div className={`h-[260px] w-full ${showAllBranches ? 'overflow-x-auto overflow-y-hidden' : 'overflow-hidden'}`}>
+            <div className="h-full" style={showAllBranches ? { minWidth: 900 } : undefined}>
+            <ResponsiveContainer width="100%" height="100%" debounce={150}>
               {loadViewMode === 'monthly' ? (
                 <BarChart data={chartRows} margin={{ left: 0, right: 8, top: 12, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748b' }} />
+                  <CartesianGrid {...CHART_GRID_PROPS} />
+                  <XAxis dataKey="month" {...CHART_AXIS_PROPS} />
                   <YAxis
-                    tick={{ fontSize: 10, fill: '#64748b' }}
+                    {...CHART_AXIS_PROPS}
+                    tick={{ ...CHART_AXIS_PROPS.tick, fontSize: 10 }}
                     tickFormatter={(v) => formatNum(kwhToMwh(v), 0, 0)}
                     unit=" MWh"
                     width={85}
                   />
-                  <Tooltip
-                    formatter={(val, name) => [
-                      `${formatNum(kwhToMwh(val), 2, 2)} MWh`,
-                      name === 'loadKwh' ? 'Listrik PLN' : 'Produksi PLTS',
-                    ]}
-                    contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '11px' }}
-                  />
-                  <Bar dataKey="loadKwh" name="loadKwh" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={32} />
-                  <Bar dataKey="actualKwh" name="actualKwh" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                  <Tooltip content={<LoadTooltip />} cursor={BAR_CURSOR} isAnimationActive={false} />
+                  {/* Animation off, as in the other dashboard charts: a data refresh mid-animation can leave the bars at zero height. */}
+                  <Bar dataKey="loadKwh" name="loadKwh" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={32} isAnimationActive={false} />
+                  <Bar dataKey="actualKwh" name="actualKwh" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} isAnimationActive={false} />
                 </BarChart>
               ) : (
                 <BarChart data={visibleBranchLoadRows} margin={{ left: 0, right: 8, top: 12, bottom: 40 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <CartesianGrid {...CHART_GRID_PROPS} />
                   <XAxis
-                    dataKey="shortName"
-                    tick={{ fontSize: 9, fill: '#64748b' }}
+                    dataKey="canonicalName"
+                    {...CHART_AXIS_PROPS}
+                    tick={{ ...CHART_AXIS_PROPS.tick, fontSize: 9 }}
                     angle={-45}
                     textAnchor="end"
                     interval={0}
                   />
                   <YAxis
-                    tick={{ fontSize: 10, fill: '#64748b' }}
+                    {...CHART_AXIS_PROPS}
+                    tick={{ ...CHART_AXIS_PROPS.tick, fontSize: 10 }}
                     tickFormatter={(v) => formatNum(kwhToMwh(v), 0, 0)}
                     unit=" MWh"
                     width={85}
                   />
-                  <Tooltip
-                    formatter={(val, name, item) => [
-                      `${formatNum(kwhToMwh(val), 2, 2)} MWh (${item?.payload?.pltsSharePct || 0}% PLTS)`,
-                      name === 'loadKwh' ? 'Listrik PLN' : 'Produksi PLTS',
-                    ]}
-                    contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '11px' }}
-                  />
-                  <Bar dataKey="loadKwh" name="loadKwh" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={20} />
-                  <Bar dataKey="productionKwh" name="productionKwh" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={20} />
+                  <Tooltip content={<LoadTooltip />} cursor={BAR_CURSOR} isAnimationActive={false} />
+                  <Bar dataKey="loadKwh" name="loadKwh" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={20} isAnimationActive={false} />
+                  <Bar dataKey="productionKwh" name="productionKwh" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={20} isAnimationActive={false} />
                 </BarChart>
               )}
             </ResponsiveContainer>
+            </div>
           </div>
         </div>
 
@@ -190,7 +214,7 @@ export default function TabLoadVsPlts({ filters }: { filters?: any }) {
                 <div className="flex justify-between text-xs font-bold mb-1">
                   <span className="text-amber-800 dark:text-amber-300">Dari PLTS</span>
                   <span className="text-amber-900 dark:text-amber-200 tabular-nums font-black">
-                    {energyMix.pltsSharePct != null ? `${formatNum(energyMix.pltsSharePct, 1, 1)}%` : '—'}
+                    {energyMix.pltsSharePct != null ? `${formatNum(energyMix.pltsSharePct, 1, 1)}%` : '-'}
                   </span>
                 </div>
                 <div className="h-3 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
@@ -205,7 +229,7 @@ export default function TabLoadVsPlts({ filters }: { filters?: any }) {
                 <div className="flex justify-between text-xs font-bold mb-1">
                   <span className="text-slate-600 dark:text-slate-400">Dari PLN</span>
                   <span className="text-slate-800 dark:text-slate-200 tabular-nums font-black">
-                    {energyMix.plnSharePct != null ? `${formatNum(energyMix.plnSharePct, 1, 1)}%` : '—'}
+                    {energyMix.plnSharePct != null ? `${formatNum(energyMix.plnSharePct, 1, 1)}%` : '-'}
                   </span>
                 </div>
                 <div className="h-3 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
@@ -223,8 +247,12 @@ export default function TabLoadVsPlts({ filters }: { filters?: any }) {
                 <span className="tabular-nums font-bold text-slate-900 dark:text-slate-100">{formatNum(kwhToMwh(totalLoadKwh), 2, 2)} MWh</span>
               </div>
               <div className="flex justify-between text-amber-700 dark:text-amber-300">
-                <span>Produksi PLTS:</span>
-                <span className="tabular-nums font-bold">{formatNum(kwhToMwh(totalProdKwh), 2, 2)} MWh</span>
+                <span>PLTS dipakai sendiri:</span>
+                <span className="tabular-nums font-bold">{formatNum(kwhToMwh(selfConsumptionKwh), 2, 2)} MWh</span>
+              </div>
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                <span>Total produksi PLTS:</span>
+                <span className="tabular-nums font-bold text-slate-900 dark:text-slate-100">{formatNum(kwhToMwh(totalProdKwh), 2, 2)} MWh</span>
               </div>
             </div>
           </div>

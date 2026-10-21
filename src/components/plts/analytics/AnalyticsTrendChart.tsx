@@ -95,7 +95,7 @@ export default function AnalyticsTrendChart({
                 }}
               />
             )}
-            <Bar dataKey="pr" radius={[4, 4, 0, 0]}>
+            <Bar isAnimationActive={false} dataKey="pr" radius={[4, 4, 0, 0]}>
               {prBarChartData.map((entry) => {
                 const isHovered = hoveredDCId === entry.dcId;
                 let fill = '#0284C7';
@@ -156,7 +156,7 @@ export default function AnalyticsTrendChart({
               const strokeWidth = isHovered ? 3.5 : 1.5;
 
               return (
-                <Line
+                <Line isAnimationActive={false}
                   key={dc.dcId}
                   yAxisId="primary"
                   type="linear"
@@ -175,7 +175,7 @@ export default function AnalyticsTrendChart({
             {/* Mode 'minmax': Hide individual lines, render ONLY Max boundary, Min boundary, and thin reference average */}
             {chartViewMode === 'minmax' && (
               <>
-                <Line
+                <Line isAnimationActive={false}
                   yAxisId="primary"
                   type="linear"
                   dataKey="max"
@@ -187,7 +187,7 @@ export default function AnalyticsTrendChart({
                   dot={{ r: 3.5, fill: '#10B981' }}
                   activeDot={{ r: 5, fill: '#10B981' }}
                 />
-                <Line
+                <Line isAnimationActive={false}
                   yAxisId="primary"
                   type="linear"
                   dataKey="min"
@@ -199,7 +199,7 @@ export default function AnalyticsTrendChart({
                   dot={{ r: 3.5, fill: '#F43F5E' }}
                   activeDot={{ r: 5, fill: '#F43F5E' }}
                 />
-                <Line
+                <Line isAnimationActive={false}
                   yAxisId="primary"
                   type="linear"
                   dataKey="average"
@@ -216,7 +216,7 @@ export default function AnalyticsTrendChart({
 
             {/* Mode 'average': Hide individual lines, render ONLY 1 prominent Weighted Average line */}
             {chartViewMode === 'average' && (
-              <Line
+              <Line isAnimationActive={false}
                 yAxisId="primary"
                 type="linear"
                 dataKey="average"

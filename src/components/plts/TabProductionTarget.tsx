@@ -241,7 +241,7 @@ export default function TabProductionTarget({ filters }: { filters?: any }) {
                   ]}
                   contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '11px' }}
                 />
-                <Bar dataKey="actualKwh" name="actualKwh" fill="#f59e0b" radius={[4, 4, 0, 0]}>
+                <Bar isAnimationActive={false} dataKey="actualKwh" name="actualKwh" fill="#f59e0b" radius={[4, 4, 0, 0]}>
                   {chartRows.map((row) => (
                     <Cell
                       key={row.yearMonth}
@@ -250,7 +250,7 @@ export default function TabProductionTarget({ filters }: { filters?: any }) {
                     />
                   ))}
                 </Bar>
-                <Line
+                <Line isAnimationActive={false}
                   type="monotone"
                   dataKey="targetKwh"
                   name="targetKwh"
@@ -416,7 +416,7 @@ export default function TabProductionTarget({ filters }: { filters?: any }) {
                     align="right"
                     wrapperStyle={{ fontSize: '11px', paddingBottom: '8px' }}
                   />
-                  <Line
+                  <Line isAnimationActive={false}
                     type="monotone"
                     dataKey="val2025"
                     name="Tahun 2025"
@@ -426,7 +426,7 @@ export default function TabProductionTarget({ filters }: { filters?: any }) {
                     dot={{ r: 4, fill: '#3b82f6', stroke: '#fff', strokeWidth: 1.5 }}
                     connectNulls={false}
                   />
-                  <Line
+                  <Line isAnimationActive={false}
                     type="monotone"
                     dataKey="val2026"
                     name="Tahun 2026"

@@ -129,27 +129,27 @@ export default function PLTSMonthlyEnergyCharts({
                       return null;
                     }}
                   />
-                  <Bar yAxisId="left" dataKey="plnConsumption" stackId="pln" name="Konsumsi PLN" fill={CHART_PALETTE.pln} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
+                  <Bar isAnimationActive={false} yAxisId="left" dataKey="plnConsumption" stackId="pln" name="Konsumsi PLN" fill={CHART_PALETTE.pln} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
                     {chartData.map((d, i) => (
                       <Cell key={`pln-cell-${i}`} opacity={d.month?.includes('*') || d.isPartial ? PARTIAL_OPACITY : 1} />
                     ))}
                   </Bar>
-                  <Bar yAxisId="left" dataKey="selfConsumption" stackId="plts" name="PLTS" fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
+                  <Bar isAnimationActive={false} yAxisId="left" dataKey="selfConsumption" stackId="plts" name="PLTS" fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
                     {chartData.map((d, i) => (
                       <Cell key={`self-cell-${i}`} opacity={d.month?.includes('*') || d.isPartial ? PARTIAL_OPACITY : 1} />
                     ))}
                   </Bar>
-                  <Bar yAxisId="left" dataKey="feedIn" stackId="plts" name="Ekspor" fill={CHART_PALETTE.feedIn} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
+                  <Bar isAnimationActive={false} yAxisId="left" dataKey="feedIn" stackId="plts" name="Ekspor" fill={CHART_PALETTE.feedIn} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
                     {chartData.map((d, i) => (
                       <Cell key={`feed-cell-${i}`} opacity={d.month?.includes('*') || d.isPartial ? PARTIAL_OPACITY : 1} />
                     ))}
                   </Bar>
-                  <Bar yAxisId="right" dataKey="avoidedEmissionTon" stackId="emission" name="Emisi Terhindar" fill={CHART_PALETTE.savings} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
+                  <Bar isAnimationActive={false} yAxisId="right" dataKey="avoidedEmissionTon" stackId="emission" name="Emisi Terhindar" fill={CHART_PALETTE.savings} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
                     {chartData.map((d, i) => (
                       <Cell key={`emi-cell-${i}`} opacity={d.month?.includes('*') || d.isPartial ? PARTIAL_OPACITY : 1} />
                     ))}
                   </Bar>
-                  <Line yAxisId="left" type="monotone" dataKey="target" name="Target PLTS" stroke={CHART_PALETTE.target} strokeDasharray="4 4" strokeWidth={2} dot={{ r: 3, fill: CHART_PALETTE.target }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
+                  <Line isAnimationActive={false} yAxisId="left" type="monotone" dataKey="target" name="Target PLTS" stroke={CHART_PALETTE.target} strokeDasharray="4 4" strokeWidth={2} dot={{ r: 3, fill: CHART_PALETTE.target }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>

@@ -5,12 +5,13 @@ import { getYearToDateMonths } from '@/lib/reportingMonths';
 export const ALL_METRIC_OPTIONS = [
   {
     id: 'specificYield',
-    label: 'Produksi per kWp hari ini',
+    label: 'Produksi per kWp',
     trendLabel: 'Produksi per kWp per bulan',
     unit: 'kWh/kWp',
     trendUnit: 'kWh/kWp',
-    desc: 'Listrik yang dihasilkan tiap 1 kWp panel (specific yield). Daftar memakai data hari ini, grafik memakai data bulanan.',
-    sourceType: 'API_LIVE',
+    // The list holds the selected period's cumulative value; today's value per kWp is the "Jam produksi penuh hari ini" metric.
+    desc: 'Listrik yang dihasilkan tiap 1 kWp panel selama periode yang dipilih (specific yield). Grafik memakai data bulanan. Untuk angka hari ini, pilih Jam produksi penuh hari ini.',
+    sourceType: 'EXCEL_HISTORY',
     chartSourceType: 'EXCEL_HISTORY'
   },
   {

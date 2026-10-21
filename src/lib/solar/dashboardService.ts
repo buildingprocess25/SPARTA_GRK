@@ -562,6 +562,9 @@ export async function getPltsLoadDashboardWithTiming(rawQuery = {}, options: Das
     selectedYear: fullData.selectedYear,
     totalLoadKwh: fullData.summary?.totalLoadKwh,
     totalLoadMwh: fullData.summary?.totalLoadMwh,
+    productionKwh: fullData.summary?.productionKwh ?? null,
+    // The PLTS share is self-consumption over (self-consumption + PLN purchase), so the card shows both numbers.
+    selfConsumptionKwh: fullData.summary?.selfConsumptionKwh ?? null,
     energyMix: fullData.summary?.energyMix,
     support: fullData.support?.load,
     monthly: fullData.monthly.map((m) => ({

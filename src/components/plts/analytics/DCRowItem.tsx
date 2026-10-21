@@ -25,6 +25,9 @@ export const DCRowItem = React.memo(function DCRowItem({
   const badges = getDCBadges(dc, selectedMetric);
   const visibleBadges = badges.slice(0, 2);
   const remainingBadges = badges.slice(2);
+  const metricText = hasValidMetric
+    ? `${Number(dc.metricValue).toLocaleString('id-ID', { maximumFractionDigits: 2 })} ${activeMetricUnit}`
+    : '-';
 
   return (
     <div
@@ -83,10 +86,10 @@ export const DCRowItem = React.memo(function DCRowItem({
             <span className="text-slate-500 dark:text-slate-400 font-normal italic text-[11px]">Dalam Pembangunan</span>
           ) : isExcludedFromRanking && selectedMetric !== 'pr' ? (
             <span className="text-slate-500 dark:text-slate-400" title="Dikecualikan dari ranking & rata-rata">
-              {hasValidMetric ? `${dc.metricValue} ${activeMetricUnit}` : '—'}
+              {metricText}
             </span>
           ) : hasValidMetric ? (
-            `${dc.metricValue} ${activeMetricUnit}`
+            metricText
           ) : isOffline ? (
             'Offline'
           ) : selectedMetric === 'pr' ? (
