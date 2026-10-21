@@ -126,7 +126,7 @@ export default function Sidebar({
         <button
           type="button"
           aria-label="Tutup menu navigasi"
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 md:hidden animate-in"
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[45] md:hidden animate-in"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -135,7 +135,7 @@ export default function Sidebar({
         role={isMobileOpen ? 'dialog' : undefined}
         aria-modal={isMobileOpen ? 'true' : undefined}
         aria-label="Navigasi utama"
-        className={`print:hidden fixed inset-y-0 left-0 w-72 h-screen h-dvh shrink-0 border-r border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between px-4 py-6 z-40 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`print:hidden fixed inset-y-0 left-0 w-72 max-w-[85vw] shrink-0 border-r border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between px-4 pt-5 pb-[max(1rem,env(safe-area-inset-bottom))] md:pt-6 md:pb-6 z-50 md:z-40 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isMobileOpen
             ? 'translate-x-0 shadow-2xl'
             : isDesktopOpen
@@ -144,9 +144,9 @@ export default function Sidebar({
         }`}
       >
         {/* Brand Lockup */}
-        <div className="px-2 pb-5 border-b border-slate-100 dark:border-slate-800 relative shrink-0 flex items-center justify-between gap-2">
-          <div className="flex items-center justify-center flex-1 min-w-0">
-            <img src="/alfamart-logo.png" alt="Alfamart Sparta Logo" className="w-full max-w-[160px] h-auto object-contain dark:brightness-110" />
+        <div className="px-2 pb-4 md:pb-5 border-b border-slate-100 dark:border-slate-800 shrink-0 flex items-center justify-between gap-2">
+          <div className="flex items-center justify-start md:justify-center flex-1 min-w-0">
+            <img src="/alfamart-logo.png" alt="Alfamart Sparta Logo" className="w-full max-w-[140px] md:max-w-[160px] h-auto object-contain dark:brightness-110" />
           </div>
 
           {/* Desktop Collapse Button */}
@@ -166,16 +166,17 @@ export default function Sidebar({
           <button
             ref={closeButtonRef}
             type="button"
-            className="md:hidden absolute -top-1 -right-1 size-11 inline-flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+            className="md:hidden -mr-2 size-11 shrink-0 inline-flex items-center justify-center text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
             onClick={() => setIsMobileOpen(false)}
             title="Tutup Menu"
+            aria-label="Tutup menu navigasi"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="space-y-6 my-4 flex-1 overflow-y-auto pr-1">
+        <nav className="space-y-5 md:space-y-6 my-3 md:my-4 flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1">
           {navItems.map((section, idx) => (
             <div key={idx}>
               <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 px-3 mb-2">
@@ -245,15 +246,17 @@ export default function Sidebar({
         </nav>
 
         {/* Footer with Interactive Profile Trigger */}
-        <div
-          className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 shrink-0"
-          onClick={() => {
-            if (onOpenProfile) onOpenProfile();
-            if (setIsMobileOpen) setIsMobileOpen(false);
-          }}
-          title="Klik untuk membuka Detail Akun & Profil"
-        >
-          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors flex items-center gap-3 cursor-pointer group">
+        <div className="pt-3 md:pt-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              if (onOpenProfile) onOpenProfile();
+              if (setIsMobileOpen) setIsMobileOpen(false);
+            }}
+            title="Klik untuk membuka Detail Akun & Profil"
+            aria-label={`Buka profil ${displayName}`}
+            className="w-full text-left p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-800 transition-colors flex items-center gap-3 cursor-pointer group focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+          >
             <div className="size-10 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-sm shrink-0 group-hover:scale-105 transition-transform">
               {initials}
             </div>
@@ -265,12 +268,12 @@ export default function Sidebar({
               </div>
               <div className="flex items-center justify-between mt-0.5">
                 <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{profileData.role}</span>
-                <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded px-1.5 py-0.2 shrink-0">
+                <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded px-1.5 py-0.5 shrink-0">
                   Profile
                 </span>
               </div>
             </div>
-          </div>
+          </button>
         </div>
       </aside>
     </>
