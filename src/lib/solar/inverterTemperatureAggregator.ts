@@ -2,7 +2,9 @@ import crypto from 'node:crypto';
 import prismaClient from '../prisma.ts';
 import { INVERTER_TEMP_V1, loadRatedPowerRegistry, buildRatedPowerIndex, getActiveInverterTempMethodVersion } from './inverterTemperatureConfig.ts';
 import { getWibParts, parseDeviceTimeWib, sanitizeError } from './inverterTemperatureCore.ts';
-import { CANONICAL_DC_ENTITIES } from './plantMap.ts';
+import { CANONICAL_DC_ENTITIES, isDcLocation } from './plantMap.ts';
+
+const DC_ENTITIES = CANONICAL_DC_ENTITIES.filter(isDcLocation);
 
 export class InverterTempAggregationError extends Error {
   declare code: string;
@@ -122,7 +124,7 @@ export async function aggregateDailyInverterTemp({
         trigger,
         status: 'running',
         startedAt: new Date(),
-        plantsExpected: CANONICAL_DC_ENTITIES.length,
+        plantsExpected: DC_ENTITIES.length,
       },
     });
     runId = run.id;
@@ -143,7 +145,7 @@ export async function aggregateDailyInverterTemp({
     });
 
     const plantMap = new Map();
-    for (const dc of CANONICAL_DC_ENTITIES) {
+    for (const dc of DC_ENTITIES) {
       for (const psId of dc.sungrowPsIds || []) {
         plantMap.set(Number(psId), {
           psId: Number(psId),
@@ -413,7 +415,7 @@ export async function aggregateMonthlyInverterTemp({
   let nationalTotalExpectedSlots = 0;
   let nationalTotalValidDays = 0;
 
-  for (const dc of CANONICAL_DC_ENTITIES) {
+  for (const dc of DC_ENTITIES) {
     const plantMonthlyList = [];
     let dcWeightedTempNumerator = 0;
     let dcTotalKwp = 0;

@@ -6,7 +6,9 @@ import {
   buildRatedPowerIndex,
 } from './inverterTemperatureConfig.ts';
 import { aggregateMonthlyInverterTemp, formatDateWib } from './inverterTemperatureAggregator.ts';
-import { CANONICAL_DC_ENTITIES } from './plantMap.ts';
+import { CANONICAL_DC_ENTITIES, isDcLocation } from './plantMap.ts';
+
+const DC_ENTITIES = CANONICAL_DC_ENTITIES.filter(isDcLocation);
 import { getWibParts } from './inverterTemperatureCore.ts';
 
 /**
@@ -133,20 +135,20 @@ export async function getInverterTemperaturePerformance({
   const ratedPowerIndex = buildRatedPowerIndex(registry);
 
   // Resolve scope and target DCs
-  let targetDcs = CANONICAL_DC_ENTITIES;
+  let targetDcs = DC_ENTITIES;
   if (scope === 'dc' && targetId && targetId !== 'ALL') {
-    targetDcs = CANONICAL_DC_ENTITIES.filter(
+    targetDcs = DC_ENTITIES.filter(
       d => d.dcId === targetId || d.canonicalName.toLowerCase() === String(targetId).toLowerCase(),
     );
     if (targetDcs.length === 0) {
-      targetDcs = CANONICAL_DC_ENTITIES;
+      targetDcs = DC_ENTITIES;
     }
   } else if (scope === 'grid' && targetId && targetId !== 'ALL') {
-    targetDcs = CANONICAL_DC_ENTITIES.filter(
+    targetDcs = DC_ENTITIES.filter(
       d => (d.gridRegion || 'JAMALI').toLowerCase() === String(targetId).toLowerCase(),
     );
     if (targetDcs.length === 0) {
-      targetDcs = CANONICAL_DC_ENTITIES;
+      targetDcs = DC_ENTITIES;
     }
   }
 
@@ -257,7 +259,7 @@ export async function getInverterTemperaturePerformance({
     let qualityStatus = 'KOSONG';
 
     if (agg) {
-      if (scope === 'national' || targetDcs.length === CANONICAL_DC_ENTITIES.length) {
+      if (scope === 'national' || targetDcs.length === DC_ENTITIES.length) {
         inverterTempC = agg.national.avgTempC;
         inverterCoveragePct = agg.national.coveragePct;
         isPartial = !agg.national.isAdequate;
