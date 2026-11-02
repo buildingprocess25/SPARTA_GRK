@@ -1,3 +1,5 @@
+import { safeEqual } from './ipGuard.ts';
+
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]', '::1']);
 
 export function evaluateCronAuthorization({ configuredSecret, authorization }: { configuredSecret?: string; authorization?: string | null } = {}) {
@@ -6,7 +8,7 @@ export function evaluateCronAuthorization({ configuredSecret, authorization }: {
   }
 
   const token = String(authorization || '').replace(/^Bearer\s+/i, '').trim();
-  if (!token || token !== configuredSecret) {
+  if (!token || !safeEqual(token, configuredSecret)) {
     return { allowed: false, status: 401, code: 'UNAUTHORIZED' };
   }
 

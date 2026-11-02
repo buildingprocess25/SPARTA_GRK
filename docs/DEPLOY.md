@@ -43,9 +43,20 @@ AUTH_ADMIN_PASSWORD_HASH=...       # node scripts/hash-password.mjs "password"
 AUTH_VALENS_PASSWORD_HASH=...
 AUTH_DEFAULT_ACCOUNT_PASSWORD=     # opsional; tanpa ini akun peran bawaan yang belum ada tidak dibuat
 
-# Keamanan cron & revalidasi
+# Keamanan cron & revalidasi (wajib: tanpa salah satunya /api/plts/revalidate menolak dengan 503)
 CRON_SECRET=...
 REVALIDATE_SECRET_TOKEN=...
+
+# Pembatasan trafik & blokir IP (default di bawah; lihat bagian 7a)
+TRUSTED_PROXY_HOPS=1
+RATE_LIMIT_PAGE_PER_MIN=600
+RATE_LIMIT_API_PER_MIN=300
+RATE_LIMIT_PUBLIC_PER_MIN=60
+RATE_LIMIT_AUTH_PER_MIN=60
+RATE_LIMIT_STRIKES_TO_BAN=3
+RATE_LIMIT_BAN_MINUTES=2
+RATE_LIMIT_ALLOWLIST=
+BLOCKED_IPS=
 
 # Web Push
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=...   # juga sebagai Build Arg di Docker
@@ -239,6 +250,86 @@ server {
     }
 }
 ```
+
+---
+
+## 7a. Proteksi Trafik Berlebih (DDoS) & Blokir IP
+
+Ada dua lapis. Lapis aplikasi saja **tidak cukup** untuk DDoS sungguhan: request banjir tetap memakan koneksi dan CPU server sebelum ditolak, dan serangan volumetrik (L3/L4) tidak pernah sampai ke Node. Lapis depan wajib dipasang di produksi.
+
+### Lapis aplikasi (sudah aktif di `src/middleware.ts`)
+
+| Tier | Route | Batas default per IP |
+|---|---|---|
+| auth | `/api/auth/login`, `/api/auth/change-password` | 60/menit |
+| public | `/api/health`, `/api/cron/*`, `/api/plts/revalidate` | 60/menit |
+| api | API lain (butuh login) | 300/menit |
+| page | halaman | 600/menit |
+
+- Lewat batas: `429 RATE_LIMITED` + header `Retry-After`.
+- Lewat batas 3 kali dalam 10 menit: IP diblokir dari seluruh aplikasi selama 2 menit (`429 IP_BLOCKED` + `Retry-After`). Log: `[ip-guard] <ip> diblokir ...`.
+- Login dan ganti password dikunci **per akun**, bukan per IP: 5 kali gagal dalam 15 menit mengunci akun itu 2 menit (`429 ACCOUNT_LOCKED`, log `[auth-lockout]`). Login berhasil me-reset hitungan, jadi user lain yang berbagi IP kantor tidak ikut terkunci.
+- `RATE_LIMIT_ALLOWLIST` membebaskan IP tertentu (mis. IP kantor) dari pembatasan; `BLOCKED_IPS` memblokir IP secara permanen. Keduanya perlu restart.
+- IP klien diambil dari `X-Forwarded-For` sesuai `TRUSTED_PROXY_HOPS`; request tanpa header proxy (Docker HEALTHCHECK, akses lokal) tidak dibatasi. **Port app (3001) tidak boleh terbuka langsung ke internet**, hanya lewat proxy.
+- State disimpan di memori proses: hilang saat restart dan tidak dibagi antar-instance.
+- `/api/health` tanpa login hanya membalas `{ status, timestamp }` dan memakai satu ping DB per 10 detik; detail sync hanya untuk user yang login.
+
+### Lapis depan (wajib di produksi)
+
+**Nginx** (tambahkan ke konfigurasi bagian 7):
+
+```nginx
+# di blok http { }
+limit_req_zone  $binary_remote_addr zone=sparta_api:10m  rate=10r/s;
+limit_req_zone  $binary_remote_addr zone=sparta_auth:10m rate=10r/m;
+limit_conn_zone $binary_remote_addr zone=sparta_conn:10m;
+
+# di blok server { } 443
+client_max_body_size 20m;
+client_body_timeout 15s;
+client_header_timeout 15s;
+limit_conn sparta_conn 30;
+limit_req_status 429;
+limit_conn_status 429;
+
+location /api/auth/login {
+    limit_req zone=sparta_auth burst=5 nodelay;
+    proxy_pass http://127.0.0.1:3000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+location /api/ {
+    limit_req zone=sparta_api burst=40 nodelay;
+    proxy_pass http://127.0.0.1:3000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+# blokir IP penyerang di level nginx (lebih murah daripada di app)
+# deny 203.0.113.9;
+```
+
+**Dokploy (Traefik)**: tambahkan middleware rate limit di label service atau di *Advanced > Traefik*:
+
+```yaml
+http:
+  middlewares:
+    sparta-ratelimit:
+      rateLimit:
+        average: 10
+        burst: 40
+        period: 1s
+    # Bila dashboard hanya dipakai internal, izinkan IP kantor/VPN saja:
+    # sparta-office-only:
+    #   ipAllowList:
+    #     sourceRange: ["<ip-kantor>/32"]
+```
+
+**Paling efektif**: taruh domain di belakang Cloudflare (proxy oranye aktif), aktifkan *Bot Fight Mode* dan rule rate limiting untuk `/api/*`, lalu set `TRUSTED_PROXY_HOPS=2`. Jika dashboard hanya dipakai internal, batasi akses ke IP kantor/VPN; ini menutup hampir semua permukaan serangan.
+
+**Blokir IP berulang secara otomatis**: fail2ban membaca log `[ip-guard]` (journalctl `plts-web`) atau log akses nginx dengan status 429, lalu memblokir IP di firewall (`ufw`/`iptables`) sebelum request menyentuh app.
 
 ---
 

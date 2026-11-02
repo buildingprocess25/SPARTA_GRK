@@ -51,8 +51,8 @@ test('fuel conversion between kg, m3, GJ and native factor units is correct', ()
 
 test('moving combustion, travel, hotel and electric vehicle formulas work', () => {
   closeTo(calculateEntry({ category: 'scope1b', mode: 'distance', distanceKm: 100, kmPerLiter: 10, factorCode: 'VEHICLE_CAR_GASOLINE' }, EMISSION_FACTORS).kgCo2e, 23.1);
-  closeTo(calculateEntry({ category: 'flight', passengers: 2, distanceKm: 100, factorCode: 'FLIGHT_DOMESTIC_ECONOMY' }, EMISSION_FACTORS).kgCo2e, 30);
-  closeTo(calculateEntry({ category: 'hotel', rooms: 2, nights: 3, factorCode: 'HOTEL_ROOM_NIGHT' }, EMISSION_FACTORS).kgCo2e, 180);
+  closeTo(calculateEntry({ category: 'flight', passengers: 2, distanceKm: 100, factorCode: 'FLIGHT_DOMESTIC_ECONOMY_SHORT' }, EMISSION_FACTORS).kgCo2e, 24);
+  closeTo(calculateEntry({ category: 'hotel', rooms: 2, nights: 3, factorCode: 'HOTEL_ID' }, EMISSION_FACTORS).kgCo2e, 296.22);
   closeTo(calculateEntry({ category: 'bus', passengers: 2, distanceKm: 100, factorCode: 'TRAVEL_BUS' }, EMISSION_FACTORS).kgCo2e, 21);
   closeTo(calculateEntry({ category: 'ev', distanceKm: 10, evFactorCode: 'EV_CAR', gridFactorCode: 'GRID_JAMALI' }, EMISSION_FACTORS).kgCo2e, 0.528);
   closeTo(calculateEntry({ category: 'kkb', units: 2, distanceKmPerUnit: 10, evFactorCode: 'EV_CAR', gridFactorCode: 'GRID_JAMALI' }, EMISSION_FACTORS).kgCo2e, 1.056);

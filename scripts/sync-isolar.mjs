@@ -26,7 +26,7 @@ import { acquireLock, releaseLock } from '../src/lib/solar/sync.ts';
 
 const DEFAULT_PORT = process.env.PORT || '3000';
 const REVALIDATE_URL = process.env.REVALIDATE_URL || `http://127.0.0.1:${DEFAULT_PORT}/api/plts/revalidate`;
-const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET_TOKEN || process.env.CRON_SECRET || 'plts_internal_secret_key_2026';
+const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET_TOKEN || process.env.CRON_SECRET || '';
 
 // ─── Timezone & Date Helpers (WIB / WITA / WIT) ───────────────────────────────
 
@@ -560,7 +560,9 @@ export async function executeSync(cliOptions = {}) {
 
       // 7. Trigger Revalidation Hook
       console.log('\n5. Memanggil Revalidation Cache Dashboard...');
-      try {
+      if (!REVALIDATE_SECRET) {
+        console.warn('   ⚠ Revalidasi skip: REVALIDATE_SECRET_TOKEN / CRON_SECRET belum diisi. Cache dashboard diperbarui paling lambat 30 menit.');
+      } else try {
         const revalRes = await fetch(REVALIDATE_URL, {
           method: 'POST',
           headers: {

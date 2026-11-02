@@ -154,6 +154,9 @@ Halaman utama yang menampilkan total emisi GRK Alfamart secara year-to-date:
   - Pertalite: 2,2951 kgCO2e/liter
   - Pertamax: 2,2868 kgCO2e/liter
 - Validasi silang dengan workbook acuan `perhitungan emisi karbon.xlsx`
+- **Genset dari jurnal BBM genset** (akun 612304 / 622304): `node --env-file=.env scripts/data/import-genset-fuel-journal.mjs "<file>.csv" [--apply]`. Jurnal hanya memuat Rupiah, jadi liter = Rp ÷ harga per liter: Solar Rp 15.000 (harga industri), Pertamax Rp 12.500, Pertalite/bensin Rp 10.000. Jenis BBM dibaca dari keterangan; Dex, Dexlite, dan Biosolar dihitung Solar, dan baris "BBM UNTUK GENSET" yang tidak menyebut jenis (kas kecil toko) juga dihitung Solar. Baris oli, aki, coolant, filter, dan suku cadang tidak dihitung emisinya. Data disimpan satu baris per KUU, bulan, dan jenis BBM (`source = JURNAL_BBM_GENSET`, `dcId` = kode KUU). Import dengan `--apply` mengganti semua data genset sebelumnya, termasuk input manual
+- **Kendaraan dari rekap biaya kendaraan**: `scripts/data/import-vehicle-fuel-costs.mjs` (liter dan Rupiah per KUU per bulan, `source = CSV_BIAYA_KENDARAAN`)
+- Data 2026 terisi Januari-September dari jurnal genset dan rekap kendaraan
 
 #### Scope 2: Emisi Tidak Langsung (Listrik Grid PLN)
 - 8 grid regional dengan faktor emisi resmi (SK Dirjen Ketenagalistrikan ESDM):
@@ -165,12 +168,18 @@ Halaman utama yang menampilkan total emisi GRK Alfamart secara year-to-date:
 
 #### Scope 3: Emisi Tidak Langsung Lainnya (Perjalanan Dinas, Kategori 6)
 - **Empat jenis biaya**: Pesawat, Hotel, Kereta Api, dan Lainnya (uang saku, transport lokal)
-- **Pesawat**: rute dibaca dari kode bandara IATA; jarak great-circle antar bandara × faktor per penumpang-km (ekonomi/bisnis, domestik/internasional, DEFRA)
-- **Hotel**: jumlah malam × jumlah kamar × faktor per kamar-malam (rata-rata, bintang 1-3, 4, atau 5)
-- **Kereta Api**: total jarak km × faktor per penumpang-km (antarkota, KRL, atau kereta cepat)
+- **Faktor emisi** mengikuti Buku Panduan Kalkulator Hijau Bank Indonesia 2026, Bab 5 (`Buku-Panduan-Hijau-2026-Update.pdf`)
+- **Pesawat**: rute dibaca dari kode bandara IATA; jarak great-circle per segmen × faktor per penumpang-km. Domestik per kelompok jarak segmen (Tabel 10): ekonomi 0,120 (<926 km), 0,089 (926-1.852 km), 0,078 (>1.852 km); bisnis 0,216 / 0,160 / 0,140. Internasional DEFRA 2025 (Tabel 11): ekonomi 0,06449, ekonomi premium 0,10318, bisnis 0,18701, first 0,25794. Domestik ekonomi premium dihitung ekonomi dan first dihitung bisnis karena BI hanya punya dua kelas domestik
+- **Hotel**: jumlah malam × jumlah kamar × faktor per kamar-malam menurut negara hotel (Tabel 15): Indonesia 49,37 (median 39 hotel mid-scale, BI), 37 negara lain dari DEFRA 2025. Negara kosong = Indonesia; kolom KELAS bintang dari template lama diabaikan
+- **Kereta Api**: total jarak km × faktor per penumpang-km menurut kelas KAI 2025 (Tabel 13): Ekonomi 0,01219, Bisnis 0,01308, Eksekutif 0,01750, Panoramic 0,02469, Luxury 0,02804, Priority 0,03044, Compartment 0,04390. Kelas kosong = Ekonomi
+- **Hitung ulang setelah faktor berubah**: `node --env-file=.env scripts/data/recalc-business-travel-emissions.mjs [--apply]` menghitung ulang semua baris tersimpan (biaya dan tanggal tidak berubah). Dengan faktor BI 2026, emisi pesawat Jan-Sep 2026 turun dari 633,4 menjadi 391,1 tCO2e
 - **Input manual** lewat modal, atau **template Excel** satu file dengan sheet terpisah per jenis (Pesawat, Hotel, Kereta Api, Lainnya), lengkap dengan dropdown KELAS dan validasi angka. CSV satu tabel dengan kolom JENIS dan template versi lama tetap diterima
-- **Import jurnal BPDL** (akun 611402 / 621402): baris yang menyebut hotel atau kereta diklasifikasikan ke jenisnya, tetapi emisinya kosong karena jurnal tidak memuat jumlah malam atau km; uang saku BPDL tetap Lainnya
+- **Import jurnal BPDL** (akun 611402 / 621402): baris yang menyebut hotel atau kereta diklasifikasikan ke jenisnya; uang saku BPDL tetap Lainnya. Untuk hotel, jumlah malam dibaca dari tanggal menginap di keterangan (`TGL 07/07/26 - 09/07/26`, `07-10/10/26`, `12-13 MEI 26`), satu baris = satu kamar, dan negara dari nama tempat (Jepang, Panglao/Manila/Davao, Vietnam, dll.; tanpa nama tempat = Indonesia; Bangladesh tidak ada di tabel BI sehingga tanpa emisi) lewat `hotelStayFromDescription`. Baris hotel tanpa tanggal menginap dan baris kereta (jurnal tidak memuat km) tetap hanya tercatat biayanya. Lewat modal atau `node --env-file=.env scripts/data/import-business-travel.mjs "<file>.csv" [--apply]`; bulan yang ada di file mengganti data bulan yang sama. Tanggal DD/MM/YYYY maupun MM/DD/YYYY diterima: urutannya ditentukan per file dari tanggal yang bagiannya lebih dari 12. Kode akun ber-nol depan (`0611402`) disamakan dengan `611402`. Kode bandara yang belum ada di `airports.ts` dilaporkan, tidak ditebak. Data 2026 terisi Januari-September
 - Dashboard dengan filter jenis perjalanan, rincian per KUU dan per rute/kota, serta biaya yang dipecah per jenis
+- **Grafik bulanan** punya tab Emisi dan Biaya serta filter sumber (Semua, Pesawat, Hotel, Kereta Api; Lainnya hanya di tab Biaya). Tab Emisi dengan "Semua sumber" memakai batang berdampingan per bulan (pesawat, hotel, kereta), dengan tinggi minimum 3 px untuk nilai di atas nol; sumber yang 0 sepanjang periode tidak digambar dan disebut di catatan. Tab Biaya memakai batang bertumpuk. Memilih satu sumber memberi skala sendiri. Tinggi grafik mengikuti kartu di sebelahnya. Di tab Biaya, Lainnya dipecah menjadi Uang saku & PJUM, Perjalanan luar negeri, dan Transport/klaim/dll. (gradasi abu-abu, data `monthlyTrend[].otherKinds`). Sumbu Y mulai dari 0; koreksi bernilai negatif tetap terlihat di tooltip. Bulan tanpa data impor dibiarkan kosong
+- **Kartu "Emisi per sumber"** menampilkan seluruh Scope 3: Pesawat, Hotel, Kereta (emisi, porsi, jumlah tiket/malam/km, biaya) dan Lainnya (biaya, tanpa emisi, dirinci per jenis transaksi: uang saku & PJUM, luar negeri, transport, klaim, lain-lain). Di bawah Pesawat ada rincian kelompok jarak faktor BI (<926 km, 926-1.852 km, >1.852 km, internasional) yang dihitung per segmen, lengkap dengan jumlah segmen dan faktor ekonominya; filter "Kelompok jarak" di tabel tetap per tiket (rata-rata segmen)
+- **Kartu "Biaya belum dihitung emisinya"** merinci dua kelompok Lainnya terbesar, sisanya digabung (termasuk tiket tanpa rute, hotel tanpa tanggal menginap, dan kereta tanpa km)
+- **Rincian Lainnya**: biaya Lainnya dipecah dari keterangan jurnal saat halaman dimuat (`otherTravelKind` di `travelLedger.ts`), jadi aturan baru berlaku tanpa import ulang. Kelompoknya: Uang saku & PJUM, Perjalanan luar negeri (Bangladesh, Vietnam, Manila, dll.), Transport darat & laut (tunjangan transport, kapal, penyeberangan), Klaim kekurangan, Lewat payroll (jurnal tipe `PL` berketerangan "BPDL", nilainya Rp 0 di ekspor), dan Lain-lain. Saat filter Lainnya aktif muncul pilihan "Rincian lainnya", tampilan "Per rincian", urutan default berubah ke biaya, dan kolom Transaksi menghitung baris bernilai positif
 
 ### 3. Pengurangan Emisi: PLTS Atap
 
@@ -210,7 +219,9 @@ Monitoring real-time PLTS atap di 37 DC (5.778,8 kWp; 36 beroperasi, Gorontalo b
 - Dua akun dari env (`AUTH_ADMIN_*`, `AUTH_VALENS_*`); Admin Super dapat menambah pengguna dengan password awal minimal 8 karakter (tombol "Buat acak" tersedia). Tidak ada password bawaan di kode; akun peran bawaan hanya dibuat bila `AUTH_DEFAULT_ACCOUNT_PASSWORD` diisi
 - **Sesi berakhir otomatis setiap hari pukul 19.00 WIB** (peringatan 5 menit sebelumnya), paling lama 7 hari sejak login. Tidak ada logout karena tidak aktif
 - Middleware Edge Runtime untuk route guard
-- CRON endpoint dilindungi bearer token terpisah
+- Pembatasan trafik per IP di middleware (`src/lib/server/ipGuard.ts`): halaman 600/menit, API 300/menit, route publik (`/api/health`, `/api/cron/*`, `/api/plts/revalidate`) 60/menit, login 60/menit; IP yang melewati batas 3 kali dalam 10 menit diblokir 2 menit (`429 IP_BLOCKED` + `Retry-After`), plus `RATE_LIMIT_ALLOWLIST` dan daftar blokir tetap `BLOCKED_IPS`. Login dan ganti password dikunci per akun: 5 kali gagal dalam 15 menit mengunci akun itu 2 menit, login berhasil me-reset hitungan. Proteksi DDoS sesungguhnya tetap di proxy/Cloudflare, lihat `docs/DEPLOY.md` bagian 7a
+- `/api/health` tanpa login hanya memberi status singkat; detail sync hanya untuk user yang login
+- CRON endpoint dilindungi bearer token terpisah (dibandingkan constant-time); `/api/plts/revalidate` menolak bila `REVALIDATE_SECRET_TOKEN`/`CRON_SECRET` kosong
 - Credential API vendor (iSolarCloud, VAPID) hanya server-side
 
 ### 7. Push Notification
@@ -227,7 +238,7 @@ Monitoring real-time PLTS atap di 37 DC (5.778,8 kWp; 36 beroperasi, Gorontalo b
    - Perhitungan emisi tidak menggunakan estimasi kasar, melainkan terikat langsung pada regulasi resmi:
      - **Scope 1**: Pedoman Inventarisasi Gas Rumah Kaca Nasional (Kementerian ESDM).
      - **Scope 2**: SK Dirjen Ketenagalistrikan Kementerian ESDM No. 414.K/TL.04/DJL.4/2024 untuk 8 grid regional (JAMALI, Sumatera, Kalbar, Kalselteng, Sulselrabar, Batam, Lombok, Sulutgo).
-     - **Scope 3**: Faktor DEFRA/BEIS untuk penerbangan (dibedakan kabin ekonomi/bisnis, jarak great-circle antar bandara tanpa uplift), hotel per kamar-malam, dan kereta api per penumpang-km.
+     - **Scope 3**: Buku Panduan Kalkulator Hijau Bank Indonesia 2026: pesawat domestik per kelompok jarak (BI), internasional DEFRA 2025, hotel per negara, kereta per kelas KAI 2025; jarak great-circle antar bandara tanpa uplift.
    - Dilengkapi snapshot multi-sumber (`MonthlyYieldObservation`) dan riwayat import (`ImportBatch`) sehingga asal setiap angka dapat ditelusuri saat audit laporan keberlanjutan (ESG).
 
 2. **Integrasi Telemetri PLTS Terdistribusi Real-Time**
@@ -310,7 +321,7 @@ Emisi Hotel (kgCO2e)   = Malam x Kamar x Faktor per kamar-malam
 Emisi Kereta (kgCO2e)  = Total jarak (km) x Faktor per penumpang-km
 ```
 
-Jarak penerbangan adalah jarak lurus (Haversine) tanpa tambahan uplift. Segmen yang berangkat atau tiba di luar Indonesia memakai faktor internasional. Transaksi bernominal negatif (refund) mengurangi biaya tetapi tidak mengurangi emisi. Faktor dari katalog `factors.v1.ts` (DEFRA, berstatus sementara). Detail di `travelLedger.ts`, `travelTemplate.ts`, dan `travelSummary.ts`.
+Jarak penerbangan adalah jarak lurus (Haversine) tanpa tambahan uplift. Segmen yang berangkat atau tiba di luar Indonesia memakai faktor internasional. Transaksi bernominal negatif (refund) mengurangi biaya tetapi tidak mengurangi emisi. Faktor dari katalog `factors.v1.ts`, bersumber dari Buku Panduan Kalkulator Hijau Bank Indonesia 2026 Bab 5 (status OFFICIAL). Pesawat domestik memilih faktor menurut jarak tiap segmen: <926 km, 926-1.852 km, >1.852 km. Detail di `travelLedger.ts`, `travelTemplate.ts`, dan `travelSummary.ts`.
 
 ### Pengurangan Emisi (PLTS)
 
@@ -455,5 +466,5 @@ pnpm run build
 ## Lisensi dan Atribusi Data
 
 - **Data cuaca**: Open-Meteo.com, Creative Commons Attribution 4.0 International (CC BY 4.0)
-- **Faktor emisi**: SK Dirjen Ketenagalistrikan ESDM No. 414.K/TL.04/DJL.4/2024, Pedoman Inventarisasi GRK Nasional, IPCC 2006 Guidelines, DEFRA 2024
+- **Faktor emisi**: SK Dirjen Ketenagalistrikan ESDM No. 414.K/TL.04/DJL.4/2024, Pedoman Inventarisasi GRK Nasional, IPCC 2006 Guidelines, Buku Panduan Kalkulator Hijau Bank Indonesia 2026 (Scope 3 perjalanan dinas)
 - **API PLTS**: Sungrow iSolarCloud OpenAPI (lisensi vendor)

@@ -17,7 +17,7 @@ import { notify } from '@/components/ui/ToastProvider';
 import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 import { AIRPORTS } from '@/lib/scope3/airports';
 import {
-  CABIN, EMISSION_STATUS, HOTEL_CLASS, TRAIN_CLASS, TRAVEL_ACCOUNTS,
+  CABIN, DEFAULT_HOTEL_COUNTRY, EMISSION_STATUS, HOTEL_COUNTRIES, TRAIN_CLASS, TRAVEL_ACCOUNTS,
   flightEmission, flightFactor, hotelEmission, hotelFactor, parseRouteField, parseStationRoute, trainEmission, trainFactor,
 } from '@/lib/scope3/travelLedger';
 
@@ -31,17 +31,25 @@ const KINDS = [
   { value: 'LAINNYA', icon: Wallet, title: 'Lainnya', detail: 'Uang saku, transport lokal' },
 ];
 
-const HOTEL_CLASSES = [
-  { value: HOTEL_CLASS.AVERAGE, title: 'Tidak tahu' },
-  { value: HOTEL_CLASS.STAR_1_3, title: 'Bintang 1-3' },
-  { value: HOTEL_CLASS.STAR_4, title: 'Bintang 4' },
-  { value: HOTEL_CLASS.STAR_5, title: 'Bintang 5' },
+const HOTEL_COUNTRY_OPTIONS = HOTEL_COUNTRIES.map(c => ({ value: c.code, label: `${c.name} · ${String(c.value).replace('.', ',')} kg/kamar-malam` }));
+
+// Domestic flights have only economy and business factors in the BI table, so the other two cabins borrow them.
+const CABINS = [
+  { value: CABIN.ECONOMY, title: 'Ekonomi', domestic: CABIN.ECONOMY },
+  { value: CABIN.PREMIUM_ECONOMY, title: 'Ekonomi premium', domestic: CABIN.ECONOMY },
+  { value: CABIN.BUSINESS, title: 'Bisnis', domestic: CABIN.BUSINESS },
+  { value: CABIN.FIRST, title: 'First class', domestic: CABIN.BUSINESS },
 ];
+const domesticBandsText = cabin => [500, 1500, 2500].map(km => flightFactor(false, cabin, km)?.value).join(' / ');
 
 const TRAIN_CLASSES = [
-  { value: TRAIN_CLASS.INTERCITY, title: 'Antarkota' },
-  { value: TRAIN_CLASS.COMMUTER, title: 'KRL' },
-  { value: TRAIN_CLASS.HIGH_SPEED, title: 'Kereta cepat' },
+  { value: TRAIN_CLASS.ECONOMY, title: 'Ekonomi' },
+  { value: TRAIN_CLASS.BUSINESS, title: 'Bisnis' },
+  { value: TRAIN_CLASS.EXECUTIVE, title: 'Eksekutif' },
+  { value: TRAIN_CLASS.PANORAMIC, title: 'Panoramic' },
+  { value: TRAIN_CLASS.LUXURY, title: 'Luxury' },
+  { value: TRAIN_CLASS.PRIORITY, title: 'Priority' },
+  { value: TRAIN_CLASS.COMPARTMENT, title: 'Compartment' },
 ];
 
 const AMOUNT_LABEL = { PESAWAT: 'Harga tiket (Rp)', HOTEL: 'Biaya hotel (Rp)', KERETA: 'Harga tiket (Rp)', LAINNYA: 'Biaya (Rp)' };
@@ -55,10 +63,10 @@ const EMPTY_FORM = {
   nights: '',
   rooms: '1',
   city: '',
-  hotelClass: HOTEL_CLASS.AVERAGE,
+  country: DEFAULT_HOTEL_COUNTRY,
   stations: '',
   distanceKm: '',
-  trainClass: TRAIN_CLASS.INTERCITY,
+  trainClass: TRAIN_CLASS.ECONOMY,
   passenger: '',
   note: '',
   amount: '',
@@ -123,13 +131,13 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
   const isTrain = form.kind === 'KERETA';
 
   const live = useMemo<Record<string, any> | null>(() => {
-    if (isHotel) return hotelEmission({ nights: Number(form.nights), rooms: Number(form.rooms || 1), hotelClass: form.hotelClass });
+    if (isHotel) return hotelEmission({ nights: Number(form.nights), rooms: Number(form.rooms || 1), country: form.country });
     if (isTrain) return { stations: parseStationRoute(form.stations), ...trainEmission({ distanceKm: Number(form.distanceKm), trainClass: form.trainClass }) };
     if (!isFlight) return null;
     const stops = parseRouteField(form.route);
     if (stops.length < 2) return { stops, status: 'INCOMPLETE' };
     return { stops, ...flightEmission(stops, { cabin: form.cabin }) };
-  }, [isFlight, isHotel, isTrain, form.route, form.cabin, form.nights, form.rooms, form.hotelClass, form.stations, form.distanceKm, form.trainClass]);
+  }, [isFlight, isHotel, isTrain, form.route, form.cabin, form.nights, form.rooms, form.country, form.stations, form.distanceKm, form.trainClass]);
 
   const validate = () => {
     const next: Record<string, any> = {};
@@ -248,8 +256,6 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
     onClose();
   };
 
-  const factorFor = international => flightFactor(international, form.cabin);
-
   return (
     <BaseModal
       open={isOpen}
@@ -362,19 +368,17 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                   <div className="space-y-1.5">
                     <FieldLabel>Kelas kabin</FieldLabel>
                     <div role="radiogroup" aria-label="Kelas kabin" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <ChoiceCard
-                        selected={form.cabin === CABIN.ECONOMY}
-                        onClick={() => set('cabin')(CABIN.ECONOMY)}
-                        title="Ekonomi"
-                        detail={`${flightFactor(false, CABIN.ECONOMY)?.value} kg/km domestik · ${flightFactor(true, CABIN.ECONOMY)?.value} internasional`}
-                      />
-                      <ChoiceCard
-                        selected={form.cabin === CABIN.BUSINESS}
-                        onClick={() => set('cabin')(CABIN.BUSINESS)}
-                        title="Bisnis"
-                        detail={`${flightFactor(false, CABIN.BUSINESS)?.value} kg/km domestik · ${flightFactor(true, CABIN.BUSINESS)?.value} internasional`}
-                      />
+                      {CABINS.map(option => (
+                        <ChoiceCard
+                          key={option.value}
+                          selected={form.cabin === option.value}
+                          onClick={() => set('cabin')(option.value)}
+                          title={option.title}
+                          detail={`Domestik ${domesticBandsText(option.domestic)} · internasional ${flightFactor(true, option.value)?.value} kg/km`}
+                        />
+                      ))}
                     </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Faktor domestik per segmen: di bawah 926 km, 926-1.852 km, di atas 1.852 km.</p>
                   </div>
                 </>
               )}
@@ -420,19 +424,12 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <FieldLabel>Kelas hotel</FieldLabel>
-                    <div role="radiogroup" aria-label="Kelas hotel" className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {HOTEL_CLASSES.map(option => (
-                        <ChoiceCard
-                          key={option.value}
-                          selected={form.hotelClass === option.value}
-                          onClick={() => set('hotelClass')(option.value)}
-                          title={option.title}
-                          detail={`${hotelFactor(option.value)?.value} kg/kamar-malam`}
-                        />
-                      ))}
-                    </div>
+                  <div className="space-y-1">
+                    <FieldLabel htmlFor="s3-country">Negara hotel</FieldLabel>
+                    <CustomSelect id="s3-country" ariaLabel="Negara hotel" value={form.country} onValueChange={set('country')} options={HOTEL_COUNTRY_OPTIONS} />
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Faktor {hotelFactor(form.country)?.value} kgCO₂e per kamar-malam. Indonesia memakai median 39 hotel mid-scale (Bank Indonesia), negara lain DEFRA 2025.
+                    </p>
                   </div>
                 </>
               )}
@@ -473,8 +470,8 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                   </div>
 
                   <div className="space-y-1.5">
-                    <FieldLabel>Jenis kereta</FieldLabel>
-                    <div role="radiogroup" aria-label="Jenis kereta" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <FieldLabel>Kelas kereta (KAI)</FieldLabel>
+                    <div role="radiogroup" aria-label="Kelas kereta" className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       {TRAIN_CLASSES.map(option => (
                         <ChoiceCard
                           key={option.value}
@@ -548,7 +545,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
                     <dl className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                       <div><dt className="text-[10px] text-slate-400">Segmen</dt><dd className="tabular-nums font-bold">{live.legs.length}</dd></div>
                       <div><dt className="text-[10px] text-slate-400">Jarak</dt><dd className="tabular-nums font-bold">{number(live.distanceKm)} km</dd></div>
-                      <div><dt className="text-[10px] text-slate-400">Faktor</dt><dd className="tabular-nums font-bold">{factorFor(live.isInternational)?.value} kg/km</dd></div>
+                      <div><dt className="text-[10px] text-slate-400">Faktor</dt><dd className="tabular-nums font-bold">{[...new Set(live.legs.map(leg => leg.factorValue))].join(' / ')} kg/km</dd></div>
                       <div><dt className="text-[10px] text-slate-400">Emisi</dt><dd className="tabular-nums font-bold text-indigo-200">{number(live.emissionKg)} kg</dd></div>
                     </dl>
                     <p className="text-[10px] tabular-nums text-slate-400 bg-slate-800/60 px-2.5 py-1.5 rounded-lg border border-slate-800">

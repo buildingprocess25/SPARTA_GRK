@@ -10,7 +10,7 @@ const fail = (status, error, code) => NextResponse.json({ success: false, error,
 
 /**
  * POST /api/scope3/entries (JSON)
- * One manual business-travel row: { date, kuu, kind: PESAWAT|HOTEL|KERETA|LAINNYA, route, cabin, hotelClass, trainClass,
+ * One manual business-travel row: { date, kuu, kind: PESAWAT|HOTEL|KERETA|LAINNYA, route, cabin, country, trainClass,
  * nights, rooms, city, distanceKm, passenger, note, amount, account }.
  * Emission is recalculated here; any value sent by the browser is ignored.
  */

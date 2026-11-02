@@ -1,40 +1,13 @@
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
+import { createIpGuard, getClientIp, safeEqual, trafficConfigFromEnv } from '@/lib/server/ipGuard.ts';
+import type { IpGuard } from '@/lib/server/ipGuard.ts';
 import { revalidatePltsDashboardCache, PLTS_CACHE_TAG } from '@/lib/solar/dashboardService';
 
 export const dynamic = 'force-dynamic';
 
-// Rate Limiting Storage in globalThis
-if (!globalThis.__PLTS_REVALIDATE_RATE_LIMIT__) {
-  globalThis.__PLTS_REVALIDATE_RATE_LIMIT__ = new Map();
-}
-const rateLimitMap = globalThis.__PLTS_REVALIDATE_RATE_LIMIT__;
-
-function checkRateLimit(clientIp) {
-  const now = Date.now();
-  const windowMs = 60 * 1000; // 1 minute window
-  const maxRequests = 20;
-
-  const timestamps = (rateLimitMap.get(clientIp) || []).filter((t) => now - t < windowMs);
-  if (timestamps.length >= maxRequests) {
-    return false;
-  }
-  timestamps.push(now);
-  rateLimitMap.set(clientIp, timestamps);
-  return true;
-}
-
-function safeCompare(a, b) {
-  if (typeof a !== 'string' || typeof b !== 'string') return false;
-  const bufA = Buffer.from(a, 'utf8');
-  const bufB = Buffer.from(b, 'utf8');
-  if (bufA.length !== bufB.length) {
-    // Constant-time dummy comparison to mitigate timing leak
-    crypto.timingSafeEqual(bufA, bufA);
-    return false;
-  }
-  return crypto.timingSafeEqual(bufA, bufB);
-}
+const REVALIDATE_RULE = { windowMs: 60_000, max: 20, strikesToBan: 3, strikeWindowMs: 10 * 60_000, banMs: 2 * 60_000 };
+const globalRevalidate = globalThis as typeof globalThis & { __PLTS_REVALIDATE_GUARD__?: IpGuard };
+const revalidateGuard = globalRevalidate.__PLTS_REVALIDATE_GUARD__ ??= createIpGuard({ maxBuckets: 2_000, maxBans: 500 });
 
 function extractToken(request) {
   const authHeader = request.headers.get('authorization') || '';
@@ -50,23 +23,34 @@ function extractToken(request) {
 
 export async function POST(request) {
   try {
-    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '127.0.0.1';
+    const clientIp = getClientIp(request.headers, trafficConfigFromEnv(process.env).trustedProxyHops);
+    const limit = revalidateGuard.check('revalidate', clientIp, REVALIDATE_RULE);
 
-    if (!checkRateLimit(clientIp)) {
+    if (!limit.allowed) {
       return NextResponse.json({
         success: false,
         error: 'Too many revalidation requests. Please wait a moment.',
         code: 'RATE_LIMIT_EXCEEDED',
       }, {
         status: 429,
-        headers: { 'Cache-Control': 'no-store' },
+        headers: { 'Cache-Control': 'no-store', 'Retry-After': String(limit.retryAfterSec) },
       });
     }
 
-    const expectedSecret = process.env.REVALIDATE_SECRET_TOKEN || process.env.CRON_SECRET || 'plts_internal_secret_key_2026';
+    const expectedSecret = process.env.REVALIDATE_SECRET_TOKEN || process.env.CRON_SECRET || '';
+    if (!expectedSecret) {
+      return NextResponse.json({
+        success: false,
+        error: 'Revalidation is not configured on this server.',
+        code: 'REVALIDATE_NOT_CONFIGURED',
+      }, {
+        status: 503,
+        headers: { 'Cache-Control': 'no-store' },
+      });
+    }
     const providedToken = extractToken(request);
 
-    if (!providedToken || !safeCompare(providedToken, expectedSecret)) {
+    if (!providedToken || !safeEqual(providedToken, expectedSecret)) {
       return NextResponse.json({
         success: false,
         error: 'Unauthorized: Invalid or missing revalidation secret token.',

@@ -1,8 +1,9 @@
 import crypto from 'node:crypto';
 import * as XLSX from 'xlsx';
 import { AIRPORTS } from './airports.ts';
+import { EMISSION_FACTORS, FLIGHT_DISTANCE_BANDS } from '../calculator/factors.v1.ts';
 import {
-  CABIN, EMISSION_STATUS, HOTEL_CLASS, TRAIN_CLASS, TRAVEL_ACCOUNTS, TRAVEL_CATEGORY,
+  CABIN, DEFAULT_HOTEL_COUNTRY, EMISSION_STATUS, HOTEL_COUNTRIES, TRAIN_CLASS, TRAVEL_ACCOUNTS, TRAVEL_CATEGORY,
   finishTravelEntry, flightFactor, hotelFactor, parseCsvRows, parseLedgerAmount, parseLedgerDate, parseRouteField, parseStationRoute,
   parseTravelLedgerRows, trainFactor,
 } from './travelLedger.ts';
@@ -20,10 +21,11 @@ export const TEMPLATE_COLUMNS = Object.freeze([
   { key: 'KUU', required: true, hint: 'Kode KUU yang menanggung biaya, misalnya Z001 atau 1AZ1' },
   { key: 'JENIS', required: true, hint: 'PESAWAT, HOTEL, KERETA, atau LAINNYA (uang saku, transport lokal)' },
   { key: 'RUTE', required: false, hint: 'PESAWAT (wajib): kode bandara, misalnya CGK-DPS-CGK. KERETA (opsional): nama stasiun, misalnya GAMBIR-YOGYAKARTA' },
-  { key: 'KELAS', required: false, hint: 'PESAWAT: EKONOMI (bawaan) atau BISNIS. HOTEL: BINTANG_1_3, BINTANG_4, BINTANG_5 (kosong = rata-rata). KERETA: ANTARKOTA (bawaan), KRL, atau CEPAT' },
+  { key: 'KELAS', required: false, hint: 'PESAWAT: EKONOMI (bawaan), EKONOMI_PREMIUM, BISNIS, atau FIRST. KERETA: EKONOMI (bawaan), BISNIS, EKSEKUTIF, PANORAMIC, LUXURY, PRIORITY, atau COMPARTMENT' },
   { key: 'MALAM', required: false, hint: 'Wajib untuk HOTEL. Jumlah malam menginap, misalnya 3' },
   { key: 'KAMAR', required: false, hint: 'HOTEL: jumlah kamar (bawaan 1)' },
   { key: 'KOTA', required: false, hint: 'HOTEL: kota lokasi hotel (opsional), misalnya SURABAYA' },
+  { key: 'NEGARA', required: false, hint: 'HOTEL: negara lokasi hotel, nama atau kode, misalnya Indonesia atau VN (kosong = Indonesia)' },
   { key: 'JARAK_KM', required: false, hint: 'Wajib untuk KERETA. Total jarak perjalanan dalam km, misalnya 512 (pulang-pergi dijumlah)' },
   { key: 'NAMA_PENUMPANG', required: false, hint: 'Nama karyawan yang berangkat (opsional)' },
   { key: 'KETERANGAN', required: false, hint: 'Keperluan perjalanan (opsional)' },
@@ -31,7 +33,9 @@ export const TEMPLATE_COLUMNS = Object.freeze([
   { key: 'AKUN', required: false, hint: '611402 atau 621402 (bawaan 611402)' },
 ]);
 
-type TemplateColumn = { key: string; required: boolean; hint: string; width?: number; options?: string[]; numeric?: 'whole' | 'decimal' };
+type TemplateColumn = { key: string; required: boolean; hint: string; width?: number; options?: string[]; optionsSheet?: string; numeric?: 'whole' | 'decimal' };
+
+const TRAIN_CLASS_OPTIONS = ['EKONOMI', 'BISNIS', 'EKSEKUTIF', 'PANORAMIC', 'LUXURY', 'PRIORITY', 'COMPARTMENT'];
 
 const COL: Record<string, TemplateColumn> = {
   TANGGAL: { key: 'TANGGAL', required: true, width: 13, hint: 'Tanggal transaksi, format 2026-01-17 atau 17/01/2026' },
@@ -51,7 +55,7 @@ export const TEMPLATE_SHEETS = Object.freeze([
     columns: [
       COL.TANGGAL, COL.KUU,
       { key: 'RUTE', required: true, width: 18, hint: 'Kode bandara dipisah tanda minus, misalnya CGK-DPS-CGK. Kode ada di sheet Kode Bandara' },
-      { key: 'KELAS', required: false, width: 12, options: ['EKONOMI', 'BISNIS'], hint: 'EKONOMI atau BISNIS (kosong = EKONOMI)' },
+      { key: 'KELAS', required: false, width: 16, options: ['EKONOMI', 'EKONOMI_PREMIUM', 'BISNIS', 'FIRST'], hint: 'EKONOMI, EKONOMI_PREMIUM, BISNIS, atau FIRST (kosong = EKONOMI). Penerbangan domestik hanya punya faktor ekonomi dan bisnis' },
       COL.NAMA, COL.KETERANGAN, COL.BIAYA, COL.AKUN,
     ],
   },
@@ -64,7 +68,7 @@ export const TEMPLATE_SHEETS = Object.freeze([
       { key: 'MALAM', required: true, width: 9, numeric: 'decimal', hint: 'Jumlah malam menginap, misalnya 3' },
       { key: 'KAMAR', required: false, width: 9, numeric: 'whole', hint: 'Jumlah kamar (kosong = 1)' },
       { key: 'KOTA', required: false, width: 16, hint: 'Kota lokasi hotel (opsional), misalnya SURABAYA' },
-      { key: 'KELAS', required: false, width: 14, options: ['BINTANG_1_3', 'BINTANG_4', 'BINTANG_5'], hint: 'BINTANG_1_3, BINTANG_4, atau BINTANG_5 (kosong = rata-rata)' },
+      { key: 'NEGARA', required: false, width: 18, optionsSheet: 'Negara Hotel', hint: 'Negara lokasi hotel, pilih dari sheet Negara Hotel (kosong = Indonesia)' },
       COL.NAMA, COL.KETERANGAN, COL.BIAYA, COL.AKUN,
     ],
   },
@@ -76,7 +80,7 @@ export const TEMPLATE_SHEETS = Object.freeze([
       COL.TANGGAL, COL.KUU,
       { key: 'RUTE', required: false, width: 26, hint: 'Nama stasiun dipisah tanda minus (opsional), misalnya GAMBIR-YOGYAKARTA-GAMBIR' },
       { key: 'JARAK_KM', required: true, width: 11, numeric: 'decimal', hint: 'Total jarak perjalanan dalam km, pulang-pergi dijumlah, misalnya 1024' },
-      { key: 'KELAS', required: false, width: 12, options: ['ANTARKOTA', 'KRL', 'CEPAT'], hint: 'ANTARKOTA, KRL, atau CEPAT (kosong = ANTARKOTA)' },
+      { key: 'KELAS', required: false, width: 14, options: TRAIN_CLASS_OPTIONS, hint: 'Kelas kereta KAI: EKONOMI, BISNIS, EKSEKUTIF, PANORAMIC, LUXURY, PRIORITY, atau COMPARTMENT (kosong = EKONOMI)' },
       COL.NAMA, COL.KETERANGAN, COL.BIAYA, COL.AKUN,
     ],
   },
@@ -89,7 +93,7 @@ export const TEMPLATE_SHEETS = Object.freeze([
 ] as { name: string; category: string; rule: string; columns: TemplateColumn[] }[]);
 
 // Reference sheets in the template (and the example rows an earlier template kept in Petunjuk) are never data.
-const REFERENCE_SHEET = /^(PETUNJUK|FAKTOR|KODE_BANDARA)/;
+const REFERENCE_SHEET = /^(PETUNJUK|FAKTOR|KODE_BANDARA|NEGARA_HOTEL)/;
 
 // Re-upload dedupe hashes these columns; hotel and train columns join the hash only when filled,
 // so a file made with the older template still hashes the same as before.
@@ -109,18 +113,25 @@ const KIND_ALIASES = Object.freeze({
   [TRAVEL_CATEGORY.OTHER]: TRAVEL_CATEGORY.OTHER,
 });
 
-const HOTEL_CLASS_ALIASES = Object.freeze({
-  '': HOTEL_CLASS.AVERAGE, RATA_RATA: HOTEL_CLASS.AVERAGE, [HOTEL_CLASS.AVERAGE]: HOTEL_CLASS.AVERAGE,
-  BINTANG_1_3: HOTEL_CLASS.STAR_1_3, BINTANG_1: HOTEL_CLASS.STAR_1_3, BINTANG_2: HOTEL_CLASS.STAR_1_3, BINTANG_3: HOTEL_CLASS.STAR_1_3, [HOTEL_CLASS.STAR_1_3]: HOTEL_CLASS.STAR_1_3,
-  BINTANG_4: HOTEL_CLASS.STAR_4, [HOTEL_CLASS.STAR_4]: HOTEL_CLASS.STAR_4,
-  BINTANG_5: HOTEL_CLASS.STAR_5, [HOTEL_CLASS.STAR_5]: HOTEL_CLASS.STAR_5,
+const CABIN_ALIASES = Object.freeze({
+  '': CABIN.ECONOMY, EKONOMI: CABIN.ECONOMY, [CABIN.ECONOMY]: CABIN.ECONOMY,
+  EKONOMI_PREMIUM: CABIN.PREMIUM_ECONOMY, PREMIUM: CABIN.PREMIUM_ECONOMY, [CABIN.PREMIUM_ECONOMY]: CABIN.PREMIUM_ECONOMY,
+  BISNIS: CABIN.BUSINESS, [CABIN.BUSINESS]: CABIN.BUSINESS,
+  FIRST: CABIN.FIRST, FIRST_CLASS: CABIN.FIRST,
 });
 
 const TRAIN_CLASS_ALIASES = Object.freeze({
-  '': TRAIN_CLASS.INTERCITY, ANTARKOTA: TRAIN_CLASS.INTERCITY, [TRAIN_CLASS.INTERCITY]: TRAIN_CLASS.INTERCITY,
-  KRL: TRAIN_CLASS.COMMUTER, [TRAIN_CLASS.COMMUTER]: TRAIN_CLASS.COMMUTER,
-  CEPAT: TRAIN_CLASS.HIGH_SPEED, WHOOSH: TRAIN_CLASS.HIGH_SPEED, [TRAIN_CLASS.HIGH_SPEED]: TRAIN_CLASS.HIGH_SPEED,
+  '': TRAIN_CLASS.ECONOMY, EKONOMI: TRAIN_CLASS.ECONOMY, [TRAIN_CLASS.ECONOMY]: TRAIN_CLASS.ECONOMY,
+  BISNIS: TRAIN_CLASS.BUSINESS, [TRAIN_CLASS.BUSINESS]: TRAIN_CLASS.BUSINESS,
+  EKSEKUTIF: TRAIN_CLASS.EXECUTIVE, [TRAIN_CLASS.EXECUTIVE]: TRAIN_CLASS.EXECUTIVE,
+  PANORAMIC: TRAIN_CLASS.PANORAMIC, LUXURY: TRAIN_CLASS.LUXURY, PRIORITY: TRAIN_CLASS.PRIORITY, COMPARTMENT: TRAIN_CLASS.COMPARTMENT,
 });
+
+// Country name or ISO code, as the BI table spells it ("Russian Federation", "UAE") or by code ("VN").
+const HOTEL_COUNTRY_ALIASES = Object.freeze(Object.fromEntries([
+  ['', DEFAULT_HOTEL_COUNTRY],
+  ...HOTEL_COUNTRIES.flatMap(c => [[c.code, c.code], [c.name.toUpperCase().replace(/\s+/g, '_'), c.code]]),
+]));
 
 // "2,5" and "1.234" both appear in Indonesian sheets; plain integers are the common case.
 function parseQuantity(raw) {
@@ -191,14 +202,15 @@ export function buildRowEntry(fields, { journalCode, sourceFile, journalType }) 
   try { amountRupiah = parseLedgerAmount(amountInput); } catch { errors.push('biaya bukan angka'); }
   if (!errors.includes('biaya bukan angka') && amountRupiah <= 0) errors.push('biaya harus lebih dari 0');
 
-  // One KELAS column serves every kind; manual input may send hotelClass/trainClass directly.
+  // One KELAS column serves flights and trains; manual input may send trainClass directly.
+  // A hotel KELAS from the older template (BINTANG_1_3 ...) is ignored: BI sets the hotel factor per country.
   const classText = String(fields.cabin ?? '').trim().toUpperCase().replace(/[\s-]+/g, '_');
-  const cabin = ['BISNIS', 'BUSINESS'].includes(classText) ? CABIN.BUSINESS : CABIN.ECONOMY;
-  if (flight && classText && !['EKONOMI', 'ECONOMY', 'BISNIS', 'BUSINESS'].includes(classText)) errors.push('KELAS pesawat harus EKONOMI atau BISNIS');
-  const hotelClass = HOTEL_CLASS_ALIASES[String(fields.hotelClass ?? classText).trim().toUpperCase()];
-  if (hotel && !hotelClass) errors.push('KELAS hotel harus BINTANG_1_3, BINTANG_4, BINTANG_5, atau kosong');
-  const trainClass = TRAIN_CLASS_ALIASES[String(fields.trainClass ?? classText).trim().toUpperCase()];
-  if (train && !trainClass) errors.push('KELAS kereta harus ANTARKOTA, KRL, atau CEPAT');
+  const cabin = CABIN_ALIASES[classText];
+  if (flight && !cabin) errors.push('KELAS pesawat harus EKONOMI, EKONOMI_PREMIUM, BISNIS, atau FIRST');
+  const country = HOTEL_COUNTRY_ALIASES[String(fields.country ?? '').trim().toUpperCase().replace(/\s+/g, '_')];
+  if (hotel && !country) errors.push(`NEGARA hotel belum ada di tabel faktor BI: ${String(fields.country).trim()}`);
+  const trainClass = TRAIN_CLASS_ALIASES[String(fields.trainClass ?? classText).trim().toUpperCase().replace(/[\s-]+/g, '_')];
+  if (train && !trainClass) errors.push(`KELAS kereta harus ${TRAIN_CLASS_OPTIONS.join(', ')}`);
 
   const stops = flight ? parseRouteField(fields.route) : null;
   if (flight) {
@@ -243,7 +255,7 @@ export function buildRowEntry(fields, { journalCode, sourceFile, journalType }) 
     amountRupiah,
     sourceFile,
     metadata: { passenger: passenger || null },
-  }, { category, stops, cabin, nights, rooms: rooms ?? 1, hotelClass, city, distanceKm, trainClass, stations });
+  }, { category, stops, cabin: cabin ?? CABIN.ECONOMY, nights, rooms: rooms ?? 1, country, city, distanceKm, trainClass, stations });
   if (category !== TRAVEL_CATEGORY.OTHER && entry.emissionStatus !== EMISSION_STATUS.CALCULATED) {
     return { error: flight ? 'rute tidak bisa dihitung' : 'emisi tidak bisa dihitung' };
   }
@@ -278,7 +290,9 @@ function parseTable(rows, { fileName, sheetName, category }) {
     let values;
     if (singleTable) {
       const extra = HASH_EXTRA_KEYS.map(key => cell(row, key));
-      values = [...HASH_BASE_KEYS.map(key => cell(row, key)), ...(extra.some(v => String(v).trim()) ? extra : [])];
+      // NEGARA joins the hash only when filled, so rows from files made before it existed hash as before.
+      const country = String(cell(row, 'NEGARA')).trim();
+      values = [...HASH_BASE_KEYS.map(key => cell(row, key)), ...(extra.some(v => String(v).trim()) ? extra : []), ...(country ? [country] : [])];
     } else {
       values = [sheetName, ...sheetDef.columns.map(c => cell(row, c.key))];
     }
@@ -291,6 +305,7 @@ function parseTable(rows, { fileName, sheetName, category }) {
       nights: cell(row, 'MALAM'),
       rooms: cell(row, 'KAMAR'),
       city: cell(row, 'KOTA'),
+      country: cell(row, 'NEGARA'),
       distanceKm: cell(row, 'JARAK_KM'),
       passenger: cell(row, 'NAMA_KARYAWAN') || cell(row, 'NAMA_PENUMPANG'),
       note: cell(row, 'KETERANGAN'),
@@ -367,7 +382,12 @@ export async function buildTravelTemplateWorkbook() {
         const target = sheet.getCell(r, i + 1);
         if (c.key === 'TANGGAL') target.numFmt = 'yyyy-mm-dd';
         if (c.key === 'BIAYA_RP') target.numFmt = '#,##0';
-        if (c.options) {
+        if (c.optionsSheet) {
+          target.dataValidation = {
+            type: 'list', allowBlank: true, formulae: [`'${c.optionsSheet}'!$A$2:$A${HOTEL_COUNTRIES.length + 1}`],
+            showErrorMessage: true, errorTitle: 'Negara tidak dikenal', error: `Pilih negara dari sheet ${c.optionsSheet}`,
+          };
+        } else if (c.options) {
           target.dataValidation = {
             type: 'list', allowBlank: true, formulae: [`"${c.options.join(',')}"`],
             showErrorMessage: true, errorTitle: 'Pilihan tidak dikenal', error: `Pilih salah satu: ${c.options.join(', ')}`,
@@ -407,19 +427,20 @@ export async function buildTravelTemplateWorkbook() {
   const factorRow = (kind, label, factor) => [kind, label, factor?.value ?? null, factor?.unit ?? ''];
   const factorSheet = addReferenceSheet(workbook, 'Faktor Emisi', [
     ['Sheet', 'KELAS', 'Faktor emisi', 'Satuan'],
-    factorRow('Pesawat', 'EKONOMI, domestik', flightFactor(false, CABIN.ECONOMY)),
-    factorRow('Pesawat', 'EKONOMI, internasional', flightFactor(true, CABIN.ECONOMY)),
-    factorRow('Pesawat', 'BISNIS, domestik', flightFactor(false, CABIN.BUSINESS)),
-    factorRow('Pesawat', 'BISNIS, internasional', flightFactor(true, CABIN.BUSINESS)),
-    factorRow('Hotel', '(kosong) rata-rata', hotelFactor(HOTEL_CLASS.AVERAGE)),
-    factorRow('Hotel', 'BINTANG_1_3', hotelFactor(HOTEL_CLASS.STAR_1_3)),
-    factorRow('Hotel', 'BINTANG_4', hotelFactor(HOTEL_CLASS.STAR_4)),
-    factorRow('Hotel', 'BINTANG_5', hotelFactor(HOTEL_CLASS.STAR_5)),
-    factorRow('Kereta Api', 'ANTARKOTA', trainFactor(TRAIN_CLASS.INTERCITY)),
-    factorRow('Kereta Api', 'KRL', trainFactor(TRAIN_CLASS.COMMUTER)),
-    factorRow('Kereta Api', 'CEPAT', trainFactor(TRAIN_CLASS.HIGH_SPEED)),
-  ], [12, 24, 14, 26]);
+    ...['EKONOMI', 'BISNIS'].flatMap(kelas => FLIGHT_DISTANCE_BANDS.map(band => factorRow('Pesawat', `${kelas}, domestik ${band.label}`, flightFactor(false, CABIN_ALIASES[kelas], band.maxKm === Infinity ? 5000 : band.maxKm - 1)))),
+    ...['EKONOMI', 'EKONOMI_PREMIUM', 'BISNIS', 'FIRST'].map(kelas => factorRow('Pesawat', `${kelas}, internasional`, flightFactor(true, CABIN_ALIASES[kelas]))),
+    ...TRAIN_CLASS_OPTIONS.map(kelas => factorRow('Kereta Api', kelas, trainFactor(TRAIN_CLASS_ALIASES[kelas]))),
+    factorRow('Hotel', 'Indonesia; negara lain di sheet Negara Hotel', hotelFactor(DEFAULT_HOTEL_COUNTRY)),
+    [],
+    ['Sumber: Bank Indonesia (2026), Buku Panduan Kalkulator Hijau, Bab 5 (pesawat domestik BI, internasional DEFRA 2025, kereta KAI 2025, hotel BI dan DEFRA 2025).'],
+  ], [12, 44, 14, 26]);
   factorSheet.getRow(1).font = { bold: true };
+
+  const countrySheet = addReferenceSheet(workbook, 'Negara Hotel', [
+    ['Negara', 'Kode', 'Faktor emisi (kgCO2e/kamar-malam)'],
+    ...HOTEL_COUNTRIES.map(c => [c.name, c.code, EMISSION_FACTORS.find(f => f.id === `HOTEL_${c.code}`)?.value ?? c.value]),
+  ], [22, 8, 30]);
+  countrySheet.getRow(1).font = { bold: true };
 
   const airportSheet = addReferenceSheet(workbook, 'Kode Bandara', [
     ['Kode', 'Bandara', 'Negara'],

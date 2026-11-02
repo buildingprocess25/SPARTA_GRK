@@ -47,7 +47,7 @@ export async function GET(req) {
     const entries = await prisma.businessTravelEntry.findMany({
       where: { yearMonth: { gte: period.start, lte: period.end } },
       select: {
-        kuu: true, yearMonth: true, category: true, route: true, amountRupiah: true,
+        kuu: true, yearMonth: true, category: true, route: true, amountRupiah: true, description: true, journalType: true,
         distanceKm: true, legCount: true, emissionTon: true, emissionStatus: true, isInternational: true, metadata: true,
       },
     });

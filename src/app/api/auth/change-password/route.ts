@@ -1,47 +1,26 @@
 import { NextResponse } from 'next/server';
 import { findUser, verifyPassword, changePassword, verifySessionToken, SESSION_COOKIE } from '@/lib/auth.ts';
+import { accountLockStatus, recordAuthFailure, recordAuthSuccess } from '@/lib/server/authThrottle.ts';
 
 export const dynamic = 'force-dynamic';
 
-// Same per-IP throttle pattern as /api/auth/login - resets on deploy/restart,
-// fine for a 2-account app.
-const RATE_LIMIT_WINDOW_MS = 5 * 60_000;
-const RATE_LIMIT_MAX_ATTEMPTS = 8;
-if (!globalThis.__AUTH_CHANGE_PW_ATTEMPTS__) globalThis.__AUTH_CHANGE_PW_ATTEMPTS__ = new Map();
-const attempts = globalThis.__AUTH_CHANGE_PW_ATTEMPTS__;
-
-function getClientIp(request) {
-  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || request.headers.get('x-real-ip')
-    || 'unknown';
-}
-
-function isRateLimited(ip) {
-  const now = Date.now();
-  const entry = attempts.get(ip);
-  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
-    attempts.set(ip, { windowStart: now, count: 1 });
-    return false;
-  }
-  entry.count += 1;
-  return entry.count > RATE_LIMIT_MAX_ATTEMPTS;
+function accountLockedResponse(retryAfterSec: number) {
+  return NextResponse.json(
+    { success: false, error: `Terlalu banyak percobaan gagal. Coba lagi dalam ${retryAfterSec} detik.`, code: 'ACCOUNT_LOCKED' },
+    { status: 429, headers: { 'Retry-After': String(retryAfterSec) } },
+  );
 }
 
 export async function POST(request) {
   try {
-    const ip = getClientIp(request);
-    if (isRateLimited(ip)) {
-      return NextResponse.json(
-        { success: false, error: 'Terlalu banyak percobaan. Coba lagi dalam beberapa menit.', code: 'RATE_LIMITED' },
-        { status: 429 },
-      );
-    }
-
     const token = request.cookies.get(SESSION_COOKIE)?.value;
     const sessionUsername = verifySessionToken(token);
     if (!sessionUsername) {
       return NextResponse.json({ success: false, error: 'Sesi tidak valid, silakan login ulang.' }, { status: 401 });
     }
+
+    const lock = accountLockStatus('change-password', sessionUsername);
+    if (lock.locked) return accountLockedResponse(lock.retryAfterSec);
 
     const body = await request.json().catch(() => ({}));
     const currentPassword = String(body?.currentPassword || '');
@@ -60,8 +39,11 @@ export async function POST(request) {
 
     const user = await findUser(sessionUsername);
     if (!user || !verifyPassword(currentPassword, user.passwordHash)) {
+      const failure = recordAuthFailure('change-password', sessionUsername);
+      if (failure.locked) return accountLockedResponse(failure.retryAfterSec);
       return NextResponse.json({ success: false, error: 'Password saat ini salah.' }, { status: 401 });
     }
+    recordAuthSuccess('change-password', sessionUsername);
     if (verifyPassword(newPassword, user.passwordHash)) {
       return NextResponse.json({ success: false, error: 'Password baru tidak boleh sama dengan password lama.' }, { status: 400 });
     }

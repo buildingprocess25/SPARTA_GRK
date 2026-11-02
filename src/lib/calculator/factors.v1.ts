@@ -55,6 +55,53 @@ const factor = (id: string, category: string, name: string, value: number | null
   ...extra,
 });
 
+// Perjalanan dinas (Scope 3) mengikuti Buku Panduan Kalkulator Hijau Bank Indonesia 2026, Bab 5.
+const biGuide = 'Bank Indonesia (2026), Buku Panduan Kalkulator Hijau, Bab 5';
+const biTravel = (id: string, name: string, value: number, unit: string, origin: string) =>
+  factor(id, 'travel', name, value, unit, `${biGuide}; ${origin}`, { year: 2026, status: FACTOR_STATUS.OFFICIAL, notes: origin });
+
+// Pesawat domestik dibagi per kelompok jarak segmen: short <926 km, medium 926-1.852 km, long >1.852 km (Tabel 10).
+export const FLIGHT_DISTANCE_BANDS = Object.freeze([
+  { id: 'SHORT', label: 'jarak pendek (<926 km)', maxKm: 926 },
+  { id: 'MEDIUM', label: 'jarak menengah (926-1.852 km)', maxKm: 1852 },
+  { id: 'LONG', label: 'jarak jauh (>1.852 km)', maxKm: Infinity },
+]);
+
+// Hotel per negara (Tabel 15): Indonesia dari median 39 hotel mid-scale (BI), negara lain DEFRA 2025.
+export const HOTEL_COUNTRIES = Object.freeze([
+  ['ID', 'Indonesia', 49.37], ['AU', 'Australia', 35.0], ['BE', 'Belgium', 12.2], ['BR', 'Brazil', 8.7],
+  ['CA', 'Canada', 7.4], ['CL', 'Chile', 27.6], ['CN', 'China', 53.5], ['CO', 'Colombia', 14.7],
+  ['CR', 'Costa Rica', 4.7], ['EG', 'Egypt', 44.2], ['FR', 'France', 6.7], ['DE', 'Germany', 13.2],
+  ['HK', 'Hong Kong', 51.5], ['IN', 'India', 58.9], ['IT', 'Italy', 14.3], ['JP', 'Japan', 39.0],
+  ['JO', 'Jordan', 68.9], ['KR', 'Korea', 55.8], ['MY', 'Malaysia', 61.5], ['MV', 'Maldives', 152.2],
+  ['MX', 'Mexico', 19.3], ['NL', 'Netherlands', 14.8], ['OM', 'Oman', 90.3], ['PH', 'Philippines', 54.3],
+  ['PT', 'Portugal', 19.0], ['QA', 'Qatar', 86.2], ['RU', 'Russian Federation', 24.2], ['SA', 'Saudi Arabia', 106.4],
+  ['SG', 'Singapore', 24.5], ['ZA', 'South Africa', 51.4], ['ES', 'Spain', 7.0], ['CH', 'Switzerland', 6.6],
+  ['TH', 'Thailand', 43.4], ['TR', 'Turkey', 32.1], ['AE', 'UAE', 63.8], ['GB', 'United Kingdom', 10.4],
+  ['US', 'United States', 16.1], ['VN', 'Vietnam', 38.5],
+].map(([code, name, value]) => Object.freeze({ code: code as string, name: name as string, value: value as number })));
+
+const TRAVEL_FACTORS = [
+  biTravel('FLIGHT_DOMESTIC_ECONOMY_SHORT', 'Pesawat domestik ekonomi, jarak pendek (<926 km)', 0.120, 'kgCO2e/penumpang-km', 'Tabel 10, Bank Indonesia (2026)'),
+  biTravel('FLIGHT_DOMESTIC_ECONOMY_MEDIUM', 'Pesawat domestik ekonomi, jarak menengah (926-1.852 km)', 0.089, 'kgCO2e/penumpang-km', 'Tabel 10, Bank Indonesia (2026)'),
+  biTravel('FLIGHT_DOMESTIC_ECONOMY_LONG', 'Pesawat domestik ekonomi, jarak jauh (>1.852 km)', 0.078, 'kgCO2e/penumpang-km', 'Tabel 10, Bank Indonesia (2026)'),
+  biTravel('FLIGHT_DOMESTIC_BUSINESS_SHORT', 'Pesawat domestik bisnis, jarak pendek (<926 km)', 0.216, 'kgCO2e/penumpang-km', 'Tabel 10, Bank Indonesia (2026)'),
+  biTravel('FLIGHT_DOMESTIC_BUSINESS_MEDIUM', 'Pesawat domestik bisnis, jarak menengah (926-1.852 km)', 0.160, 'kgCO2e/penumpang-km', 'Tabel 10, Bank Indonesia (2026)'),
+  biTravel('FLIGHT_DOMESTIC_BUSINESS_LONG', 'Pesawat domestik bisnis, jarak jauh (>1.852 km)', 0.140, 'kgCO2e/penumpang-km', 'Tabel 10, Bank Indonesia (2026)'),
+  biTravel('FLIGHT_INTERNATIONAL_ECONOMY', 'Pesawat internasional ekonomi', 0.06449, 'kgCO2e/penumpang-km', 'Tabel 11, DEFRA (2025)'),
+  biTravel('FLIGHT_INTERNATIONAL_PREMIUM', 'Pesawat internasional ekonomi premium', 0.10318, 'kgCO2e/penumpang-km', 'Tabel 11, DEFRA (2025)'),
+  biTravel('FLIGHT_INTERNATIONAL_BUSINESS', 'Pesawat internasional bisnis', 0.18701, 'kgCO2e/penumpang-km', 'Tabel 11, DEFRA (2025)'),
+  biTravel('FLIGHT_INTERNATIONAL_FIRST', 'Pesawat internasional first class', 0.25794, 'kgCO2e/penumpang-km', 'Tabel 11, DEFRA (2025)'),
+  ...HOTEL_COUNTRIES.map(c => biTravel(`HOTEL_${c.code}`, `Hotel di ${c.name}`, c.value, 'kgCO2e/kamar-malam', c.code === 'ID' ? 'Tabel 15, median 39 hotel mid-scale Indonesia' : 'Tabel 15, DEFRA (2025)')),
+  biTravel('TRAIN_ECONOMY', 'Kereta api kelas ekonomi', 0.01219, 'kgCO2e/penumpang-km', 'Tabel 13, KAI (2025)'),
+  biTravel('TRAIN_BUSINESS', 'Kereta api kelas bisnis', 0.01308, 'kgCO2e/penumpang-km', 'Tabel 13, KAI (2025)'),
+  biTravel('TRAIN_EXECUTIVE', 'Kereta api kelas eksekutif', 0.01750, 'kgCO2e/penumpang-km', 'Tabel 13, KAI (2025)'),
+  biTravel('TRAIN_PANORAMIC', 'Kereta api kelas panoramic', 0.02469, 'kgCO2e/penumpang-km', 'Tabel 13, KAI (2025)'),
+  biTravel('TRAIN_LUXURY', 'Kereta api kelas luxury', 0.02804, 'kgCO2e/penumpang-km', 'Tabel 13, KAI (2025)'),
+  biTravel('TRAIN_PRIORITY', 'Kereta api kelas priority', 0.03044, 'kgCO2e/penumpang-km', 'Tabel 13, KAI (2025)'),
+  biTravel('TRAIN_COMPARTMENT', 'Kereta api kelas compartment', 0.04390, 'kgCO2e/penumpang-km', 'Tabel 13, KAI (2025)'),
+];
+
 /**
  * Satu-satunya katalog faktor Kalkulator Emisi. Nilai TEMPORARY hanya untuk
  * simulasi; NEEDS_FACTOR tidak pernah diperlakukan sebagai nol oleh engine.
@@ -100,19 +147,7 @@ export const EMISSION_FACTORS = Object.freeze([
   factor('GRID_MALUKU_PAPUA', 'grid', 'Maluku–Papua', 0.78, 'kgCO2e/kWh', gridSource, { year: 2019, locationOrGrid: 'Maluku–Papua' }),
   factor('GRID_INDONESIA', 'grid', 'Indonesia (rata-rata nasional)', 0.87, 'kgCO2e/kWh', gridSource, { year: 2019, locationOrGrid: 'Indonesia' }),
 
-  factor('FLIGHT_DOMESTIC_ECONOMY', 'travel', 'Pesawat domestik (ekonomi)', 0.15, 'kgCO2e/penumpang-km', defra),
-  factor('FLIGHT_DOMESTIC_BUSINESS', 'travel', 'Pesawat domestik (bisnis)', 0.225, 'kgCO2e/penumpang-km', defra),
-  factor('FLIGHT_INTERNATIONAL_ECONOMY', 'travel', 'Pesawat internasional (ekonomi)', 0.12, 'kgCO2e/penumpang-km', defra),
-  factor('FLIGHT_INTERNATIONAL_BUSINESS', 'travel', 'Pesawat internasional (bisnis)', 0.348, 'kgCO2e/penumpang-km', defra),
-  factor('FLIGHT_INTERNATIONAL_FIRST', 'travel', 'Pesawat internasional (first class)', 0.480, 'kgCO2e/penumpang-km', defra),
-  factor('HOTEL_3_STAR', 'travel', 'Hotel bintang 1–3', 20, 'kgCO2e/kamar-malam', defra),
-  factor('HOTEL_4_STAR', 'travel', 'Hotel bintang 4', 30, 'kgCO2e/kamar-malam', defra),
-  factor('HOTEL_5_STAR', 'travel', 'Hotel bintang 5', 45, 'kgCO2e/kamar-malam', defra),
-  factor('HOTEL_ROOM_NIGHT', 'travel', 'Hotel (rata-rata)', 30, 'kgCO2e/kamar-malam', defra),
-  factor('TRAIN_KRL', 'travel', 'KRL', 0.035, 'kgCO2e/penumpang-km', defra),
-  factor('TRAIN_INTERCITY', 'travel', 'KA antarkota', 0.041, 'kgCO2e/penumpang-km', defra),
-  factor('TRAIN_HIGH_SPEED', 'travel', 'KA cepat', 0.030, 'kgCO2e/penumpang-km', defra),
-  factor('TRAIN_PASSENGER_KM', 'travel', 'Kereta api (rata-rata)', 0.04, 'kgCO2e/penumpang-km', defra),
+  ...TRAVEL_FACTORS,
   factor('TRAVEL_BUS', 'travel', 'Bus', 0.105, 'kgCO2e/penumpang-km', defra),
   factor('TRAVEL_TAXI', 'travel', 'Taksi / ride-hailing', 0.192, 'kgCO2e/penumpang-km', defra),
 

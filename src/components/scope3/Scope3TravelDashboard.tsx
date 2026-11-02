@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { AlertCircle, Building2, FileQuestion, Flame, Hotel, Plane, RefreshCw, Route, Search, TrainFront, Wallet } from 'lucide-react';
-import { Bar, BarChart, CartesianGrid, ComposedChart, Line, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { CHART_PALETTE, formatYAxisNumber } from '@/components/ui/ChartTheme';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,14 +23,27 @@ import { rupiahShort } from '@/lib/units';
 const MONTH_NAMES = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 const TOP_KUU_IN_CHART = 10;
 const ALL = 'all';
-const EMPTY_FILTERS = { category: ALL, origin: ALL, destination: ALL, kuu: ALL, region: ALL, band: ALL };
+const EMPTY_FILTERS = { category: ALL, origin: ALL, destination: ALL, kuu: ALL, region: ALL, band: ALL, otherKind: ALL };
 
 const CATEGORY_META = {
   [TRAVEL_CATEGORY.FLIGHT]: { label: 'Pesawat', countLabel: 'Tiket', routeLabel: 'Rute', icon: Plane, color: CHART_PALETTE.calc },
   [TRAVEL_CATEGORY.HOTEL]: { label: 'Hotel', countLabel: 'Menginap', routeLabel: 'Kota', icon: Hotel, color: CHART_PALETTE.plts },
   [TRAVEL_CATEGORY.TRAIN]: { label: 'Kereta Api', countLabel: 'Tiket', routeLabel: 'Rute', icon: TrainFront, color: CHART_PALETTE.water },
-  [TRAVEL_CATEGORY.OTHER]: { label: 'Lainnya', countLabel: 'Transaksi', routeLabel: 'Rute', icon: Wallet, color: CHART_PALETTE.pln },
+  [TRAVEL_CATEGORY.OTHER]: { label: 'Lainnya', countLabel: 'Transaksi', routeLabel: 'Rincian', icon: Wallet, color: CHART_PALETTE.pln },
 };
+// Lainnya has no emission factor, so it only appears among the cost keys.
+const EMISSION_KEYS = [
+  { category: TRAVEL_CATEGORY.FLIGHT, ton: 'flightTon' },
+  { category: TRAVEL_CATEGORY.HOTEL, ton: 'hotelTon' },
+  { category: TRAVEL_CATEGORY.TRAIN, ton: 'trainTon' },
+];
+// Lainnya cost split for the monthly chart: the two largest kinds, the rest folded into one, in one gray family
+// so it still reads as "no emission". The card lists every kind in text.
+const OTHER_GROUPS = [
+  { key: 'otherAllowanceJuta', label: 'Uang saku & PJUM', kinds: ['ALLOWANCE'], color: '#CBD5E1' },
+  { key: 'otherAbroadJuta', label: 'Perjalanan luar negeri', kinds: ['INTERNATIONAL'], color: '#94A3B8' },
+  { key: 'otherRestJuta', label: 'Transport, klaim, dll.', kinds: ['TRANSPORT', 'CLAIM', 'PAYROLL', 'MISC'], color: '#64748B' },
+];
 const COST_KEYS = [
   { category: TRAVEL_CATEGORY.FLIGHT, rupiah: 'flightRupiah', juta: 'flightJuta' },
   { category: TRAVEL_CATEGORY.HOTEL, rupiah: 'hotelRupiah', juta: 'hotelJuta' },
@@ -81,7 +94,6 @@ const INPUT_KIND = { [TRAVEL_CATEGORY.FLIGHT]: 'PESAWAT', [TRAVEL_CATEGORY.HOTEL
 
 const withJuta = row => ({ ...row, ...Object.fromEntries(COST_KEYS.map(k => [k.juta, juta(row[k.rupiah])])) });
 
-const BAND_COLORS = { short: '#E11D48', medium: '#F59E0B', long: '#6366F1', international: '#94A3B8' };
 
 const routeLabel = route => route.split('-').join(' → ');
 const juta = value => Number(((value || 0) / 1_000_000).toFixed(2));
@@ -136,6 +148,8 @@ export default function Scope3TravelDashboard() {
   const [error, setError] = useState('');
   const [view, setView] = useState('kuu');
   const [kuuMetric, setKuuMetric] = useState('emission');
+  const [monthlyMetric, setMonthlyMetric] = useState('emission');
+  const [monthlySource, setMonthlySource] = useState(ALL);
   const [search, setSearch] = useState('');
   const [isInputOpen, setIsInputOpen] = useState(false);
   const [inputKind, setInputKind] = useState('PESAWAT');
@@ -172,10 +186,16 @@ export default function Scope3TravelDashboard() {
   const activeFilterCount = Object.values(filters).filter(v => v !== ALL).length + (search.trim() ? 1 : 0);
   // Airport, region and distance filters only describe flights, so they appear (and apply) for all kinds or for Pesawat.
   const showFlightFilters = filters.category === ALL || filters.category === TRAVEL_CATEGORY.FLIGHT;
+  const showOtherFilter = filters.category === TRAVEL_CATEGORY.OTHER;
   const flightFilterActive = showFlightFilters && [filters.origin, filters.destination, filters.region, filters.band].some(v => v !== ALL);
-  const changeCategory = value => setFilters(prev => (value === ALL || value === TRAVEL_CATEGORY.FLIGHT
-    ? { ...prev, category: value }
-    : { ...prev, category: value, origin: ALL, destination: ALL, region: ALL, band: ALL }));
+  const changeCategory = value => {
+    setFilters(prev => (value === ALL || value === TRAVEL_CATEGORY.FLIGHT
+      ? { ...prev, category: value, otherKind: ALL }
+      : { ...prev, category: value, origin: ALL, destination: ALL, region: ALL, band: ALL, otherKind: value === TRAVEL_CATEGORY.OTHER ? prev.otherKind : ALL }));
+    // Lainnya has no emission, so sorting by emission would leave its rows in no useful order.
+    if (value === TRAVEL_CATEGORY.OTHER && sortBy === 'emission') setSortBy('cost');
+  };
+  const otherKindLabel = useMemo(() => Object.fromEntries((api?.otherKinds || []).map(k => [k.id, k.label])), [api?.otherKinds]);
 
   const filterOptions = useMemo(() => {
     const flightStops = groups.filter(g => g.category === TRAVEL_CATEGORY.FLIGHT && g.route).map(g => g.route.split('-'));
@@ -189,12 +209,14 @@ export default function Scope3TravelDashboard() {
       kuu: [{ value: ALL, label: 'Semua KUU' }, ...knownKuu.map(k => ({ value: k, label: k }))],
       region: [{ value: ALL, label: 'Domestik & internasional' }, { value: 'domestic', label: 'Domestik' }, { value: 'international', label: 'Internasional' }],
       band: [{ value: ALL, label: 'Semua jarak' }, ...(api?.distanceBands || []).filter(b => b.id !== 'international').map(b => ({ value: b.id, label: b.label }))],
+      otherKind: [{ value: ALL, label: 'Semua rincian' }, ...(api?.otherKinds || []).map(k => ({ value: k.id, label: k.label }))],
     };
-  }, [groups, knownKuu, api?.distanceBands]);
+  }, [groups, knownKuu, api?.distanceBands, api?.otherKinds]);
 
   const filteredGroups = useMemo(() => groups.filter(g => {
     if (filters.category !== ALL && g.category !== filters.category) return false;
     if (filters.kuu !== ALL && g.kuu !== filters.kuu) return false;
+    if (filters.otherKind !== ALL && g.otherKind !== filters.otherKind) return false;
     if (!flightFilterActive) return true;
     if (g.category !== TRAVEL_CATEGORY.FLIGHT || !g.band) return false;
     const stops = g.route.split('-');
@@ -211,10 +233,13 @@ export default function Scope3TravelDashboard() {
     const merged = new Map();
     for (const g of filteredGroups) {
       // Per-route rows keep each kind apart, so a hotel city never merges with a train route of the same name.
-      const key = view === 'kuu' ? g.kuu : `${g.category}|${g.route ?? ''}`;
+      // Lainnya has no route, so its per-route rows are its breakdown kinds instead.
+      const isKind = view === 'route' && g.category === TRAVEL_CATEGORY.OTHER;
+      const key = view === 'kuu' ? g.kuu : isKind ? `${g.category}|kind:${g.otherKind}` : `${g.category}|${g.route ?? ''}`;
       if (!merged.has(key)) {
         merged.set(key, {
-          key, label: view === 'kuu' ? g.kuu : g.route, category: view === 'kuu' ? null : g.category, isInternational: g.isInternational,
+          key, label: view === 'kuu' ? g.kuu : isKind ? otherKindLabel[g.otherKind] ?? g.otherKind : g.route, isKind,
+          category: view === 'kuu' ? null : g.category, isInternational: g.isInternational,
           count: 0, roomNights: 0, distanceKm: 0, emissionTon: 0, rupiah: 0,
           ...Object.fromEntries(COST_KEYS.map(k => [k.rupiah, 0])),
         });
@@ -230,9 +255,9 @@ export default function Scope3TravelDashboard() {
     const query = search.trim().toLowerCase();
     const sortValue = SORTS[sortBy].value;
     return [...merged.values()]
-      .filter(r => !query || (view === 'kuu' ? r.label : routeLabel(r.label ?? '')).toLowerCase().includes(query))
+      .filter(r => !query || (view === 'kuu' || r.isKind ? r.label : routeLabel(r.label ?? '')).toLowerCase().includes(query))
       .sort((a, b) => sortValue(b) - sortValue(a));
-  }, [filteredGroups, view, search, sortBy]);
+  }, [filteredGroups, view, search, sortBy, otherKindLabel]);
 
   const tableCategory = filters.category === ALL ? (flightFilterActive ? TRAVEL_CATEGORY.FLIGHT : ALL) : filters.category;
   const tableMeta = tableCategory === ALL ? null : CATEGORY_META[tableCategory];
@@ -249,10 +274,57 @@ export default function Scope3TravelDashboard() {
   // A month with nothing imported is unknown, not zero: null leaves a gap instead of a misleading drop to 0.
   const monthlyData = useMemo(() => {
     const imported = new Set(api?.availableMonths || []);
+    const emptyKeys = [...EMISSION_KEYS.map(k => k.ton), ...COST_KEYS.map(k => k.juta), ...OTHER_GROUPS.map(g => g.key)];
     return (api?.monthlyTrend || []).map(m => (imported.has(m.yearMonth)
-      ? withJuta(m)
-      : { yearMonth: m.yearMonth, month: m.month, emissionTon: null, ...Object.fromEntries(COST_KEYS.map(k => [k.juta, null])) }));
+      ? { ...withJuta(m), ...Object.fromEntries(OTHER_GROUPS.map(g => [g.key, juta(g.kinds.reduce((s, id) => s + (m.otherKinds?.[id] ?? 0), 0))])) }
+      : { yearMonth: m.yearMonth, month: m.month, emissionTon: null, ...Object.fromEntries(emptyKeys.map(key => [key, null])) }));
   }, [api?.monthlyTrend, api?.availableMonths]);
+
+  // Picking one source gives it the whole scale; Lainnya has no emission, so it is offered on the cost tab only.
+  const monthlySourceOptions = [
+    { value: ALL, label: monthlyMetric === 'emission' ? 'Semua sumber' : 'Semua jenis' },
+    ...[TRAVEL_CATEGORY.FLIGHT, TRAVEL_CATEGORY.HOTEL, TRAVEL_CATEGORY.TRAIN, ...(monthlyMetric === 'cost' ? [TRAVEL_CATEGORY.OTHER] : [])]
+      .map(category => ({ value: category, label: CATEGORY_META[category].label })),
+  ];
+  const emissionSeries = category => {
+    const k = EMISSION_KEYS.find(e => e.category === category);
+    return { key: k.ton, label: `${CATEGORY_META[category].label} (tCO₂e)`, color: CATEGORY_META[category].color };
+  };
+  const costSeries = category => {
+    const k = COST_KEYS.find(c => c.category === category);
+    return { key: k.juta, label: `${CATEGORY_META[category].label} (Rp juta)`, color: CATEGORY_META[category].color };
+  };
+  const otherSeries = OTHER_GROUPS.map(g => ({ key: g.key, label: `${g.label} (Rp juta)`, color: g.color }));
+  const seriesFor = monthlyMetric === 'emission' ? emissionSeries : costSeries;
+  // Emission sources sit side by side so hotel and train keep their own bar next to the far larger flight bar;
+  // cost stays stacked because its parts add up to the month's spend. A side-by-side source with no emission in
+  // the whole period would only leave an empty slot each month, so it is named in the note instead.
+  const groupedEmission = monthlyMetric === 'emission' && monthlySource === ALL;
+  const periodTon = key => monthlyData.reduce((s, m) => s + (m[key] ?? 0), 0);
+  const silentSources = groupedEmission
+    ? [TRAVEL_CATEGORY.HOTEL, TRAVEL_CATEGORY.TRAIN].filter(category => periodTon(seriesFor(category).key) === 0) as string[]
+    : [];
+  const monthlySeries = monthlySource === ALL
+    ? [TRAVEL_CATEGORY.FLIGHT, TRAVEL_CATEGORY.HOTEL, TRAVEL_CATEGORY.TRAIN].filter(c => !silentSources.includes(c)).map(seriesFor)
+      .concat(monthlyMetric === 'cost' ? otherSeries : [])
+    : monthlySource === TRAVEL_CATEGORY.OTHER ? otherSeries : [seriesFor(monthlySource)];
+  const monthlyGrouped = groupedEmission && monthlySeries.length > 1;
+  const silentNote = silentSources.length
+    ? ` ${silentSources.map(c => CATEGORY_META[c].label).join(' dan ')} 0 tCO₂e di periode ini, jadi tidak digambar.`
+    : '';
+  const changeMonthlyMetric = value => {
+    setMonthlyMetric(value);
+    if (value === 'emission' && monthlySource === TRAVEL_CATEGORY.OTHER) setMonthlySource(ALL);
+  };
+  const monthlyNote = monthlyMetric === 'emission'
+    ? monthlySource === ALL
+      ? `Tiap sumber punya batang sendiri di samping pesawat; emisinya jauh lebih kecil, jadi pilih satu sumber untuk melihat skalanya sendiri.${silentNote} Lainnya (uang saku, PJUM, klaim) belum punya faktor emisi, jadi hanya ada di tab Biaya.`
+      : `Hanya ${CATEGORY_META[monthlySource].label.toLowerCase()}, dengan skala sendiri.`
+    : monthlySource === ALL
+      ? 'Lainnya dipecah menurut isi transaksinya. Hotel dan kereta kecil dibanding yang lain; pilih satu jenis untuk melihat skalanya sendiri.'
+      : monthlySource === TRAVEL_CATEGORY.OTHER
+        ? 'Biaya Lainnya menurut isi transaksinya. Rincian lengkap per jenis ada di kartu Emisi per sumber.'
+        : `Hanya biaya ${CATEGORY_META[monthlySource].label.toLowerCase()}, dengan skala sendiri.`;
 
   const metric = KUU_METRICS[kuuMetric];
   const kuuChart = useMemo(() => {
@@ -272,11 +344,26 @@ export default function Scope3TravelDashboard() {
   const bandTotalTon = bands.reduce((s, b) => s + b.emissionTon, 0);
   const factors = api?.factors || [];
   const factorsOf = prefix => factors.filter(f => f.id.startsWith(prefix));
+  // Economy factor behind each band, read from the factor list the API sends, so the card never drifts from the calculation.
+  const BAND_FACTOR_ID = { short: 'FLIGHT_DOMESTIC_ECONOMY_SHORT', medium: 'FLIGHT_DOMESTIC_ECONOMY_MEDIUM', long: 'FLIGHT_DOMESTIC_ECONOMY_LONG', international: 'FLIGHT_INTERNATIONAL_ECONOMY' };
+  const bandFactor = id => {
+    const value = factors.find(f => f.id === BAND_FACTOR_ID[id])?.value;
+    return value == null ? '-' : `${value.toLocaleString('id-ID', { minimumFractionDigits: 3, maximumFractionDigits: 5 })} kg/km`;
+  };
   const totalCost = rupiahShort(summary?.totalRupiah);
   const flightCost = rupiahShort(summary?.flightRupiah);
   const hotelCost = rupiahShort(summary?.hotelRupiah);
   const trainCost = rupiahShort(summary?.trainRupiah);
-  const uncounted = rupiahShort((summary?.otherRupiah ?? 0) + (summary?.uncalculatedRupiah ?? 0));
+  const uncountedRupiah = (summary?.otherRupiah ?? 0) + (summary?.uncalculatedRupiah ?? 0);
+  const uncounted = rupiahShort(uncountedRupiah);
+  // The two largest Lainnya kinds by cost, then everything else (other kinds plus tickets and stays without quantities).
+  const uncountedTrend = (() => {
+    const top = [...(api?.otherByKind || [])].filter(k => k.rupiah > 0).sort((a, b) => b.rupiah - a.rupiah).slice(0, 2);
+    if (!top.length) return 'Tiket tanpa rute, hotel tanpa tanggal menginap, dan kereta tanpa km';
+    const rest = uncountedRupiah - top.reduce((s, k) => s + k.rupiah, 0);
+    const short = value => { const r = rupiahShort(value); return `${r.value} ${r.unit}`; };
+    return [...top.map(k => `${k.label} ${short(k.rupiah)}`), rest > 0 ? `lainnya ${short(rest)}` : null].filter(Boolean).join(' · ');
+  })();
   const pending = loading ? '-' : null;
   const tripLabel = row => [
     row.ticketCount ? `${formatNum(row.ticketCount)} tiket pesawat` : null,
@@ -285,16 +372,25 @@ export default function Scope3TravelDashboard() {
   ].filter(Boolean).join(', ') || 'tanpa tiket';
 
   const kuuChartConfig = Object.fromEntries(metric.series.map(s => [s.key, { label: s.label, color: s.color }]));
-  const monthlyConfig = {
-    ...Object.fromEntries(COST_KEYS.map(k => [k.juta, { label: `${CATEGORY_META[k.category].label} (Rp juta)`, color: CATEGORY_META[k.category].color }])),
-    emissionTon: { label: 'Emisi (tCO₂e)', color: CHART_PALETTE.emission },
-  };
+  const monthlyConfig = Object.fromEntries(monthlySeries.map(s => [s.key, { label: s.label, color: s.color }]));
+
+  // Emission per Scope 3 source; Lainnya carries cost but no emission, so it is listed without a bar share.
+  const sources = [
+    { category: TRAVEL_CATEGORY.FLIGHT, ton: summary?.flightTon ?? 0, rupiah: summary?.flightRupiah ?? 0, detail: `${formatNum(summary?.ticketCount ?? 0)} tiket · ${formatNum(summary?.distanceKm ?? 0)} km` },
+    { category: TRAVEL_CATEGORY.HOTEL, ton: summary?.hotelTon ?? 0, rupiah: summary?.hotelRupiah ?? 0, detail: `${formatNum(summary?.hotelStays ?? 0)} menginap · ${formatNum(summary?.roomNights ?? 0)} kamar-malam` },
+    { category: TRAVEL_CATEGORY.TRAIN, ton: summary?.trainTon ?? 0, rupiah: summary?.trainRupiah ?? 0, detail: `${formatNum(summary?.trainTrips ?? 0)} tiket · ${formatNum(summary?.trainKm ?? 0)} km` },
+    { category: TRAVEL_CATEGORY.OTHER, ton: null, rupiah: summary?.otherRupiah ?? 0, detail: `${formatNum(summary?.otherCount ?? 0)} transaksi` },
+  ];
+  const sourceTotalTon = summary?.emissionTon ?? 0;
+  // Payroll lines are Rp 0 in the export, so kinds with no cost are left out of the list.
+  const otherKindRows = [...(api?.otherByKind || [])].filter(k => k.rupiah !== 0).sort((a, b) => b.rupiah - a.rupiah);
+  const rupiahText = value => { const r = rupiahShort(value); return `${r.value} ${r.unit}`; };
 
   return (
     <div className="space-y-6 animate-in">
       <PageHeader
         title="Scope 3: Perjalanan Dinas"
-        info="Pesawat dihitung per tiket dari jarak antar bandara, hotel dari jumlah kamar-malam, dan kereta api dari total jarak km, masing-masing dikalikan faktor emisinya. Uang saku, transport lokal, serta baris hotel atau kereta dari jurnal yang tidak memuat malam atau jarak dicatat biayanya saja."
+        info="Faktor emisi mengikuti Buku Panduan Kalkulator Hijau Bank Indonesia 2026. Pesawat dihitung per segmen dari jarak antar bandara, dengan faktor domestik menurut kelompok jarak segmen. Hotel dihitung dari kamar-malam dengan faktor negara hotel, kereta api dari km dengan faktor kelas KAI. Uang saku dan transaksi tanpa rute, tanggal menginap, atau km dicatat biayanya saja."
         actions={
           <>
             {hasData && (
@@ -352,77 +448,134 @@ export default function Scope3TravelDashboard() {
               label="Biaya belum dihitung emisinya"
               value={pending ?? uncounted.value}
               unit={uncounted.unit}
-              trend="Uang saku, transport lokal, dan transaksi tanpa rute, malam, atau jarak"
+              trend={uncountedTrend}
               icon={Building2}
               theme="default"
-              tooltip="Uang saku dan transport lokal tidak punya data jarak. Baris hotel atau kereta dari jurnal BPDL juga tidak memuat jumlah malam atau km. Lebih baik kosong daripada ditebak dari nominal rupiah."
+              tooltip="Uang saku, PJUM, dan klaim BPDL adalah uang, bukan aktivitas, dan Kalkulator Hijau BI tidak punya faktor untuknya. Tiket tanpa rute terbaca, hotel tanpa tanggal menginap, dan kereta tanpa km juga masuk di sini. Emisinya dibiarkan kosong, tidak ditebak dari nominal rupiah. Rinciannya ada di tab Lainnya di bawah."
             />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            <Card className="lg:col-span-3 space-y-4">
-              <ChartCardHeader title="Biaya dan emisi per bulan" />
+            <Card className="lg:col-span-3 flex flex-col gap-4">
+              <ChartCardHeader
+                title={monthlyMetric === 'emission' ? 'Emisi per bulan menurut sumber' : 'Biaya per bulan menurut jenis'}
+                action={
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="w-40">
+                      <CustomSelect ariaLabel="Sumber pada grafik bulanan" value={monthlySource} onValueChange={setMonthlySource} options={monthlySourceOptions} />
+                    </div>
+                    <SegmentedTabs
+                      value={monthlyMetric}
+                      onChange={changeMonthlyMetric}
+                      fullWidthOnMobile={false}
+                      options={[{ value: 'emission', label: 'Emisi' }, { value: 'cost', label: 'Biaya' }]}
+                    />
+                  </div>
+                }
+              />
               {loading ? (
                 <div role="status" aria-label="Memuat tren bulanan" className="h-72 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />
               ) : (
-                <ChartContainer config={monthlyConfig} className="aspect-auto h-72 w-full">
-                  <ComposedChart data={monthlyData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                    <XAxis dataKey="month" tickLine={false} axisLine={false} />
-                    <YAxis yAxisId="rp" tickLine={false} axisLine={false} width={56} tickFormatter={v => formatYAxisNumber(v)} />
-                    <YAxis yAxisId="ton" orientation="right" tickLine={false} axisLine={false} width={44} tickFormatter={v => `${formatYAxisNumber(v)} t`} />
-                    <ChartTooltip
-                      content={<ChartTooltipContent formatter={(value, name) => (value == null ? 'belum ada data' : name === 'emissionTon' ? `${formatNum(value, 2)} tCO₂e` : `Rp ${formatNum(value, 1)} Jt`)} />}
-                    />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    {COST_KEYS.map((k, i) => (
-                      <Bar
-                        key={k.juta}
-                        yAxisId="rp"
-                        dataKey={k.juta}
-                        stackId="cost"
-                        fill={`var(--color-${k.juta})`}
-                        radius={i === COST_KEYS.length - 1 ? [4, 4, 0, 0] : 0}
-                        maxBarSize={40}
-                        isAnimationActive={false}
+                <>
+                  {/* Grows with the card so the chart fills the height set by the source card beside it. */}
+                  <ChartContainer config={monthlyConfig} className="aspect-auto min-h-72 w-full flex-1">
+                    <BarChart data={monthlyData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap={monthlyGrouped ? "14%" : "18%"} barGap={2}>
+                      <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                      <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                      {/* Starts at 0: refunds of a few million rupiah would otherwise push a -1.100 tick; their value stays in the tooltip. */}
+                      <YAxis domain={[0, "auto"]} allowDataOverflow tickLine={false} axisLine={false} width={56} tickFormatter={v => (monthlyMetric === 'emission' ? `${formatYAxisNumber(v)} t` : formatYAxisNumber(v))} />
+                      <ChartTooltip
+                        content={<ChartTooltipContent formatter={value => (value == null ? 'belum ada data' : monthlyMetric === 'emission' ? `${formatNum(value, 2)} tCO₂e` : `Rp ${formatNum(value, 1)} Jt`)} />}
                       />
-                    ))}
-                    <Line yAxisId="ton" dataKey="emissionTon" stroke="var(--color-emissionTon)" strokeWidth={2.5} dot={{ r: 3.5, fill: 'var(--color-emissionTon)' }} connectNulls={false} isAnimationActive={false} />
-                  </ComposedChart>
-                </ChartContainer>
+                      <ChartLegend content={<ChartLegendContent />} />
+                      {monthlySeries.map((s, i) => (
+                        <Bar
+                          key={s.key}
+                          dataKey={s.key}
+                          stackId={monthlyGrouped ? undefined : 'month'}
+                          fill={`var(--color-${s.key})`}
+                          radius={monthlyGrouped || i === monthlySeries.length - 1 ? [4, 4, 0, 0] : 0}
+                          maxBarSize={monthlyGrouped ? 26 : 40}
+                          // A few kg of hotel emission next to a 100 t flight bar would round to nothing; 3 px keeps it findable.
+                          minPointSize={monthlyGrouped ? value => (Number(value) > 0 ? 3 : 0) : 0}
+                          isAnimationActive={false}
+                        />
+                      ))}
+                    </BarChart>
+                  </ChartContainer>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">{monthlyNote} Bulan tanpa data impor dibiarkan kosong.</p>
+                </>
               )}
             </Card>
 
             <Card className="lg:col-span-2 space-y-4">
-              <ChartCardHeader title="Emisi menurut jarak penerbangan" />
+              <ChartCardHeader title="Emisi per sumber" />
               {loading ? (
-                <div role="status" aria-label="Memuat sebaran jarak" className="h-72 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />
-              ) : bandTotalTon === 0 ? (
-                <p className="py-10 text-center text-xs text-slate-500 dark:text-slate-400">Belum ada tiket dengan rute terbaca di periode ini.</p>
+                <div role="status" aria-label="Memuat emisi per sumber" className="h-72 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />
               ) : (
                 <div className="space-y-4">
-                  <div className="flex h-3 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800" role="img" aria-label="Porsi emisi per kelompok jarak">
-                    {bands.filter(b => b.emissionTon > 0).map(b => (
-                      <span key={b.id} style={{ width: `${(b.emissionTon / bandTotalTon) * 100}%`, backgroundColor: BAND_COLORS[b.id] }} />
-                    ))}
-                  </div>
+                  {sourceTotalTon > 0 && (
+                    <div className="flex h-3 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800" role="img" aria-label="Porsi emisi Scope 3 per sumber">
+                      {sources.filter(s => s.ton > 0).map(s => (
+                        <span key={s.category} style={{ width: `${(s.ton / sourceTotalTon) * 100}%`, backgroundColor: CATEGORY_META[s.category].color }} />
+                      ))}
+                    </div>
+                  )}
                   <ul className="space-y-3">
-                    {bands.map(b => (
-                      <li key={b.id} className="flex items-start justify-between gap-3 text-xs">
-                        <span className="flex items-start gap-2 min-w-0">
-                          <span className="mt-1 size-2.5 shrink-0 rounded-full" style={{ backgroundColor: BAND_COLORS[b.id] }} aria-hidden="true" />
-                          <span className="min-w-0">
-                            <span className="block font-semibold text-slate-900 dark:text-slate-100">{b.label}</span>
-                            <span className="block text-[11px] text-slate-500 dark:text-slate-400">{b.detail} · {formatNum(b.ticketCount)} tiket</span>
+                    {sources.map(s => (
+                      <li key={s.category} className="text-xs">
+                        <div className="flex items-start justify-between gap-3">
+                          <span className="flex items-start gap-2 min-w-0">
+                            <span className="mt-1 size-2.5 shrink-0 rounded-full" style={{ backgroundColor: CATEGORY_META[s.category].color }} aria-hidden="true" />
+                            <span className="min-w-0">
+                              <span className="block font-semibold text-slate-900 dark:text-slate-100">{CATEGORY_META[s.category].label}</span>
+                              <span className="block text-[11px] text-slate-500 dark:text-slate-400">{s.detail} · {rupiahText(s.rupiah)}</span>
+                            </span>
                           </span>
-                        </span>
-                        <span className="text-right shrink-0">
-                          <span className="block tabular-nums font-bold text-slate-900 dark:text-slate-100">{formatNum(b.emissionTon, 2)} tCO₂e</span>
-                          <span className="block text-[11px] text-slate-500 dark:text-slate-400">{formatNum((b.emissionTon / bandTotalTon) * 100, 1)}%</span>
-                        </span>
+                          <span className="text-right shrink-0">
+                            {s.ton === null ? (
+                              <span className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tanpa emisi</span>
+                            ) : (
+                              <>
+                                <span className="block tabular-nums font-bold text-slate-900 dark:text-slate-100">{formatNum(s.ton, 2)} tCO₂e</span>
+                                <span className="block text-[11px] text-slate-500 dark:text-slate-400">{formatNum(sourceTotalTon ? (s.ton / sourceTotalTon) * 100 : 0, 1)}%</span>
+                              </>
+                            )}
+                          </span>
+                        </div>
+                        {/* Flights are the only source with distance bands, so their split sits under the Pesawat row. */}
+                        {s.category === TRAVEL_CATEGORY.FLIGHT && bandTotalTon > 0 && (
+                          <ul className="mt-2 ml-[18px] space-y-1.5 border-l border-slate-200 dark:border-slate-700 pl-3" aria-label="Emisi pesawat per kelompok jarak">
+                            {bands.map(b => (
+                              <li key={b.id} className="flex items-start justify-between gap-3 text-[11px]">
+                                <span className="min-w-0 text-slate-600 dark:text-slate-300">
+                                  <span className="font-semibold">{b.label}</span>
+                                  <span className="block text-slate-500 dark:text-slate-400">{b.detail} · {formatNum(b.segmentCount)} segmen · faktor ekonomi {bandFactor(b.id)}</span>
+                                </span>
+                                <span className="shrink-0 tabular-nums font-semibold text-slate-700 dark:text-slate-200">{formatNum(b.emissionTon, 2)} t</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {s.category === TRAVEL_CATEGORY.OTHER && otherKindRows.length > 0 && (
+                          <ul className="mt-2 ml-[18px] space-y-1.5 border-l border-slate-200 dark:border-slate-700 pl-3" aria-label="Biaya Lainnya per jenis transaksi">
+                            {otherKindRows.map(k => (
+                              <li key={k.id} className="flex items-start justify-between gap-3 text-[11px]">
+                                <span className="min-w-0 text-slate-600 dark:text-slate-300">
+                                  <span className="font-semibold">{k.label}</span>
+                                  <span className="block text-slate-500 dark:text-slate-400">{formatNum(k.count)} transaksi</span>
+                                </span>
+                                <span className="shrink-0 tabular-nums font-semibold text-slate-700 dark:text-slate-200">{rupiahText(k.rupiah)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </li>
                     ))}
                   </ul>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Pesawat dihitung per segmen dengan kelompok jarak faktor Bank Indonesia, jadi satu tiket transit bisa mengisi dua kelompok. Hotel dan kereta menunggu jumlah malam atau km; baris tanpa data itu hanya tercatat biayanya.
+                  </p>
                 </div>
               )}
             </Card>
@@ -489,7 +642,7 @@ export default function Scope3TravelDashboard() {
                   fullWidthOnMobile={false}
                   options={[
                     { value: 'kuu', label: 'Per KUU', icon: Building2 },
-                    { value: 'route', label: tableCategory === TRAVEL_CATEGORY.HOTEL ? 'Per kota' : 'Per rute', icon: Route },
+                    { value: 'route', label: { [TRAVEL_CATEGORY.HOTEL]: 'Per kota', [TRAVEL_CATEGORY.OTHER]: 'Per rincian' }[tableCategory] ?? 'Per rute', icon: Route },
                   ]}
                 />
               }
@@ -520,7 +673,8 @@ export default function Scope3TravelDashboard() {
               })}
             </div>
 
-            <div className={`grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 ${showFlightFilters ? 'xl:grid-cols-6' : 'lg:grid-cols-2 xl:max-w-xl'}`}>
+            <div className={`grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 ${showFlightFilters ? 'xl:grid-cols-6' : showOtherFilter ? 'xl:max-w-3xl' : 'lg:grid-cols-2 xl:max-w-xl'}`}>
+              {showOtherFilter && <CustomSelect ariaLabel="Rincian lainnya" value={filters.otherKind} onValueChange={setFilter('otherKind')} options={filterOptions.otherKind} />}
               {showFlightFilters && <CustomSelect ariaLabel="Bandara asal" value={filters.origin} onValueChange={setFilter('origin')} options={filterOptions.origin} />}
               {showFlightFilters && <CustomSelect ariaLabel="Bandara tujuan" value={filters.destination} onValueChange={setFilter('destination')} options={filterOptions.destination} />}
               <CustomSelect ariaLabel="KUU" value={filters.kuu} onValueChange={setFilter('kuu')} options={filterOptions.kuu} />
@@ -537,11 +691,11 @@ export default function Scope3TravelDashboard() {
               <label className="relative">
                 <Search className="absolute left-3 top-2.5 text-slate-500 dark:text-slate-400 z-10" size={14} aria-hidden="true" />
                 <Input
-                  aria-label={view === 'kuu' ? 'Cari KUU' : 'Cari rute atau kota'}
+                  aria-label={view === 'kuu' ? 'Cari KUU' : showOtherFilter ? 'Cari rincian' : 'Cari rute atau kota'}
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   className="w-full sm:w-64 pl-9 pr-3"
-                  placeholder={view === 'kuu' ? 'Cari kode KUU' : 'Cari rute atau kota, mis. CGK'}
+                  placeholder={view === 'kuu' ? 'Cari kode KUU' : showOtherFilter ? 'Cari rincian, mis. payroll' : 'Cari rute atau kota, mis. CGK'}
                 />
               </label>
               <div className="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400">
@@ -601,7 +755,7 @@ export default function Scope3TravelDashboard() {
                   ) : rows.map(row => (
                     <TableRow key={row.key}>
                       <TableHead scope="row" className="sticky left-0 z-10 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-900 dark:text-slate-100">
-                        {view === 'kuu' ? row.label : (row.label ? routeLabel(row.label) : <span className="font-normal text-slate-500 dark:text-slate-400">Tidak dicatat</span>)}
+                        {view === 'kuu' || row.isKind ? row.label : (row.label ? routeLabel(row.label) : <span className="font-normal text-slate-500 dark:text-slate-400">Tidak dicatat</span>)}
                         {view === 'route' && row.category === TRAVEL_CATEGORY.FLIGHT && row.isInternational && <span className="ml-2 rounded border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700 dark:text-indigo-300">Internasional</span>}
                       </TableHead>
                       {showKindColumn && <TableCell className="text-slate-700 dark:text-slate-300">{CATEGORY_META[row.category].label}</TableCell>}
@@ -650,21 +804,21 @@ export default function Scope3TravelDashboard() {
               <li>
                 Faktor pesawat per penumpang-km:{' '}
                 {factorsOf('FLIGHT').length ? factorsOf('FLIGHT').map(f => `${f.label} ${formatNum(f.value, 3)}`).join('; ') : 'belum termuat'}.
-                Tiket dari jurnal dianggap ekonomi karena jurnal tidak mencatat kelas kabin; input manual dan template boleh memilih bisnis.
+                Segmen domestik memakai faktor sesuai jarak segmennya. Tiket dari jurnal dianggap ekonomi karena jurnal tidak mencatat kelas kabin; input manual dan template boleh memilih kelas lain.
               </li>
               <li>Segmen yang berangkat atau tiba di luar Indonesia memakai faktor internasional.</li>
               <li>
-                Hotel: jumlah malam × jumlah kamar × faktor per kamar-malam
-                {factorsOf('HOTEL').length ? ` (${factorsOf('HOTEL').map(f => `${f.label} ${formatNum(f.value, 0)} kg`).join('; ')})` : ''}.
+                Hotel: jumlah malam × jumlah kamar × faktor per kamar-malam menurut negara hotel
+                {factorsOf('HOTEL').length ? ` (${factorsOf('HOTEL').map(f => `${f.label} ${formatNum(f.value, 2)} kg`).join('; ')}; negara lain ada di template)` : ''}.
               </li>
               <li>
-                Kereta api: total jarak km × faktor per penumpang-km
-                {factorsOf('TRAIN').length ? ` (${factorsOf('TRAIN').map(f => `${f.label} ${formatNum(f.value, 3)}`).join('; ')})` : ''}.
+                Kereta api: total jarak km × faktor per penumpang-km menurut kelas KAI
+                {factorsOf('TRAIN').length ? ` (${factorsOf('TRAIN').map(f => `${f.label.replace('Kereta api kelas ', '')} ${formatNum(f.value, 5)}`).join('; ')})` : ''}.
                 Jaraknya diisi pengguna karena belum ada data koordinat stasiun.
               </li>
-              <li>Baris hotel atau kereta dari jurnal BPDL tidak memuat malam atau jarak, jadi hanya biayanya yang tercatat sampai datanya dilengkapi lewat input manual atau template.</li>
+              <li>Hotel dari jurnal BPDL: jumlah malam dibaca dari tanggal menginap di keterangan (misalnya &quot;TGL 07/07/26 - 09/07/26&quot;), satu baris dihitung satu kamar, dan negara dari nama tempat yang tertulis (tanpa nama tempat dianggap Indonesia). Baris tanpa tanggal menginap dan baris kereta dari jurnal hanya tercatat biayanya sampai dilengkapi lewat input manual atau template.</li>
               <li>Transaksi dengan nominal negatif (refund atau koreksi) mengurangi biaya tetapi tidak mengurangi emisi.</li>
-              {factors[0]?.source && <li>Sumber faktor: {factors[0].source}.</li>}
+              {factors.length > 0 && <li>Sumber faktor: Bank Indonesia (2026), Buku Panduan Kalkulator Hijau, Bab 5. Pesawat domestik dari Bank Indonesia, pesawat internasional dan hotel luar negeri dari DEFRA 2025, kereta dari KAI 2025.</li>}
             </ul>
           </details>
         </>

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isSessionPayloadActive, nextDailyCutoff } from './lib/sessionPolicy.ts';
+import { createIpGuard, getClientIp, trafficConfigFromEnv, trafficTierForPath } from './lib/server/ipGuard.ts';
+import type { IpGuard } from './lib/server/ipGuard.ts';
 
 /**
  * Route guard for the 2-account login (see src/lib/auth.ts). Runs on the
@@ -18,6 +20,37 @@ const PUBLIC_API_PREFIXES = [
   '/api/plts/revalidate', // authenticated separately via REVALIDATE_SECRET_TOKEN
 ];
 const STATIC_FILE_PATTERN = /\.(png|jpg|jpeg|gif|svg|ico|webp|avif|css|js|map|woff2?|ttf)$/i;
+const FORWARDED_USER_HEADER = 'x-sparta-user';
+
+const trafficConfig = trafficConfigFromEnv(process.env);
+const globalGuard = globalThis as typeof globalThis & { __SPARTA_IP_GUARD__?: IpGuard };
+const ipGuard = globalGuard.__SPARTA_IP_GUARD__ ??= createIpGuard();
+
+function rejectTraffic(pathname: string, retryAfterSec: number, code: 'IP_BLOCKED' | 'RATE_LIMITED') {
+  const headers = { 'Retry-After': String(retryAfterSec), 'Cache-Control': 'no-store' };
+  const error = code === 'IP_BLOCKED'
+    ? 'Akses dari alamat IP ini diblokir sementara karena trafik berlebihan.'
+    : 'Terlalu banyak permintaan. Coba lagi sebentar lagi.';
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.json({ success: false, error, code }, { status: 429, headers });
+  }
+  return new NextResponse(error, { status: 429, headers });
+}
+
+function guardTraffic(request, pathname: string) {
+  const ip = getClientIp(request.headers, trafficConfig.trustedProxyHops);
+  // No proxy header means a direct local call (Docker HEALTHCHECK, dev server); there is no client IP to judge.
+  if (ip === 'unknown' || trafficConfig.allowlist.has(ip)) return null;
+  if (trafficConfig.blockedIps.has(ip)) return rejectTraffic(pathname, 3600, 'IP_BLOCKED');
+
+  const tier = trafficTierForPath(pathname);
+  const decision = ipGuard.check(tier, ip, trafficConfig.rules[tier]);
+  if (decision.allowed) return null;
+  if (decision.newlyBanned) {
+    console.warn(`[ip-guard] ${ip} diblokir ${Math.round(decision.retryAfterSec / 60)} menit: batas trafik "${tier}" terlampaui berulang (${pathname})`);
+  }
+  return rejectTraffic(pathname, decision.retryAfterSec, decision.banned ? 'IP_BLOCKED' : 'RATE_LIMITED');
+}
 
 function base64urlToBytes(value) {
   const padded = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(value.length + ((4 - (value.length % 4)) % 4), '=');
@@ -63,14 +96,19 @@ function expiredByCutoff(token) {
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  if (
-    pathname.startsWith('/_next')
-    || pathname === '/favicon.ico'
-    || STATIC_FILE_PATTERN.test(pathname)
-    || PUBLIC_PAGE_PATHS.has(pathname)
-    || PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix))
-  ) {
+  if (pathname.startsWith('/_next') || pathname === '/favicon.ico' || STATIC_FILE_PATTERN.test(pathname)) {
     return NextResponse.next();
+  }
+
+  const rejected = guardTraffic(request, pathname);
+  if (rejected) return rejected;
+
+  if (PUBLIC_PAGE_PATHS.has(pathname) || PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+    // Public routes skip the session check, so a client-sent identity header must not reach them.
+    if (!request.headers.has(FORWARDED_USER_HEADER)) return NextResponse.next();
+    const strippedHeaders = new Headers(request.headers);
+    strippedHeaders.delete(FORWARDED_USER_HEADER);
+    return NextResponse.next({ request: { headers: strippedHeaders } });
   }
 
   const token = request.cookies.get(SESSION_COOKIE)?.value;
@@ -95,7 +133,7 @@ export async function middleware(request) {
   // cookie themselves. Must be set on the outgoing *request*, not just the
   // response, or downstream handlers never see it.
   const forwardedHeaders = new Headers(request.headers);
-  forwardedHeaders.set('x-sparta-user', username);
+  forwardedHeaders.set(FORWARDED_USER_HEADER, username);
   return NextResponse.next({ request: { headers: forwardedHeaders } });
 }
 

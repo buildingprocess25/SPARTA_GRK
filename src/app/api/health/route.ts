@@ -1,18 +1,43 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma.ts';
+import { verifySessionToken, SESSION_COOKIE } from '@/lib/auth.ts';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+const ANONYMOUS_CACHE_MS = 10_000;
+const NO_STORE = { 'Cache-Control': 'no-store, max-age=0' };
+
+let anonymousProbe: { at: number; healthy: boolean } | null = null;
+let anonymousProbeInFlight: Promise<boolean> | null = null;
+
+// The route is public for the Docker HEALTHCHECK, so anonymous calls share one DB ping per 10 s instead of one per request.
+async function probeDatabaseCached(): Promise<boolean> {
+  if (anonymousProbe && Date.now() - anonymousProbe.at < ANONYMOUS_CACHE_MS) return anonymousProbe.healthy;
+  anonymousProbeInFlight ??= prisma.$queryRaw`SELECT 1`
+    .then(() => true, () => false)
+    .then((healthy) => {
+      anonymousProbe = { at: Date.now(), healthy };
+      anonymousProbeInFlight = null;
+      return healthy;
+    });
+  return anonymousProbeInFlight;
+}
+
 /**
  * GET /api/health
- * Production healthcheck endpoint for Dokploy / Docker container monitoring.
- * Verifies:
- * 1. Database connectivity & query latency (PostgreSQL via Prisma)
- * 2. iSolar sync engine status (latest attempt, latest success, data age)
- * 3. Total active DC plants stored in database
+ * Without a session: only `{ status, timestamp }`, enough for Docker/Dokploy.
+ * With a session (Profil > Pemeliharaan): DB latency, iSolar sync state and plant count.
  */
-export async function GET() {
+export async function GET(request) {
+  if (!verifySessionToken(request.cookies.get(SESSION_COOKIE)?.value)) {
+    const healthy = await probeDatabaseCached();
+    return NextResponse.json(
+      { status: healthy ? 'healthy' : 'unhealthy', timestamp: new Date().toISOString() },
+      { status: healthy ? 200 : 503, headers: NO_STORE },
+    );
+  }
+
   const startTime = Date.now();
   const now = new Date();
 

@@ -43,7 +43,7 @@ Perhitungan emisi mengacu pada standar resmi Kementerian ESDM, Pedoman Inventari
    - Simulator dampak penambahan kapasitas PLTS dan penghematan biaya listrik.
 
 4. **Scope 3: Perjalanan Dinas (Business Travel)**
-   - Kalkulasi emisi tiket pesawat berdasarkan rute bandara (IATA code) dan kelas kabin (DEFRA / ICAO methodology).
+   - Kalkulasi emisi tiket pesawat berdasarkan rute bandara (IATA code) dan kelas kabin, memakai faktor Buku Panduan Kalkulator Hijau Bank Indonesia 2026 (domestik per kelompok jarak, internasional DEFRA 2025).
    - Emisi perjalanan kereta api, armada sewa/operasional darat, dan penginapan hotel.
    - Fitur upload batch template Excel untuk rekonsiliasi data perjalanan bulanan.
 
