@@ -20,7 +20,6 @@ export function catchUpPastDays(lastDate: string | null, now = new Date()): numb
 
 /**
  * Daily weather (GHI, temperature, rain) for every DC weather site from Open-Meteo, throttled to once every 6 hours.
- * Uses OPEN_METEO_API_KEY when set; the free tier is for non-commercial use.
  */
 export async function syncWeatherFromOpenMeteo({
   db = prisma, now = new Date(), force = false,

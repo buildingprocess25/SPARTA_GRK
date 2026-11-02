@@ -2,7 +2,8 @@
 
 import { Line, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, ComposedChart } from 'recharts';
 import { CheckSquare } from 'lucide-react';
-import { getPlantColor } from './analyticsConfig';
+import { getTrendColor, MAX_COLORED_TRENDS, TREND_COLORS, TREND_NEUTRAL } from './analyticsConfig';
+import { CHART_AXIS_PROPS, CHART_GRID_PROPS } from '@/components/ui/ChartTheme';
 import { SafePrBarTooltip, SafeTrendTooltip } from './AnalyticsTooltips';
 
 export default function AnalyticsTrendChart({
@@ -20,6 +21,18 @@ export default function AnalyticsTrendChart({
   trendDataset,
   unitMode,
 }: { activeChosenCount?: any; activeMetricMeta?: any; chartViewMode?: any; chosenDCs?: any; computedAverageMetricValue?: any; handleSelectAll?: any; hoveredDCId?: any; isMounted?: any; prBarChartData?: any; rankedChosenCount?: any; selectedMetric?: any; trendDataset?: any; unitMode?: any }) {
+  const unitLabel = selectedMetric === 'specificYield' && unitMode === 'daily'
+    ? 'kWh/kWp/hari'
+    : (activeMetricMeta?.trendUnit || activeMetricMeta?.unit || '');
+  const partialMonth = (trendDataset || []).find((row) => row.partial);
+  // The running month is a hollow dot: same place on the line, visibly not a full month.
+  const partialAwareDot = (color) => (props) => {
+    const { cx, cy, payload, value } = props;
+    if (cx == null || cy == null || value == null) return <g key={`${payload?.ym}-empty`} />;
+    return payload?.partial
+      ? <circle key={payload.ym} cx={cx} cy={cy} r={4} className="fill-white dark:fill-slate-900" stroke={color} strokeWidth={2} />
+      : <circle key={payload.ym} cx={cx} cy={cy} r={3.5} fill={color} />;
+  };
   return (
     <div className="flex-1 min-h-[320px] w-full pt-3 relative">
       {!isMounted ? (
@@ -118,118 +131,90 @@ export default function AnalyticsTrendChart({
           </BarChart>
         </ResponsiveContainer>
       ) : (
-        <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={trendDataset} margin={{ top: 10, right: 15, left: 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-            <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748B' }} stroke="#E2E8F0" />
-
-            <YAxis
-              yAxisId="primary"
-              tick={{ fontSize: 11, fill: '#64748B' }}
-              stroke="#E2E8F0"
-              label={{
-                value: selectedMetric === 'specificYield' && unitMode === 'daily'
-                  ? 'Produksi per kWp (kWh/kWp/hari)'
-                  : `${activeMetricMeta.trendLabel || activeMetricMeta.label} (${activeMetricMeta.trendUnit || activeMetricMeta.unit})`,
-                angle: -90,
-                position: 'insideLeft',
-                style: { fill: '#64748B', fontSize: 10 }
-              }}
-            />
-
-            <Tooltip
-              content={
-                <SafeTrendTooltip
-                  activeMetricUnit={selectedMetric === 'specificYield' && unitMode === 'daily' ? 'kWh/kWp/hari' : (activeMetricMeta.trendUnit || activeMetricMeta.unit)}
-                  unitMode={unitMode}
-                  chartViewMode={chartViewMode}
-                  hoveredDCId={hoveredDCId}
-                />
-              }
-            />
-
-            {/* Mode 'individual': Render ALL chosen DCs with distinct soft colors, NO average line, NO min-max lines */}
-            {chartViewMode === 'individual' && chosenDCs.map((dc, idx) => {
-              const isHovered = hoveredDCId === dc.dcId;
-              const color = getPlantColor(idx, chosenDCs.length);
-              const strokeOpacity = isHovered ? 1.0 : (hoveredDCId ? 0.12 : 0.65);
-              const strokeWidth = isHovered ? 3.5 : 1.5;
-
-              return (
-                <Line isAnimationActive={false}
-                  key={dc.dcId}
+        <div className="h-full flex flex-col">
+          <div className="flex-1 min-h-[280px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={trendDataset} margin={{ top: 10, right: 15, left: 0, bottom: 5 }}>
+                <CartesianGrid {...CHART_GRID_PROPS} />
+                {/* Short month labels and interval 0: the long "Okt 2026" style labels made recharts hide October. */}
+                <XAxis dataKey="month" {...CHART_AXIS_PROPS} interval={0} tick={{ ...CHART_AXIS_PROPS.tick, fontSize: 10 }} />
+                <YAxis
                   yAxisId="primary"
-                  type="linear"
-                  dataKey={dc.dcId}
-                  name={dc.canonicalName || dc.name}
-                  stroke={color}
-                  strokeOpacity={strokeOpacity}
-                  strokeWidth={strokeWidth}
-                  connectNulls={false}
-                  dot={isHovered ? { r: 4.5, fill: color } : false}
-                  activeDot={{ r: 6, fill: color }}
+                  {...CHART_AXIS_PROPS}
+                  width={44}
+                  tick={{ ...CHART_AXIS_PROPS.tick, fontSize: 10 }}
+                  tickFormatter={(v) => Number(v).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
                 />
-              );
-            })}
 
-            {/* Mode 'minmax': Hide individual lines, render ONLY Max boundary, Min boundary, and thin reference average */}
-            {chartViewMode === 'minmax' && (
-              <>
-                <Line isAnimationActive={false}
-                  yAxisId="primary"
-                  type="linear"
-                  dataKey="max"
-                  name="Batas Maksimum"
-                  stroke="#10B981"
-                  strokeWidth={2}
-                  strokeDasharray="4 4"
-                  connectNulls={false}
-                  dot={{ r: 3.5, fill: '#10B981' }}
-                  activeDot={{ r: 5, fill: '#10B981' }}
+                <Tooltip
+                  content={
+                    <SafeTrendTooltip
+                      activeMetricUnit={unitLabel}
+                      unitMode={unitMode}
+                      chartViewMode={chartViewMode}
+                      hoveredDCId={hoveredDCId}
+                    />
+                  }
                 />
-                <Line isAnimationActive={false}
-                  yAxisId="primary"
-                  type="linear"
-                  dataKey="min"
-                  name="Batas Minimum"
-                  stroke="#F43F5E"
-                  strokeWidth={2}
-                  strokeDasharray="4 4"
-                  connectNulls={false}
-                  dot={{ r: 3.5, fill: '#F43F5E' }}
-                  activeDot={{ r: 5, fill: '#F43F5E' }}
-                />
-                <Line isAnimationActive={false}
-                  yAxisId="primary"
-                  type="linear"
-                  dataKey="average"
-                  name="Rata-rata Referensi"
-                  stroke="#0284C7"
-                  strokeWidth={1.5}
-                  strokeDasharray="2 2"
-                  strokeOpacity={0.7}
-                  connectNulls={false}
-                  dot={false}
-                />
-              </>
-            )}
 
-            {/* Mode 'average': Hide individual lines, render ONLY 1 prominent Weighted Average line */}
-            {chartViewMode === 'average' && (
-              <Line isAnimationActive={false}
-                yAxisId="primary"
-                type="linear"
-                dataKey="average"
-                name={`Rata-rata Tertimbang (${rankedChosenCount} DC)`}
-                stroke="#0284C7"
-                strokeWidth={3.5}
-                connectNulls={false}
-                dot={{ r: 4.5, fill: '#0284C7' }}
-                activeDot={{ r: 7, fill: '#0284C7' }}
-              />
-            )}
-          </ComposedChart>
-        </ResponsiveContainer>
+                {/* "Semua PLTS": up to 8 DCs get their own hue; beyond that every line is neutral and the
+                    capacity-weighted average carries the reading, with the hovered DC lifted out in colour. */}
+                {chartViewMode === 'individual' && chosenDCs.map((dc, idx) => {
+                  const isHovered = hoveredDCId === dc.dcId;
+                  const color = getTrendColor(idx, chosenDCs.length);
+                  const stroke = color || (isHovered ? TREND_COLORS[0] : TREND_NEUTRAL);
+                  const strokeOpacity = isHovered ? 1 : (hoveredDCId ? 0.15 : (color ? 0.9 : 0.35));
+                  return (
+                    <Line isAnimationActive={false}
+                      key={dc.dcId}
+                      yAxisId="primary"
+                      type="linear"
+                      dataKey={dc.dcId}
+                      name={dc.canonicalName || dc.name}
+                      stroke={stroke}
+                      strokeOpacity={strokeOpacity}
+                      strokeWidth={isHovered ? 3 : (color ? 2 : 1.25)}
+                      connectNulls={false}
+                      dot={isHovered ? { r: 4, fill: stroke } : false}
+                      activeDot={{ r: 5, fill: stroke }}
+                    />
+                  );
+                })}
+                {chartViewMode === 'individual' && chosenDCs.length > MAX_COLORED_TRENDS && (
+                  <Line isAnimationActive={false} yAxisId="primary" type="linear" dataKey="average" name="Rata-rata"
+                    stroke={TREND_COLORS[0]} strokeWidth={3} connectNulls={false} dot={partialAwareDot(TREND_COLORS[0])} activeDot={{ r: 6 }} />
+                )}
+
+                {chartViewMode === 'minmax' && (
+                  <>
+                    <Line isAnimationActive={false} yAxisId="primary" type="linear" dataKey="max" name="Tertinggi"
+                      stroke={TREND_COLORS[2]} strokeWidth={2} strokeDasharray="4 4" connectNulls={false} dot={partialAwareDot(TREND_COLORS[2])} activeDot={{ r: 5 }} />
+                    <Line isAnimationActive={false} yAxisId="primary" type="linear" dataKey="min" name="Terendah"
+                      stroke={TREND_COLORS[7]} strokeWidth={2} strokeDasharray="4 4" connectNulls={false} dot={partialAwareDot(TREND_COLORS[7])} activeDot={{ r: 5 }} />
+                    <Line isAnimationActive={false} yAxisId="primary" type="linear" dataKey="average" name="Rata-rata"
+                      stroke={TREND_COLORS[0]} strokeWidth={2} connectNulls={false} dot={false} />
+                  </>
+                )}
+
+                {chartViewMode === 'average' && (
+                  <Line isAnimationActive={false} yAxisId="primary" type="linear" dataKey="average"
+                    name={`Rata-rata tertimbang (${rankedChosenCount} DC)`}
+                    stroke={TREND_COLORS[0]} strokeWidth={3} connectNulls={false} dot={partialAwareDot(TREND_COLORS[0])} activeDot={{ r: 6 }} />
+                )}
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+          {partialMonth && (
+            <p className="mt-2 text-[11px] text-slate-600 dark:text-slate-400">
+              * {partialMonth.monthTitle}. {unitMode === 'daily' ? 'Rata-rata harian sudah adil untuk dibandingkan.' : 'Totalnya belum sebanding dengan bulan penuh; pilih Rata-rata harian untuk membandingkan.'}
+            </p>
+          )}
+          {chartViewMode === 'individual' && chosenDCs.length > MAX_COLORED_TRENDS && (
+            <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-400">
+              {chosenDCs.length} DC dipilih, jadi tiap DC digambar abu-abu dan garis biru adalah rata-ratanya. Arahkan kursor ke DC di daftar kiri, atau pilih maksimal {MAX_COLORED_TRENDS} DC, untuk melihat garisnya berwarna.
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

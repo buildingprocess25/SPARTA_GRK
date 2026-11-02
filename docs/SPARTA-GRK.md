@@ -197,6 +197,7 @@ Monitoring real-time PLTS atap di 37 DC (5.778,8 kWp; 36 beroperasi, Gorontalo b
 - **Manajemen kuota API**: guard untuk hourly (2.000), daily (48.000), dan monthly (100.000) call limit
 - **Analitik performa**:
   - Produksi per kWp (kWh/kWp, dikenal juga sebagai *specific yield*) per DC
+  - Grafik tren "Perbandingan antar DC": Januari s.d. bulan berjalan (`getApiMonths` di `trendMonths.ts`, berganti sendiri saat bulan baru), label bulan pendek agar semua bulan tampil. Tombol "Total per bulan" atau "Rata-rata harian" (total bulan ÷ jumlah hari, tetap satu titik per bulan; bulan berjalan dibagi hari yang sudah lewat). Bulan berjalan ditandai `*` dan titik berongga. Maksimal 8 DC diberi warna tetap; bila lebih, tiap DC digambar abu-abu dan garis biru adalah rata-rata menurut kapasitas
   - Equivalent Hours dari API
   - Performance Ratio (PR) bulanan per plant langsung dari iSolarCloud (titik `p83023` mode bulanan, identik dengan Annual Report portal), dengan agregat setara cara portal; bulan dengan PR di luar 10-100% (sensor iradiasi bermasalah) tidak dihitung
   - Koreksi temperatur silikon (-0,45%/°C dari STC 25°C) menggunakan model Sandia/King
@@ -388,6 +389,8 @@ Portal iSolarCloud menampilkan angka tetap 90 (95 untuk Karawang) untuk PR yang 
 
 **Satuan PR dari API**: titik `p83023` dikirim sebagai rasio (`"0.7309"` untuk 73,09% di portal, dicek 2 Nov 2026). `prMonthlySync.ts` mengalikannya 100 dan menyimpan persen dua desimal. Sebelum 2 Nov 2026 rasio tersimpan apa adanya sehingga semua PR resmi tersaring aturan 10-100% (PR Okt/Nov kosong, total "11,6%"); data 2025-2026 sudah ditarik ulang dengan `scripts/data/backfill-plant-pr-monthly.mjs`. Grafik "PR vs suhu panel" (`/api/plts/pr-analysis`) memakai aturan yang sama dengan dashboard (PR resmi dulu, estimasi sebagai cadangan).
 
+Setelah mengubah `prMonthlySync.ts` atau `scheduler.ts`, restart `next dev` (dan daemon). Timer scheduler dibuat sekali saat server start dan tetap memakai kode lama; pada 2 Nov 2026 server yang start sebelum perbaikan ×100 menulis ulang PR Okt/Nov sebagai rasio, sehingga PR Oktober kosong. Tes `prStoredAsPercent.test.mjs` (database live) menangkap baris seperti itu; perbaikannya `backfill-plant-pr-monthly.mjs <awal> <akhir> --apply`.
+
 **Iradiasi dan cuaca bulanan**:
 - Baris iradiasi dari laporan tahunan iSolarCloud (`climate_monthly`) hanya dipakai bila laporannya diimpor setelah bulan itu selesai (`isClimateRowComplete`); laporan yang ditarik di tengah bulan hanya berisi beberapa hari dan dulu membuat PR Oktober terbaca 914%.
 - Bulan tanpa laporan lengkap memakai GHI harian Open-Meteo yang dijumlahkan, lalu dikalikan rasio median sensor÷Open-Meteo dari bulan yang punya keduanya (`radiationCalibrationRatio`), karena GHI Open-Meteo sekitar 40% di atas sensor iSolarCloud.
@@ -397,7 +400,14 @@ Portal iSolarCloud menampilkan angka tetap 90 (95 untuk Karawang) untuk PR yang 
 
 ### Deteksi Soiling (Soiling Alert / Washing Recommendation)
 
-Jika PR suatu DC turun berturut-turut atau mengalami penurunan $\ge 10-15\%$ dibandingkan histori bulan sebelumnya pada kondisi cuaca cerah (iradiasi bulanan $\ge 80\text{ kWh/m}^2$ atau tidak mengalami penurunan iradiasi proporsional), sistem memicu **Soiling Alert** dengan rekomendasi *"Perlu Pembersihan Panel (Washing)"*.
+Daftar **"Perlu dicek untuk cuci panel"** di tab Kinerja panel (`/api/plts/pr-analysis`, `soilingAlerts`):
+
+- Membandingkan PR dua bulan lengkap terakhir per DC. PR resmi iSolarCloud dipakai lebih dulu; estimasi energi ÷ (kWp × iradiasi terkalibrasi) hanya bila PR resmi tidak ada. Nilai di luar 10-100% tidak dihitung.
+- DC masuk daftar bila PR turun 10% atau lebih dan iradiasi bulan terakhir tetap tinggi (≥ 80 kWh/m² atau tidak turun sebanding), dengan rekomendasi pencucian panel.
+- Hanya dicek bila bulan terakhir yang tersedia adalah bulan tutup terakhir (`getLastClosedMonth`), jadi daftar berganti sendiri tiap bulan selesai dan bulan berjalan tidak pernah memicu peringatan. Pada 2 Nov 2026 isinya 1 DC (Serang, PR 59,6% ke 40,2%, Sep ke Okt).
+- Tampilannya daftar berperingkat menurut besar penurunan (5 teratas, tombol "Lihat semua"); tiap baris membuka tampilan per DC.
+
+Kartu di atas grafik: "Kinerja panel (PR)" adalah PR tertimbang produksi (Σ energi ÷ Σ energi/PR) dari bulan lengkap tahun terpilih, "PR jika panel tidak panas" adalah PR terkoreksi ke 25°C, lalu rata-rata parameter cuaca terpilih dan korelasinya dengan PR. Grafik PR dan grafik parameter dipisah (satu sumbu tiap grafik); PR bulan berjalan baru dihitung setelah bulan tutup.
 
 ### Laporan Ringkasan Harian (Daily Executive Digest 18:00 WIB)
 

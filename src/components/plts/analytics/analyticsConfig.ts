@@ -1,6 +1,5 @@
 import { SOLAR_CONSTANTS } from '@/lib/solar/processor';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
-import { getYearToDateMonths } from '@/lib/reportingMonths';
 
 export const ALL_METRIC_OPTIONS = [
   {
@@ -80,17 +79,7 @@ export const METRIC_OPTIONS = isFeatureEnabled('auditBaseline')
   ? ALL_METRIC_OPTIONS
   : ALL_METRIC_OPTIONS.filter(m => m.sourceType !== 'AUDIT_BASELINE');
 
-// January through the current month; the current month counts only the days elapsed so far.
-export const API_MONTHS = getYearToDateMonths().map(({ yearMonth, label }: { yearMonth?: any; label?: any }, index, all) => {
-  const [year, month] = yearMonth.split('-').map(Number);
-  const isCurrent = index === all.length - 1;
-  return {
-    ym: `${year}${String(month).padStart(2, '0')}`,
-    label: `${label} ${year}`,
-    short: label,
-    days: isCurrent ? Math.max(1, new Date().getDate()) : new Date(year, month, 0).getDate(),
-  };
-});
+export { getApiMonths, getTrendColor, MAX_COLORED_TRENDS, TREND_COLORS, TREND_NEUTRAL } from '@/lib/solar/trendMonths';
 
 export function getPlantColor(idx, total = 37) {
   const hue = Math.round((idx * 137.508) % 360);

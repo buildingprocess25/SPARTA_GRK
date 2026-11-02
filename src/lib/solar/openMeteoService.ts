@@ -4,10 +4,8 @@
  * Sources:
  * - Archive: https://archive-api.open-meteo.com/v1/archive (Historical verified reanalysis)
  * - Forecast: https://api.open-meteo.com/v1/forecast (Recent days & real-time monitoring)
- * 
- * Note on Commercial License:
- * Open-Meteo is free for non-commercial and evaluation use.
- * For production commercial enterprise use, an API key can be supplied via OPEN_METEO_API_KEY.
+ *
+ * Free endpoints only, no API key: the project does not use the paid Open-Meteo plan.
  */
 
 import prisma from '../prisma.ts';
@@ -59,7 +57,6 @@ export const WEATHER_LOCATION_REGISTRY = [
 const yesterdayWib = () => new Date(Date.now() + 7 * 3600_000 - 86_400_000).toISOString().slice(0, 10);
 
 export async function fetchHistoricalWeatherForLocation(loc, startDate = '2025-01-01', endDate = yesterdayWib()) {
-  const apiKey = process.env.OPEN_METEO_API_KEY;
   const baseUrl = 'https://archive-api.open-meteo.com/v1/archive';
   const params = new URLSearchParams({
     latitude: String(loc.lat),
@@ -70,7 +67,6 @@ export async function fetchHistoricalWeatherForLocation(loc, startDate = '2025-0
     hourly: 'temperature_2m,relative_humidity_2m',
     timezone: 'Asia/Jakarta',
   });
-  if (apiKey) params.set('apikey', apiKey);
 
   const url = `${baseUrl}?${params.toString()}`;
   const res = await fetch(url);
@@ -157,7 +153,6 @@ export async function fetchHistoricalWeatherForLocation(loc, startDate = '2025-0
  * Fetch and process real-time / forecast weather for a single location (past 2 days + forecast 1 day)
  */
 export async function fetchForecastWeatherForLocation(loc, pastDays = 2, forecastDays = 1) {
-  const apiKey = process.env.OPEN_METEO_API_KEY;
   const baseUrl = 'https://api.open-meteo.com/v1/forecast';
   const params = new URLSearchParams({
     latitude: String(loc.lat),
@@ -168,7 +163,6 @@ export async function fetchForecastWeatherForLocation(loc, pastDays = 2, forecas
     hourly: 'temperature_2m,relative_humidity_2m',
     timezone: 'Asia/Jakarta',
   });
-  if (apiKey) params.set('apikey', apiKey);
 
   const url = `${baseUrl}?${params.toString()}`;
   const res = await fetch(url);

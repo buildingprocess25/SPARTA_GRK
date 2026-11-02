@@ -10,7 +10,8 @@ import {
 } from '@/lib/solar/performanceRatio';
 import { WEATHER_LOCATION_REGISTRY } from '@/lib/solar/openMeteoService';
 import { isDcLocation } from '@/lib/solar/plantMap.ts';
-import { getCurrentYearMonth } from '@/lib/reportingMonths';
+import { getCurrentYearMonth, getLastClosedMonth } from '@/lib/reportingMonths';
+import { isValidPlantPr } from '@/lib/solar/prValidity';
 
 export const dynamic = 'force-dynamic';
 
@@ -340,7 +341,8 @@ export async function GET(request) {
           totalPlantCount: scopedPlants.length,
           sensorPlantsCount,
           openMeteoPlantsCount,
-          sensorSharePct: aggPr.includedPlantCount > 0 ? Number(((sensorPlantsCount / aggPr.includedPlantCount) * 100).toFixed(1)) : 0,
+          // Share of DCs whose irradiation came from the site sensor, out of all DCs with any irradiation value.
+          sensorSharePct: sensorPlantsCount + openMeteoPlantsCount > 0 ? Number(((sensorPlantsCount / (sensorPlantsCount + openMeteoPlantsCount)) * 100).toFixed(1)) : 0,
         });
       }
 
@@ -373,7 +375,7 @@ export async function GET(request) {
     // Compute Soiling Alerts across plants based on latest closed months in primary year
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
     const soilingAlerts: any[] = [];
-    const primaryYear = years[0];
+    const primaryYear = years.at(-1);
 
     for (const p of plants) {
       if (p.operationalStatus === 'UNDER_CONSTRUCTION') continue;
@@ -406,20 +408,29 @@ export async function GET(request) {
         const weatherKey = dcToWeatherKey.get(p.dcId) || p.dcId;
         const wEntry = weatherMonthlyMap.get(`${weatherKey}:${ym}`);
 
+        // Same irradiance basis as the monthly series: a full-month sensor value, else calibrated Open-Meteo. The
+        // uncalibrated GHI sat ~40% high and made October look like a 30% PR drop at 31 DCs.
         let irrad = 0;
         if (sensorEntry && sensorEntry.radiationKwhM2 && sensorEntry.radiationKwhM2 > 0) {
           irrad = sensorEntry.radiationKwhM2;
         } else if (wEntry && wEntry.sumGhi > 0) {
-          irrad = Number(wEntry.sumGhi.toFixed(2));
+          irrad = Number((wEntry.sumGhi * radiationCalibration).toFixed(2));
         }
 
-        if (hasEnergy && energyKwh > 0 && irrad > 0) {
-          const pr = (energyKwh / (cap * irrad)) * 100;
+        // iSolarCloud's own PR first; the estimate only when there is none. Values outside 10-100% (bad sensor) are
+        // skipped, so a broken sensor month cannot trigger or hide a washing alert.
+        const official = Number(officialPrMap.get(`${ym}:${(p.sungrowPsIds || [])[0]}`));
+        const pr = Number.isFinite(official)
+          ? official
+          : (hasEnergy && energyKwh > 0 && irrad > 0 ? (energyKwh / (cap * irrad)) * 100 : null);
+        if (pr !== null && isValidPlantPr(pr)) {
           closedMonthlyPrs.push({ month: m, pr, irrad });
         }
       }
 
-      if (closedMonthlyPrs.length >= 2) {
+      // Only the last closed month can raise a washing alert; an older drop is history, not a to-do.
+      const lastClosedMonthOfYear = String(primaryYear) === String(getLastClosedMonth().year) ? getLastClosedMonth().month : 12;
+      if (closedMonthlyPrs.length >= 2 && closedMonthlyPrs.at(-1).month === lastClosedMonthOfYear) {
         const latest = closedMonthlyPrs[closedMonthlyPrs.length - 1];
         const prev = closedMonthlyPrs[closedMonthlyPrs.length - 2];
 

@@ -8,7 +8,8 @@ import { CustomSelect } from '@/components/ui/select';
 import { processAllDCAnalytics, SOLAR_CONSTANTS } from '@/lib/solar/processor';
 import { formatNum } from '@/data/sustainabilityData';
 import { isFeatureEnabled } from '@/lib/solar/conversionConfig';
-import { METRIC_OPTIONS, API_MONTHS, getPlantColor, PALETTE } from './analytics/analyticsConfig';
+import { METRIC_OPTIONS, getApiMonths, getTrendColor } from './analytics/analyticsConfig';
+import { useRunningMonth } from '@/hooks/useRunningMonth';
 import { matchesFuzzyQuery } from './analytics/analyticsHelpers';
 import { DCRowItem } from './analytics/DCRowItem';
 import AnalyticsTelemetryPanel from './analytics/AnalyticsTelemetryPanel';
@@ -294,13 +295,16 @@ export default function PLTSAnalyticsSection({
     }
   };
 
-  // Trend Dataset Construction (Monthly 2026 from Canonical ISOLAR_REPORT_IMPORT)
+  // Monthly trend, January through the running month (rebuilt when the month turns while the page is open).
+  const runningYearMonth = useRunningMonth().yearMonth;
   const trendDataset = useMemo(() => {
-    return API_MONTHS.map(m => {
+    return getApiMonths().map(m => {
       const isDaily = unitMode === 'daily';
       const monthObj: Record<string, any> = {
-        month: m.label,
+        month: m.partial ? `${m.label}*` : m.label,
         shortMonth: m.short,
+        monthTitle: `${m.label} ${m.year}${m.partial ? ` (berjalan, ${m.days} hari)` : ''}`,
+        partial: m.partial,
         ym: m.ym,
         days: m.days,
         unitMode
@@ -394,7 +398,8 @@ export default function PLTSAnalyticsSection({
       monthObj.targetPr = 80;
       return monthObj;
     });
-  }, [activeChosenDCIds, allDCItems, selectedMetric, unitMode]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeChosenDCIds, allDCItems, selectedMetric, unitMode, runningYearMonth]);
 
   const prBarChartData = useMemo(() => {
     if (selectedMetric !== 'pr') return [];
@@ -429,8 +434,10 @@ export default function PLTSAnalyticsSection({
 
   const trendTitle = useMemo(() => {
     if (activeChosenCount === 0) return 'Tidak ada lokasi yang dipilih';
-    const label = activeMetricMeta.trendLabel || activeMetricMeta.label;
-    const unit = selectedMetric === 'specificYield' && unitMode === 'daily'
+    const isDailyAverage = selectedMetric === 'specificYield' && unitMode === 'daily';
+    // "Rata-rata harian" is still one point per month: the month's total divided by its days.
+    const label = isDailyAverage ? 'rata-rata produksi harian per kWp, tiap bulan' : (activeMetricMeta.trendLabel || activeMetricMeta.label);
+    const unit = isDailyAverage
       ? `${activeMetricMeta.unit}/hari`
       : (activeMetricMeta.trendUnit || activeMetricMeta.unit);
 
@@ -709,9 +716,8 @@ export default function PLTSAnalyticsSection({
                 if (isSelected) {
                   const chosenIdx = chosenDCs.findIndex(d => d.dcId === dc.dcId);
                   if (chosenIdx >= 0) {
-                    colorBadge = chartViewMode === 'individual'
-                      ? getPlantColor(chosenIdx, chosenDCs.length)
-                      : (chosenDCs.length <= 10 ? PALETTE[chosenIdx % PALETTE.length] : null);
+                    // Same colour as the DC's line; none when more DCs are chosen than there are distinguishable hues.
+                    colorBadge = chartViewMode === 'individual' ? getTrendColor(chosenIdx, chosenDCs.length) : null;
                   }
                 }
 
@@ -740,10 +746,10 @@ export default function PLTSAnalyticsSection({
           {/* Bottom Average Footer */}
           <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between text-xs shrink-0 bg-slate-50 dark:bg-slate-800/40 p-2.5 rounded-xl mt-2 gap-1.5">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-slate-500 dark:text-slate-400 font-medium">Rata-rata Tertimbang ({rankedChosenCount} plant):</span>
-              <strong className="tabular-nums text-blue-700 dark:text-blue-300 font-bold">
+              <span className="text-slate-600 dark:text-slate-400 font-medium">Rata-rata menurut kapasitas ({rankedChosenCount} DC):</span>
+              <strong className="tabular-nums text-slate-900 dark:text-slate-100 font-bold">
                 {computedAverageMetricValue !== null && computedAverageMetricValue !== undefined
-                  ? `${computedAverageMetricValue} ${activeMetricMeta.unit}`
+                  ? `${Number(computedAverageMetricValue).toLocaleString('id-ID', { maximumFractionDigits: 2 })} ${activeMetricMeta.unit}`
                   : '—'}
               </strong>
             </div>
@@ -770,7 +776,7 @@ export default function PLTSAnalyticsSection({
                     className={`px-2.5 py-1 rounded-full transition-all ${unitMode === 'monthly' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                       }`}
                   >
-                    kWh/kWp per bulan
+                    Total per bulan
                   </button>
                   <button
                     type="button"
@@ -778,7 +784,7 @@ export default function PLTSAnalyticsSection({
                     className={`px-2.5 py-1 rounded-full transition-all ${unitMode === 'daily' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                       }`}
                   >
-                    kWh/kWp per hari
+                    Rata-rata harian
                   </button>
                 </div>
               )}
@@ -864,14 +870,14 @@ export default function PLTSAnalyticsSection({
               <div className="flex items-center gap-3">
                 {chartViewMode === 'individual' && (
                   <span className="inline-flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500" /> {chosenDCs.length} PLTS ditampilkan
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-400" aria-hidden="true" /> {chosenDCs.length} DC ditampilkan
                   </span>
                 )}
                 {chartViewMode === 'average' && (
                   <span className="inline-flex items-center gap-1.5 font-bold text-blue-700 dark:text-blue-300">
-                    <span className="w-3.5 h-1 bg-blue-600 rounded-full" /> Rata-rata Tertimbang ({chosenDCs.length} PLTS):{' '}
+                    <span className="w-3.5 h-1 bg-blue-600 rounded-full" aria-hidden="true" /> Rata-rata menurut kapasitas ({chosenDCs.length} DC):{' '}
                     {computedAverageMetricValue !== null && computedAverageMetricValue !== undefined
-                      ? `${computedAverageMetricValue} ${selectedMetric === 'specificYield' && unitMode === 'daily' ? 'kWh/kWp/hari' : activeMetricMeta.unit}`
+                      ? `${Number(computedAverageMetricValue).toLocaleString('id-ID', { maximumFractionDigits: 2 })} ${selectedMetric === 'specificYield' && unitMode === 'daily' ? 'kWh/kWp/hari' : activeMetricMeta.unit}`
                       : '—'}
                   </span>
                 )}
@@ -883,8 +889,8 @@ export default function PLTSAnalyticsSection({
                   const unitSuffix = selectedMetric === 'specificYield' && unitMode === 'daily' ? 'kWh/kWp/hari' : activeMetricMeta.unit;
                   return (
                     <span className="inline-flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
-                      <span className="w-3.5 h-0.5 bg-slate-400 rounded-full border-t border-dashed" /> Rentang ({chosenDCs.length} PLTS):{' '}
-                      {overallMin !== null && overallMax !== null ? `${overallMin} – ${overallMax} ${unitSuffix}` : '—'}
+                      <span className="w-3.5 h-0.5 bg-slate-400 rounded-full border-t border-dashed" aria-hidden="true" /> Rentang ({chosenDCs.length} DC):{' '}
+                      {overallMin !== null && overallMax !== null ? `${overallMin.toLocaleString('id-ID')} sampai ${overallMax.toLocaleString('id-ID')} ${unitSuffix}` : '—'}
                     </span>
                   );
                 })()}
