@@ -58,7 +58,7 @@ export async function fetchRawEnergyFlows({ year = 2026, rootDir = process.cwd()
   const maxYm = `${safeYear}12`;
 
   try {
-    const dbFlows = await prisma.$queryRawUnsafe<any[]>(`
+    const dbFlows = await prisma.$queryRawUnsafe(`
       SELECT ef.year_month as "yearMonth", 
              ef.ps_id as "psId", 
              ef.yield_kwh as "yieldKwh", 
