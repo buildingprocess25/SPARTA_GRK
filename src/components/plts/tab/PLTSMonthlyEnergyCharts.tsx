@@ -168,13 +168,29 @@ export default function PLTSMonthlyEnergyCharts({
           </div>
 
           <div className="space-y-5 my-4">
+            {/* PLTS Bar (same order and wording as the "Kebutuhan listrik vs PLTS" tab) */}
+            <div>
+              <div className="flex justify-between text-sm font-bold text-amber-600 dark:text-amber-400 mb-2">
+                <span className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-300">
+                  <Sun size={14} className="text-amber-500" aria-hidden="true" /> Dari PLTS
+                </span>
+                <span className="text-sm font-bold text-amber-700 dark:text-amber-300 tabular-nums">{dynamicEnergyBreakdown.pltsLabel}</span>
+              </div>
+              <div className="h-2.5 rounded-full bg-amber-50 dark:bg-amber-500/10 overflow-hidden border border-amber-100/60 dark:border-amber-500/20">
+                <div
+                  className="h-full rounded-full bg-amber-500 transition-all duration-500"
+                  style={{ width: `${dynamicEnergyBreakdown.pltsPercentage}%` }}
+                />
+              </div>
+            </div>
+
             {/* PLN Bar */}
             <div>
               <div className="flex justify-between text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                 <span className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
-                  <Zap size={14} className="text-slate-500 dark:text-slate-400" /> PLN (Grid)
+                  <Zap size={14} className="text-slate-500 dark:text-slate-400" aria-hidden="true" /> Dari PLN
                 </span>
-                <span className="text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums">{dynamicEnergyBreakdown.plnPercentage}%</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums">{dynamicEnergyBreakdown.plnLabel}</span>
               </div>
               <div className="h-2.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                 <div
@@ -184,21 +200,20 @@ export default function PLTSMonthlyEnergyCharts({
               </div>
             </div>
 
-            {/* PLTS Bar */}
-            <div>
-              <div className="flex justify-between text-sm font-bold text-amber-600 dark:text-amber-400 mb-2">
-                <span className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-300">
-                  <Sun size={14} className="text-amber-500" /> PLTS (Solar)
-                </span>
-                <span className="text-sm font-bold text-amber-700 dark:text-amber-300 tabular-nums">{dynamicEnergyBreakdown.pltsPercentage}%</span>
+            <dl className="rounded-lg bg-slate-50 dark:bg-slate-800/40 p-3 text-[11px] space-y-1.5">
+              <div className="flex justify-between gap-3 text-slate-600 dark:text-slate-400">
+                <dt>Total kebutuhan listrik DC</dt>
+                <dd className="tabular-nums font-bold text-slate-900 dark:text-slate-100">{dynamicEnergyBreakdown.totalLoadLabel}</dd>
               </div>
-              <div className="h-2.5 rounded-full bg-amber-50 dark:bg-amber-500/10 overflow-hidden border border-amber-100/60 dark:border-amber-500/20">
-                <div
-                  className="h-full rounded-full bg-amber-500 transition-all duration-500"
-                  style={{ width: `${dynamicEnergyBreakdown.pltsPercentage}%` }}
-                />
+              <div className="flex justify-between gap-3 text-slate-600 dark:text-slate-400">
+                <dt>Dibeli dari PLN</dt>
+                <dd className="tabular-nums font-bold text-slate-900 dark:text-slate-100">{dynamicEnergyBreakdown.purchasedLabel}</dd>
               </div>
-            </div>
+              <div className="flex justify-between gap-3 text-amber-800 dark:text-amber-300">
+                <dt>PLTS dipakai sendiri</dt>
+                <dd className="tabular-nums font-bold">{dynamicEnergyBreakdown.selfConsumptionLabel}</dd>
+              </div>
+            </dl>
           </div>
         </div>
 

@@ -433,7 +433,11 @@ export default function PLTSMonthlyMatrixTable({
               {MONTH_NAMES.map((m, idx) => {
                 const isSelectedCol = idx + 1 === selectedThroughMonth;
                 const isDimmed = idx + 1 > selectedThroughMonth;
-                const isPartial = monthlyRows[idx]?.partial;
+                // Only the running WIB month is "Berjalan"; later months of the year have not started yet.
+                const colYm = `${selectedYear}-${String(idx + 1).padStart(2, '0')}`;
+                const runningYm = getRunningMonth().yearMonth;
+                const isRunning = colYm === runningYm;
+                const isFuture = colYm > runningYm;
                 return (
                   <th
                     key={m}
@@ -442,10 +446,13 @@ export default function PLTSMonthlyMatrixTable({
                     }`}
                   >
                     <div>{m}</div>
-                    {isPartial && (
+                    {isRunning && (
                       <span className="inline-block mt-0.5 text-[9px] font-bold px-1 py-0.2 bg-amber-400/20 text-amber-300 rounded border border-amber-400/30">
                         Berjalan
                       </span>
+                    )}
+                    {isFuture && (
+                      <span className="inline-block mt-0.5 text-[9px] font-medium text-slate-400">Belum berjalan</span>
                     )}
                   </th>
                 );

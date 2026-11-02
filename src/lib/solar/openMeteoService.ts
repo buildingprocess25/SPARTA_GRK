@@ -55,7 +55,10 @@ export const WEATHER_LOCATION_REGISTRY = [
 /**
  * Fetch and process historical weather archive for a single location
  */
-export async function fetchHistoricalWeatherForLocation(loc, startDate = '2025-01-01', endDate = '2026-10-05') {
+// Default end: yesterday in WIB, the last day the archive API can serve complete.
+const yesterdayWib = () => new Date(Date.now() + 7 * 3600_000 - 86_400_000).toISOString().slice(0, 10);
+
+export async function fetchHistoricalWeatherForLocation(loc, startDate = '2025-01-01', endDate = yesterdayWib()) {
   const apiKey = process.env.OPEN_METEO_API_KEY;
   const baseUrl = 'https://archive-api.open-meteo.com/v1/archive';
   const params = new URLSearchParams({

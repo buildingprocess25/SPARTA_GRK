@@ -201,7 +201,8 @@ Monitoring real-time PLTS atap di 37 DC (5.778,8 kWp; 36 beroperasi, Gorontalo b
   - Performance Ratio (PR) bulanan per plant langsung dari iSolarCloud (titik `p83023` mode bulanan, identik dengan Annual Report portal), dengan agregat setara cara portal; bulan dengan PR di luar 10-100% (sensor iradiasi bermasalah) tidak dihitung
   - Koreksi temperatur silikon (-0,45%/°C dari STC 25°C) menggunakan model Sandia/King
   - Analisis korelasi cuaca (GHI, suhu, kelembapan) dari Open-Meteo
-- **Matriks bulanan**: tabel 37 DC x 12 bulan dengan yield, load, feed-in, dan PR
+- **Matriks bulanan**: tabel 37 DC x 12 bulan dengan yield, load, feed-in, dan PR; badge "Berjalan" hanya untuk bulan berjalan, bulan sesudahnya "Belum berjalan"
+- **Kebutuhan listrik vs PLTS**: kebutuhan listrik per bulan = listrik dibeli dari PLN + PLTS dipakai sendiri dari `energy_flow_monthly` (dasar yang sama dengan Scope 2), sehingga totalnya sama dengan Scope 2. Kolom beban laporan tahunan hanya cadangan; dulu totalnya terhitung ganda (32.525 MWh) karena bulan dengan laporan tahunan dan workbook dijumlah dua kali
 - **Produksi bulanan di halaman PLTS** dibaca dari `monthly_yield_observation`. Sync energi bulanan (setiap 3 jam) ikut menulis produksi tiap plant ke tabel ini: bulan yang sudah tutup sebagai `api_history` (final), bulan berjalan sebagai `api_live_partial`. Laporan bulanan yang diunggah (`ISOLAR_REPORT_IMPORT`) tetap menang bila ada
 - **Target RKAP**: tracking realisasi terhadap target produksi perusahaan
 - **Emisi terhindar**: energi PLTS x 0,997 kgCO2/kWh
@@ -384,6 +385,15 @@ T_panel       = T_day + (G / 800) x (NOCT - 20)
 ```
 
 Portal iSolarCloud menampilkan angka tetap 90 (95 untuk Karawang) untuk PR yang tidak masuk akal; dashboard menyimpan nilai mentahnya dan menandai bulan di luar 10-100% sebagai sensor iradiasi bermasalah, bukan memakai 90. Sinkronisasi di `prMonthlySync.ts`, batas valid di `prValidity.ts`, agregasi di `dashboard.ts` (`calculateWeightedPr`). Koefisien gamma = -0,45%/°C, NOCT = 45°C (`performanceRatio.ts`).
+
+**Satuan PR dari API**: titik `p83023` dikirim sebagai rasio (`"0.7309"` untuk 73,09% di portal, dicek 2 Nov 2026). `prMonthlySync.ts` mengalikannya 100 dan menyimpan persen dua desimal. Sebelum 2 Nov 2026 rasio tersimpan apa adanya sehingga semua PR resmi tersaring aturan 10-100% (PR Okt/Nov kosong, total "11,6%"); data 2025-2026 sudah ditarik ulang dengan `scripts/data/backfill-plant-pr-monthly.mjs`. Grafik "PR vs suhu panel" (`/api/plts/pr-analysis`) memakai aturan yang sama dengan dashboard (PR resmi dulu, estimasi sebagai cadangan).
+
+**Iradiasi dan cuaca bulanan**:
+- Baris iradiasi dari laporan tahunan iSolarCloud (`climate_monthly`) hanya dipakai bila laporannya diimpor setelah bulan itu selesai (`isClimateRowComplete`); laporan yang ditarik di tengah bulan hanya berisi beberapa hari dan dulu membuat PR Oktober terbaca 914%.
+- Bulan tanpa laporan lengkap memakai GHI harian Open-Meteo yang dijumlahkan, lalu dikalikan rasio median sensor÷Open-Meteo dari bulan yang punya keduanya (`radiationCalibrationRatio`), karena GHI Open-Meteo sekitar 40% di atas sensor iSolarCloud.
+- Suhu panel di tab Cuaca dan di grafik PR sama-sama dari `weather_daily.module_temp_c`.
+- `weather_daily` diisi otomatis oleh scheduler (`weatherSync.ts`) sekali per 6 jam; bila tertinggal, tarikan berikutnya mengejar sampai 92 hari ke belakang.
+- Bulan berjalan ditandai `*` dan dipudarkan di grafik, tidak ikut rata-rata kartu, dan tooltip menyebut berapa hari datanya.
 
 ### Deteksi Soiling (Soiling Alert / Washing Recommendation)
 

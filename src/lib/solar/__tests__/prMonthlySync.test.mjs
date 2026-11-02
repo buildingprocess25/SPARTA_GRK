@@ -4,10 +4,11 @@ import { prRowsFromPoints, syncMonthlyPrFromApi } from '../prMonthlySync.ts';
 import { isValidPlantPr } from '../prValidity.ts';
 import { calculateWeightedPr } from '../dashboard.ts';
 
-test('monthly PR rows come from data_type 1 and skip empty readings', () => {
+// The live API answers with a ratio: 1459033 Jan 2026 came back as "0.7309" (portal: 73.09%), checked on 2 Nov 2026.
+test('monthly PR rows come from data_type 1, convert the ratio to percent, and skip empty readings', () => {
   const rows = prRowsFromPoints({
-    '1583524_11_0_0': { p83023: [{ 1: '74.07', time_stamp: '202601' }, { 1: '--', time_stamp: '202602' }, { 1: '', time_stamp: '202603' }] },
-    '1459033_11_0_0': { p83023: [{ 1: '73.09', time_stamp: '202601' }] },
+    '1583524_11_0_0': { p83023: [{ 1: '0.7407', time_stamp: '202601' }, { 1: '--', time_stamp: '202602' }, { 1: '', time_stamp: '202603' }] },
+    '1459033_11_0_0': { p83023: [{ 1: '0.7309', time_stamp: '202601' }] },
   }, [1583524, 1459033, 999]);
   assert.deepEqual(rows, [
     { yearMonth: '202601', psId: 1583524, prPercent: 74.07 },
@@ -77,7 +78,7 @@ test('sync asks for last and this month and upserts by month and plant', async (
   let body;
   const request = async (_path, payload) => {
     body = payload;
-    return { data: { result_code: '1', result_data: { '1583524_11_0_0': { p83023: [{ 1: '89.39', time_stamp: '202610' }, { 1: '117.82', time_stamp: '202609' }] } } } };
+    return { data: { result_code: '1', result_data: { '1583524_11_0_0': { p83023: [{ 1: '0.8939', time_stamp: '202610' }, { 1: '1.1782', time_stamp: '202609' }] } } } };
   };
   const result = await syncMonthlyPrFromApi({ db, now, request });
   assert.deepEqual([body.start_time, body.end_time, body.query_type, body.data_type, body.data_point], ['202609', '202610', '2', '1', 'p83023']);

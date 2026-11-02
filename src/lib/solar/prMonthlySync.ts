@@ -18,7 +18,11 @@ function previousYearMonth(ym) {
   return month === 1 ? `${year - 1}12` : `${year}${String(month - 1).padStart(2, '0')}`;
 }
 
-/** Turns a getDevicePointsDayMonthYearDataList monthly PR response into plant_pr_monthly rows; missing readings are skipped. */
+/**
+ * Turns a getDevicePointsDayMonthYearDataList monthly PR response into plant_pr_monthly rows; missing readings are
+ * skipped. p83023 comes back as a ratio ("0.7309" for the portal's 73.09%), so it is stored as a percent with two
+ * decimals; storing the raw ratio made every value fall outside the 10-100% validity band.
+ */
 export function prRowsFromPoints(resultData = {}, psIds = []) {
   const rows = [];
   for (const psId of psIds) {
@@ -27,7 +31,7 @@ export function prRowsFromPoints(resultData = {}, psIds = []) {
       if (!entry.time_stamp || raw === undefined || raw === null || raw === '' || raw === '--') continue;
       const value = Number(raw);
       if (!Number.isFinite(value)) continue;
-      rows.push({ yearMonth: String(entry.time_stamp), psId, prPercent: Number(value.toFixed(2)) });
+      rows.push({ yearMonth: String(entry.time_stamp), psId, prPercent: Number((value * 100).toFixed(2)) });
     }
   }
   return rows;

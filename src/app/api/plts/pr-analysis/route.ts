@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { resolveMonthly } from '@/lib/solar/dashboard';
+import { calculateWeightedPr, resolveMonthly } from '@/lib/solar/dashboard';
+import { isClimateRowComplete, radiationCalibrationRatio } from '@/lib/solar/climateCompleteness';
 import {
-  calculateCapacityWeightedPr,
   estimatePanelTemperature,
   calculateTemperatureCorrectedPr,
   calculatePearsonCorrelation,
@@ -73,6 +73,7 @@ export async function GET(request) {
         tempMaxC: true,
         tempDayMeanC: true,
         ghiKwhM2: true,
+        moduleTempC: true,
         humidityMean: true,
         source: true,
       },
@@ -90,8 +91,17 @@ export async function GET(request) {
         radiationKwhM2: true,
         moduleTempC: true,
         source: true,
+        importedAt: true,
+        updatedAt: true,
       },
     });
+
+    // iSolarCloud's own monthly PR (percent); it wins over the energy / (kWp x irradiance) estimate, as on the dashboard.
+    const officialPrRows = await prisma.plantPrMonthly.findMany({
+      where: { yearMonth: { gte: minYm, lte: maxYm } },
+      select: { yearMonth: true, psId: true, prPercent: true },
+    }).catch(() => []);
+    const officialPrMap = new Map(officialPrRows.map(r => [`${r.yearMonth}:${r.psId}`, Number(r.prPercent)] as const));
 
     // Build indexing maps
     const obsMap = new Map();
@@ -102,8 +112,9 @@ export async function GET(request) {
     }
 
     const sensorMap = new Map();
+    // A report row imported before its month closed holds only part of the month; Open-Meteo's sum stands in for it.
     for (const c of climateSensors) {
-      sensorMap.set(`${c.yearMonth}:${c.psId}`, c);
+      if (isClimateRowComplete(c)) sensorMap.set(`${c.yearMonth}:${c.psId}`, c);
     }
 
     // Map DC ID to weather location key
@@ -125,6 +136,8 @@ export async function GET(request) {
           sumGhi: 0,
           sumTempMean: 0,
           sumTempDay: 0,
+          sumModuleTemp: 0,
+          countModuleTemp: 0,
           sumHum: 0,
           countHum: 0,
           sources: new Set(),
@@ -135,6 +148,10 @@ export async function GET(request) {
       if (w.ghiKwhM2) entry.sumGhi += w.ghiKwhM2;
       if (w.tempMeanC) entry.sumTempMean += w.tempMeanC;
       if (w.tempDayMeanC) entry.sumTempDay += w.tempDayMeanC;
+      if (Number.isFinite(w.moduleTempC)) {
+        entry.sumModuleTemp += w.moduleTempC;
+        entry.countModuleTemp++;
+      }
       if (w.humidityMean) {
         entry.sumHum += w.humidityMean;
         entry.countHum++;
@@ -152,6 +169,19 @@ export async function GET(request) {
 
     // The running WIB month is partial; every month before it is closed.
     const currentYearMonth = getCurrentYearMonth().replace('-', '');
+
+    // Scale Open-Meteo GHI onto the irradiance sensors' basis using plant-months that have both (see helper).
+    const calibrationPairs = [];
+    for (const p of plants) {
+      const weatherKey = dcToWeatherKey.get(p.dcId) || p.dcId;
+      for (const [key, sensor] of sensorMap) {
+        const [ym, psId] = key.split(':');
+        if (Number(psId) !== Number((p.sungrowPsIds || [])[0])) continue;
+        const w = weatherMonthlyMap.get(`${weatherKey}:${ym}`);
+        if (w?.sumGhi > 0) calibrationPairs.push({ sensor: Number(sensor.radiationKwhM2), openMeteo: w.sumGhi });
+      }
+    }
+    const radiationCalibration = radiationCalibrationRatio(calibrationPairs);
 
     // Build monthly series for each requested year
     const yearlySeries: Record<string, any> = {};
@@ -199,7 +229,7 @@ export async function GET(request) {
             irradiationKwhM2 = sensorEntry.radiationKwhM2;
             irradSource = 'sensor';
           } else if (wEntry && wEntry.sumGhi > 0) {
-            irradiationKwhM2 = Number(wEntry.sumGhi.toFixed(2));
+            irradiationKwhM2 = Number((wEntry.sumGhi * radiationCalibration).toFixed(2));
             irradSource = 'open-meteo-estimate';
           }
 
@@ -208,11 +238,15 @@ export async function GET(request) {
           const humidityMean = wEntry && wEntry.countHum > 0 ? Number((wEntry.sumHum / wEntry.countHum).toFixed(1)) : null;
 
           const dailyAvgGhi = irradiationKwhM2 && wEntry?.days > 0 ? irradiationKwhM2 / wEntry.days : (irradiationKwhM2 ? irradiationKwhM2 / 30 : null);
-          const tempPanelC = tempDayMeanC !== null && dailyAvgGhi !== null
-            ? estimatePanelTemperature({ tempDayMeanC, ghiKwhM2: dailyAvgGhi })
-            : null;
+          // The daily panel temperature already stored with the weather (what the "Cuaca dan suhu" tab shows), so both
+          // tabs report one number; the Sandia estimate from monthly means is only a fallback.
+          const tempPanelC = wEntry?.countModuleTemp > 0
+            ? Number((wEntry.sumModuleTemp / wEntry.countModuleTemp).toFixed(2))
+            : (tempDayMeanC !== null && dailyAvgGhi !== null ? estimatePanelTemperature({ tempDayMeanC, ghiKwhM2: dailyAvgGhi }) : null);
 
+          const officialPr = officialPrMap.get(`${ym}:${(p.sungrowPsIds || [])[0]}`);
           plantCalculations.push({
+            officialPrPct: Number.isFinite(officialPr) ? officialPr : null,
             dcId: p.dcId,
             name: p.canonicalName,
             capacityKwp: cap,
@@ -228,7 +262,17 @@ export async function GET(request) {
         }
 
         // Aggregate across plants for this month
-        const aggPr = calculateCapacityWeightedPr(plantCalculations);
+        // Same rule as the dashboard: official PR first, then the estimate; values outside 10-100% are left out.
+        const weighted = calculateWeightedPr(plantCalculations.map(pc => ({
+          plantId: pc.dcId, yearMonth: ym, energyKwh: pc.energyKwh, capacityKwp: pc.capacityKwp,
+          radiationKwhM2: pc.irradiationKwhM2, officialPrPct: pc.officialPrPct, isOperational: pc.isOperational,
+        })));
+        const aggPr = {
+          prPercent: weighted.valuePct === null ? null : Number(weighted.valuePct.toFixed(2)),
+          includedPlantCount: weighted.activePlantCount,
+          excludedPlantCount: weighted.anomalies.length,
+          source: weighted.source,
+        };
 
         const totalEnergyKwh = plantCalculations
           .filter(p => p.energyKwh !== null)
@@ -291,6 +335,8 @@ export async function GET(request) {
           specificYield,
           capacityFactorPercent: capacityFactor,
           includedPlantCount: aggPr.includedPlantCount,
+          prExcludedPlantCount: aggPr.excludedPlantCount,
+          prSource: aggPr.source,
           totalPlantCount: scopedPlants.length,
           sensorPlantsCount,
           openMeteoPlantsCount,

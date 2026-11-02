@@ -3,8 +3,9 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { getRecentYears } from '@/lib/reportingMonths';
 import {
-  CartesianGrid, Line, ComposedChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
+  CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
+import { CHART_AXIS_PROPS, CHART_GRID_PROPS, CHART_PALETTE, ChartPillLegend, ChartTooltipCard } from '@/components/ui/ChartTheme';
 import {
   Gauge, Thermometer, Sun, Zap, Activity, RefreshCw, Layers, MapPin, TrendingDown,
   Sparkles, Droplets, AlertTriangle, CheckCircle2, ChevronRight
@@ -13,6 +14,7 @@ import { TabContentSkeleton } from './PLTSDashboardSkeletons';
 import InfoHint from '@/components/ui/InfoHint';
 import { CustomSelect } from '@/components/ui/select';
 
+const PR_COLOR = '#0284c7';
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
 const PARAM_OPTIONS = [
@@ -94,6 +96,27 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
       paramValue: item[activeParam.key] ?? null,
     }));
   }, [apiData, selectedYear, activeParam]);
+
+  // One tooltip for both stacked charts (they share syncId), in the app's standard light/dark card.
+  const prTooltip = ({ active, payload }: { active?: any; payload?: any }) => {
+    if (!active || !payload?.length) return null;
+    const item = payload[0].payload;
+    return (
+      <ChartTooltipCard
+        title={`${item.monthLabel} ${selectedYear}${item.isPartial ? ' (bulan berjalan)' : ''}`}
+        items={[
+          { label: 'PR', value: item.isPartial ? 'dihitung setelah bulan tutup' : (item.prPercent != null ? `${formatNum(item.prPercent, 1, 1)}%` : 'tidak ada'), dotColor: PR_COLOR },
+          { label: 'PR pada 25°C', value: item.isPartial ? 'dihitung setelah bulan tutup' : (item.prCorrectedPercent != null ? `${formatNum(item.prCorrectedPercent, 1, 1)}%` : 'tidak ada') },
+          { label: activeParam.label, value: item.paramValue != null ? `${formatNum(item.paramValue, 1, 2)} ${activeParam.unit}` : 'tidak ada', dotColor: activeParam.color },
+        ]}
+        footer={`PR dari ${item.includedPlantCount ?? 0} dari ${item.totalPlantCount ?? 0} plant${item.prExcludedPlantCount ? `; ${item.prExcludedPlantCount} plant dikecualikan karena sensor iradiasinya di luar 10-100%` : ''}.`}
+      />
+    );
+  };
+  const excludedTotal = seriesData.reduce((sum: number, s: any) => sum + (s.isPartial ? 0 : (s.prExcludedPlantCount || 0)), 0);
+  const excludedNote = excludedTotal > 0
+    ? `PR bulanan memakai angka resmi iSolarCloud per plant. Sepanjang ${selectedYear}, ${excludedTotal} angka plant-bulan dikecualikan karena sensor iradiasinya membaca di luar 10-100%, sama seperti yang disembunyikan portal.`
+    : null;
 
   // Averages for Jan-Sep (excluding partial and future months)
   const summaryMetrics = useMemo(() => {
@@ -374,124 +397,70 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
         </div>
       )}
 
-      {/* Main Dual-Axis Chart */}
+      {/* Two stacked charts on one month axis: PR on its own 50-100% scale, the chosen parameter on its own scale.
+          A shared second y-axis made one series unreadable whenever the other had an outlier. */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black text-slate-900 dark:text-slate-100">
-              PR vs {activeParam.label.toLowerCase()} ({selectedYear})
-            </span>
-          </div>
-          <div className="flex items-center gap-4 text-[11px] font-semibold">
-            <div className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300">
-              <span className="w-3 h-1 bg-blue-600 rounded-full" />
-              <span>PR (%)</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-              <span className="w-3 h-0.5 border-t-2 border-dashed border-emerald-500" />
-              <span>Target 80%</span>
-            </div>
-            <div className="flex items-center gap-1.5" style={{ color: activeParam.color }}>
-              <span className="w-3 h-1 rounded-full" style={{ backgroundColor: activeParam.color }} />
-              <span>{activeParam.label} ({activeParam.unit})</span>
-            </div>
+          <span className="text-xs font-black text-slate-900 dark:text-slate-100">
+            Apakah panel bekerja sesuai target, dan apa pengaruh {activeParam.label.toLowerCase()}? ({selectedYear})
+          </span>
+          <ChartPillLegend items={[
+            { label: 'PR (%)', color: PR_COLOR },
+            { label: 'Target 80%', color: CHART_PALETTE.savings, type: 'line' },
+            { label: 'Waspada 75%', color: CHART_PALETTE.plts, type: 'line' },
+            { label: `${activeParam.label} (${activeParam.unit})`, color: activeParam.color },
+          ]} />
+        </div>
+
+        <div>
+          <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">PR bulanan (%)</p>
+          <div className="h-[200px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={seriesData} syncId="pr-vs-param" margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                <CartesianGrid {...CHART_GRID_PROPS} />
+                <XAxis dataKey="monthLabel" {...CHART_AXIS_PROPS} />
+                <YAxis {...CHART_AXIS_PROPS} domain={[50, 100]} allowDataOverflow width={46} tickFormatter={(v) => `${v}%`} />
+                <Tooltip content={prTooltip} />
+                {/* The legend above names both lines; labels on lines 5 points apart overlapped. */}
+                <ReferenceLine y={80} stroke={CHART_PALETTE.savings} strokeDasharray="4 4" />
+                <ReferenceLine y={75} stroke={CHART_PALETTE.plts} strokeDasharray="4 4" />
+                <Line isAnimationActive={false} type="monotone" dataKey="prPercent" name="PR" stroke={PR_COLOR} strokeWidth={2} connectNulls={false} dot={{ r: 4, fill: PR_COLOR, strokeWidth: 0 }} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="h-[340px] w-full pt-2">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={seriesData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="monthLabel" tick={{ fontSize: 11, fill: '#64748b' }} />
-              
-              {/* Left Y-Axis: PR (%) */}
-              <YAxis
-                yAxisId="left"
-                domain={[50, 100]}
-                unit="%"
-                tick={{ fontSize: 10, fill: '#0284c7' }}
-                width={46}
-              />
-
-              {/* Right Y-Axis: Selected Parameter */}
-              <YAxis
-                yAxisId="right"
-                orientation="right"
-                domain={activeParam.domain}
-                unit={` ${activeParam.unit}`}
-                tick={{ fontSize: 10, fill: activeParam.color }}
-                width={56}
-              />
-
-              <Tooltip
-                content={({ active, payload, label }: { active?: any; payload?: any; label?: any }) => {
-                  if (!active || !payload || !payload.length) return null;
-                  const item = payload[0]?.payload;
-                  return (
-                    // backdrop-blur-md keeps this tooltip legible over chart gridlines behind it
-                    <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg text-xs space-y-1.5">
-                      <div className="flex items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-1 font-bold text-slate-800 dark:text-slate-200">
-                        <span>Bulan: {label} {selectedYear}</span>
-                        {item.isPartial && (
-                          <span className="text-[9px] bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded font-bold">
-                            Bulan berjalan
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center justify-between gap-4 text-blue-700 dark:text-blue-300 font-bold">
-                        <span>PR:</span>
-                        <span>{item.isPartial ? 'Dihitung setelah bulan tutup' : (item.prPercent != null ? `${formatNum(item.prPercent, 1, 1)}%` : '—')}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4 text-emerald-700 dark:text-emerald-300 font-medium">
-                        <span>PR pada 25°C:</span>
-                        <span>{item.isPartial ? 'Dihitung setelah bulan tutup' : (item.prCorrectedPercent != null ? `${formatNum(item.prCorrectedPercent, 1, 1)}%` : '—')}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4 font-bold" style={{ color: activeParam.color }}>
-                        <span>{activeParam.label}:</span>
-                        <span>{formatNum(item.paramValue, 1, 2)} {activeParam.unit}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4 text-slate-500 dark:text-slate-400 text-[10px] pt-1 border-t border-slate-100 dark:border-slate-800">
-                        <span>Plant dihitung:</span>
-                        <span>{item.includedPlantCount} dari {item.totalPlantCount} plant</span>
-                      </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                        Data sinar matahari: {item.sensorPlantsCount > 0 ? 'sensor iSolar dan Open-Meteo' : 'perkiraan Open-Meteo'}
-                      </div>
-                    </div>
-                  );
-                }}
-              />
-
-              <ReferenceLine yAxisId="left" y={80} stroke="#10b981" strokeDasharray="4 4" label={{ value: 'Target 80%', fill: '#10b981', fontSize: 10, position: 'insideTopRight' }} />
-              <ReferenceLine yAxisId="left" y={75} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: 'Waspada 75%', fill: '#f59e0b', fontSize: 10, position: 'insideBottomRight' }} />
-
-              {/* Blue PR Line */}
-              <Line isAnimationActive={false}
-                yAxisId="left"
-                type="monotone"
-                dataKey="prPercent"
-                name="PR"
-                stroke="#0284c7"
-                strokeWidth={3}
-                dot={{ r: 4, fill: '#0284c7', stroke: '#fff', strokeWidth: 2 }}
-                activeDot={{ r: 6 }}
-              />
-
-              {/* Red/Colored Parameter Line */}
-              <Line isAnimationActive={false}
-                yAxisId="right"
-                type="monotone"
-                dataKey="paramValue"
-                name={activeParam.label}
-                stroke={activeParam.color}
-                strokeWidth={2.5}
-                strokeDasharray={activeParam.id.includes('temp') ? '0' : '4 4'}
-                dot={{ r: 4, fill: activeParam.color, stroke: '#fff', strokeWidth: 2 }}
-                activeDot={{ r: 6 }}
-              />
-            </ComposedChart>
-          </ResponsiveContainer>
+        <div>
+          <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">{activeParam.label} ({activeParam.unit})</p>
+          <div className="h-[160px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={seriesData} syncId="pr-vs-param" margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                <CartesianGrid {...CHART_GRID_PROPS} />
+                <XAxis dataKey="monthLabel" {...CHART_AXIS_PROPS} />
+                <YAxis {...CHART_AXIS_PROPS} domain={['auto', 'auto']} width={46} tickFormatter={(v) => formatNum(v, 0, 1)} />
+                <Tooltip content={prTooltip} />
+                <Line
+                  isAnimationActive={false}
+                  type="monotone"
+                  dataKey="paramValue"
+                  name={activeParam.label}
+                  stroke={activeParam.color}
+                  strokeWidth={2}
+                  dot={(props) => {
+                    const { cx, cy, payload } = props;
+                    if (cx == null || cy == null || payload.paramValue == null) return <g key={payload.month} />;
+                    // The running month is hollow: its value covers only the days so far.
+                    return payload.isPartial
+                      ? <circle key={payload.month} cx={cx} cy={cy} r={4} className="fill-white dark:fill-slate-900" stroke={activeParam.color} strokeWidth={2} />
+                      : <circle key={payload.month} cx={cx} cy={cy} r={4} fill={activeParam.color} />;
+                  }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
+        {excludedNote && <p className="text-[11px] text-slate-600 dark:text-slate-400">{excludedNote}</p>}
       </div>
     </div>
   );

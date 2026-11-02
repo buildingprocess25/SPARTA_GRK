@@ -4,6 +4,7 @@ import { computeEnergyBalance, validateEnergyBalanceRow } from './energyBalance.
 import { isValidPlantPr, PR_VALID_RANGE } from './prValidity.ts';
 import { EMISSION_CONSTANTS, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './conversionConfig.ts';
 import { getRunningMonth } from '../reportingMonths.ts';
+import { radiationCalibrationRatio } from './climateCompleteness.ts';
 
 export const MONTHLY_SOURCE_POLICY = Object.freeze({
   preferredCompletedSource: 'ISOLAR_REPORT_IMPORT',
@@ -519,7 +520,16 @@ export function buildPltsDashboardFromRows({
     const loadRows = uniqueLoads.filter((item) => (
       (plant.sungrowPsIds || []).includes(Number(item.psId)) && selectedKeys.includes(item.yearMonth)
     ));
-    const loadValues = loadRows.map((item) => finiteOrNull(item.loadKwh)).filter((value) => value !== null);
+    const reportLoadValues = loadRows.map((item) => finiteOrNull(item.loadKwh)).filter((value) => value !== null);
+    // Plant load = PLN purchase + self-consumed PLTS per month from the API energy flow (Scope 2's basis); the report
+    // load is used only for months that have no complete energy flow.
+    const flowLoadValues = monthly.filter((item) => item.hasCompleteEnergyFlow).map((item) => {
+      const purchased = (item.parts || [])
+        .map((part) => resolveFlowField(item.yearMonth, part.psId, part.source, 'purchasedKwh'))
+        .filter((value) => value !== null);
+      return purchased.length ? purchased.reduce((sum, value) => sum + value, 0) + item.selfConsumptionKwh : null;
+    }).filter((value) => value !== null);
+    const loadValues = flowLoadValues.length ? flowLoadValues : reportLoadValues;
     const costSavings = calculateCostSavings(productionKwh, plant.dcId);
 
     // Missing or invalid feed-in data must never imply 100% self-consumption.
@@ -788,6 +798,16 @@ export function buildPltsDashboardFromRows({
     };
   });
 
+  // Months that have both a full-month sensor value and Open-Meteo calibrate the Open-Meteo fallback (see helper).
+  const monthAverage = (values) => (values.length ? values.reduce((s, v) => s + v, 0) / values.length : null);
+  const weatherMonthKey = (ym) => (String(ym).includes('-') ? ym : `${String(ym).slice(0, 4)}-${String(ym).slice(4, 6)}`);
+  const radiationCalibration = radiationCalibrationRatio(
+    [...new Set(climate.map((c) => c.yearMonth))].map((ym) => ({
+      sensor: monthAverage(climate.filter((c) => c.yearMonth === ym).map((c) => Number(c.radiationKwhM2)).filter((v) => Number.isFinite(v) && v > 0)),
+      openMeteo: monthAverage(weatherMonthly.filter((w) => w.yearMonth === weatherMonthKey(ym)).map((w) => Number(w.sumGhiKwhM2)).filter((v) => Number.isFinite(v) && v > 0)),
+    })),
+  );
+
   const monthly = monthNumbers.map((month) => {
     const ym = monthKey(year, month);
     const ymYoY = yoyMonthly.find((y) => y.month === month);
@@ -816,15 +836,25 @@ export function buildPltsDashboardFromRows({
       : null;
     const selfConsumptionMwh = selfConsumptionKwh !== null ? round(selfConsumptionKwh / 1000, 2) : null;
 
-    // Monthly Load
+    // Monthly Load: PLN purchase + self-consumed PLTS from the API energy flow, the same basis as Scope 2. The annual
+    // report's load column is only a fallback, since it stops at the day the report was exported.
     const monthLoads = uniqueLoads.filter((item) => item.yearMonth === ym && filteredPlants.some(p => (p.sungrowPsIds || []).includes(Number(item.psId))));
-    const loadKwh = monthLoads.length ? round(monthLoads.reduce((sum, item) => sum + (Number(item.loadKwh) || 0), 0)) : null;
+    const reportLoadKwh = monthLoads.length ? round(monthLoads.reduce((sum, item) => sum + (Number(item.loadKwh) || 0), 0)) : null;
+    const loadKwh = purchasedKwh !== null && selfConsumptionKwh !== null ? round(purchasedKwh + selfConsumptionKwh) : reportLoadKwh;
     const loadMwh = loadKwh !== null ? round(loadKwh / 1000, 2) : null;
 
     // Monthly Radiation & PR
     const monthClimate = climate.filter((item) => item.yearMonth === ym && filteredPlants.some(p => (p.sungrowPsIds || []).includes(Number(item.psId))));
     const radValues = monthClimate.map(c => Number(c.radiationKwhM2)).filter(v => Number.isFinite(v) && v > 0);
-    const avgRadiationKwhM2 = radValues.length ? round(radValues.reduce((sum, v) => sum + v, 0) / radValues.length, 1) : null;
+    // Without a full-month report row, irradiance is Open-Meteo's daily GHI summed over the days fetched so far.
+    const normMonth = ym.includes('-') ? ym : `${ym.slice(0, 4)}-${ym.slice(4, 6)}`;
+    const monthWeather = weatherMonthly.filter((w) => w.yearMonth === normMonth || w.yearMonth === ym);
+    const weatherGhiSums = monthWeather.map((w) => Number(w.sumGhiKwhM2)).filter((v) => Number.isFinite(v) && v > 0);
+    const weatherDays = monthWeather.length ? Math.max(...monthWeather.map((w) => Number(w.days) || 0)) : 0;
+    const avgRadiationKwhM2 = radValues.length
+      ? round(radValues.reduce((sum, v) => sum + v, 0) / radValues.length, 1)
+      : (weatherGhiSums.length ? round((weatherGhiSums.reduce((sum, v) => sum + v, 0) / weatherGhiSums.length) * radiationCalibration, 1) : null);
+    const radiationSource = radValues.length ? 'ISOLAR_REPORT' : (weatherGhiSums.length ? 'OPEN_METEO_CALIBRATED' : null);
 
     const monthPrInputs = [];
     for (const plant of filteredPlants) {
@@ -918,6 +948,9 @@ export function buildPltsDashboardFromRows({
       loadKwh,
       loadMwh,
       radiationKwhM2: avgRadiationKwhM2,
+      radiationSource,
+      weatherDays,
+      daysInMonth: new Date(Number(ym.slice(0, 4)), Number(ym.slice(-2)), 0).getDate(),
       moduleTempC: monthModuleTempC,
       precipitationMm: monthPrecipitationMm,
       ambientTempC: monthAmbientTempC,
@@ -948,8 +981,10 @@ export function buildPltsDashboardFromRows({
   const costSavingsSummary = calculateCostSavings(productionKwh);
 
   // Total Load & Energy Mix
-  const allSelectedLoads = loads.filter((item) => selectedKeys.includes(item.yearMonth) && filteredPlants.some(p => (p.sungrowPsIds || []).includes(Number(item.psId))));
-  const totalLoadKwh = allSelectedLoads.length ? round(allSelectedLoads.reduce((sum, item) => sum + (Number(item.loadKwh) || 0), 0)) : null;
+  // Sum of the monthly loads above, so the total matches the bars and Scope 2 (the raw report rows double-counted
+  // months that had both the annual report and the monitoring workbook).
+  const selectedMonthLoads = monthly.filter((m) => selectedKeys.includes(m.yearMonth) && m.loadKwh !== null);
+  const totalLoadKwh = selectedMonthLoads.length ? round(selectedMonthLoads.reduce((sum, m) => sum + Number(m.loadKwh), 0)) : null;
   const totalLoadMwh = totalLoadKwh !== null ? round(totalLoadKwh / 1000, 2) : null;
   const pltsSharePct = energyBalance?.energyMix?.pltsSharePct ?? (totalLoadKwh > 0 && productionKwh > 0 ? round((productionKwh / totalLoadKwh) * 100, 1) : null);
   const plnSharePct = energyBalance?.energyMix?.plnSharePct ?? (pltsSharePct !== null ? round(100 - pltsSharePct, 1) : null);
@@ -992,16 +1027,19 @@ export function buildPltsDashboardFromRows({
     // Monthly PR
     const monthClimate = climate.filter((item) => item.yearMonth === ym && filteredPlants.some(p => (p.sungrowPsIds || []).includes(Number(item.psId))));
     const monthPrInputs = [];
+    // Same rule as the selected-period PR: iSolarCloud's monthly PR first, the energy/irradiance estimate as fallback.
     for (const plant of plantRows) {
       const clim = monthClimate.find(c => (plant.psIds || []).includes(Number(c.psId)));
+      const official = officialPrIndex.get(`${ym}:${Number((plant.psIds || [])[0])}`);
       const plantProd = plantMonthly.find((m, i) => plantRows[i]?.dcId === plant.dcId)?.energyKwh;
-      if (clim && plantProd !== null && plantProd !== undefined) {
+      if ((clim || Number.isFinite(official)) && plantProd !== null && plantProd !== undefined) {
         monthPrInputs.push({
           plantId: plant.dcId,
           yearMonth: ym,
           energyKwh: plantProd,
           capacityKwp: plant.capacityKwp,
-          radiationKwhM2: clim.radiationKwhM2,
+          radiationKwhM2: clim?.radiationKwhM2 ?? null,
+          officialPrPct: Number.isFinite(official) ? official : null,
           isOperational: plant.commissionedAt ? isPlantOperationalInMonth(plant.commissionedAt, ym) : true,
         });
       }

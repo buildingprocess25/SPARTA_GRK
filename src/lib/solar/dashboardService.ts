@@ -3,6 +3,7 @@ import { getGridFactor } from '../emission-factors.ts';
 import { buildPltsDashboardFromRows, parseDashboardQuery } from './dashboard.ts';
 import { isDcLocation } from './plantMap.ts';
 import { mergeEnergyFlowRows } from './energyFlowSources.ts';
+import { isClimateRowComplete } from './climateCompleteness.ts';
 import { performance } from 'perf_hooks';
 import { getRunningMonth, getRunningYtdPeriod } from '../reportingMonths.ts';
 
@@ -207,6 +208,8 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
             source: true,
             sourceRef: true,
             metadata: true,
+            importedAt: true,
+            updatedAt: true,
           },
           orderBy: [{ yearMonth: 'asc' }, { psId: 'asc' }],
         }),
@@ -245,7 +248,9 @@ async function fetchPltsRawData({ years, db = prisma, simulateLatencyMs = 0 }) {
             ROUND(AVG(module_temp_c)::numeric, 1)::float as "avgModuleTempC",
             ROUND(AVG(temp_mean_c)::numeric, 1)::float as "avgAmbientTempC",
             ROUND(SUM(precipitation_mm)::numeric, 1)::float as "precipitationMm",
-            ROUND(AVG(ghi_kwh_m2)::numeric, 2)::float as "avgGhiKwhM2"
+            ROUND(AVG(ghi_kwh_m2)::numeric, 2)::float as "avgGhiKwhM2",
+            ROUND(SUM(ghi_kwh_m2)::numeric, 2)::float as "sumGhiKwhM2",
+            COUNT(DISTINCT date)::int as "days"
           FROM weather_daily
           WHERE date >= ${minDateStr} AND date <= ${maxDateStr}
           GROUP BY SUBSTRING(date, 1, 7), location_key
@@ -308,7 +313,8 @@ export async function getPltsDashboard(rawQuery = {}, { db = prisma, now = new D
       .sort()
       .at(-1) || null,
   }));
-  const normalizedClimate = climate.map((row) => ({
+  // Only report rows that cover their whole month; a partial month falls back to Open-Meteo's daily sum.
+  const normalizedClimate = climate.filter(isClimateRowComplete).map((row) => ({
     ...row,
     radiationType: row.metadata?.radiationType || row.metadata?.radiation_type || null,
     periodType: row.metadata?.periodType || row.metadata?.period_type || null,
@@ -402,7 +408,8 @@ async function executeWithTiming(cachePrefix, rawQuery, builderFn, options: Dash
       .sort()
       .at(-1) || null,
   }));
-  const normalizedClimate = climate.map((row) => ({
+  // Only report rows that cover their whole month; a partial month falls back to Open-Meteo's daily sum.
+  const normalizedClimate = climate.filter(isClimateRowComplete).map((row) => ({
     ...row,
     radiationType: row.metadata?.radiationType || row.metadata?.radiation_type || null,
     periodType: row.metadata?.periodType || row.metadata?.period_type || null,
@@ -550,6 +557,10 @@ export async function getPltsSupportDashboardWithTiming(rawQuery = {}, options: 
     monthly: fullData.monthly.map((m) => ({
       yearMonth: m.yearMonth,
       radiationKwhM2: m.radiationKwhM2,
+      radiationSource: m.radiationSource,
+      weatherDays: m.weatherDays,
+      daysInMonth: m.daysInMonth,
+      partial: m.partial,
       moduleTempC: m.moduleTempC,
       precipitationMm: m.precipitationMm,
       ambientTempC: m.ambientTempC,
@@ -580,6 +591,9 @@ export async function getPltsLoadDashboardWithTiming(rawQuery = {}, options: Das
       yearMonth: m.yearMonth,
       loadKwh: m.loadKwh,
       loadMwh: m.loadMwh,
+      purchasedMwh: m.purchasedMwh,
+      selfConsumptionMwh: m.selfConsumptionMwh,
+      partial: m.partial,
       actualKwh: m.actualMwh !== null ? m.actualMwh * 1000 : null,
       actualMwh: m.actualMwh,
     })),

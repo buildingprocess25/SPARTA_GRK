@@ -1,27 +1,102 @@
 'use client';
 
 import { useMemo } from 'react';
-import {
-  Area, AreaChart, Bar, Line, ComposedChart,
-  CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis
-} from 'recharts';
-import { Sun, CloudSun, CheckCircle2, CloudRain, Thermometer } from 'lucide-react';
+import { Bar, BarChart, Cell, Line, LineChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Sun, Thermometer, CloudRain } from 'lucide-react';
 import { usePltsEndpoint } from '@/hooks/usePltsData';
 import { TabContentSkeleton } from './PLTSDashboardSkeletons';
-import InfoHint from '@/components/ui/InfoHint';
-
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+import KpiCard from '@/components/ui/KpiCard';
+import { CHART_AXIS_PROPS, CHART_GRID_PROPS, CHART_PALETTE, ChartTooltipCard, PARTIAL_OPACITY } from '@/components/ui/ChartTheme';
+import { MONTH_LABELS_SHORT } from '@/lib/reportingMonths';
 
 function formatNum(value, min = 0, max = 2) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return '—';
   return Number(value).toLocaleString('id-ID', { minimumFractionDigits: min, maximumFractionDigits: max });
 }
 
+const average = (values) => (values.length ? values.reduce((s, v) => s + v, 0) / values.length : null);
+
+const RADIATION_SOURCE_LABEL = {
+  ISOLAR_REPORT: 'Sensor iradiasi iSolarCloud',
+  OPEN_METEO_CALIBRATED: 'Perkiraan Open-Meteo, disetarakan ke sensor',
+};
+
 function EmptyMeasurement({ title, message }: { title?: any; message?: any }) {
   return (
-    <div className="h-[220px] rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col items-center justify-center px-6 text-center">
+    <div className="h-[200px] rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col items-center justify-center px-6 text-center">
       <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{title}: belum tersedia</p>
       <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-lg">{message}</p>
+    </div>
+  );
+}
+
+/** One small chart per measure, each on its own axis, so no series is squeezed by another's scale. */
+function MonthlyMeasureChart({ title, question, rows, dataKey, unit, color, kind, decimals = 1 }: {
+  title: string; question: string; rows: any[]; dataKey: string; unit: string; color: string; kind: 'bar' | 'line'; decimals?: number;
+}) {
+  const hasValues = rows.some((r) => r[dataKey] != null);
+  const tooltip = ({ active, payload }: { active?: any; payload?: any }) => {
+    if (!active || !payload?.length) return null;
+    const row = payload[0].payload;
+    const footer = [
+      row.partial ? `Bulan berjalan: baru ${row.weatherDays || 0} dari ${row.daysInMonth} hari, angka belum sebulan penuh` : null,
+      dataKey === 'radiationKwhM2' && row.radiationSource ? `Sumber: ${RADIATION_SOURCE_LABEL[row.radiationSource] || row.radiationSource}` : null,
+    ].filter(Boolean).join('. ');
+    return (
+      <ChartTooltipCard
+        title={`${row.monthLong} ${row.year}`}
+        items={[{ label: title, value: `${formatNum(row[dataKey], decimals, decimals)} ${unit}`, dotColor: color }]}
+        footer={footer || null}
+      />
+    );
+  };
+
+  return (
+    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 min-w-0">
+      <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{title} ({unit})</p>
+      <p className="text-[11px] text-slate-600 dark:text-slate-400 mb-2">{question}</p>
+      {hasValues ? (
+        <div className="h-[200px]">
+          <ResponsiveContainer width="100%" height="100%">
+            {kind === 'bar' ? (
+              <BarChart data={rows} margin={{ left: 0, right: 8, top: 8, bottom: 0 }}>
+                <CartesianGrid {...CHART_GRID_PROPS} />
+                <XAxis dataKey="tick" {...CHART_AXIS_PROPS} interval={0} tick={{ ...CHART_AXIS_PROPS.tick, fontSize: 10 }} />
+                <YAxis {...CHART_AXIS_PROPS} width={40} tick={{ ...CHART_AXIS_PROPS.tick, fontSize: 10 }} />
+                <Tooltip content={tooltip} cursor={{ fill: 'var(--chart-grid)', opacity: 0.4 }} />
+                <Bar isAnimationActive={false} dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} maxBarSize={22}>
+                  {rows.map((row) => <Cell key={row.yearMonth} fill={color} opacity={row.partial ? PARTIAL_OPACITY : 1} />)}
+                </Bar>
+              </BarChart>
+            ) : (
+              <LineChart data={rows} margin={{ left: 0, right: 8, top: 8, bottom: 0 }}>
+                <CartesianGrid {...CHART_GRID_PROPS} />
+                <XAxis dataKey="tick" {...CHART_AXIS_PROPS} interval={0} tick={{ ...CHART_AXIS_PROPS.tick, fontSize: 10 }} />
+                <YAxis {...CHART_AXIS_PROPS} width={40} domain={['dataMin - 2', 'dataMax + 2']} tickFormatter={(v) => formatNum(v, 0, 0)} tick={{ ...CHART_AXIS_PROPS.tick, fontSize: 10 }} />
+                <Tooltip content={tooltip} />
+                <Line
+                  isAnimationActive={false}
+                  type="monotone"
+                  dataKey={dataKey}
+                  stroke={color}
+                  strokeWidth={2}
+                  connectNulls
+                  dot={(props) => {
+                    const { cx, cy, payload } = props;
+                    if (cx == null || cy == null || payload[dataKey] == null) return <g key={payload.yearMonth} />;
+                    // The running month is a hollow dot: same position, visibly not a full month.
+                    return payload.partial
+                      ? <circle key={payload.yearMonth} cx={cx} cy={cy} r={4} className="fill-white dark:fill-slate-900" stroke={color} strokeWidth={2} />
+                      : <circle key={payload.yearMonth} cx={cx} cy={cy} r={4} fill={color} stroke={color} strokeWidth={2} />;
+                  }}
+                />
+              </LineChart>
+            )}
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <EmptyMeasurement title={title} message="Belum ada data cuaca untuk periode ini. Data ditarik otomatis setiap hari dari Open-Meteo." />
+      )}
     </div>
   );
 }
@@ -29,23 +104,30 @@ function EmptyMeasurement({ title, message }: { title?: any; message?: any }) {
 export default function TabSupportingParameters({ filters }: { filters?: any }) {
   const { data, loading, error } = usePltsEndpoint('/api/plts/dashboard/support', filters);
 
-  const chartRows = useMemo(() => {
-    return (data?.monthly || []).map((row) => {
-      const monthIdx = Number(row.yearMonth.slice(4, 6)) - 1;
-      return {
-        ...row,
-        month: MONTHS[monthIdx] || row.yearMonth,
-        radiationKwhM2: row.radiationKwhM2 != null ? Number(row.radiationKwhM2.toFixed(1)) : null,
-        moduleTempC: row.moduleTempC != null ? Number(row.moduleTempC.toFixed(1)) : null,
-        precipitationMm: row.precipitationMm != null ? Number(row.precipitationMm.toFixed(1)) : null,
-        ambientTempC: row.ambientTempC != null ? Number(row.ambientTempC.toFixed(1)) : null,
-      };
-    });
-  }, [data]);
+  const rows = useMemo(() => (data?.monthly || []).map((row) => {
+    const monthIdx = Number(String(row.yearMonth).slice(-2)) - 1;
+    const label = MONTH_LABELS_SHORT[monthIdx] || row.yearMonth;
+    return {
+      ...row,
+      year: String(row.yearMonth).slice(0, 4),
+      monthLong: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][monthIdx],
+      tick: row.partial ? `${label}*` : label,
+      radiationKwhM2: row.radiationKwhM2 != null ? Number(Number(row.radiationKwhM2).toFixed(1)) : null,
+      moduleTempC: row.moduleTempC != null ? Number(Number(row.moduleTempC).toFixed(1)) : null,
+      precipitationMm: row.precipitationMm != null ? Number(Number(row.precipitationMm).toFixed(1)) : null,
+    };
+  }), [data]);
 
-  const hasWeatherData = useMemo(() => {
-    return chartRows.some((r) => r.moduleTempC != null || r.precipitationMm != null);
-  }, [chartRows]);
+  // Card averages use complete months only, so a running month with two days of data does not pull them down.
+  const complete = rows.filter((r) => !r.partial);
+  const avgOf = (key) => average(complete.map((r) => r[key]).filter((v) => v != null));
+  const avgRadiation = avgOf('radiationKwhM2');
+  const avgModuleTemp = avgOf('moduleTempC');
+  const avgRain = avgOf('precipitationMm');
+  const completeRange = complete.length
+    ? `${MONTH_LABELS_SHORT[Number(String(complete[0].yearMonth).slice(-2)) - 1]}-${MONTH_LABELS_SHORT[Number(String(complete.at(-1).yearMonth).slice(-2)) - 1]} ${complete.at(-1).year}`
+    : null;
+  const running = rows.find((r) => r.partial);
 
   if (loading && !data) return <TabContentSkeleton />;
   if (error && !data) return <EmptyMeasurement title="Data cuaca" message={error} />;
@@ -53,189 +135,81 @@ export default function TabSupportingParameters({ filters }: { filters?: any }) 
   return (
     <div className="space-y-4" data-testid="tab-supporting-parameters">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {/* Card 1: Rata-rata Iradiasi */}
-        <div className="rounded-xl border border-amber-200/80 dark:border-amber-500/20 bg-amber-50/40 dark:bg-amber-500/10 p-3.5">
-          <div className="flex items-center justify-between text-amber-800 dark:text-amber-300">
-            <span className="flex items-center gap-1 text-[11px] font-bold">
-              Sinar matahari per bulan
-              <InfoHint size={12} title="Sinar matahari per bulan" text="Rata-rata energi sinar matahari yang jatuh ke tiap meter persegi panel dalam sebulan (iradiasi, kWh/m²). Makin tinggi, makin besar potensi produksi PLTS." />
-            </span>
-            <Sun size={16} aria-hidden="true" />
-          </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-amber-900 dark:text-amber-200 tabular-nums">
-              {formatNum(data?.climate?.avgRadiationKwhM2, 1, 1)}
-            </span>
-            <span className="text-xs font-bold text-amber-700 dark:text-amber-300">kWh/m²</span>
-          </div>
-          {data?.climate?.avgRadiationKwhM2 != null && (
-            <span className="text-[10px] text-amber-800 dark:text-amber-300 block mt-1">
-              Sekitar {formatNum(data.climate.avgRadiationKwhM2 / 30.4, 1, 1)} jam matahari penuh per hari
-            </span>
-          )}
-        </div>
-
-        {/* Card 2: Suhu Modul & Curah Hujan (Aktif via Open-Meteo & Sandia) */}
-        <div className="rounded-xl border border-sky-200/80 dark:border-sky-500/20 bg-sky-50/40 dark:bg-sky-500/10 p-3.5">
-          <div className="flex items-center justify-between text-sky-800 dark:text-sky-300">
-            <span className="flex items-center gap-1 text-[11px] font-bold">
-              Suhu panel dan curah hujan
-              <InfoHint size={12} title="Suhu panel dan curah hujan" text="Suhu panel diperkirakan dari data cuaca Open-Meteo (model Sandia), bukan diukur sensor. Curah hujan juga dari Open-Meteo." />
-            </span>
-            <CloudSun size={16} className="text-sky-600 dark:text-sky-400" aria-hidden="true" />
-          </div>
-          {data?.climate?.avgModuleTempC != null ? (
-            <div className="mt-2 flex items-baseline gap-2.5 flex-wrap">
-              <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-black text-rose-600 dark:text-rose-400 tabular-nums">
-                  {formatNum(data?.climate?.avgModuleTempC, 1, 1)}
-                </span>
-                <span className="text-xs font-bold text-rose-700 dark:text-rose-300">°C</span>
-              </div>
-              <span className="text-slate-300 dark:text-slate-600 text-sm">/</span>
-              <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-black text-sky-600 dark:text-sky-400 tabular-nums">
-                  {formatNum(data?.climate?.avgPrecipitationMm, 0, 1)}
-                </span>
-                <span className="text-xs font-bold text-sky-700 dark:text-sky-300">mm</span>
-              </div>
-            </div>
-          ) : (
-            <div className="mt-2 flex items-baseline gap-1.5">
-              <span className="text-lg font-bold text-slate-600 dark:text-slate-400">Memuat data cuaca...</span>
-            </div>
-          )}
-          <span className="text-[10px] text-sky-800 dark:text-sky-300 block mt-1">
-            Sumber: Open-Meteo (CC BY 4.0)
-          </span>
-        </div>
-
-        {/* Card 3: Status Sensor & Provenance */}
-        <div className="rounded-xl border border-emerald-200/80 dark:border-emerald-500/20 bg-emerald-50/40 dark:bg-emerald-500/10 p-3.5">
-          <div className="flex items-center justify-between text-emerald-800 dark:text-emerald-300">
-            <span className="text-[11px] font-bold">Jumlah data cuaca</span>
-            <CheckCircle2 size={16} aria-hidden="true" />
-          </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl font-black text-emerald-900 dark:text-emerald-200 tabular-nums">
-              {data?.climate?.totalMeasurements != null ? formatNum(data.climate.totalMeasurements, 0, 0) : '—'}
-            </span>
-            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">catatan</span>
-          </div>
-          {data?.climate?.source && (
-            <span className="text-[10px] text-emerald-700 dark:text-emerald-300 block mt-1 font-semibold">
-              Sumber: {data.climate.source}
-            </span>
-          )}
-        </div>
+        <KpiCard
+          label="Sinar matahari per bulan"
+          value={formatNum(avgRadiation, 1, 1)}
+          unit="kWh/m²"
+          icon={Sun}
+          theme="plts"
+          tooltip="Energi sinar matahari yang jatuh ke tiap meter persegi panel dalam sebulan (iradiasi). Makin tinggi, makin besar potensi produksi PLTS."
+          trend={avgRadiation != null ? `Sekitar ${formatNum(avgRadiation / 30.4, 1, 1)} jam matahari penuh per hari, rata-rata ${completeRange}` : 'Belum ada bulan lengkap'}
+        />
+        <KpiCard
+          label="Suhu panel (perkiraan)"
+          value={formatNum(avgModuleTemp, 1, 1)}
+          unit="°C"
+          icon={Thermometer}
+          theme="emission"
+          tooltip="Diperkirakan dari suhu udara dan sinar matahari Open-Meteo (model Sandia), bukan diukur sensor. Panel yang lebih panas menghasilkan listrik sedikit lebih rendah."
+          trend={avgModuleTemp != null ? `Rata-rata siang hari, ${completeRange}` : 'Belum ada bulan lengkap'}
+        />
+        <KpiCard
+          label="Curah hujan per bulan"
+          value={formatNum(avgRain, 0, 1)}
+          unit="mm"
+          icon={CloudRain}
+          theme="water"
+          tooltip="Jumlah hujan sebulan dari Open-Meteo, dirata-rata dari semua lokasi DC. Bulan hujan biasanya berawan, sehingga produksi PLTS turun."
+          trend={avgRain != null ? `Rata-rata semua lokasi DC, ${completeRange}` : 'Belum ada bulan lengkap'}
+        />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Chart 1: Tren Iradiasi */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Sinar matahari per bulan (kWh/m²)</span>
-            <span className="text-[10px] text-slate-600 dark:text-slate-400">Rata-rata semua DC</span>
-          </div>
-          <div className="h-[230px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartRows} margin={{ left: 0, right: 12, top: 8, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="iradGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:stroke-slate-800" />
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748b' }} />
-                <YAxis unit=" kWh/m²" tick={{ fontSize: 10, fill: '#64748b' }} width={75} />
-                <Tooltip
-                  formatter={(val) => [`${formatNum(val, 1, 1)} kWh/m²`, 'Sinar matahari']}
-                  contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '11px', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
-                />
-                <Area isAnimationActive={false} type="monotone" dataKey="radiationKwhM2" stroke="#f59e0b" strokeWidth={2.5} fillOpacity={1} fill="url(#iradGrad)" dot={{ r: 4, fill: '#f59e0b' }} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Chart 2: Suhu Panel & Curah Hujan (Aktif via Open-Meteo) */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">Suhu panel (°C) dan curah hujan (mm)</span>
-              <span className="text-[10px] text-slate-600 dark:text-slate-400">Perkiraan dari data cuaca</span>
-            </div>
-            <div className="flex items-center gap-2 text-[10px]">
-              <span className="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400">
-                <span className="w-2.5 h-0.5 bg-rose-500 rounded-full inline-block" /> Suhu panel (°C)
-              </span>
-              <span className="inline-flex items-center gap-1 font-semibold text-sky-600 dark:text-sky-400">
-                <span className="w-2 h-2 bg-sky-500 rounded-sm inline-block" /> Curah Hujan (mm)
-              </span>
-            </div>
-          </div>
-
-          <div className="h-[230px]">
-            {hasWeatherData ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={chartRows} margin={{ left: 0, right: 12, top: 8, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" className="dark:stroke-slate-800" />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748b' }} />
-                  {/* Sumbu Kiri: Curah Hujan (mm) */}
-                  <YAxis
-                    yAxisId="rain"
-                    unit=" mm"
-                    tick={{ fontSize: 10, fill: '#0284c7' }}
-                    width={55}
-                  />
-                  {/* Sumbu Kanan: Suhu (°C) */}
-                  <YAxis
-                    yAxisId="temp"
-                    orientation="right"
-                    unit=" °C"
-                    domain={[20, 60]}
-                    tick={{ fontSize: 10, fill: '#e11d48' }}
-                    width={50}
-                  />
-                  <Tooltip
-                    formatter={(val, name) => {
-                      if (name === 'precipitationMm') return [`${formatNum(val, 1, 1)} mm`, 'Curah hujan'];
-                      if (name === 'moduleTempC') return [`${formatNum(val, 1, 1)} °C`, 'Suhu panel (perkiraan)'];
-                      if (name === 'ambientTempC') return [`${formatNum(val, 1, 1)} °C`, 'Suhu udara'];
-                      return [val, name];
-                    }}
-                    contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '11px', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
-                  />
-                  <Bar isAnimationActive={false}
-                    yAxisId="rain"
-                    dataKey="precipitationMm"
-                    fill="#38bdf8"
-                    opacity={0.7}
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={28}
-                  />
-                  <Line isAnimationActive={false}
-                    yAxisId="temp"
-                    type="monotone"
-                    dataKey="moduleTempC"
-                    stroke="#f43f5e"
-                    strokeWidth={2.5}
-                    dot={{ r: 3.5, fill: '#f43f5e' }}
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-full flex items-center justify-center">
-                <EmptyMeasurement
-                  title="Suhu panel dan curah hujan"
-                  message="Belum ada data cuaca untuk periode ini."
-                />
-              </div>
-            )}
-          </div>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        <MonthlyMeasureChart title="Sinar matahari" question="Berapa banyak sinar matahari tiap bulan?" rows={rows} dataKey="radiationKwhM2" unit="kWh/m²" color={CHART_PALETTE.plts} kind="bar" />
+        <MonthlyMeasureChart title="Suhu panel" question="Seberapa panas panel di siang hari?" rows={rows} dataKey="moduleTempC" unit="°C" color={CHART_PALETTE.emission} kind="line" />
+        <MonthlyMeasureChart title="Curah hujan" question="Bulan mana yang paling banyak hujan?" rows={rows} dataKey="precipitationMm" unit="mm" color={CHART_PALETTE.water} kind="bar" />
       </div>
+
+      <div className="text-[11px] leading-relaxed text-slate-600 dark:text-slate-400 space-y-1">
+        {running && (
+          <p>
+            * {running.monthLong} {running.year} masih berjalan: data cuaca baru {running.weatherDays || 0} dari {running.daysInMonth} hari, jadi batangnya dipudarkan dan tidak ikut rata-rata di kartu.
+          </p>
+        )}
+        <p>
+          Sumber: sinar matahari dari sensor iradiasi iSolarCloud; bulan yang belum punya laporan lengkap memakai Open-Meteo (CC BY 4.0) yang disetarakan ke sensor. Suhu panel dan curah hujan dari Open-Meteo, ditarik otomatis setiap hari.
+        </p>
+      </div>
+
+      <details className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-xs">
+        <summary className="cursor-pointer font-semibold text-slate-700 dark:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded">Lihat angka per bulan</summary>
+        <div className="overflow-x-auto mt-2">
+          <table className="w-full text-left tabular-nums">
+            <thead className="text-slate-600 dark:text-slate-400">
+              <tr>
+                <th className="py-1.5 pr-3 font-semibold">Bulan</th>
+                <th className="py-1.5 pr-3 font-semibold text-right">Sinar matahari (kWh/m²)</th>
+                <th className="py-1.5 pr-3 font-semibold text-right">Suhu panel (°C)</th>
+                <th className="py-1.5 pr-3 font-semibold text-right">Curah hujan (mm)</th>
+                <th className="py-1.5 font-semibold">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody className="text-slate-800 dark:text-slate-200">
+              {rows.map((r) => (
+                <tr key={r.yearMonth} className="border-t border-slate-100 dark:border-slate-800">
+                  <td className="py-1.5 pr-3 whitespace-nowrap">{r.monthLong} {r.year}</td>
+                  <td className="py-1.5 pr-3 text-right">{formatNum(r.radiationKwhM2, 1, 1)}</td>
+                  <td className="py-1.5 pr-3 text-right">{formatNum(r.moduleTempC, 1, 1)}</td>
+                  <td className="py-1.5 pr-3 text-right">{formatNum(r.precipitationMm, 1, 1)}</td>
+                  <td className="py-1.5 text-slate-600 dark:text-slate-400">
+                    {r.partial ? `Berjalan, ${r.weatherDays || 0}/${r.daysInMonth} hari` : (r.radiationSource === 'OPEN_METEO_CALIBRATED' ? 'Sinar matahari: perkiraan Open-Meteo' : '')}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
     </div>
   );
 }

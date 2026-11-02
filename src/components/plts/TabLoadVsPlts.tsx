@@ -1,33 +1,34 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { PlugZap } from 'lucide-react';
 import { usePltsEndpoint } from '@/hooks/usePltsData';
 import { TabContentSkeleton } from './PLTSDashboardSkeletons';
 import InfoHint from '@/components/ui/InfoHint';
 import { CustomSelect } from '@/components/ui/select';
 import { kwhToMwh } from '@/lib/units';
-import { CHART_AXIS_PROPS, CHART_GRID_PROPS, ChartTooltipCard } from '@/components/ui/ChartTheme';
+import { CHART_AXIS_PROPS, CHART_GRID_PROPS, ChartTooltipCard, PARTIAL_OPACITY } from '@/components/ui/ChartTheme';
 
-const SERIES_LABEL = { loadKwh: 'Listrik PLN', actualKwh: 'Produksi PLTS', productionKwh: 'Produksi PLTS' };
+// The grey bar is the DC's whole electricity demand (PLN purchase + self-used PLTS), not the PLN purchase alone.
+const SERIES_LABEL = { loadKwh: 'Kebutuhan listrik', actualKwh: 'Produksi PLTS', productionKwh: 'Produksi PLTS' };
 const SERIES_COLOR = { loadKwh: '#94a3b8', actualKwh: '#f59e0b', productionKwh: '#f59e0b' };
 const BAR_CURSOR = { fill: 'var(--chart-grid)', opacity: 0.6 };
 
 function LoadTooltip({ active, payload, label }: { active?: boolean; payload?: any[]; label?: any }) {
   if (!active || !payload?.length) return null;
   const row = payload[0]?.payload;
-  return (
-    <ChartTooltipCard
-      title={label}
-      items={payload.map((p) => ({
-        label: SERIES_LABEL[p.dataKey] ?? p.dataKey,
-        value: `${formatNum(kwhToMwh(p.value), 2, 2)} MWh`,
-        dotColor: SERIES_COLOR[p.dataKey],
-      }))}
-      footer={row?.pltsSharePct != null ? `${formatNum(row.pltsSharePct, 1, 1)}% kebutuhan dipenuhi PLTS` : null}
-    />
-  );
+  const items: { label: string; value: string; dotColor?: string }[] = payload.map((p) => ({
+    label: SERIES_LABEL[p.dataKey] ?? p.dataKey,
+    value: `${formatNum(kwhToMwh(p.value), 2, 2)} MWh`,
+    dotColor: SERIES_COLOR[p.dataKey],
+  }));
+  if (row?.purchasedMwh != null) items.splice(1, 0, { label: 'Dibeli dari PLN', value: `${formatNum(row.purchasedMwh, 2, 2)} MWh` });
+  const footer = [
+    row?.pltsSharePct != null ? `${formatNum(row.pltsSharePct, 1, 1)}% kebutuhan dipenuhi PLTS` : null,
+    row?.partial ? 'Bulan berjalan, angka belum sebulan penuh' : null,
+  ].filter(Boolean).join('. ');
+  return <ChartTooltipCard title={row?.monthTitle || label} items={items} footer={footer || null} />;
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -57,11 +58,14 @@ export default function TabLoadVsPlts({ filters }: { filters?: any }) {
       const actualKwh = row.actualKwh != null ? Math.round(row.actualKwh) : null;
       const loadKwh = row.loadKwh != null ? Math.round(row.loadKwh) : (row.loadMwh != null ? Math.round(row.loadMwh * 1000) : null);
 
+      const month = MONTHS[monthIdx] || row.yearMonth;
       return {
         ...row,
-        month: MONTHS[monthIdx] || row.yearMonth,
+        month: row.partial ? `${month}*` : month,
+        monthTitle: `${month} ${row.yearMonth.slice(0, 4)}${row.partial ? ' (bulan berjalan)' : ''}`,
         actualKwh,
         loadKwh,
+        pltsSharePct: row.selfConsumptionMwh != null && row.loadMwh > 0 ? (row.selfConsumptionMwh / row.loadMwh) * 100 : null,
       };
     });
   }, [data]);
@@ -139,11 +143,11 @@ export default function TabLoadVsPlts({ filters }: { filters?: any }) {
         <div className="h-[320px] rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-              {loadViewMode === 'monthly' ? 'Listrik PLN vs produksi PLTS per bulan (MWh)' : `Listrik PLN vs PLTS, ${visibleBranchLoadRows.length} DC (MWh)`}
+              {loadViewMode === 'monthly' ? 'Kebutuhan listrik DC vs produksi PLTS per bulan (MWh)' : `Kebutuhan listrik vs produksi PLTS, ${visibleBranchLoadRows.length} DC (MWh)`}
             </span>
             <div className="flex items-center gap-3 text-[11px]">
               <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 font-semibold">
-                <span className="size-2.5 rounded-xs bg-slate-400" /> Listrik PLN
+                <span className="size-2.5 rounded-xs bg-slate-400" /> Kebutuhan listrik
               </span>
               <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
                 <span className="size-2.5 rounded-xs bg-amber-500" /> PLTS
@@ -169,8 +173,12 @@ export default function TabLoadVsPlts({ filters }: { filters?: any }) {
                   />
                   <Tooltip content={<LoadTooltip />} cursor={BAR_CURSOR} isAnimationActive={false} />
                   {/* Animation off, as in the other dashboard charts: a data refresh mid-animation can leave the bars at zero height. */}
-                  <Bar dataKey="loadKwh" name="loadKwh" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={32} isAnimationActive={false} />
-                  <Bar dataKey="actualKwh" name="actualKwh" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} isAnimationActive={false} />
+                  <Bar dataKey="loadKwh" name="loadKwh" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={32} isAnimationActive={false}>
+                    {chartRows.map((row) => <Cell key={row.yearMonth} fill="#94a3b8" opacity={row.partial ? PARTIAL_OPACITY : 1} />)}
+                  </Bar>
+                  <Bar dataKey="actualKwh" name="actualKwh" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} isAnimationActive={false}>
+                    {chartRows.map((row) => <Cell key={row.yearMonth} fill="#f59e0b" opacity={row.partial ? PARTIAL_OPACITY : 1} />)}
+                  </Bar>
                 </BarChart>
               ) : (
                 <BarChart data={visibleBranchLoadRows} margin={{ left: 0, right: 8, top: 12, bottom: 40 }}>
@@ -245,6 +253,10 @@ export default function TabLoadVsPlts({ filters }: { filters?: any }) {
               <div className="flex justify-between text-slate-600 dark:text-slate-400">
                 <span>Total kebutuhan listrik DC:</span>
                 <span className="tabular-nums font-bold text-slate-900 dark:text-slate-100">{formatNum(kwhToMwh(totalLoadKwh), 2, 2)} MWh</span>
+              </div>
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                <span>Dibeli dari PLN:</span>
+                <span className="tabular-nums font-bold text-slate-900 dark:text-slate-100">{totalLoadKwh != null && selfConsumptionKwh != null ? `${formatNum(kwhToMwh(totalLoadKwh - selfConsumptionKwh), 2, 2)} MWh` : '-'}</span>
               </div>
               <div className="flex justify-between text-amber-700 dark:text-amber-300">
                 <span>PLTS dipakai sendiri:</span>

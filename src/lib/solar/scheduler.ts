@@ -12,6 +12,7 @@ import { captureSnapshot30m, get30mSlotInfo } from './snapshot.ts';
 import prisma from '../prisma.ts';
 import { syncEnergyFlowFromApi } from './energyFlowSync.ts';
 import { syncMonthlyPrFromApi } from './prMonthlySync.ts';
+import { syncWeatherFromOpenMeteo } from './weatherSync.ts';
 import { invalidatePltsServerCache } from './dashboardService.ts';
 
 /**
@@ -42,6 +43,7 @@ export async function runSchedulerCycle({
     snapshotResult: Record<string, unknown> | null;
     energyFlowResult?: { status: string; [key: string]: unknown };
     prMonthlyResult?: { status: string; [key: string]: unknown };
+    weatherResult?: { status: string; [key: string]: unknown };
   } = {
     timestamp: now.toISOString(),
     wibTime: formatWibTime(now),
@@ -80,6 +82,14 @@ export async function runSchedulerCycle({
     } catch (err) {
       console.error('[Scheduler] Monthly PR sync error:', err.message);
       cycleReport.prMonthlyResult = { status: 'failed', error: err.message };
+    }
+    // Daily weather for the irradiance/temperature charts; 6-hour throttle, catches up any gap on its own.
+    try {
+      cycleReport.weatherResult = await syncWeatherFromOpenMeteo({ now, force: trigger === 'manual' });
+      if (cycleReport.weatherResult.status !== 'skipped') invalidatePltsServerCache();
+    } catch (err) {
+      console.error('[Scheduler] Weather sync error:', err.message);
+      cycleReport.weatherResult = { status: 'failed', error: err.message };
     }
   }
 

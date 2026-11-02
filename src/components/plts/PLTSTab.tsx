@@ -570,9 +570,18 @@ export default function PLTSTab() {
     const plnPct = dashboardData?.summary?.energyMix?.plnSharePct
       ?? dashboardData?.summary?.energyBalance?.energyMix?.plnSharePct
       ?? null;
+    const pct = (v) => (v != null ? `${Number(v).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%` : '—');
+    const mwh = (kwh) => (kwh != null ? `${(Number(kwh) / 1000).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MWh` : '—');
+    const loadKwh = dashboardData?.summary?.totalLoadKwh ?? null;
+    const selfKwh = dashboardData?.summary?.selfConsumptionKwh ?? null;
     return {
-      pltsPercentage: pltsPct != null ? Number(pltsPct.toFixed(1)) : '—',
-      plnPercentage: plnPct != null ? Number(plnPct.toFixed(1)) : '—',
+      pltsPercentage: pltsPct != null ? Math.min(100, Number(pltsPct)) : 0,
+      plnPercentage: plnPct != null ? Math.min(100, Number(plnPct)) : 0,
+      pltsLabel: pct(pltsPct),
+      plnLabel: pct(plnPct),
+      totalLoadLabel: mwh(loadKwh),
+      selfConsumptionLabel: mwh(selfKwh),
+      purchasedLabel: loadKwh != null && selfKwh != null ? mwh(loadKwh - selfKwh) : '—',
     };
   }, [dashboardData]);
 
