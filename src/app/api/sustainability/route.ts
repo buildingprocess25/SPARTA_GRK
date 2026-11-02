@@ -124,7 +124,15 @@ export async function GET(request) {
 
     const scope1MonthlyTrend = monthKeys.map((ym, idx) => {
       const monthFuel = fuelRecords.filter(r => r.yearMonth === ym);
+      const vehicleFuel = monthFuel.filter(isVehicleFuelRecord);
+      // Set when the vehicle rekap was cut before month end (import --covered-through); the latest cut-off wins.
+      const vehicleCoveredThrough = vehicleFuel
+        .map((r) => (r.metadata as { coveredThrough?: string } | null)?.coveredThrough)
+        .filter(Boolean).sort().at(-1) || null;
       return {
+        hasGensetData: monthFuel.length > vehicleFuel.length,
+        hasVehicleData: vehicleFuel.length > 0,
+        vehicleCoveredThrough,
         month: monthLabels[idx],
         yearMonth: ym,
         fuelLiters: Number(monthFuel.reduce((acc, r) => acc + (r.liters || 0), 0).toFixed(2)),

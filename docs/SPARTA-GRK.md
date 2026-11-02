@@ -144,6 +144,11 @@ Halaman utama yang menampilkan total emisi GRK Alfamart secara year-to-date:
 - **Breakdown per scope** dengan grafik tren bulanan
 - **Kalkulator emisi interaktif**: simulasi emisi dari berbagai sumber (BBM, listrik, penerbangan, kendaraan, refrigeran, LPG, dll.) dengan 60+ faktor emisi dari IPCC dan ESDM
 - **Saran pengurangan emisi** berdasarkan hasil kalkulasi
+- **Status per bulan di tabel bulanan** (`src/lib/reportingMonthStatus.ts`), dihitung ulang dari kondisi tiap sumber setiap kali data berubah:
+  - Bulan berjalan: "Bulan berjalan", dengan rincian seperti "Listrik & PLTS s.d. 2 Nov, 09.19" dan sumber yang belum ada.
+  - Bulan yang sudah lewat tapi ada sumber yang kurang: "Belum lengkap", hanya menyebut yang kurang, misal "BBM kendaraan s.d. 15 Okt" atau "Genset belum ada". Perjalanan dinas hanya dicek bila sakelar Scope 3 aktif.
+  - Bulan yang sudah lengkap: tanpa label.
+  - Status baru muncul setelah data server masuk, jadi saat halaman masih memuat tidak ada sumber yang dicap "belum ada". Bulan yang belum lengkap tidak ikut dirata-rata dan diberi tanda `*` di grafik; Scope 3 dirata-rata sendiri atas bulan yang jurnalnya ada.
 
 ### 2. Sumber Emisi (Scope 1, 2, 3)
 
@@ -155,8 +160,9 @@ Halaman utama yang menampilkan total emisi GRK Alfamart secara year-to-date:
   - Pertamax: 2,2868 kgCO2e/liter
 - Validasi silang dengan workbook acuan `perhitungan emisi karbon.xlsx`
 - **Genset dari jurnal BBM genset** (akun 612304 / 622304): `node --env-file=.env scripts/data/import-genset-fuel-journal.mjs "<file>.csv" [--apply]`. Jurnal hanya memuat Rupiah, jadi liter = Rp ÷ harga per liter: Solar Rp 15.000 (harga industri), Pertamax Rp 12.500, Pertalite/bensin Rp 10.000. Jenis BBM dibaca dari keterangan; Dex, Dexlite, dan Biosolar dihitung Solar, dan baris "BBM UNTUK GENSET" yang tidak menyebut jenis (kas kecil toko) juga dihitung Solar. Baris oli, aki, coolant, filter, dan suku cadang tidak dihitung emisinya. Data disimpan satu baris per KUU, bulan, dan jenis BBM (`source = JURNAL_BBM_GENSET`, `dcId` = kode KUU). Import dengan `--apply` mengganti semua data genset sebelumnya, termasuk input manual
-- **Kendaraan dari rekap biaya kendaraan**: `scripts/data/import-vehicle-fuel-costs.mjs` (liter dan Rupiah per KUU per bulan, `source = CSV_BIAYA_KENDARAAN`)
-- Data 2026 terisi Januari-September dari jurnal genset dan rekap kendaraan
+- **Kendaraan dari rekap biaya kendaraan**: `scripts/data/import-vehicle-fuel-costs.mjs` (liter dan Rupiah per KUU per bulan, `source = CSV_BIAYA_KENDARAAN`). Bila rekap ditarik sebelum bulan terakhirnya selesai, tambahkan `--covered-through YYYY-MM-DD` (misal `2026-10-15`) supaya bulan itu tersimpan dengan `metadata.coveredThrough` dan tampil "BBM kendaraan s.d. 15 Okt", bukan dianggap lengkap. Untuk data yang sudah diimpor tanpa tanda itu: `node --env-file=.env scripts/data/backfill-vehicle-covered-through.mjs 2026-10-15 [--apply]`
+- Data 2026: genset Januari-September dari jurnal genset, kendaraan Januari-September penuh dan Oktober s.d. 15 Oktober dari rekap kendaraan
+- Tabel rincian per lokasi menampilkan kode KUU, liter, emisi, dan biaya. Tidak ada kolom wilayah PLN karena BBM tidak memakai faktor grid, dan kode KUU belum terpetakan ke master fasilitas
 
 #### Scope 2: Emisi Tidak Langsung (Listrik Grid PLN)
 - 8 grid regional dengan faktor emisi resmi (SK Dirjen Ketenagalistrikan ESDM):
@@ -427,7 +433,7 @@ Aplikasi berjalan di server Linux (Ubuntu/Debian) via Docker atau langsung di No
 - **Runtime**: Node.js 22 LTS
 - **Container**: Docker multi-stage build, output standalone Next.js
 - **Reverse proxy**: Nginx dengan SSL
-- **Sinkronisasi**: `solar-daemon.mjs` sebagai systemd service, polling setiap 5 menit pada jam matahari, sinkronisasi penuh pukul 20:00 WIB; energi bulanan dan PR bulanan ditarik setiap 3 jam
+- **Sinkronisasi**: `solar-daemon.mjs` sebagai systemd service, polling setiap 5 menit pada jam matahari, sinkronisasi penuh pukul 20:00 WIB; energi bulanan dan PR bulanan ditarik setiap 3 jam (setiap tarikan memperbarui `energy_flow_monthly.fetched_at`; bulan berjalan tampil "Listrik & PLTS s.d. <waktu tarikan>", dan bulan yang sudah lewat jadi final begitu ditarik ulang setelah bulannya selesai)
 - **Migrasi**: `npx prisma migrate deploy`, lalu sekali `scripts/data/backfill-isolar-monthly-pr.mjs` setelah migrasi `plant_pr_monthly`
 
 Detail lengkap ada di `DEPLOY.md`.

@@ -70,6 +70,7 @@ export async function upsertEnergyFlowRows(db, rows, now = new Date()) {
           feed_in_kwh = EXCLUDED.feed_in_kwh,
           purchased_kwh = EXCLUDED.purchased_kwh,
           load_kwh = EXCLUDED.load_kwh,
+          fetched_at = EXCLUDED.fetched_at,
           updated_at = EXCLUDED.updated_at;
     `;
   }

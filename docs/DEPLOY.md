@@ -357,7 +357,7 @@ node scripts/sync-isolar.mjs
 
 ## 9. Prosedur Bulanan: Impor Laporan Resmi iSolarCloud (Closing Bulanan)
 
-Sejak 19 Oktober 2026 scheduler menarik energi bulanan (listrik beli PLN, beban, produksi PLTS, ekspor) langsung dari API iSolarCloud setiap 3 jam pada jam sync, untuk bulan lalu dan bulan berjalan, dengan sumber `ISOLAR_API` (`src/lib/solar/energyFlowSync.js`). Angka API terbukti sama dengan Monthly Report portal; bulan berjalan tampil sebagai "sementara". Impor laporan di bawah tetap menjadi closing resmi dan otomatis mengalahkan angka API.
+Sejak 19 Oktober 2026 scheduler menarik energi bulanan (listrik beli PLN, beban, produksi PLTS, ekspor) langsung dari API iSolarCloud setiap 3 jam pada jam sync, untuk bulan lalu dan bulan berjalan, dengan sumber `ISOLAR_API` (`src/lib/solar/energyFlowSync.ts`). Angka API terbukti sama dengan Monthly Report portal, jadi laporan bulanan tidak lagi wajib: begitu bulan selesai dan ditarik ulang (scheduler selalu ikut menarik bulan lalu), angka API bulan itu dianggap final (`isEnergyFlowFinal()` di `src/lib/solar/energyFlowSources.ts`). Bulan berjalan tampil "Listrik & PLTS s.d. <waktu>", dengan waktu dari `fetched_at` tarikan terakhir (setiap tarikan memperbarui kolom ini). Tombol "Perbarui sekarang" di halaman PLTS (`POST /api/isolar`) juga langsung menarik energi bulanan ini tanpa menunggu jadwal 3 jam (sekitar 2 request API per klik, tetap kena cooldown tombol). Impor laporan di bawah tetap bisa dipakai sebagai pembanding dan otomatis mengalahkan angka API, tapi tidak lagi menjadi syarat sebuah bulan dianggap lengkap.
 
 Pada awal setiap bulan (setelah bulan sebelumnya berakhir dan laporan resmi diunduh dari portal iSolarCloud):
 

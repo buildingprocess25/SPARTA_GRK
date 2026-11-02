@@ -22,6 +22,7 @@ const unitTestScripts = [
   ['--test', 'src/lib/scope1/__tests__/gensetJournal.test.mjs'],
   ['--test', 'src/lib/__tests__/sessionPolicy.test.mjs'],
   ['--test', 'src/lib/solar/__tests__/energyFlowSync.test.mjs'],
+  ['--test', 'src/lib/__tests__/reportingMonthStatus.test.mjs'],
   ['--test', 'src/lib/solar/__tests__/inverterTemperature.test.mjs'],
   ['--test', 'tests/reconciliation-identities.test.mjs'],
   ['--test', 'src/lib/importers/__tests__/energyFlowImport.test.mjs'],

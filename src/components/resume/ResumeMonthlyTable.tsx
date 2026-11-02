@@ -3,7 +3,25 @@
 import { formatNum } from '@/data/sustainabilityData';
 import InfoHint from '@/components/ui/InfoHint';
 import { Table as TableRoot, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell } from '@/components/ui/table';
-import { formatDataAsOf } from './resumeParts';
+import type { MonthStatus } from '@/lib/reportingMonthStatus';
+
+// "Bulan berjalan" is expected and reads in blue; "Belum lengkap" asks for an upload and reads in amber. The title
+// carries the meaning, so the colour is a second cue, not the only one.
+const STATUS_TONE = {
+  running: 'text-sky-700 dark:text-sky-300',
+  incomplete: 'text-amber-700 dark:text-amber-300',
+};
+
+function MonthStatusNote({ status }: { status: MonthStatus }) {
+  return (
+    <span className="block w-36 sm:w-56 whitespace-normal mt-0.5">
+      <span className={`block text-[11px] font-semibold ${STATUS_TONE[status.kind] || ''}`}>{status.title}</span>
+      {status.details.map(detail => (
+        <span key={detail} className="block text-[11px] font-medium leading-snug text-slate-600 dark:text-slate-400">{detail}</span>
+      ))}
+    </span>
+  );
+}
 
 export default function ResumeMonthlyTable({
   avgNet,
@@ -47,18 +65,14 @@ export default function ResumeMonthlyTable({
             <TableRow key={i} className="print:break-inside-avoid border-b border-slate-100 dark:border-slate-800">
               <TableCell className="sticky left-0 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap min-w-[140px]">{d.month} 2026</TableCell>
               <TableCell colSpan={includeScope3 ? 10 : 9} className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 italic">
-                Laporan bulanan iSolarCloud belum diimpor, jadi bulan ini belum dihitung.
+                Data listrik & PLTS bulan ini belum tersedia, jadi bulan ini belum dihitung.
               </TableCell>
             </TableRow>
           ) : (
             <TableRow key={i} className="print:break-inside-avoid border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
               <TableCell className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap min-w-[140px]">
                 {d.month} 2026
-                {d.provisional && (
-                  <span className="block text-[11px] font-medium text-amber-700 dark:text-amber-300">
-                    Sementara{d.dataAsOf ? ` · data s.d. ${formatDataAsOf(d.dataAsOf)}` : ''}
-                  </span>
-                )}
+                {d.status?.title && <MonthStatusNote status={d.status} />}
               </TableCell>
               <TableCell className="px-4 py-3 text-sm tabular-nums text-right text-slate-600 dark:text-slate-400 whitespace-nowrap">{formatNum(d.scope1GensetTon, 1)}</TableCell>
               <TableCell className="px-4 py-3 text-sm tabular-nums text-right text-slate-600 dark:text-slate-400 whitespace-nowrap">{formatNum(d.scope1VehicleTon, 1)}</TableCell>

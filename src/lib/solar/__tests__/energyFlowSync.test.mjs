@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ENERGY_FLOW_SOURCE, mergeEnergyFlowRows } from '../energyFlowSources.ts';
+import { ENERGY_FLOW_SOURCE, isEnergyFlowFinal, mergeEnergyFlowRows } from '../energyFlowSources.ts';
 import { energyFlowRowsFromPoints, syncEnergyFlowFromApi } from '../energyFlowSync.ts';
 
 const row = (source, values) => ({ yearMonth: '202610', psId: 1, yieldKwh: 0, feedInKwh: 0, purchasedKwh: 0, loadKwh: 0, source, ...values });
@@ -32,6 +32,16 @@ test('a manual yield correction keeps purchased energy from the lower-priority s
   assert.equal(merged.purchasedKwh, 1000);
 });
 
+test('an API month becomes final once it is pulled after the month closed in WIB', () => {
+  const api = (fetchedAt) => ({ yearMonth: '202610', source: ENERGY_FLOW_SOURCE.API, fetchedAt });
+  assert.equal(isEnergyFlowFinal(api('2026-10-19T07:32:00Z')), false);
+  assert.equal(isEnergyFlowFinal(api('2026-10-31T16:59:59Z')), false);
+  assert.equal(isEnergyFlowFinal(api('2026-10-31T17:00:00Z')), true);
+  assert.equal(isEnergyFlowFinal({ yearMonth: '2026-10', storageYearMonth: '202610', source: ENERGY_FLOW_SOURCE.API, fetchedAt: '2026-11-02T02:15:00Z' }), true);
+  assert.equal(isEnergyFlowFinal(api(null)), false);
+  assert.equal(isEnergyFlowFinal({ yearMonth: '202610', source: ENERGY_FLOW_SOURCE.REPORT }), true);
+});
+
 test('points response converts Wh to kWh and leaves missing points null', () => {
   const rows = energyFlowRowsFromPoints({
     '1_11_0_0': { p83102: [{ 4: '1598000.0', time_stamp: '202610' }], p83022: [{ 4: '766200', time_stamp: '202610' }] },
@@ -44,7 +54,8 @@ function fakeDb({ lastSync = null, psIds = [1] } = {}) {
   return {
     written,
     $queryRaw: async () => [{ last: lastSync }],
-    $executeRaw: async (_strings, ...values) => { written.push(values); },
+    sql: [],
+    async $executeRaw(strings, ...values) { this.sql.push(strings.join('?')); written.push(values); },
     plantMaster: { findMany: async () => [{ sungrowPsIds: psIds }] },
   };
 }
@@ -71,6 +82,15 @@ test('sync asks for last month through this month and stores API rows', async ()
   assert.equal(payload.end_time, '202610');
   assert.equal(result.rows, 1);
   assert.ok(db.written[0].includes(ENERGY_FLOW_SOURCE.API));
+});
+
+test('a repeat pull moves fetched_at forward so the "data s.d." label follows the latest sync', async () => {
+  const now = new Date('2026-11-02T01:34:00Z');
+  const db = fakeDb();
+  const request = async () => ({ data: { result_code: '1', result_data: { '1_11_0_0': { p83102: [{ 4: '1000', time_stamp: '202610' }] } } } });
+  await syncEnergyFlowFromApi({ db, now, request, force: true });
+  assert.match(db.sql[0], /DO UPDATE[\s\S]*fetched_at = EXCLUDED\.fetched_at/);
+  assert.ok(db.written[0].includes(now));
 });
 
 test('sync surfaces a vendor rejection instead of writing nothing silently', async () => {

@@ -21,9 +21,6 @@ export function CalculatorLoadingSkeleton() {
   );
 }
 
-// API pulls run through the day, so the as-of time matters as much as the date.
-export const formatDataAsOf = (iso) => new Date(iso).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
-
 export function Scope3Switch({ checked, onChange }: { checked?: any; onChange?: any }) {
   return (
     <button

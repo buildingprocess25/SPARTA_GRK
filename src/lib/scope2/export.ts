@@ -159,7 +159,7 @@ export async function buildScope2WorkbookBytes(exported) {
       },
       {
         name: 'Per DC-Bulan', title: 'Rincian per DC per bulan', rows: perDcBulan, total: true,
-        notes: ['Status "Sementara" berarti angka bulan berjalan dari API iSolarCloud, sebelum laporan bulanan resmi diimpor.'],
+        notes: ['Status "Sementara" berarti angka bulan berjalan dari API iSolarCloud, yang belum ditarik ulang setelah bulannya selesai. Setelah ditarik ulang, angka API dianggap final tanpa perlu laporan bulanan.'],
       },
       {
         name: 'Per Grid', title: 'Emisi Scope 2 per sistem grid', rows: perGrid, total: true,

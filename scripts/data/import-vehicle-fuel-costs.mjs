@@ -4,8 +4,11 @@ import prisma from '../../src/lib/prisma.ts';
 import { calculateScope1FuelEmission } from '../../src/lib/carbon/carbonEngine.ts';
 import { isVehicleFuelRecord } from '../../src/lib/scope1/fuelCategory.ts';
 
-// Usage: node scripts/import-vehicle-fuel-costs.mjs <rekap.csv> [--map <kuu-map.json>] [--year 2026] [--fuel PERTALITE] [--apply]
+// Usage: node scripts/data/import-vehicle-fuel-costs.mjs <rekap.csv> [--map <kuu-map.json>] [--year 2026] [--fuel PERTALITE]
+//          [--covered-through YYYY-MM-DD] [--apply]
 // Without --apply it only prints what would change.
+// --covered-through marks the rekap's cut-off date (e.g. a rekap pulled on 15 Oct). Rows for that month store it as
+// metadata.coveredThrough, so the dashboard shows the month as "BBM kendaraan s.d. 15 Okt" instead of complete.
 // KUU codes missing from --map are stored with the raw code as dcId until a facility mapping exists.
 const SOURCE = 'CSV_BIAYA_KENDARAAN';
 
@@ -17,9 +20,11 @@ function parseArgs(argv) {
     else if (arg === '--map') args.map = argv[++i];
     else if (arg === '--year') args.year = argv[++i];
     else if (arg === '--fuel') args.fuel = argv[++i].toUpperCase();
+    else if (arg === '--covered-through') args.coveredThrough = argv[++i];
     else args.csv = arg;
   }
   if (!args.csv) throw new Error('Wajib: path CSV rekap biaya kendaraan');
+  if (args.coveredThrough && !/^\d{4}-\d{2}-\d{2}$/.test(args.coveredThrough)) throw new Error('--covered-through harus berformat YYYY-MM-DD');
   return args;
 }
 
@@ -140,7 +145,9 @@ async function main() {
         source: SOURCE,
         batchId,
         proofRef,
-        metadata: { kuu: row.code },
+        metadata: args.coveredThrough?.startsWith(yearMonth)
+          ? { kuu: row.code, coveredThrough: args.coveredThrough }
+          : { kuu: row.code },
       });
     }
   }
@@ -152,6 +159,7 @@ async function main() {
 
   console.log(`Data kendaraan lama yang akan dihapus: ${existing.length}`);
   for (const r of existing) console.log(`  - ${r.id} ${r.yearMonth} ${r.dcId} ${r.liters} L ${r.source}`);
+  if (args.coveredThrough) console.log(`Bulan ${args.coveredThrough.slice(0, 7)} ditandai mencakup s.d. ${args.coveredThrough}`);
   console.log(`Data baru: ${data.length} baris dari ${parsed.rows.length} KUU, ${totalLiters.toLocaleString('id-ID')} L, Rp ${totalCost.toLocaleString('id-ID')}, ${totalTon.toFixed(3)} tCO2e (${args.fuel})`);
 
   if (!args.apply) {

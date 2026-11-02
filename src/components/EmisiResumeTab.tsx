@@ -8,6 +8,7 @@ import { useSustainability } from '@/context/SustainabilityContext';
 import { formatNum } from '@/data/sustainabilityData';
 import { CARBON_FACTORS } from '@/lib/carbon/carbonEngine';
 import { getYearToDateMonths } from '@/lib/reportingMonths';
+import { buildMonthStatus } from '@/lib/reportingMonthStatus';
 import PageHeader from '@/components/ui/PageHeader';
 import CardBox from '@/components/ui/CardBox';
 import { Button } from '@/components/ui/button';
@@ -39,7 +40,9 @@ const NO_SCOPE3_MONTHS = Object.freeze({});
 const INCLUDE_SCOPE3_KEY = 'sparta_include_scope3';
 
 export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCalculator = false }: { setActiveTab?: any; navigateTo?: any; initialOpenCalculator?: boolean }) {
-  const { scope1, scope2, pltsData, waterData, inputHistory } = useSustainability();
+  const { scope1, scope2, pltsData, waterData, inputHistory, backendMeta } = useSustainability();
+  // The context starts from seed data with no per-source availability; flags wait for the server response.
+  const serverDataIn = Boolean(backendMeta);
   const [chartMetricView, setChartMetricView] = useState('net'); // 'net' | 'all' | 'penambahan' | 'pengurangan'
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(initialOpenCalculator);
   const calculatorRef = useRef(null);
@@ -235,13 +238,15 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
   const months = ytdMonths.map(m => m.label);
   const yearMonthOf = Object.fromEntries(ytdMonths.map(m => [m.label, m.yearMonth]));
   const scope3ByMonth = (includeScope3 && realKpiState.data?.scope3ByMonth) || NO_SCOPE3_MONTHS;
+  const scope3Settled = Boolean(realKpiState.data);
+  const currentYearMonth = ytdMonths.at(-1)?.yearMonth;
 
   const { monthlyComparisonData, chartData, avgPenambahan, avgPengurangan, avgNet, avgOffsetRatio, avgScope1Genset, avgScope1Vehicle, avgScope2, avgPltsAvoided, avgWaterAvoided, avgScope3 } = useMemo(() => {
     const forMonth = (trend, month) => (trend || []).find(m => m.month === month);
     const list = months.map((month) => {
       const pltsMonth = forMonth(pltsData.monthlyTrend, month);
       const scope2Month = forMonth(scope2.monthlyTrend, month);
-      // A month whose iSolarCloud report is not imported yet has no PLTS or PLN rows; show it as pending, not as zero.
+      // A month with no PLTS or PLN rows at all (no API pull and no report) is shown as pending, not as zero.
       if (pltsMonth?.hasData === false && scope2Month?.hasData === false) {
         return { month, pending: true, penambahanTon: null, penguranganTon: null, netTon: null, offsetRatioPct: null, scope1Ton: null, scope1GensetTon: null, scope1VehicleTon: null, scope2Ton: null, scope3Ton: null, pltsAvoided: null, waterAvoided: null };
       }
@@ -270,15 +275,29 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         ? Number(((penguranganTon / penambahanTon) * 100).toFixed(2))
         : 0;
 
-      // Month-to-date figures pulled from the iSolarCloud API until the monthly report replaces them.
-      const provisional = Boolean(pltsMonth?.provisional || scope2Month?.provisional);
-      const dataAsOf = scope2Month?.dataThroughDate || pltsMonth?.dataFetchedAt || null;
+      const yearMonth = yearMonthOf[month];
+      const statusInput = {
+        yearMonth,
+        currentYearMonth,
+        genset: { hasData: Boolean(scope1Month?.hasGensetData) },
+        vehicle: { hasData: Boolean(scope1Month?.hasVehicleData), coveredThrough: scope1Month?.vehicleCoveredThrough || null },
+        energy: {
+          hasData: Boolean(pltsMonth?.hasData || scope2Month?.hasData),
+          provisional: Boolean(pltsMonth?.provisional || scope2Month?.provisional),
+          dataAsOf: scope2Month?.dataThroughDate || pltsMonth?.dataFetchedAt || null,
+        },
+        // Until the Scope 3 request settles, an empty month is unknown rather than missing.
+        travel: includeScope3 && scope3Settled ? { hasData: s3Ton !== null } : null,
+      };
+      const status = serverDataIn ? buildMonthStatus(statusInput) : null;
+      // Averages and the chart's '*' ignore Scope 3, which has its own average over the months it covers.
+      const provisional = buildMonthStatus({ ...statusInput, travel: null }).kind !== 'complete';
 
       return {
         month,
         pending: false,
         provisional,
-        dataAsOf,
+        status,
         penambahanTon,
         penguranganTon,
         netTon,
@@ -317,7 +336,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         return withScope3.length ? Number((withScope3.reduce((acc, d) => acc + d.scope3Ton, 0) / withScope3.length).toFixed(1)) : null;
       })(),
     };
-  }, [scope1, scope2, pltsData, waterData, scope3ByMonth]);
+  }, [scope1, scope2, pltsData, waterData, scope3ByMonth, includeScope3, scope3Settled, currentYearMonth, serverDataIn]);
 
   return (
     <div className="space-y-6 animate-in">

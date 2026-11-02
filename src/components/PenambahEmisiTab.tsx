@@ -100,16 +100,20 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
     const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     const years = [...new Set(months.map(m => m.slice(0, 4)))].sort().reverse();
     const options = [];
+    // The API's default period runs to the current month, which may have no data yet; the YTD option must
+    // carry that same value or the select shows its placeholder instead of the period on screen.
+    const apiPeriod = scope1Api?.period || '';
     years.forEach(year => {
       const monthsInYear = months.filter(m => m.startsWith(year));
-      const last = monthsInYear.at(-1);
+      const apiYtdEnd = apiPeriod.startsWith(`${year}-01_`) ? apiPeriod.slice(8, 15) : null;
+      const last = apiYtdEnd && apiYtdEnd > monthsInYear.at(-1) ? apiYtdEnd : monthsInYear.at(-1);
       options.push({ value: `${year}-01_${last}`, label: `Jan-${monthNames[Number(last.slice(5, 7)) - 1].slice(0, 3)} ${year} (YTD)` });
       [...monthsInYear].reverse().forEach(ym => {
         options.push({ value: `${ym}_${ym}`, label: `${monthNames[Number(ym.slice(5, 7)) - 1]} ${year}` });
       });
     });
     return options;
-  }, [scope1Api?.availableMonths]);
+  }, [scope1Api?.availableMonths, scope1Api?.period]);
 
   const scope1Slice = scope1Api?.[scope1Category] || null;
   const filteredScope1Rows = useMemo(() => {
@@ -118,8 +122,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
     if (!query) return rows;
     return rows.filter(r => (
       (r.name || '').toLowerCase().includes(query)
-      || (r.region || '').toLowerCase().includes(query)
-      || (r.grid || '').toLowerCase().includes(query)
+      || (r.id || '').toLowerCase().includes(query)
     ));
   }, [scope1Slice?.rows, scope1Search]);
 
@@ -634,7 +637,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                   value={scope1Search}
                   onChange={(event) => setScope1Search(event.target.value)}
                   className="w-full sm:w-56 pl-9 pr-3"
-                  placeholder="Cari lokasi atau wilayah..."
+                  placeholder="Cari kode lokasi (mis. PZ01)"
                 />
               </label>
             </div>
@@ -647,7 +650,6 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
               <thead className="sticky top-0 z-20 bg-slate-900 text-white text-xs">
                 <tr>
                   <th className="sticky left-0 top-0 z-30 bg-slate-900 px-4 py-3 font-semibold">Lokasi</th>
-                  <th className="px-4 py-3 font-semibold">Wilayah PLN</th>
                   <th className="text-right px-4 py-3 font-semibold">{scope1Category === 'genset' ? 'Solar (Liter)' : 'BBM (Liter)'}</th>
                   <th className="text-right px-4 py-3 font-semibold text-amber-300">Emisi (tCO₂e)</th>
                   <th className="text-right px-4 py-3 font-semibold">Biaya</th>
@@ -656,7 +658,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
               <tbody>
                 {scope1Error ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center border-b border-slate-100 dark:border-slate-800">
+                    <td colSpan={4} className="px-4 py-8 text-center border-b border-slate-100 dark:border-slate-800">
                       <div className="flex flex-col items-center justify-center gap-2 text-rose-600 dark:text-rose-400">
                         <AlertCircle size={20} />
                         <span className="font-semibold text-xs">Data Scope 1 belum bisa dimuat: {scope1Error}</span>
@@ -668,7 +670,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                   </tr>
                 ) : scope1Loading ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                    <td colSpan={4} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                       <div className="flex items-center justify-center gap-2">
                         <RefreshCw size={16} className="animate-spin text-blue-500" />
                         <span role="status">Memuat data Scope 1...</span>
@@ -677,7 +679,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                   </tr>
                 ) : filteredScope1Rows.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                    <td colSpan={4} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                       {scope1Search
                         ? `Tidak ada lokasi yang cocok dengan "${scope1Search}"`
                         : `Belum ada data ${scope1Category === 'genset' ? 'genset' : 'kendaraan'} untuk periode ini. Tambahkan lewat tombol "Input data Scope 1".`}
@@ -690,7 +692,6 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                         <div className="font-semibold text-slate-900 dark:text-slate-100">{row.name}</div>
                         {row.facilityType && <div className="text-[10px] text-slate-500 dark:text-slate-400">{row.facilityType}</div>}
                       </td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{row.region || '—'} {row.grid ? `(${row.grid})` : ''}</td>
                       <td className="px-4 py-3 tabular-nums text-right text-slate-800 dark:text-slate-200">
                         {row.liters > 0 ? `${formatNum(row.liters)} L` : <span className="text-slate-300 dark:text-slate-600">—</span>}
                       </td>
@@ -708,7 +709,6 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                 <tfoot className="bg-slate-100 dark:bg-slate-800 font-bold">
                   <tr>
                     <td className="sticky bottom-0 left-0 z-20 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3 text-slate-900 dark:text-slate-100">TOTAL</td>
-                    <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 px-4 py-3"></td>
                     <td className="sticky bottom-0 z-10 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-300 dark:border-slate-600 text-right px-4 py-3 tabular-nums text-slate-900 dark:text-slate-100">
                       {formatNum(filteredScope1Rows.reduce((s, r) => s + r.liters, 0))} L
                     </td>

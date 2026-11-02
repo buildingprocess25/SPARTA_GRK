@@ -4,7 +4,7 @@ import path from 'node:path';
 import { CARBON_FACTORS, FACTOR_REGISTRY_PROVENANCE } from '../carbon/carbonEngine.ts';
 import { fetchRawEnergyFlows } from '../energy-data.ts';
 import { CANONICAL_DC_ENTITIES, isDcLocation } from '../solar/plantMap.ts';
-import { isApiEnergyFlow } from '../solar/energyFlowSources.ts';
+import { isEnergyFlowFinal } from '../solar/energyFlowSources.ts';
 import {
   buildAutomaticSummary,
   buildProjection,
@@ -90,9 +90,9 @@ async function buildRowsFromDb({ year, rootDir }) {
       exportKwh: raw.feedInKwh,
       gridFactorKgPerKwh: factor.value,
       factorStatus: factor.status,
-      // API rows are month-to-date figures; only report imports and manual entries close a month.
-      periodStatus: isApiEnergyFlow(raw) ? 'partial' : 'complete',
-      dataThroughDate: isApiEnergyFlow(raw) ? raw.fetchedAt : null,
+      // An API row is month-to-date until it is pulled again after its month closed.
+      periodStatus: isEnergyFlowFinal(raw) ? 'complete' : 'partial',
+      dataThroughDate: isEnergyFlowFinal(raw) ? null : raw.fetchedAt,
       sourceRefs: [`energy_flow_monthly:${raw.source}`],
       qualityFlags: factor.status === 'temporary' ? [`FACTOR_SOURCE:${factor.source}`] : [],
     }));

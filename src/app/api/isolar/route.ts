@@ -8,6 +8,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma.ts';
 import { readDashboardPayload, runSync, isInSyncWindow, formatWibTime, getWibTimeInfo } from '@/lib/solar/sync.ts';
+import { syncEnergyFlowFromApi } from '@/lib/solar/energyFlowSync.ts';
 import { aggregateRawApiIntoCanonicalDCs, calculateNationwideSummary } from '@/lib/solar/processor.ts';
 import { CANONICAL_DC_ENTITIES } from '@/lib/solar/plantMap.ts';
 import { QUOTA_CONFIG } from '@/lib/solar/endpoints.ts';
@@ -391,6 +392,14 @@ export async function POST(request) {
       console.error('[isolar/route] Manual sync failed:', error?.code || error?.name || error.message);
       // Even if vendor call fails, we still return latest DB data with error flag
       syncResult = { status: 'failed', error: sanitizeErrorMessage(error?.message || 'Sinkronisasi vendor gagal.') };
+    }
+    // A manual refresh also pulls monthly energy (PLN purchase, load), so the Scope 2 and resume figures move with it.
+    try {
+      const energyFlowResult = await syncEnergyFlowFromApi({ force: true });
+      syncResult = { ...syncResult, energyFlowResult };
+    } catch (error) {
+      console.error('[isolar/route] Manual energy flow sync failed:', error?.message);
+      syncResult = { ...syncResult, energyFlowResult: { status: 'failed', error: sanitizeErrorMessage(error?.message || 'Sinkronisasi energi bulanan gagal.') } };
     }
   }
 

@@ -46,3 +46,23 @@ export function mergeEnergyFlowRows(rows = []) {
 }
 
 export const isApiEnergyFlow = (row) => row?.source === ENERGY_FLOW_SOURCE.API;
+
+const WIB_OFFSET_MS = 7 * 60 * 60_000;
+
+/** First instant (UTC) of the month after `yearMonth` (YYYYMM or YYYY-MM) in WIB. */
+export function wibMonthEndExclusive(yearMonth) {
+  const digits = String(yearMonth).replace('-', '');
+  const year = Number(digits.slice(0, 4));
+  const month = Number(digits.slice(4, 6));
+  return new Date(Date.UTC(year, month, 1) - WIB_OFFSET_MS);
+}
+
+/**
+ * A report or manual row is final. An API row is final once it was pulled after its month closed (WIB):
+ * the API matches the portal Monthly Report, so the monthly report is optional rather than required.
+ */
+export function isEnergyFlowFinal(row) {
+  if (!isApiEnergyFlow(row)) return true;
+  if (!row?.fetchedAt || !row?.yearMonth) return false;
+  return new Date(row.fetchedAt).getTime() >= wibMonthEndExclusive(row.storageYearMonth || row.yearMonth).getTime();
+}

@@ -51,7 +51,7 @@ export default function MainScope3Bridge({ onNavigate }: { onNavigate?: any }) {
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-3.5">
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Jarak terbang</p>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Jarak tempuh</p>
             <div className="mt-2">
               <strong className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{number.format(summary.distanceKm)}</strong>
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">km</span>

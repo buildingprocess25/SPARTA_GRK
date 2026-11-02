@@ -196,7 +196,7 @@ export function buildSrnPpiWorkbookData(reportData) {
     No: i + 1,
     KUU: r.kuu,
     'Jumlah Tiket Pesawat': r.ticketCount,
-    'Jarak Terbang (km)': r.distanceKm,
+    'Jarak Tempuh (km)': r.distanceKm,
     'Kamar-Malam Hotel': r.roomNights ?? 0,
     'Jarak Kereta Api (km)': r.trainKm ?? 0,
     'Emisi Scope 3 (tCO2e)': round(r.emissionTon, 3),

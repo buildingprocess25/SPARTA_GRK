@@ -20,7 +20,7 @@ import { getGridFactor, GRID_EMISSION_FACTORS, DEFAULT_GRID_FACTOR_KG_PER_KWH } 
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './solar/conversionConfig.ts';
 import { isPlantUnderConstruction } from './solar/dashboard.ts';
 import { parseIsolarMonthlyReportFile } from './importers/isolarMonthlyReport.ts';
-import { isApiEnergyFlow, mergeEnergyFlowRows } from './solar/energyFlowSources.ts';
+import { isEnergyFlowFinal, mergeEnergyFlowRows } from './solar/energyFlowSources.ts';
 
 const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -184,8 +184,8 @@ export async function getCanonicalEnergyRows({
     seenIdentities.add(identity);
 
     const mNum = Number(raw.storageYearMonth.slice(4, 6));
-    // API rows are month-to-date until the monthly report replaces them, so they never count as a closed month.
-    const isProvisional = isApiEnergyFlow(raw);
+    // API rows stay month-to-date until a pull after the month closed; then they count as final without a monthly report.
+    const isProvisional = !isEnergyFlowFinal(raw);
     const isPartial = mNum > throughMonth || isProvisional;
 
     const yieldKwh = Number(raw.yieldKwh || 0);
