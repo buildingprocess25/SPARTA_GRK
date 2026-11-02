@@ -35,7 +35,7 @@ export default function PLTSOverviewKpis({
           label="Kapasitas PLTS"
           value={dashboardData?.summary?.capacityKwp != null ? formatNum(dashboardData.summary.capacityKwp, 2) : '—'}
           unit="kWp"
-          trend={dashboardData?.summary?.plantCount != null ? `${dashboardData.summary.plantCount} lokasi · ${dashboardData?.summary?.operationalCapacityKwp != null ? formatNum(dashboardData.summary.operationalCapacityKwp, 2) + ' kWp sudah beroperasi' : '—'}` : '—'}
+          trend={dashboardData?.summary?.plantCount != null ? `${dashboardData.summary.plantCount} DC · ${dashboardData?.summary?.operationalCapacityKwp != null ? formatNum(dashboardData.summary.operationalCapacityKwp, 2) + ' kWp sudah beroperasi' : '—'}` : '—'}
           icon={Sun}
           theme="plts"
           infoKey="plts_capacity"

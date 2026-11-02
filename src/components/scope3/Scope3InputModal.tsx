@@ -273,7 +273,7 @@ export default function Scope3InputModal({ isOpen, onClose, onSuccess, knownKuu 
               <Plane size={14} aria-hidden="true" /> Input Manual
             </TabsTrigger>
             <TabsTrigger value="excel" className="gap-2 flex-1 sm:flex-initial">
-              <FileSpreadsheet size={14} aria-hidden="true" /> Upload Excel/CSV
+              <FileSpreadsheet size={14} aria-hidden="true" /> Unggah Excel/CSV
             </TabsTrigger>
           </TabsList>
         </div>

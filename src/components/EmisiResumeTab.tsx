@@ -260,7 +260,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       const s3Ton = scope3ByMonth[yearMonthOf[month]] ?? null;
       const penambahanTon = Number((s1Ton + s2Ton + (s3Ton ?? 0)).toFixed(1));
 
-      // Avoided: PLTS + water recycle; only water is subtracted from the net (see netEmissionTon above).
+      // Avoided: PLTS + water recycle; both are subtracted from the net (see netEmissionTon above).
       const pltsKwh = pltsMonth?.pltsGen || 0;
       // Same 0.997 factor and basis as /api/sustainability, so both pages agree.
       const pltsAvoided = pltsMonth?.avoidedCo2Ton
@@ -341,8 +341,8 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
   return (
     <div className="space-y-6 animate-in">
       <PageHeader
-        title="Dashboard Emisi Karbon"
-        info="Ringkasan emisi karbon di seluruh Bisnis Proses Alfamart, mencakup sumber emisi (Scope 1 2 dan 3) serta pengurang emisi."
+        title="Ringkasan Emisi"
+        info="Ringkasan emisi karbon di seluruh Bisnis Proses Alfamart, mencakup sumber emisi (Scope 1 2 dan 3) serta emisi yang terhindar berkat PLTS dan daur ulang air."
       />
 
       {realKpiState.error && (
@@ -457,7 +457,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
                 ...(chartMetricView === 'all' || chartMetricView === 'penambahan' ? [{ label: `Emisi Dihasilkan (Scope ${includeScope3 ? '1-3' : '1+2'})`, color: CHART_PALETTE.emission }] : []),
                 ...(chartMetricView === 'all' || chartMetricView === 'pengurangan' ? [{ label: 'Pengurangan Emisi (PLTS & Air)', color: CHART_PALETTE.savings }] : []),
                 ...(chartMetricView === 'all' || chartMetricView === 'net' ? [{ label: 'Total Emisi Akhir', color: CHART_PALETTE.net, type: 'line' }] : []),
-                ...(chartMetricView === 'all' || chartMetricView === 'net' ? [{ label: '% Penurunan Emisi', color: CHART_PALETTE.target, type: 'line' }] : []),
+                ...(chartMetricView === 'all' || chartMetricView === 'net' ? [{ label: '% Pengurangan Emisi', color: CHART_PALETTE.target, type: 'line' }] : []),
               ]}
             />
 

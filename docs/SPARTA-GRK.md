@@ -196,7 +196,7 @@ Monitoring real-time PLTS atap di 37 DC (5.778,8 kWp; 36 beroperasi, Gorontalo b
 - **Sinkronisasi otomatis**: polling setiap 5 menit pada jam produksi (05:30-18:30 WIB)
 - **Manajemen kuota API**: guard untuk hourly (2.000), daily (48.000), dan monthly (100.000) call limit
 - **Analitik performa**:
-  - Specific Yield (kWh/kWp) per plant
+  - Produksi per kWp (kWh/kWp, dikenal juga sebagai *specific yield*) per DC
   - Equivalent Hours dari API
   - Performance Ratio (PR) bulanan per plant langsung dari iSolarCloud (titik `p83023` mode bulanan, identik dengan Annual Report portal), dengan agregat setara cara portal; bulan dengan PR di luar 10-100% (sensor iradiasi bermasalah) tidak dihitung
   - Koreksi temperatur silikon (-0,45%/°C dari STC 25°C) menggunakan model Sandia/King
@@ -235,6 +235,27 @@ Monitoring real-time PLTS atap di 37 DC (5.778,8 kWp; 36 beroperasi, Gorontalo b
 - Web Push via VAPID untuk alarm dan fault PLTS
 - Subscription per-device tersimpan di database
 - Cooldown untuk mencegah spam notifikasi
+
+### Istilah di Tampilan
+
+Satu konsep memakai satu kata di semua halaman. Pakai daftar ini saat menambah atau mengubah teks UI.
+
+| Konsep | Kata yang dipakai | Tidak dipakai lagi |
+|---|---|---|
+| Total pengurangan dari PLTS + daur ulang air | **Pengurangan Emisi** (kartu, grafik, kolom total, menu) | mitigasi, pengurang emisi |
+| Pengurangan dari satu sumber | **Emisi terhindar** (misal "Emisi Terhindar · PLTS") | emisi yang dicegah, emisi dicegah, reduksi emisi, penghematan dari PLTS |
+| Pengurangan ÷ emisi dihasilkan | **% Pengurangan Emisi** | % Penurunan Emisi |
+| Listrik dari jaringan PLN | **Listrik dibeli dari PLN**, singkatnya **Listrik PLN** di judul kolom | konsumsi/pemakaian listrik PLN |
+| Satu Distribution Center | **DC**. "Plant" hanya untuk instalasi fisik (sub-plant di DC multi-plant). "Lokasi" hanya untuk kode KUU Scope 1 dan meter air. "Cabang" hanya untuk hierarki cabang di Scope 2 | plant DC, lokasi DC |
+| Memasukkan file | Tombol **Input data …**, kata kerja **unggah/diunggah** | upload, di-upload, impor/import (di teks UI) |
+| Menarik data terbaru | **Perbarui** untuk tombol, **sinkronisasi** untuk pesan proses iSolarCloud | segarkan, muat ulang |
+| Listrik PLTS yang masuk ke jaringan | **Dialirkan ke PLN** (boleh disertai "ekspor") | ekspor (feed-in) saja |
+| Menyimpan file ke perangkat | **Unduh** | ekspor |
+| kWh per kWp terpasang | **Produksi per kWp** | specific yield, yield (di label UI) |
+| Wilayah grid listrik | **Wilayah PLN**; filter pulau cukup **Jawa / Luar Jawa** | grid (di judul kolom), region |
+| Halaman utama | **Ringkasan Emisi** | Dashboard Emisi Karbon, Resume Emisi |
+
+Laporan resmi SRN-PPI dan OJK tetap memakai istilah regulasinya (misal "Aksi Mitigasi"), karena pembacanya mengharapkan istilah itu.
 
 ---
 
@@ -357,7 +378,7 @@ Jika PR suatu DC turun berturut-turut atau mengalami penurunan $\ge 10-15\%$ dib
 
 Pada tab API iSolarCloud (`PLTSAnalyticsSection`), disediakan **Daily Executive Digest** dengan titik cut-off harian pukul 18:00 WIB (akhir jam produksi surya). Menampilkan:
 1. Total produksi harian nasional (MWh & kWh), emisi $\text{CO}_2$ terhindar (ton), dan ekuivalen serapan pohon.
-2. Top 3 DC performa terbaik harian berdasarkan *Specific Yield* ($\text{kWh/kWp}$).
+2. Top 3 DC performa terbaik harian berdasarkan produksi per kWp (*specific yield*) ($\text{kWh/kWp}$).
 3. Daftar DC yang membutuhkan atensi teknis / pemeliharaan (offline, alarm proteksi, atau suhu inverter tinggi).
 4. Satu tombol salin cepat berformat rapi WhatsApp untuk kebutuhan memo manajemen / direksi.
 

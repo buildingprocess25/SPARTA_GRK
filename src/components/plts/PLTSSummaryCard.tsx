@@ -512,7 +512,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
       'Plant ID',
       'Lokasi',
       'ps_id',
-      'Grid',
+      'Wilayah PLN',
       'Produksi (MWh)',
       'PR (%)',
       'Emisi Terhindar (tCO2e)',
@@ -701,7 +701,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
           <div className="flex items-center gap-2 rounded-xl bg-amber-50/70 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/30 px-3 py-1.5 text-[11px] text-amber-800 dark:text-amber-300">
             <AlertCircle size={13} className="text-amber-600 dark:text-amber-400 shrink-0" />
             <span>
-              <strong>Data belum lengkap:</strong> {unmatchedOrPartialRows.length} lokasi ({unmatchedOrPartialRows.map(r => r.canonicalName).slice(0, 3).join(', ')}{unmatchedOrPartialRows.length > 3 ? ` +${unmatchedOrPartialRows.length - 3} lainnya` : ''}).
+              <strong>Data belum lengkap:</strong> {unmatchedOrPartialRows.length} DC ({unmatchedOrPartialRows.map(r => r.canonicalName).slice(0, 3).join(', ')}{unmatchedOrPartialRows.length > 3 ? ` +${unmatchedOrPartialRows.length - 3} lainnya` : ''}).
             </span>
           </div>
         )}

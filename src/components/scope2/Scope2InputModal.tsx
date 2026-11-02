@@ -370,7 +370,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
 
       setStatusMessage({
         type: 'success',
-        text: `Sukses! ${data.committedCount} transaksi Scope 2 PLN berhasil diimpor ke database!`
+        text: `Sukses! ${data.committedCount} transaksi Scope 2 PLN berhasil disimpan.`
       });
       notify.success(toastPresets.uploadSuccess);
 
@@ -447,7 +447,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
               }`}
             >
               <FileSpreadsheet size={14} className={activeTab === 'excel' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'} />
-              <span>Upload Excel/CSV</span>
+              <span>Unggah Excel/CSV</span>
             </button>
           </div>
         </div>

@@ -334,7 +334,7 @@ export default function PLTSMonthlyMatrixTable({
           </h3>
           <InfoHint
             title="Rekap PLTS per bulan"
-            text={`Target dan realisasi produksi, kinerja panel, kapasitas, emisi yang dicegah, batubara, dan setara pohon. Emisi = listrik PLTS yang dipakai sendiri × ${CONVERSION_CONFIG.emission.factorKgPerKwh} kgCO₂/kWh. Batubara = produksi × ${CONVERSION_CONFIG.coal.factorKgPerKwh} kg/kWh. Pohon = emisi ÷ ${CONVERSION_CONFIG.tree.factorKgPerTreePerYear} kgCO₂ per pohon per tahun. Progres setahun = realisasi s.d. bulan terpilih ÷ target setahun. Proyeksi akhir tahun = (realisasi ÷ target s.d. bulan terpilih) × target setahun.`}
+            text={`Target dan realisasi produksi, kinerja panel, kapasitas, emisi terhindar, batubara, dan setara pohon. Emisi = listrik PLTS yang dipakai sendiri × ${CONVERSION_CONFIG.emission.factorKgPerKwh} kgCO₂/kWh. Batubara = produksi × ${CONVERSION_CONFIG.coal.factorKgPerKwh} kg/kWh. Pohon = emisi ÷ ${CONVERSION_CONFIG.tree.factorKgPerTreePerYear} kgCO₂ per pohon per tahun. Progres setahun = realisasi s.d. bulan terpilih ÷ target setahun. Proyeksi akhir tahun = (realisasi ÷ target s.d. bulan terpilih) × target setahun.`}
           />
         </div>
 
@@ -694,7 +694,7 @@ export default function PLTSMonthlyMatrixTable({
               <td className="sticky left-0 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-3.5 py-3 z-10 border-r border-slate-200 dark:border-slate-700 align-middle shadow-xs">
                 <div className="flex items-center gap-1.5">
                   <TrendingUp size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>Emisi yang dicegah</span>
+                  <span>Emisi terhindar</span>
                 </div>
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal block mt-0.5">
                   (tCO₂e)

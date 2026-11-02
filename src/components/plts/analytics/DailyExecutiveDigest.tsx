@@ -103,7 +103,7 @@ export default function DailyExecutiveDigest({
         statusType = 'warning';
         detail = `Suhu inverter mencapai ${d.inverterTempMax}°C`;
       } else if (d.todaySpecificYield !== null && d.todaySpecificYield < 1.0) {
-        statusLabel = 'Yield rendah';
+        statusLabel = 'Produksi rendah';
         statusType = 'warning';
         detail = `Specific yield ${d.todaySpecificYield} kWh/kWp`;
       }
@@ -141,7 +141,7 @@ export default function DailyExecutiveDigest({
 
     text += `1. RINGKASAN PRODUKSI NASIONAL\n`;
     text += `- Total Produksi: ${formatNum(digestMetrics.totalTodayMwh, 2)} MWh (${formatNum(digestMetrics.totalTodayKwh, 0)} kWh)\n`;
-    text += `- Rerata Specific Yield: ${digestMetrics.nationalSpecificYield} kWh/kWp\n`;
+    text += `- Rerata produksi per kWp: ${digestMetrics.nationalSpecificYield} kWh/kWp\n`;
     text += `- Emisi CO2 Terhindar: ${formatNum(digestMetrics.avoidedCo2Ton, 2)} ton CO2e\n`;
     text += `- Ekuivalen Serapan: ~${formatNum(digestMetrics.treeEquivalent, 0)} pohon\n`;
     text += `- DC Beroperasi: ${digestMetrics.operationalCount} dari 37 DC (1 DC Gorontalo tahap konstruksi)\n\n`;
@@ -252,7 +252,7 @@ export default function DailyExecutiveDigest({
 
         <div className="p-4">
           <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block">
-            Rerata Specific Yield
+            Rerata Produksi per kWp
           </span>
           <div className="flex items-baseline gap-1.5 mt-1.5">
             <span className="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">
@@ -302,7 +302,7 @@ export default function DailyExecutiveDigest({
         <div className="p-5">
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-100 tracking-tight">
-              Peringkat Specific Yield Tertinggi
+              Peringkat Produksi per kWp Tertinggi
             </h4>
             <span className="text-[11px] text-slate-500 dark:text-slate-400">
               3 Performa Terbaik Hari Ini
@@ -317,7 +317,7 @@ export default function DailyExecutiveDigest({
                   <th className="py-2 px-3 font-semibold">Nama Distribusi Center (DC)</th>
                   <th className="py-2 px-3 font-semibold text-right">Kapasitas</th>
                   <th className="py-2 px-3 font-semibold text-right">Produksi</th>
-                  <th className="py-2 px-3 font-semibold text-right">Yield</th>
+                  <th className="py-2 px-3 font-semibold text-right">Produksi per kWp</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">

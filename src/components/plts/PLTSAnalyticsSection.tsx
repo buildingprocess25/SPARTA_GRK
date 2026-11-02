@@ -444,9 +444,9 @@ export default function PLTSAnalyticsSection({
       return `Tren ${label}: ${chosenDCs[0]?.canonicalName || chosenDCs[0]?.name || '1 Lokasi'} (${unit})`;
     }
     if (activeChosenCount >= 38) {
-      return `Tren ${label}: Seluruh ${activeChosenCount} Plant Operasional (${unit})`;
+      return `Tren ${label}: Seluruh ${activeChosenCount} DC Beroperasi (${unit})`;
     }
-    return `Tren ${label}: ${activeChosenCount} Plant Terpilih (${unit})`;
+    return `Tren ${label}: ${activeChosenCount} DC Terpilih (${unit})`;
   }, [activeChosenCount, activeMetricMeta, chosenDCs, selectedMetric, unitMode]);
 
   // Table Data (filtered by selection + search)
@@ -480,7 +480,7 @@ export default function PLTSAnalyticsSection({
 
   const handleExportCSV = () => {
     if (!tableDisplayItems || tableDisplayItems.length === 0) return;
-    const headers = ['Nama DC', 'Wilayah', 'Grid', 'Kapasitas (kWp)', 'Produksi (MWh)', 'Specific Yield (kWh/kWp)', 'Status'];
+    const headers = ['Nama DC', 'Wilayah', 'Wilayah PLN', 'Kapasitas (kWp)', 'Produksi (MWh)', 'Produksi per kWp (kWh/kWp)', 'Status'];
     const rows = tableDisplayItems.map(d => [
       `"${(d.canonicalName || d.name || '').replace(/"/g, '""')}"`,
       `"${(d.region || '').replace(/"/g, '""')}"`,
@@ -530,7 +530,7 @@ export default function PLTSAnalyticsSection({
               </h2>
               <InfoHint title="Perbandingan antar DC" text="Bandingkan dan urutkan kinerja PLTS tiap DC. Plant yang masih dibangun tidak ikut peringkat dan rata-rata." />
               <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-500/20">
-                {operationalItems.length} plant beroperasi{underConstructionCount > 0 ? `, ${underConstructionCount} masih dibangun` : ''}
+                {operationalItems.length} DC beroperasi{underConstructionCount > 0 ? `, ${underConstructionCount} masih dibangun` : ''}
               </span>
               {operationalKwp > 0 && (
                 <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20">
@@ -571,7 +571,7 @@ export default function PLTSAnalyticsSection({
               onClick={() => handleSelectRegion('Jawa')}
               className="px-3 py-1.5 rounded-full text-xs font-semibold text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-white/50 dark:hover:bg-slate-800 transition-all whitespace-nowrap"
             >
-              Region Jawa
+              Jawa
             </button>
             <button
               type="button"
@@ -931,7 +931,7 @@ export default function PLTSAnalyticsSection({
             {/* Selection Counter Badge + Reset */}
             <div className="hidden md:flex items-center gap-2">
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                Menampilkan <strong className="text-slate-900 dark:text-slate-100">{activeChosenCount}</strong> dari {allDCItems.length} lokasi DC
+                Menampilkan <strong className="text-slate-900 dark:text-slate-100">{activeChosenCount}</strong> dari {allDCItems.length} DC
               </span>
               {!isAllSelected && (
                 <button

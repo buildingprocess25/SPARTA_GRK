@@ -80,7 +80,7 @@ export default function ResumeReportExport({
                 SRN-PPI (Kementerian LHK)
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                Laporan inventarisasi Gas Rumah Kaca nasional format resmi. Mencakup data transaksi genset, konsumsi BBM armada, pemakaian listrik 37 DC, mitigasi penurunan emisi, dan rujukan faktor emisi resmi.
+                Laporan inventarisasi Gas Rumah Kaca nasional format resmi. Mencakup data transaksi genset, konsumsi BBM armada, pemakaian listrik 37 DC, emisi terhindar dari PLTS dan daur ulang air, dan rujukan faktor emisi resmi.
               </p>
             </div>
           </div>
@@ -165,7 +165,7 @@ export default function ResumeReportExport({
           </div>
           <div>
             <div className="text-xs font-semibold text-slate-900 dark:text-slate-100">
-              Ekspor Tabulasi Ringkasan Emisi (.csv)
+              Unduh Tabulasi Ringkasan Emisi (.csv)
             </div>
             <div className="text-[11px] text-slate-500 dark:text-slate-400">
               Untuk pengolahan data mentah, BI dashboard internal, atau audit tim analitik.

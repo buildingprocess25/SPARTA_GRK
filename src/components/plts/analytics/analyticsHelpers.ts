@@ -163,7 +163,7 @@ export function getDCBadges(dc, selectedMetric) {
       id: 'high_yield',
       label: 'Melebihi batas wajar',
       className: 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30',
-      tooltip: `Specific Yield hari ini (${dc.todaySpecificYield} kWh/kWp) melebihi batas wajar harian (>6.0)`
+      tooltip: `Produksi per kWp hari ini (${dc.todaySpecificYield} kWh/kWp) melebihi batas wajar harian (>6.0)`
     });
   }
 

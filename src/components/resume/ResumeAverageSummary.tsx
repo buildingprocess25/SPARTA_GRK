@@ -29,10 +29,10 @@ export default function ResumeAverageSummary({
       <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
       <div className="flex flex-col">
         <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1">
-          % Penurunan Emisi
+          % Pengurangan Emisi
           <InfoHint
-            title="% Penurunan Emisi"
-            text="Persentase pengurangan emisi dari PLTS dan daur ulang air terhadap total emisi yang dihasilkan operasional."
+            title="% Pengurangan Emisi"
+            text="Pengurangan emisi (emisi terhindar dari PLTS dan daur ulang air) dibagi total emisi yang dihasilkan, dalam persen. Contoh: 20% berarti seperlima emisi operasional sudah diimbangi."
             size={12}
           />
         </span>

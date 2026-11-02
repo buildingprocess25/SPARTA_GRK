@@ -66,8 +66,8 @@ export const ALL_METRIC_OPTIONS = [
   },
   {
     id: 'co2',
-    label: 'Emisi yang dicegah',
-    trendLabel: 'Emisi yang dicegah per bulan',
+    label: 'Emisi terhindar',
+    trendLabel: 'Emisi terhindar per bulan',
     unit: 'tCO₂e',
     trendUnit: 'tCO₂e',
     desc: `Produksi PLTS × ${SOLAR_CONSTANTS.CO2_FACTOR_PLTS} kgCO₂e/kWh.`,

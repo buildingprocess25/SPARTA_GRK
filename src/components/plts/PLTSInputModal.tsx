@@ -191,7 +191,7 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
         {errors.balance && <p role="alert" className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-700 dark:text-rose-300">{errors.balance}</p>}
 
         <div className="rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 p-4">
-          <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Emisi yang dicegah</p>
+          <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Emisi terhindar</p>
           <p className="mt-1 text-2xl font-black text-emerald-900 dark:text-emerald-200">{avoidedEmissionTon.toLocaleString('id-ID', { maximumFractionDigits: 3 })} tCO₂e</p>
           <p className="mt-1 text-[11px] text-emerald-800 dark:text-emerald-300">{Number(selfConsumptionKwh || 0).toLocaleString('id-ID')} kWh × {PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH} kgCO₂/kWh ÷ 1.000</p>
         </div>

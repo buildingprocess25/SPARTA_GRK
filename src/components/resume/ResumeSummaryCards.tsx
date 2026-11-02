@@ -53,7 +53,7 @@ export default function ResumeSummaryCards({
               <div className="flex items-center gap-1.5">
                 <InfoHint
                   title="Total Emisi Akhir"
-                  text="Total emisi operasional Alfamart (Scope 1 dan Scope 2) setelah dikurangi kontribusi mitigasi PLTS atap dan pemanfaatan daur ulang air."
+                  text="Total emisi yang dihasilkan dikurangi emisi terhindar dari PLTS atap dan daur ulang air."
                 />
               </div>
             </div>
@@ -131,7 +131,7 @@ export default function ResumeSummaryCards({
                   Pengurangan Emisi
                 </h3>
                 <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400">
-                  Mitigasi PLTS & Air
+                  Emisi Terhindar PLTS & Air
                 </span>
               </div>
               <div className="flex items-center gap-1.5">

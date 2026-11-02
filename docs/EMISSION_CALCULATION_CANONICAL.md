@@ -2,7 +2,7 @@
 
 ## 1. Rumus Tunggal Kanonik (Single Source of Truth)
 
-Seluruh indikator emisi terhindar di dashboard (halaman PLTS, Resume Emisi GRK, dan `/api/sustainability`) memakai satu rumus dan satu faktor:
+Seluruh indikator emisi terhindar di dashboard (halaman PLTS, Ringkasan Emisi, dan `/api/sustainability`) memakai satu rumus dan satu faktor:
 
 $$\text{Emisi Terhindar (tCO}_2\text{e)} = \sum_{\text{plant eligible}} \frac{\text{Energi Pakai Sendiri (kWh)} \times 0,997\text{ kgCO}_2\text{/kWh}}{1.000}$$
 
@@ -24,7 +24,7 @@ Faktor emisi PLTS sama di semua grid, jadi status grid tidak menentukan kelayaka
 
 DC Manado (grid Sulutgo) ikut dihitung. Status grid Sulutgo yang masih sementara hanya berpengaruh ke Scope 2, karena Scope 2 memakai faktor grid per wilayah.
 
-Aturan ini dipakai bersama oleh halaman PLTS, Resume Emisi GRK, `/api/emissions` (kartu KPI dan ekspor laporan), dan `/api/sustainability`.
+Aturan ini dipakai bersama oleh halaman PLTS, Ringkasan Emisi, `/api/emissions` (kartu KPI dan ekspor laporan), dan `/api/sustainability`.
 
 ---
 

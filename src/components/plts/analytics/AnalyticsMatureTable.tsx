@@ -56,7 +56,7 @@ export default function AnalyticsMatureTable({
             }}
             className="text-right px-3 py-3 font-semibold cursor-pointer hover:bg-slate-800"
           >
-            Specific Yield
+            Produksi per kWp
           </th>
           {isAuditBaselineEnabled && (
             <th

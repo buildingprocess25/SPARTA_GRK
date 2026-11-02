@@ -20,7 +20,7 @@ export default function AnalyticsTelemetryPanel({
           <InfoHint title="Status inverter per lokasi" text="Data dari iSolarCloud. Inverter mengirim data tiap 5 menit, dashboard mengambilnya tiap 10 menit." />
         </div>
         <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20 shrink-0">
-          {telemetryDisplayItems.length} lokasi
+          {telemetryDisplayItems.length} DC
         </span>
       </div>
 
@@ -94,7 +94,7 @@ export default function AnalyticsTelemetryPanel({
                     <strong className="tabular-nums text-emerald-700 dark:text-emerald-300 font-bold">{formatNum(kwhToMwh(todayKwh), 3)} MWh</strong>
                   </div>
                   <div className="flex justify-between items-center py-0.5 border-b border-slate-100/60 dark:border-slate-800">
-                    <span className="text-slate-500 dark:text-slate-400 text-[11px]">Specific Yield (sebagian)</span>
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px]">Produksi per kWp (sebagian)</span>
                     <strong className="tabular-nums text-blue-700 dark:text-blue-300 font-bold">
                       {st.todaySpecificYield !== null && st.todaySpecificYield !== undefined ? `${st.todaySpecificYield} kWh/kWp` : '—'}
                     </strong>
@@ -153,7 +153,7 @@ export default function AnalyticsTelemetryPanel({
                 <th className="px-3 py-2 font-semibold">Status</th>
                 <th className="text-right px-3 py-2 font-semibold">Daya Live</th>
                 <th className="text-right px-3 py-2 font-semibold">Yield Hari Ini</th>
-                <th className="text-right px-3 py-2 font-semibold">Specific Yield (sebagian)</th>
+                <th className="text-right px-3 py-2 font-semibold">Produksi per kWp (sebagian)</th>
                 <th className="text-right px-3 py-2 font-semibold">Kapasitas API</th>
                 <th className="text-right px-3 py-2 font-semibold">Suhu Inverter</th>
                 <th className="text-center px-3 py-2 font-semibold">Waktu Update</th>

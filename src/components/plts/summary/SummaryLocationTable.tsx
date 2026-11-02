@@ -194,7 +194,7 @@ export default function SummaryLocationTable({
                       {loc.productionMwh == null ? <span className="text-slate-500 dark:text-slate-400 font-sans">Belum tersedia</span> : formatNum(loc.productionMwh, 2, 2)}
                     </td>
 
-                    {/* Column 4: Specific Yield (kWh/kWp) */}
+                    {/* Column 4: Produksi per kWp (kWh/kWp) */}
                     <td className="px-3 py-2.5 text-right tabular-nums text-slate-700 dark:text-slate-300 whitespace-nowrap">
                       {formatNum(loc.specificYield, 1, 1)} <span className="text-[10px] text-slate-500 dark:text-slate-400">kWh/kWp</span>
                     </td>

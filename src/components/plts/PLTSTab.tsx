@@ -594,7 +594,7 @@ export default function PLTSTab() {
         info="Listrik dari panel surya di atap DC: berapa yang dihasilkan, berapa yang dipakai sendiri, dan berapa emisi yang tidak jadi keluar."
         badge={
           <>
-            <span>{totalPlants} plant DC</span>
+            <span>{totalPlants} DC</span>
             <span>&middot;</span>
             <span>Sungrow</span>
             <span>&middot;</span>
@@ -603,7 +603,7 @@ export default function PLTSTab() {
         }
         actions={
           <div className="flex shrink-0 flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
-            <InputDataButton label="Input Data PLTS" icon={Sun} onClick={() => setIsInputModalOpen(true)} className="w-full sm:w-auto" />
+            <InputDataButton label="Input data PLTS" icon={Sun} onClick={() => setIsInputModalOpen(true)} className="w-full sm:w-auto" />
             <SegmentedTabs
               value={activePltsSubView}
               onChange={setActivePltsSubView}

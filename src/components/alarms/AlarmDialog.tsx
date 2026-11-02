@@ -157,7 +157,7 @@ export default function AlarmDialog() {
               disabled={isLoading}
               className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
               title="Perbarui daftar alarm sekarang"
-              aria-label="Segarkan alarm"
+              aria-label="Perbarui daftar alarm"
             >
               <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
             </button>

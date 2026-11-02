@@ -69,11 +69,11 @@ export default function UploadHistory() {
       const response = await fetch(`/api/import/batch?id=${encodeURIComponent(batch.id)}`, { method: 'DELETE' });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.success) throw new Error(data.error || `Server merespons ${response.status}`);
-      notify.success('Upload dihapus', `${data.deletedRows} baris dari ${data.filename} sudah dihapus.`);
+      notify.success('File unggahan dihapus', `${data.deletedRows} baris dari ${data.filename} sudah dihapus.`);
       setBatches((current) => current.filter((item) => item.id !== batch.id));
       refreshData?.();
     } catch (error) {
-      notify.error('Upload gagal dihapus', error.message);
+      notify.error('File unggahan gagal dihapus', error.message);
     } finally {
       setDeletingId(null);
     }
@@ -83,17 +83,17 @@ export default function UploadHistory() {
     <CardBox className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Upload Excel</h2>
+          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">File Excel yang diunggah</h2>
           <InfoHint
-            title="Upload Excel"
-            text="File yang di-upload lewat tombol Input data. Menghapus upload menghapus semua baris dari file itu. Impor laporan iSolarCloud dan impor lama tidak bisa dihapus dari sini."
+            title="File Excel yang diunggah"
+            text="File yang diunggah lewat tombol Input data. Menghapus file ikut menghapus semua baris dari file itu. Laporan iSolarCloud dan data lama yang masuk lewat jalur lain tidak bisa dihapus dari sini."
           />
         </div>
         <button
           type="button"
           onClick={load}
           disabled={state === 'loading'}
-          aria-label="Muat ulang daftar upload"
+          aria-label="Perbarui daftar file"
           className="inline-flex size-9 items-center justify-center rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         >
           <RefreshCw size={15} className={state === 'loading' ? 'animate-spin' : ''} aria-hidden="true" />
@@ -101,14 +101,14 @@ export default function UploadHistory() {
       </div>
 
       {state === 'loading' && batches.length === 0 && (
-        <p role="status" className="py-6 text-center text-sm text-slate-600 dark:text-slate-400">Memuat daftar upload...</p>
+        <p role="status" className="py-6 text-center text-sm text-slate-600 dark:text-slate-400">Memuat daftar file...</p>
       )}
       {state === 'error' && (
         <p role="alert" className="text-sm text-rose-700 dark:text-rose-300">Daftar upload belum bisa dimuat: {loadError}</p>
       )}
       {state === 'ready' && batches.length === 0 && (
         <p className="py-6 text-center text-sm text-slate-600 dark:text-slate-400">
-          Belum ada file yang di-upload. Upload lewat tombol &quot;Input data&quot; di halaman Scope 1, Scope 2, atau Daur Ulang Air.
+          Belum ada file yang diunggah. Unggah lewat tombol &quot;Input data&quot; di halaman Scope 1, Scope 2, atau Daur Ulang Air.
         </p>
       )}
 

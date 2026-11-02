@@ -453,7 +453,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
               }`}
             >
               <FileSpreadsheet size={14} className={activeTab === 'excel' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'} />
-              <span>Upload Excel/CSV</span>
+              <span>Unggah Excel/CSV</span>
             </button>
           </div>
         </div>

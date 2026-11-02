@@ -94,7 +94,7 @@ export default function PLTSMonthlyEnergyCharts({
                                 const nameMap = {
                                   plnConsumption: 'Konsumsi PLN',
                                   selfConsumption: 'PLTS',
-                                  feedIn: 'Ekspor (Feed-in)',
+                                  feedIn: 'Dialirkan ke PLN (ekspor)',
                                   pltsGen: 'Produksi PLTS',
                                   avoidedEmissionTon: 'Emisi Terhindar',
                                   target: 'Target PLTS',
@@ -139,7 +139,7 @@ export default function PLTSMonthlyEnergyCharts({
                       <Cell key={`self-cell-${i}`} opacity={d.month?.includes('*') || d.isPartial ? PARTIAL_OPACITY : 1} />
                     ))}
                   </Bar>
-                  <Bar isAnimationActive={false} yAxisId="left" dataKey="feedIn" stackId="plts" name="Ekspor" fill={CHART_PALETTE.feedIn} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
+                  <Bar isAnimationActive={false} yAxisId="left" dataKey="feedIn" stackId="plts" name="Dialirkan ke PLN" fill={CHART_PALETTE.feedIn} radius={[4, 4, 0, 0]} maxBarSize={16} animationDuration={800} animationEasing="ease-out">
                     {chartData.map((d, i) => (
                       <Cell key={`feed-cell-${i}`} opacity={d.month?.includes('*') || d.isPartial ? PARTIAL_OPACITY : 1} />
                     ))}

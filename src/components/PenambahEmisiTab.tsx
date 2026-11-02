@@ -468,7 +468,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
               {activeSubScope === 'scope1'
                 ? (scope1Category === 'genset' ? 'Pemakaian dan emisi genset per bulan' : 'Pemakaian dan emisi kendaraan per bulan')
-                : `Tren Konsumsi Listrik & Emisi 12 Bulan: ${selectedBranch === 'all' ? 'Seluruh Cabang' : currentBranchObj?.name || 'Cabang'} (${selectedFacility.toUpperCase()})`}
+                : `Tren Listrik PLN & Emisi 12 Bulan: ${selectedBranch === 'all' ? 'Seluruh Cabang' : currentBranchObj?.name || 'Cabang'} (${selectedFacility.toUpperCase()})`}
             </h3>
           </div>
           <ChartPillLegend
@@ -476,7 +476,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
               { label: scope1Category === 'genset' ? 'Solar Genset' : 'Bensin Kendaraan', color: CHART_PALETTE.genset },
               { label: 'Emisi CO₂e', color: CHART_PALETTE.emission, type: 'line' },
             ] : [
-              { label: 'Konsumsi Listrik PLN', color: CHART_PALETTE.plts },
+              { label: 'Listrik dibeli dari PLN', color: CHART_PALETTE.plts },
               { label: 'Emisi Scope 2', color: CHART_PALETTE.emission, type: 'line' },
             ]}
           />
@@ -589,7 +589,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                     return null;
                   }}
                 />
-                <Bar yAxisId="left" dataKey="plnKwh" name="Konsumsi Listrik PLN (MWh)" fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} maxBarSize={32} animationDuration={800} animationEasing="ease-out">
+                <Bar yAxisId="left" dataKey="plnKwh" name="Listrik dibeli dari PLN (MWh)" fill={CHART_PALETTE.plts} radius={[4, 4, 0, 0]} maxBarSize={32} animationDuration={800} animationEasing="ease-out">
                   {hierarchyStats.monthlyData.map((d, i) => (
                     <Cell key={`pln-cell-${i}`} opacity={d.month?.includes('*') || d.month === 'Okt' ? PARTIAL_OPACITY : 1} />
                   ))}
@@ -608,7 +608,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
             <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
               {activeSubScope === 'scope1'
                 ? (scope1Category === 'genset' ? 'Rincian Pemakaian Genset per Lokasi' : 'Rincian Pemakaian BBM Kendaraan per Lokasi')
-                : 'Rincian Pemakaian Listrik & Emisi per Cabang'}
+                : 'Rincian Listrik PLN & Emisi per Cabang'}
             </h3>
             {activeSubScope === 'scope1' && (
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
@@ -730,7 +730,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
                   <th className="px-4 py-3 font-semibold">Kategori</th>
                   <th className="px-4 py-3 font-semibold">Wilayah PLN</th>
                   <th className="px-4 py-3 font-semibold">Faktor Emisi</th>
-                  <th className="text-right px-4 py-3 font-semibold">Pemakaian Listrik (YTD)</th>
+                  <th className="text-right px-4 py-3 font-semibold">Listrik PLN (YTD)</th>
                   <th className="text-right px-4 py-3 font-semibold">Emisi Scope 2 (YTD)</th>
                   <th className="text-right px-4 py-3 font-semibold">Perkiraan Tagihan Listrik</th>
                 </tr>

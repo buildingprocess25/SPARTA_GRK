@@ -66,12 +66,12 @@ export default function IsolarReportUploadCard({ onImported }: { onImported?: an
 
       setResult(payload);
       setStatus('done');
-      notify.success('Laporan diimpor', `${payload.plantMonthsSaved} data plant-bulan, ${monthRange(payload.months)}.`);
+      notify.success('Laporan diunggah', `${payload.plantMonthsSaved} data plant-bulan, ${monthRange(payload.months)}.`);
       await Promise.allSettled([refreshData?.(), onImported?.()]);
     } catch (error) {
       setErrorMessage(error.message);
       setStatus('error');
-      notify.error('Import gagal', error.message);
+      notify.error('Unggah gagal', error.message);
     }
   };
 
@@ -79,10 +79,10 @@ export default function IsolarReportUploadCard({ onImported }: { onImported?: an
     <CardBox className="space-y-4">
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Upload laporan bulanan iSolarCloud</h3>
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Unggah laporan bulanan iSolarCloud (opsional)</h3>
           <InfoHint
-            title="Upload laporan bulanan"
-            text="Data dari file langsung dipakai di halaman PLTS, Resume Emisi, Scope 2, dan unduhan laporan. Bulan yang belum selesai di dalam file dilewati otomatis."
+            title="Unggah laporan bulanan"
+            text="Angka bulanan listrik dan PLTS sudah ditarik otomatis dari API iSolarCloud, jadi laporan ini tidak wajib. Bila diunggah, angka dari file menggantikan angka API di halaman PLTS, Ringkasan Emisi, Scope 2, dan unduhan laporan. Bulan yang belum selesai di dalam file dilewati otomatis."
           />
         </div>
         <p className="text-xs text-slate-600 dark:text-slate-400 max-w-2xl">
@@ -146,7 +146,7 @@ export default function IsolarReportUploadCard({ onImported }: { onImported?: an
             <div className="flex items-start justify-between gap-3">
               <p className="flex items-center gap-2 font-bold text-emerald-800 dark:text-emerald-300">
                 <CheckCircle2 size={16} aria-hidden="true" />
-                {result.fileName} berhasil diimpor
+                {result.fileName} berhasil diunggah
               </p>
               <button
                 type="button"
@@ -235,7 +235,7 @@ export default function IsolarReportUploadCard({ onImported }: { onImported?: an
           <div role="alert" className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50/60 dark:bg-rose-500/10 p-4 text-xs text-rose-800 dark:text-rose-300 space-y-1">
             <p className="flex items-center gap-2 font-bold">
               <AlertCircle size={16} aria-hidden="true" />
-              {fileName ? `${fileName} gagal diimpor` : 'Import gagal'}
+              {fileName ? `${fileName} gagal diunggah` : 'Unggah gagal'}
             </p>
             <p className="pl-6">{errorMessage}</p>
           </div>

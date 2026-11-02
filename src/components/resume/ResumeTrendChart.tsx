@@ -51,7 +51,7 @@ export default function ResumeTrendChart({
                   return (
                     <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs max-w-[240px]">
                       <span className="font-bold">Bulan: {String(label).replace("*", "")} 2026</span>
-                      <p className="mt-1 text-slate-500 dark:text-slate-400">Laporan bulanan iSolarCloud belum diimpor.</p>
+                      <p className="mt-1 text-slate-500 dark:text-slate-400">Data listrik & PLTS bulan ini belum tersedia.</p>
                     </div>
                   );
                 }
@@ -99,7 +99,7 @@ export default function ResumeTrendChart({
                       <div className="flex items-center justify-between gap-3 tabular-nums pt-1">
                         <span className="flex items-center gap-1.5 font-sans text-purple-700 dark:text-purple-300 font-semibold">
                           <span className="size-2 rounded-full bg-purple-500 shrink-0" />
-                          % Penurunan Emisi:
+                          % Pengurangan Emisi:
                         </span>
                         <strong className="text-purple-700 dark:text-purple-300">{formatNum(data.offsetRatioPct, 2)}%</strong>
                       </div>
@@ -137,7 +137,7 @@ export default function ResumeTrendChart({
             <Line yAxisId="left" type="monotone" dataKey="netTon" name="Total Emisi Akhir" stroke={CHART_PALETTE.net} strokeWidth={2.5} dot={{ r: 3.5, fill: CHART_PALETTE.net }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
           )}
           {(chartMetricView === 'all' || chartMetricView === 'net') && (
-            <Line yAxisId="right" type="monotone" dataKey="offsetRatioPct" name="% Penurunan Emisi" stroke={CHART_PALETTE.target} strokeWidth={2} strokeDasharray="3 3" dot={{ r: 3, fill: CHART_PALETTE.target }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
+            <Line yAxisId="right" type="monotone" dataKey="offsetRatioPct" name="% Pengurangan Emisi" stroke={CHART_PALETTE.target} strokeWidth={2} strokeDasharray="3 3" dot={{ r: 3, fill: CHART_PALETTE.target }} activeDot={{ r: 5 }} animationDuration={800} animationEasing="ease-out" />
           )}
         </ComposedChart>
       </ChartContainer>

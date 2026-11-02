@@ -69,9 +69,9 @@ export default function SummaryMetricCards({
                 infoKey="plts_savings"
               />
 
-              {/* Card 4: Reduksi Emisi */}
+              {/* Card 4: Emisi terhindar */}
               <KpiCard
-                label="Emisi yang dicegah"
+                label="Emisi terhindar"
                 value={kpi.totalCo2ReducedTon != null ? formatNum(kpi.totalCo2ReducedTon, 2, 2) : '—'}
                 unit="tCO₂e"
                 subtitle={

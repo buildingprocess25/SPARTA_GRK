@@ -59,7 +59,7 @@ export default function PLTSLiveStatCards({
         label="Produksi hari ini"
         value={isLoading ? '—' : formatNum(kwhToMwh(isolarLiveState?.summaryNationwide?.todayGeneratedKwh || 0), 2)}
         unit="MWh"
-        trend={isLoading ? 'Memuat...' : isolarLiveState?.isNightBeforeDawn ? 'Angka kemarin, mulai dihitung ulang pukul 06.00 WIB' : `Dari ${isolarLiveState?.stationList?.length ?? '—'} lokasi`}
+        trend={isLoading ? 'Memuat...' : isolarLiveState?.isNightBeforeDawn ? 'Angka kemarin, mulai dihitung ulang pukul 06.00 WIB' : `Dari ${isolarLiveState?.stationList?.length ?? '—'} DC`}
         theme="plts"
         tooltip="Listrik yang sudah dihasilkan panel surya sejak pagi ini."
       />

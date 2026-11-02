@@ -48,16 +48,16 @@ export default function ResumeMonthlyTable({
             <TableHead className="text-right text-white px-4 py-3 font-semibold whitespace-nowrap">Scope 2 · Listrik PLN</TableHead>
             {includeScope3 && <TableHead className="text-right text-white px-4 py-3 font-semibold whitespace-nowrap">Scope 3 · Perjalanan Dinas</TableHead>}
             <TableHead className="text-right px-4 py-3 font-semibold bg-red-950 text-red-100 whitespace-nowrap">Total Emisi Dihasilkan (tCO₂e)</TableHead>
-            <TableHead className="text-right text-white px-4 py-3 font-semibold whitespace-nowrap">Pengurangan PLTS</TableHead>
-            <TableHead className="text-right text-white px-4 py-3 font-semibold whitespace-nowrap">Pengurangan Daur Ulang Air</TableHead>
-            <TableHead className="text-right px-4 py-3 font-semibold bg-emerald-950 text-emerald-100 whitespace-nowrap">Total Pengurangan (tCO₂e)</TableHead>
+            <TableHead className="text-right text-white px-4 py-3 font-semibold whitespace-nowrap">Emisi Terhindar · PLTS</TableHead>
+            <TableHead className="text-right text-white px-4 py-3 font-semibold whitespace-nowrap">Emisi Terhindar · Daur Ulang Air</TableHead>
+            <TableHead className="text-right px-4 py-3 font-semibold bg-emerald-950 text-emerald-100 whitespace-nowrap">Total Pengurangan Emisi (tCO₂e)</TableHead>
             <TableHead className="text-right text-white px-4 py-3 font-semibold whitespace-nowrap">
               <span className="inline-flex items-center justify-end gap-1">
                 Total Emisi Akhir (tCO₂e)
-                <InfoHint size={12} title="Total Emisi Akhir" text="Total emisi operasional setelah dikurangi mitigasi PLTS dan daur ulang air." />
+                <InfoHint size={12} title="Total Emisi Akhir" text="Total emisi yang dihasilkan dikurangi emisi terhindar dari PLTS dan daur ulang air." />
               </span>
             </TableHead>
-            <TableHead className="text-center text-white px-4 py-3 font-semibold whitespace-nowrap">% Penurunan Emisi</TableHead>
+            <TableHead className="text-center text-white px-4 py-3 font-semibold whitespace-nowrap">% Pengurangan Emisi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

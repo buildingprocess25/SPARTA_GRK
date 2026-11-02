@@ -61,8 +61,8 @@ export default function MainScope2Bridge({ onNavigate }: { onNavigate?: any }) {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-3.5 flex flex-col justify-between">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span>Tanpa Pembangkit PLTS</span>
-            <InfoHint title="Tanpa Pembangkit PLTS" text="Perkiraan emisi seandainya seluruh kebutuhan listrik DC dibeli dari PLN tanpa adanya pasokan listrik tenaga surya (PLTS)." size={12} />
+            <span>Jika tanpa PLTS</span>
+            <InfoHint title="Jika tanpa PLTS" text="Perkiraan emisi seandainya seluruh kebutuhan listrik DC dibeli dari PLN tanpa adanya pasokan listrik tenaga surya (PLTS)." size={12} />
           </p>
           <div className="mt-2">
             <strong className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{number.format(scope2Bridge.loadBasisTon)}</strong>
@@ -71,7 +71,7 @@ export default function MainScope2Bridge({ onNavigate }: { onNavigate?: any }) {
         </div>
 
         <div className="rounded-xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-3.5 flex flex-col justify-between">
-          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Penghematan dari PLTS</p>
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Emisi terhindar dari PLTS</p>
           <div className="mt-2">
             <strong className="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">− {number.format(scope2Bridge.pltsAvoidedTon)}</strong>
             <span className="text-xs font-semibold text-emerald-600/80 dark:text-emerald-400 ml-1">tCO₂e</span>

@@ -116,7 +116,7 @@ function Scope2ChartTooltip({ active, payload, label }: { active?: any; payload?
         <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400 tabular-nums">
           <span className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-slate-400 shrink-0" />
-            <span className="text-slate-600 dark:text-slate-400 font-sans">Dibeli PLN:</span>
+            <span className="text-slate-600 dark:text-slate-400 font-sans">Dibeli dari PLN:</span>
           </span>
           <strong className="text-slate-900 dark:text-slate-100">{row?.electricityMwh != null ? `${show(row.electricityMwh)} MWh` : '—'}</strong>
         </div>
@@ -513,7 +513,7 @@ export default function Scope2AnnualLoadDashboard() {
                   width={55}
                 />
                 <Tooltip content={<Scope2ChartTooltip />} />
-                <Bar yAxisId="left" dataKey="electricityMwh" stackId="pln" name="Listrik dibeli PLN" fill={CHART_PALETTE.pln} radius={[4, 4, 0, 0]} maxBarSize={18} animationDuration={800} animationEasing="ease-out">
+                <Bar yAxisId="left" dataKey="electricityMwh" stackId="pln" name="Listrik dibeli dari PLN" fill={CHART_PALETTE.pln} radius={[4, 4, 0, 0]} maxBarSize={18} animationDuration={800} animationEasing="ease-out">
                   {monthly.map((entry, idx) => (
                     <Cell key={`pln-cell-${idx}`} opacity={entry.periodStatus === 'partial' ? PARTIAL_OPACITY : 1} />
                   ))}
@@ -535,7 +535,7 @@ export default function Scope2AnnualLoadDashboard() {
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400">
             <div className="flex items-center gap-2">
               <span className="size-3 rounded bg-slate-400" />
-              <span>Listrik dibeli PLN (MWh)</span>
+              <span>Listrik dibeli dari PLN (MWh)</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="size-3 rounded bg-amber-500" />

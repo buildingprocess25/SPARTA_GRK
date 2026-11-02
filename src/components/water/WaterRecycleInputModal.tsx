@@ -118,7 +118,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }: {
         body: JSON.stringify(payload),
       });
       const result = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(result?.message || result?.error || 'Server menolak data Water Recycle.');
+      if (!response.ok) throw new Error(result?.message || result?.error || 'Server menolak data daur ulang air.');
 
       setStatusMessage({
         type: 'success',
@@ -364,7 +364,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }: {
                 <strong className="text-slate-100 tabular-nums text-xs">{liveCalc.volumeM3.toLocaleString('id-ID')} m³</strong>
               </div>
               <div>
-                <span className="text-[10px] text-slate-300 block">Emisi dicegah</span>
+                <span className="text-[10px] text-slate-300 block">Emisi terhindar</span>
                 <strong className="text-emerald-400 tabular-nums font-bold text-xs">{liveCalc.co2AvoidedTon.toFixed(3)} tCO₂e</strong>
               </div>
               <div>

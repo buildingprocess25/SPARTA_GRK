@@ -129,7 +129,7 @@ export default function AnalyticsTrendChart({
               stroke="#E2E8F0"
               label={{
                 value: selectedMetric === 'specificYield' && unitMode === 'daily'
-                  ? 'Specific Yield (kWh/kWp/hari)'
+                  ? 'Produksi per kWp (kWh/kWp/hari)'
                   : `${activeMetricMeta.trendLabel || activeMetricMeta.label} (${activeMetricMeta.trendUnit || activeMetricMeta.unit})`,
                 angle: -90,
                 position: 'insideLeft',

@@ -85,7 +85,7 @@ export default function WaterRecycleTab() {
     <div className="space-y-6 animate-in">
       <PageHeader
         title="Daur Ulang Air"
-        info="Air yang didaur ulang di DC, dihitung dari angka meter. Emisi yang dicegah = volume × 0,344 kgCO₂e/m³ (metode workbook internal, belum diverifikasi sumber luar). Penghematan biaya = volume × Rp 8.000/m³ (perkiraan tarif PDAM industri)."
+        info="Air yang didaur ulang di DC, dihitung dari angka meter. Emisi terhindar = volume × 0,344 kgCO₂e/m³ (metode workbook internal, belum diverifikasi sumber luar). Penghematan biaya = volume × Rp 8.000/m³ (perkiraan tarif PDAM industri)."
         actions={
           <div className="flex shrink-0 flex-col items-end gap-2 self-start">
             <InputDataButton label="Input data air" icon={Droplets} onClick={() => setIsInputModalOpen(true)} />
@@ -124,7 +124,7 @@ export default function WaterRecycleTab() {
           theme="water"
         />
         <KpiCard
-          label="Emisi yang dicegah"
+          label="Emisi terhindar"
           value={loading ? '—' : formatNum(summary?.totalEmissionAvoidedTon ?? 0, 3)}
           unit="tCO₂e"
           trend="Faktor 0,344 kgCO₂e/m³"
@@ -215,7 +215,7 @@ export default function WaterRecycleTab() {
                 <th className="sticky left-0 top-0 z-30 bg-slate-900 px-4 py-3 font-semibold">Lokasi</th>
                 <th className="px-4 py-3 font-semibold">Wilayah</th>
                 <th className="text-right px-4 py-3 font-semibold">Volume</th>
-                <th className="text-right px-4 py-3 font-semibold text-emerald-300">Emisi dicegah</th>
+                <th className="text-right px-4 py-3 font-semibold text-emerald-300">Emisi terhindar</th>
                 <th className="text-right px-4 py-3 font-semibold">Penghematan</th>
               </tr>
             </thead>

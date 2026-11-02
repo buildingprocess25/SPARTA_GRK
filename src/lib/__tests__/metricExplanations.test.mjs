@@ -18,7 +18,7 @@ test('metricExplanations has complete structure for all entries', () => {
 
 test('getMetricExplanation returns the entry, and null for unknown keys', () => {
   const plts = getMetricExplanation('plts_avoided_emission');
-  assert.equal(plts.title, 'Emisi yang dicegah');
+  assert.equal(plts.title, 'Emisi terhindar');
   assert.match(plts.formula, /0,997/);
 
   assert.equal(getMetricExplanation('unknown_key_123'), null);

@@ -35,9 +35,9 @@ export const METRIC_EXPLANATIONS = {
   },
 
   plts_avoided_emission: {
-    title: 'Emisi yang dicegah',
+    title: 'Emisi terhindar',
     definition: 'Emisi yang tidak terjadi karena DC memakai listrik PLTS, bukan listrik PLN.',
-    formula: 'Emisi dicegah (tCO₂e) = listrik PLTS yang dipakai sendiri (kWh) × 0,997 kgCO₂/kWh ÷ 1.000.',
+    formula: 'Emisi terhindar (tCO₂e) = listrik PLTS yang dipakai sendiri (kWh) × 0,997 kgCO₂/kWh ÷ 1.000.',
     source: 'Laporan bulanan iSolarCloud dan faktor emisi PLTS dashboard (0,997 kgCO₂/kWh).',
     varianceReason: 'Listrik yang dikirim ke PLN tidak dihitung. Plant yang masih dibangun juga tidak dihitung.',
   },
@@ -85,9 +85,9 @@ export const METRIC_EXPLANATIONS = {
   },
 
   plts_summary_co2: {
-    title: 'Emisi yang dicegah',
+    title: 'Emisi terhindar',
     definition: 'Total emisi yang dicegah oleh PLTS di lokasi yang sedang dipilih.',
-    formula: 'Emisi dicegah (tCO₂e) = listrik PLTS yang dipakai sendiri (kWh) × 0,997 kgCO₂/kWh ÷ 1.000. Setara pohon = emisi ÷ 21,77 kg per pohon per tahun.',
+    formula: 'Emisi terhindar (tCO₂e) = listrik PLTS yang dipakai sendiri (kWh) × 0,997 kgCO₂/kWh ÷ 1.000. Setara pohon = emisi ÷ 21,77 kg per pohon per tahun.',
     source: 'Laporan bulanan iSolarCloud dan faktor emisi PLTS dashboard.',
     varianceReason: 'Plant yang masih dibangun tidak dihitung.',
   },
@@ -155,7 +155,7 @@ export const METRIC_EXPLANATIONS = {
     definition: 'Menunjukkan bagaimana PLTS mengurangi listrik yang dibeli dari PLN, lalu berapa emisinya.',
     formula: 'Kebutuhan listrik − listrik PLTS yang dipakai sendiri = listrik dari PLN. Listrik dari PLN × faktor emisi = emisi Scope 2.',
     source: 'Laporan bulanan pemakaian listrik dan produksi PLTS.',
-    varianceReason: 'Penghematan dari PLTS tidak dikurangkan lagi dari emisi, karena Scope 2 sudah dihitung dari listrik yang benar-benar dibeli.',
+    varianceReason: 'Emisi terhindar dari PLTS tidak dikurangkan lagi dari Scope 2, karena Scope 2 sudah dihitung dari listrik yang benar-benar dibeli dari PLN.',
   },
 
   scope2_monthly_trend: {

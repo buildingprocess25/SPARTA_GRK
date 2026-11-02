@@ -70,7 +70,7 @@ export default function SummaryCascadeToolbar({
               {selectedDc !== 'ALL' ? ` • ${data?.locations?.find(l => l.dcId === selectedDc)?.canonicalName || selectedDc}` : ''}
             </span>
             <span className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded">
-              {filteredRows.length} lokasi
+              {filteredRows.length} DC
             </span>
           </div>
           {isFiltered && (
