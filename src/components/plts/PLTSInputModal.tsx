@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { getLastClosedMonth, getRecentYears, MONTH_LABELS_LONG } from '@/lib/reportingMonths';
 import { Check, RefreshCw, Sun } from 'lucide-react';
 import BaseModal from '@/components/ui/BaseModal';
 import { useConfirm } from '@/components/ui/ConfirmProvider';
@@ -9,10 +10,12 @@ import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib/solar/conversionConfig';
 import { CustomSelect } from '@/components/ui/select';
 
-const MONTHS = [
-  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
-];
+const MONTHS = MONTH_LABELS_LONG;
+// Monthly production is entered for a month that has ended, so the form opens on the last closed month.
+const defaultPeriod = () => {
+  const closed = getLastClosedMonth();
+  return { month: String(closed.month).padStart(2, '0'), year: String(closed.year) };
+};
 
 export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }: { open?: any; onClose?: any; onSuccess?: any; plants?: any[] }) {
   const confirm = useConfirm();
@@ -26,8 +29,8 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
     }))
   )), [plants]);
   const [plantKey, setPlantKey] = useState('');
-  const [month, setMonth] = useState('09');
-  const [year, setYear] = useState('2026');
+  const [month, setMonth] = useState(() => defaultPeriod().month);
+  const [year, setYear] = useState(() => defaultPeriod().year);
   const [productionKwh, setProductionKwh] = useState('');
   const [selfConsumptionKwh, setSelfConsumptionKwh] = useState('');
   const [exportKwh, setExportKwh] = useState('');
@@ -98,8 +101,8 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
 
   const dirty = Boolean(
     (plantOptions[0] && plantKey !== plantOptions[0].key)
-    || month !== '09'
-    || year !== '2026'
+    || month !== defaultPeriod().month
+    || year !== defaultPeriod().year
     || productionKwh
     || selfConsumptionKwh
     || exportKwh
@@ -166,7 +169,7 @@ export default function PLTSInputModal({ open, onClose, onSuccess, plants = [] }
               ariaLabel="Tahun"
               value={year}
               onChange={(event) => setYear(event.target.value)}
-              options={[2026, 2025, 2024].map((val) => ({
+              options={getRecentYears().map(Number).map((val) => ({
                 value: String(val),
                 label: String(val),
               }))}

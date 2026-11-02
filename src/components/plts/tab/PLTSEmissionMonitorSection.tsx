@@ -5,6 +5,7 @@ import { formatNum } from '@/data/sustainabilityData';
 import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
 import CardBox from '@/components/ui/CardBox';
 import { CustomSelect } from '@/components/ui/select';
+import { withActivePeriodOption } from '@/lib/reportingMonths';
 
 export default function PLTSEmissionMonitorSection({
   dcSearch,
@@ -46,7 +47,7 @@ export default function PLTSEmissionMonitorSection({
               ariaLabel="Periode"
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              options={emissionsPeriods}
+              options={withActivePeriodOption(emissionsPeriods, selectedPeriod)}
             />
           </div>
         </div>

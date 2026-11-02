@@ -21,6 +21,7 @@ import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './solar/conversionConfi
 import { isPlantUnderConstruction } from './solar/dashboard.ts';
 import { parseIsolarMonthlyReportFile } from './importers/isolarMonthlyReport.ts';
 import { isEnergyFlowFinal, mergeEnergyFlowRows } from './solar/energyFlowSources.ts';
+import { getRunningMonth } from './reportingMonths.ts';
 
 const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -51,7 +52,7 @@ export interface RawEnergyFlowRow {
   fetchedAt?: string | null;
 }
 
-export async function fetchRawEnergyFlows({ year = 2026, rootDir = process.cwd() } = {}): Promise<RawEnergyFlowRow[]> {
+export async function fetchRawEnergyFlows({ year = getRunningMonth().year, rootDir = process.cwd() } = {}): Promise<RawEnergyFlowRow[]> {
   const parsedYear = Number(year);
   const safeYear = Number.isInteger(parsedYear) && parsedYear >= 2000 && parsedYear <= 2100 ? parsedYear : 2026;
   const minYm = `${safeYear}01`;
@@ -156,9 +157,9 @@ export async function fetchRawEnergyFlows({ year = 2026, rootDir = process.cwd()
  * Menghasilkan baris kanonik per DC per bulan (37 Distribution Centers)
  */
 export async function getCanonicalEnergyRows({
-  year = 2026,
+  year = getRunningMonth().year,
   includeStores = false, // Sesuai arahan user, default false (hide drive-thru)
-  throughMonth = 9,
+  throughMonth = getRunningMonth().month,
   rootDir = process.cwd(),
 } = {}) {
   const rawRows = await fetchRawEnergyFlows({ year, rootDir });
@@ -263,9 +264,9 @@ export async function getCanonicalEnergyRows({
  * Menghasilkan ringkasan bulanan (12 bulan)
  */
 export async function getCanonicalMonthlySummary({
-  year = 2026,
+  year = getRunningMonth().year,
   includeStores = false,
-  throughMonth = 9,
+  throughMonth = getRunningMonth().month,
   rootDir = process.cwd(),
 } = {}) {
   const rows = await getCanonicalEnergyRows({ year, includeStores, throughMonth, rootDir });
@@ -329,8 +330,8 @@ export async function getCanonicalMonthlySummary({
  * Menghasilkan ringkasan YTD (Januari s.d. throughMonth)
  */
 export async function getCanonicalYtdSummary({
-  year = 2026,
-  throughMonth = 9,
+  year = getRunningMonth().year,
+  throughMonth = getRunningMonth().month,
   includeStores = false,
   rootDir = process.cwd(),
 } = {}) {
@@ -355,7 +356,7 @@ export async function getCanonicalYtdSummary({
   return {
     year,
     throughMonth,
-    periodLabel: `Jan–${MONTH_NAMES_SHORT[throughMonth - 1]} ${year} (YTD)`,
+    periodLabel: `Jan-${MONTH_NAMES_SHORT[throughMonth - 1]} ${year} (YTD)`,
     plantCount: distinctPlants.size,
     officialPlantCount: distinctOfficialPlants.size,
     temporaryPlantCount: distinctPlants.size - distinctOfficialPlants.size,

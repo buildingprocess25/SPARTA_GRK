@@ -15,6 +15,7 @@ import SummaryYoyComparisonChart from './summary/SummaryYoyComparisonChart';
 import SummaryMetricCards from './summary/SummaryMetricCards';
 import SummaryCascadeToolbar from './summary/SummaryCascadeToolbar';
 import { BarChart, Legend } from 'recharts';
+import { getRunningMonth, withActivePeriodOption } from '@/lib/reportingMonths';
 export { GRID_OPTIONS, DATA_FRESH_THRESHOLD_MIN, DATA_STALE_THRESHOLD_MIN, formatDataAge, extractHhMmWib } from './summary/summaryHelpers';
 
 // Module-level client cache for instant UI rendering across filter toggles
@@ -35,7 +36,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
   const [sortDir, setSortDir] = useState('desc'); // 'asc' | 'desc'
   const [expandedDC, setExpandedDC] = useState(null);
   const [localCompareYears, setLocalCompareYears] = useState(true);
-  const [localThroughMonth, setLocalThroughMonth] = useState(9);
+  const [localThroughMonth, setLocalThroughMonth] = useState(() => getRunningMonth().month);
   const [chartType, setChartType] = useState('bar');
   const [showTarget, setShowTarget] = useState(true);
   const [syncedAt, setSyncedAt] = useState(null);
@@ -80,7 +81,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
   };
 
   const handleModeChange = (mode, month = selectedMonth) => {
-    const year = String(period || '2026').slice(0, 4);
+    const year = String(period || getRunningMonth().year).slice(0, 4);
     const endMonth = mode === 'MONTH' ? month : throughMonth;
     const nextPeriod = mode === 'MONTH'
       ? `${year}-${String(month).padStart(2, '0')}_${year}-${String(month).padStart(2, '0')}`
@@ -90,7 +91,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
   };
 
   const handleThroughMonthChange = (month) => {
-    const year = String(period || '2026').slice(0, 4);
+    const year = String(period || getRunningMonth().year).slice(0, 4);
     const nextPeriod = `${year}-01_${year}-${String(month).padStart(2, '0')}`;
     if (sharedFilters) updateShared({ throughMonth: month, month, period: nextPeriod });
     else setThroughMonth(month);
@@ -143,7 +144,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
     if (compareYears) {
       const compareParam = Array.isArray(compareYears) ? compareYears.join(',') : '2025,2026';
       params.set('compare', compareParam);
-      params.set('throughMonth', String(throughMonth || 9));
+      params.set('throughMonth', String(throughMonth || getRunningMonth().month));
     }
 
     const qs = params.toString();
@@ -433,10 +434,10 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
 
   const comparison = data?.history?.comparison || (dashboardData?.yoy ? {
     years: dashboardData.yoy.years || [2025, 2026],
-    label: `Jan–${MONTH_SHORT[(throughMonth || 9) - 1] || 'Sep'}`,
+    label: `Jan-${MONTH_SHORT[(throughMonth || getRunningMonth().month) - 1]}`,
     deltaKwh: dashboardData.yoy.deltaKwh ?? null,
     changePct: dashboardData.yoy.changePct ?? null,
-    series: (dashboardData.yoy.monthly || []).slice(0, throughMonth || 9).map((item, index) => {
+    series: (dashboardData.yoy.monthly || []).slice(0, throughMonth || getRunningMonth().month).map((item, index) => {
       const y0 = (dashboardData.yoy.years || [2025, 2026])[0];
       const y1 = (dashboardData.yoy.years || [2025, 2026])[1];
       const val0 = item.values?.[y0] ?? item[String(y0)] ?? item[y0] ?? null;
@@ -628,7 +629,7 @@ export default function PLTSSummaryCard({ onSelectLocation, sharedFilters, onSha
                 ariaLabel="Periode"
                 value={data?.history?.activePeriod?.value || period}
                 onChange={(e) => handlePeriodChange(e.target.value)}
-                options={data?.history?.periodOptions || []}
+                options={withActivePeriodOption(data?.history?.periodOptions || [], data?.history?.activePeriod?.value || period)}
               />
             </div>
             <div className="w-36">

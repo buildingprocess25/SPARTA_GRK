@@ -4,6 +4,7 @@ import { buildPltsDashboardFromRows, parseDashboardQuery } from './dashboard.ts'
 import { isDcLocation } from './plantMap.ts';
 import { mergeEnergyFlowRows } from './energyFlowSources.ts';
 import { performance } from 'perf_hooks';
+import { getRunningMonth, getRunningYtdPeriod } from '../reportingMonths.ts';
 
 let nextRevalidateTag = null;
 try {
@@ -640,11 +641,13 @@ export async function getPltsMatrixDashboard(rawQuery = {}, options: DashboardSe
  * Pre-warm default dashboard endpoints into memory
  */
 export async function preWarmPltsCache() {
+  // Same default the PLTS page opens on, or the warmed entry is never hit.
+  const runningMonth = getRunningMonth().month;
   const defaultQuery = {
-    period: '2026-01_2026-09',
+    period: getRunningYtdPeriod(),
     mode: 'YTD',
-    month: 9,
-    throughMonth: 9,
+    month: runningMonth,
+    throughMonth: runningMonth,
     compare: '2025,2026',
     grid: 'ALL',
     plant: 'ALL',

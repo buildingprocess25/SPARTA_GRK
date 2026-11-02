@@ -492,10 +492,9 @@ export async function executeSync(cliOptions = {}) {
         }
 
 
-        // Handle Partial Month (Current Month) in monthly_yield_observation
-        // RULE: Closed months (Jan-Sep 2026) with ISOLAR_REPORT_IMPORT are NEVER touched
-        const closedMonths = ['202601', '202602', '202603', '202604', '202605', '202606', '202607', '202608', '202609'];
-        if (!closedMonths.includes(currentYearMonth)) {
+        // Handle Partial Month (Current Month) in monthly_yield_observation.
+        // currentYearMonth is always the running WIB month, so closed months (and their imported reports) are never touched.
+        {
           // Aggregate all daily rows for the current month, excluding any anomalous outliers outside 0-7 kWh/kWp/day
           const monthDailies = await tx.dailyYield.findMany({
             where: { dateWib: { startsWith: `${currentYearMonth.slice(0, 4)}-${currentYearMonth.slice(4, 6)}` } },

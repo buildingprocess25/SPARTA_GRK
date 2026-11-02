@@ -38,7 +38,7 @@ test('keeps years separate, preserves real zero, and serializes missing history 
   assert.deepEqual(result.locations.find(item => item.dcId === 'DC-B').monthly.map(item => item.energyKwh), [0, null]);
   assert.equal(result.locations.find(item => item.dcId === 'DC-B').hasIncompleteHistory, true);
   assert.ok(result.availablePeriods.some(item => item.value === '2025-01_2025-02'));
-  assert.ok(result.availablePeriods.some(item => item.value === '2026-01_2026-02'));
+  assert.ok(result.availablePeriods.some(item => item.value === '2026-01_2026-10'));
   assert.equal(result.availablePeriods.find(item => item.value === '2026-10_2026-10').label, 'Okt 2026 (sebagian)');
 });
 

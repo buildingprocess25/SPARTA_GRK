@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRunningMonth } from '@/hooks/useRunningMonth';
 import { Activity, AlertCircle, Flame, Search, Zap } from 'lucide-react';
 import {
   Area, AreaChart, Bar, CartesianGrid, Cell, ComposedChart, Line,
@@ -28,23 +29,30 @@ import {
 import { buildProjection, filterCanonicalRows, parseScope2Query } from '@/lib/scope2/analytics.ts';
 import { aggregateCanonicalRows } from '@/lib/scope2/energyReconciliation.ts';
 import { getGridFactor, DEFAULT_GRID_FACTOR_KG_PER_KWH } from '@/lib/emission-factors.ts';
+import { getRunningMonth, MONTH_LABELS_SHORT } from '@/lib/reportingMonths';
 
 const SHOW_TARIFF = false;
 const number = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 });
-const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+const months = MONTH_LABELS_SHORT;
 const show = value => value === null || value === undefined || !Number.isFinite(value) ? '—' : number.format(value);
 const formatFactor = value => value === null || value === undefined || !Number.isFinite(value)
   ? '—'
   : Number(value).toLocaleString('id-ID', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
+// January through the running month (WIB), like the PLTS page; the running month shows as partial.
+function defaultPeriodFilters(running = getRunningMonth()) {
+  return { month: running.yearMonth, from: `${running.year}-01`, to: running.yearMonth };
+}
+
 function initialFilters() {
-  if (typeof window === 'undefined') return { period: 'ytd', month: '2026-09', from: '2026-01', to: '2026-09', grid: 'all', dc: 'all', q: '', tariff: 1400, scope2Basis: 'purchased' };
+  const defaults = defaultPeriodFilters();
+  if (typeof window === 'undefined') return { period: 'ytd', ...defaults, grid: 'all', dc: 'all', q: '', tariff: 1400, scope2Basis: 'purchased' };
   const parsed = parseScope2Query(new URLSearchParams(window.location.search));
   return {
     ...parsed,
-    month: parsed.month || '2026-09',
-    from: parsed.from || '2026-01',
-    to: parsed.to || '2026-09',
+    month: parsed.month || defaults.month,
+    from: parsed.from || defaults.from,
+    to: parsed.to || defaults.to,
   };
 }
 
@@ -102,7 +110,7 @@ function Scope2ChartTooltip({ active, payload, label }: { active?: any; payload?
     <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs space-y-1.5 min-w-[240px] select-text">
       <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1 mb-1">
         <span className="font-bold text-slate-800 dark:text-slate-200">
-          Bulan: {label} {row?.yearMonth ? row.yearMonth.slice(0, 4) : '2026'}
+          Bulan: {label} {row?.yearMonth ? row.yearMonth.slice(0, 4) : getRunningMonth().year}
         </span>
         {isPartial && (
           <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/20">
@@ -159,6 +167,22 @@ export default function Scope2AnnualLoadDashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [filters, setFilters] = useState(initialFilters);
+  const runningMonth = useRunningMonth();
+  const previousRunningMonth = useRef(runningMonth);
+  // When the month turns while the page is open, filters still on the old defaults move to the new month.
+  useEffect(() => {
+    const old = previousRunningMonth.current;
+    previousRunningMonth.current = runningMonth;
+    if (old.yearMonth === runningMonth.yearMonth) return;
+    const oldDefaults = defaultPeriodFilters(old);
+    const next = defaultPeriodFilters(runningMonth);
+    setFilters(prev => ({
+      ...prev,
+      month: prev.month === oldDefaults.month ? next.month : prev.month,
+      from: prev.from === oldDefaults.from ? next.from : prev.from,
+      to: prev.to === oldDefaults.to ? next.to : prev.to,
+    }));
+  }, [runningMonth]);
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'scope2EmissionTon', direction: 'desc' });
   const [isInputModalOpen, setIsInputModalOpen] = useState(false);
@@ -237,11 +261,12 @@ export default function Scope2AnnualLoadDashboard() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    const defaults = defaultPeriodFilters();
     const isDefault =
       filters.period === 'ytd' &&
-      filters.month === '2026-09' &&
-      filters.from === '2026-01' &&
-      filters.to === '2026-09' &&
+      filters.month === defaults.month &&
+      filters.from === defaults.from &&
+      filters.to === defaults.to &&
       (filters.grid === 'all' || !filters.grid) &&
       (filters.dc === 'all' || !filters.dc) &&
       !filters.q &&
@@ -295,7 +320,7 @@ export default function Scope2AnnualLoadDashboard() {
     const rows = filterCanonicalRows(canonicalRows, filters);
     if (rows && rows.length > 0) return rows;
     // Presentation safety fallback: never show empty 0s if canonical data exists
-    return canonicalRows.filter(r => r.yearMonth?.startsWith('2026-')) || canonicalRows;
+    return canonicalRows.filter(r => r.yearMonth?.startsWith(`${getRunningMonth().year}-`)) || canonicalRows;
   }, [canonicalRows, filters]);
 
   const monitoredCount = data?.coverage?.monitoredPlantCount || 37;
@@ -337,7 +362,7 @@ export default function Scope2AnnualLoadDashboard() {
   }, [monthly]);
 
   const projection = useMemo(() => {
-    const p = buildProjection(filteredRows, { year: 2026, field: 'scope2EmissionTon' });
+    const p = buildProjection(filteredRows, { year: getRunningMonth().year, field: 'scope2EmissionTon' });
     if (!p.baseAnnual && data?.projection) return data.projection;
     return p;
   }, [filteredRows, data]);
@@ -701,7 +726,7 @@ export default function Scope2AnnualLoadDashboard() {
                   const item = payload[0];
                   return (
                     <ChartTooltipCard
-                      title={`Bulan: ${label} 2026`}
+                      title={`Bulan: ${label} ${item.payload?.yearMonth?.slice(0, 4) || getRunningMonth().year}`}
                       items={[
                         {
                           label: 'Akumulasi emisi',

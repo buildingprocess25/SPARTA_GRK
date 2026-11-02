@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
+import { useRunningMonth } from '@/hooks/useRunningMonth';
 import {
   dcLocations as initialDCLocations,
   waterRecycleData as initialWaterData,
@@ -165,6 +166,15 @@ export function SustainabilityProvider({ children }: { children?: any }) {
     fetchBackendData();
     setIsLoaded(true);
   }, [fetchBackendData]);
+
+  // The month list behind every trend runs January through the running month; refetch when the month turns.
+  const runningYearMonth = useRunningMonth().yearMonth;
+  const loadedForMonth = useRef(runningYearMonth);
+  useEffect(() => {
+    if (loadedForMonth.current === runningYearMonth) return;
+    loadedForMonth.current = runningYearMonth;
+    fetchBackendData();
+  }, [runningYearMonth, fetchBackendData]);
 
   useEffect(() => {
     if (!isLoaded) return;

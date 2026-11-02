@@ -202,6 +202,7 @@ Monitoring real-time PLTS atap di 37 DC (5.778,8 kWp; 36 beroperasi, Gorontalo b
   - Koreksi temperatur silikon (-0,45%/°C dari STC 25°C) menggunakan model Sandia/King
   - Analisis korelasi cuaca (GHI, suhu, kelembapan) dari Open-Meteo
 - **Matriks bulanan**: tabel 37 DC x 12 bulan dengan yield, load, feed-in, dan PR
+- **Produksi bulanan di halaman PLTS** dibaca dari `monthly_yield_observation`. Sync energi bulanan (setiap 3 jam) ikut menulis produksi tiap plant ke tabel ini: bulan yang sudah tutup sebagai `api_history` (final), bulan berjalan sebagai `api_live_partial`. Laporan bulanan yang diunggah (`ISOLAR_REPORT_IMPORT`) tetap menang bila ada
 - **Target RKAP**: tracking realisasi terhadap target produksi perusahaan
 - **Emisi terhindar**: energi PLTS x 0,997 kgCO2/kWh
 - **Ekuivalen lingkungan**: batubara terhindar (0,4 kg/kWh), pohon setara (21,77 kgCO2/pohon/tahun)
@@ -254,6 +255,20 @@ Satu konsep memakai satu kata di semua halaman. Pakai daftar ini saat menambah a
 | kWh per kWp terpasang | **Produksi per kWp** | specific yield, yield (di label UI) |
 | Wilayah grid listrik | **Wilayah PLN**; filter pulau cukup **Jawa / Luar Jawa** | grid (di judul kolom), region |
 | Halaman utama | **Ringkasan Emisi** | Dashboard Emisi Karbon, Resume Emisi |
+| Singkatan bulan | Jan, Feb, Mar, Apr, Mei, Jun, Jul, **Agu**, Sep, Okt, Nov, Des (`MONTH_LABELS_SHORT` di `src/lib/reportingMonths.ts`) | Ags |
+
+### Periode Otomatis
+
+Tidak ada bulan atau tahun laporan yang ditulis tetap di kode. Semua periode bawaan dihitung dari `src/lib/reportingMonths.ts` (zona WIB):
+
+- **Dashboard ikut bulan berjalan** (`getRunningMonth`, `getRunningYtdPeriod`): PLTS, Scope 1, Scope 2, Scope 3, Daur Ulang Air, dan tabel Ringkasan Emisi dibuka pada Januari s.d. bulan berjalan. Pada 2 Nov 2026 tombol PLTS berbunyi "Jan s.d. Nov 2026" dan "Nov 2026 saja"; bulan berjalan ditandai "(sebagian)" atau "Bulan berjalan" karena datanya belum sebulan penuh. Di bulan Januari tombol kedua disembunyikan karena isinya sama.
+- **Laporan resmi ikut bulan tutup terakhir** (`getLastClosedMonth`, `getDefaultYtdPeriod`): pilihan YTD di Unduh laporan resmi (SRN-PPI, OJK, CSV) hanya berisi bulan yang sudah selesai, misal "Januari - Oktober 2026" pada November. Formulir Input data PLTS juga dibuka pada bulan tutup terakhir.
+- **Ganti bulan tanpa reload** (`src/hooks/useRunningMonth.ts`): halaman mengecek bulan berjalan setiap menit dan saat tab kembali aktif. Begitu bulan berganti, filter yang masih di posisi bawaan pindah ke bulan baru dan data dimuat ulang; filter yang dipilih manual tidak diubah.
+- **Dropdown periode tidak pernah kosong**: `buildMonthPeriodOptions` (Scope 1, air) dan `withActivePeriodOption` (PLTS) memastikan periode yang sedang aktif selalu ada di daftar, termasuk tanggal 1 saat bulan baru belum punya data.
+- **Pilihan tahun** di formulir input (`getRecentYears`): tahun berjalan dan dua tahun sebelumnya.
+- Semua hitungan bulan memakai WIB, bukan jam browser atau server, supaya pengguna di WITA/WIT dan server UTC berganti bulan pada saat yang sama.
+
+Yang memang tetap per tahun dan perlu diperbarui saat ganti tahun anggaran: target RKAP 2026, perbandingan produksi 2025 vs 2026 di tab Target, dan laporan tahunan beban 2025/2026 di Scope 2.
 
 Laporan resmi SRN-PPI dan OJK tetap memakai istilah regulasinya (misal "Aksi Mitigasi"), karena pembacanya mengharapkan istilah itu.
 

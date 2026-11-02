@@ -1,5 +1,5 @@
 import { MASTER_FACILITIES, BRANCH_LIST, FACILITY_TYPES, getFilteredFacilities, findFacilityById } from '@/lib/master/facilityMaster';
-import { getYearToDateMonths } from '@/lib/reportingMonths';
+import { getYearToDateMonths, MONTH_LABELS_SHORT } from '@/lib/reportingMonths';
 
 export { MASTER_FACILITIES, BRANCH_LIST, FACILITY_TYPES, getFilteredFacilities, findFacilityById };
 
@@ -80,10 +80,7 @@ export const MONTH_NAMES_FULL = [
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
 ];
 
-export const MONTH_NAMES_SHORT = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-  'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'
-];
+export const MONTH_NAMES_SHORT = MONTH_LABELS_SHORT;
 
 export const branchHierarchyList = [
   {
@@ -754,7 +751,7 @@ export const isolarDCBranches = [
 
 // Target vs pencapaian bulanan
 export const pltsTargetMatrix = {
-  months: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
+  months: MONTH_LABELS_SHORT,
   energyMwh: {
     target: [515.00, 535.00, 535.00, 475.00, 475.00, 475.00, 475.00, 475.00, 475.00, 475.00, 474.00, 474.00],
     actual: [478.83, 454.63, 584.03, 583.15, 528.87, 533.20, 549.00, 583.27, null, null, null, null],

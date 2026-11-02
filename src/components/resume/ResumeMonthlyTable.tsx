@@ -63,7 +63,7 @@ export default function ResumeMonthlyTable({
         <TableBody>
           {monthlyComparisonData.map((d, i) => d.pending ? (
             <TableRow key={i} className="print:break-inside-avoid border-b border-slate-100 dark:border-slate-800">
-              <TableCell className="sticky left-0 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap min-w-[140px]">{d.month} 2026</TableCell>
+              <TableCell className="sticky left-0 bg-white dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap min-w-[140px]">{d.month} {d.yearMonth?.slice(0, 4)}</TableCell>
               <TableCell colSpan={includeScope3 ? 10 : 9} className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 italic">
                 Data listrik & PLTS bulan ini belum tersedia, jadi bulan ini belum dihitung.
               </TableCell>
@@ -71,7 +71,7 @@ export default function ResumeMonthlyTable({
           ) : (
             <TableRow key={i} className="print:break-inside-avoid border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
               <TableCell className="sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 font-bold text-slate-900 dark:text-slate-100 px-4 py-3 z-10 border-r border-slate-100 dark:border-slate-800 whitespace-nowrap min-w-[140px]">
-                {d.month} 2026
+                {d.month} {d.yearMonth?.slice(0, 4)}
                 {d.status?.title && <MonthStatusNote status={d.status} />}
               </TableCell>
               <TableCell className="px-4 py-3 text-sm tabular-nums text-right text-slate-600 dark:text-slate-400 whitespace-nowrap">{formatNum(d.scope1GensetTon, 1)}</TableCell>

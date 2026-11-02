@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { getRecentYears } from '@/lib/reportingMonths';
 import { Droplets, CheckCircle2, AlertCircle, Calculator } from 'lucide-react';
 import { calculateWaterRecycleImpact } from '@/lib/carbon/carbonEngine';
 import { MASTER_FACILITIES, findFacilityById } from '@/lib/master/facilityMaster';
@@ -249,11 +250,7 @@ export default function WaterRecycleInputModal({ isOpen, onClose, onSuccess }: {
                   ariaLabel="Tahun"
                   value={periodYear}
                   onValueChange={(val) => handlePeriodChange(periodMonth, val)}
-                  options={[
-                    { value: '2026', label: '2026' },
-                    { value: '2025', label: '2025' },
-                    { value: '2024', label: '2024' },
-                  ]}
+                  options={getRecentYears().map(year => ({ value: year, label: year }))}
                 />
               </div>
               <div className="col-span-6 sm:col-span-4">

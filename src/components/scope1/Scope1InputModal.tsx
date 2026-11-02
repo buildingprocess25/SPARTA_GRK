@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { getRecentYears } from '@/lib/reportingMonths';
 import {
   Fuel, FileSpreadsheet, Download, RefreshCw,
   CheckCircle2, AlertCircle, AlertTriangle, Calculator,
@@ -399,9 +400,9 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
     || fuelLiters
     || costRupiah
     || pricePerLiter !== '15000'
-    || periodMonth !== '08'
-    || periodYear !== '2026'
-    || activityDate !== '2026-08-15'
+    || periodMonth !== String(today.getMonth() + 1).padStart(2, '0')
+    || periodYear !== String(today.getFullYear())
+    || activityDate !== today.toISOString().slice(0, 10)
     || (gensetAssetCode && gensetAssetCode !== defaultAssetCode)
     || gensetKva !== '500'
     || runHours !== '40'
@@ -631,11 +632,7 @@ export default function Scope1InputModal({ isOpen, onClose, onSuccess, initialCa
                       ariaLabel="Tahun"
                       value={periodYear}
                       onValueChange={(val) => handlePeriodChange(periodMonth, val)}
-                      options={[
-                        { value: '2026', label: '2026' },
-                        { value: '2025', label: '2025' },
-                        { value: '2024', label: '2024' },
-                      ]}
+                      options={getRecentYears().map(year => ({ value: year, label: year }))}
                     />
                   </div>
 

@@ -1,3 +1,5 @@
+import { getCurrentYearMonth, getRunningMonth } from '../reportingMonths.ts';
+
 function rounded(value, digits = 2) {
   return Number(Number(value).toFixed(digits));
 }
@@ -129,7 +131,7 @@ export function parseScope2Query(searchParams) {
   if (month) {
     month = month.trim();
     if (/^\d{1,2}$/.test(month)) {
-      month = `2026-${month.padStart(2, '0')}`;
+      month = `${getCurrentYearMonth().slice(0, 4)}-${month.padStart(2, '0')}`;
     } else if (/^\d{4}\d{2}$/.test(month)) {
       month = `${month.slice(0, 4)}-${month.slice(4, 6)}`;
     }
@@ -193,14 +195,15 @@ export function filterCanonicalRows(rows, query) {
     if (query.period === 'month' && query.month) {
       const targetMonth = query.month.includes('-')
         ? query.month
-        : `2026-${query.month.padStart(2, '0')}`;
+        : `${getRunningMonth().year}-${query.month.padStart(2, '0')}`;
       if (row.yearMonth !== targetMonth) return false;
     }
     if (query.period === 'range') {
       if (query.from && row.yearMonth < query.from) return false;
       if (query.to && row.yearMonth > query.to) return false;
     }
-    if (query.period === 'ytd' && !row.yearMonth.startsWith('2026-')) return false;
+    // YTD is the reporting year of the last closed month (WIB), so January still shows the year that just ended.
+    if (query.period === 'ytd' && !row.yearMonth.startsWith(`${getRunningMonth().year}-`)) return false;
     return true;
   });
 }

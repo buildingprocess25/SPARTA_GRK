@@ -7,7 +7,8 @@ import { CHART_PALETTE, ChartPillLegend } from '@/components/ui/ChartTheme';
 import { useSustainability } from '@/context/SustainabilityContext';
 import { formatNum } from '@/data/sustainabilityData';
 import { CARBON_FACTORS } from '@/lib/carbon/carbonEngine';
-import { getYearToDateMonths } from '@/lib/reportingMonths';
+import { getDefaultYtdPeriod, getYearToDateMonths } from '@/lib/reportingMonths';
+import { useRunningMonth } from '@/hooks/useRunningMonth';
 import { buildMonthStatus } from '@/lib/reportingMonthStatus';
 import PageHeader from '@/components/ui/PageHeader';
 import CardBox from '@/components/ui/CardBox';
@@ -64,10 +65,18 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
     try { localStorage.setItem(INCLUDE_SCOPE3_KEY, String(next)); } catch (_) {}
   };
 
-  const availableReportPeriods = useMemo(() => getAvailableReportPeriods(), []);
+  const runningYearMonth = useRunningMonth().yearMonth;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const availableReportPeriods = useMemo(() => getAvailableReportPeriods(), [runningYearMonth]);
   const [selectedReportPeriod, setSelectedReportPeriod] = useState(
-    availableReportPeriods[0]?.value || '2026-01_2026-09'
+    availableReportPeriods[0]?.value || getDefaultYtdPeriod()
   );
+  // After a month change the old YTD option disappears; fall back to the new first option instead of an empty select.
+  useEffect(() => {
+    if (!availableReportPeriods.some(p => p.value === selectedReportPeriod)) {
+      setSelectedReportPeriod(availableReportPeriods[0]?.value || getDefaultYtdPeriod());
+    }
+  }, [availableReportPeriods, selectedReportPeriod]);
 
   // Real top-level KPIs (Net/Gross/Offset/Cost Saving), sourced from the same
   // real APIs the report export and the Scope 1/2 bridge panels already use,
@@ -141,7 +150,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
         if (!cancelled) setRealKpiState({ loading: false, data: null, error: err.message });
       });
     return () => { cancelled = true; };
-  }, []);
+  }, [runningYearMonth]);
 
   const resumeKPI = useMemo(() => {
     const base = realKpiState.data || {
@@ -248,7 +257,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
       const scope2Month = forMonth(scope2.monthlyTrend, month);
       // A month with no PLTS or PLN rows at all (no API pull and no report) is shown as pending, not as zero.
       if (pltsMonth?.hasData === false && scope2Month?.hasData === false) {
-        return { month, pending: true, penambahanTon: null, penguranganTon: null, netTon: null, offsetRatioPct: null, scope1Ton: null, scope1GensetTon: null, scope1VehicleTon: null, scope2Ton: null, scope3Ton: null, pltsAvoided: null, waterAvoided: null };
+        return { month, yearMonth: yearMonthOf[month], pending: true, penambahanTon: null, penguranganTon: null, netTon: null, offsetRatioPct: null, scope1Ton: null, scope1GensetTon: null, scope1VehicleTon: null, scope2Ton: null, scope3Ton: null, pltsAvoided: null, waterAvoided: null };
       }
 
       // Penambahan: Scope 1 (genset + kendaraan) + Scope 2 (PLN) + Scope 3 (perjalanan dinas, bila jurnalnya sudah ada)
@@ -295,6 +304,7 @@ export default function EmisiResumeTab({ setActiveTab, navigateTo, initialOpenCa
 
       return {
         month,
+        yearMonth,
         pending: false,
         provisional,
         status,

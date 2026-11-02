@@ -9,6 +9,7 @@ import { usePltsEndpoint } from '@/hooks/usePltsData';
 import { TabContentSkeleton } from './PLTSDashboardSkeletons';
 import InfoHint from '@/components/ui/InfoHint';
 import { kwhToMwh } from '@/lib/units';
+import { getRunningMonth } from '@/lib/reportingMonths';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -60,7 +61,7 @@ export default function TabProductionTarget({ filters }: { filters?: any }) {
     const sourceRows = (data?.monthly && data.monthly.length > 0)
       ? data.monthly
       : yoyMonthlyList.map((m) => ({
-          yearMonth: m.currentYearMonth || `2026${String(m.month).padStart(2, '0')}`,
+          yearMonth: m.currentYearMonth || `${getRunningMonth().year}${String(m.month).padStart(2, '0')}`,
           actualKwh: m.currentKwh,
           previousKwh: m.previousKwh,
           previousPlantCount: m.previousPlantCount,

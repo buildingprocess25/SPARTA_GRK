@@ -6,6 +6,7 @@ import { BookOpen, Calculator, CheckCircle2, FileDown, Home, ListChecks, RotateC
 import { calculateEntry, inclusiveDays, summarizeEntries } from '@/lib/calculator/engine.ts';
 import { EMISSION_FACTORS } from '@/lib/calculator/factors.v1.ts';
 import CalculatorEntryForm from './CalculatorEntryForm';
+import { getCurrentYearMonth } from '@/lib/reportingMonths';
 import CalculatorEntryList from './CalculatorEntryList';
 import CalculatorHome from './CalculatorHome';
 import CalculatorLiveSummary from './CalculatorLiveSummary';
@@ -19,7 +20,9 @@ import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
 
 const DRAFT_KEY = 'alfamart-esg-calculator-draft-v2';
 const AUDIT_KEY = 'alfamart-esg-calculator-audit-history-v1';
-const INITIAL_PROFILE = Object.freeze({ organizationName: 'Alfamart', unitName: '', periodStart: '2026-01-01', periodEnd: '2026-12-31' });
+// The reporting period defaults to the current calendar year (WIB).
+const CURRENT_YEAR = getCurrentYearMonth().slice(0, 4);
+const INITIAL_PROFILE = Object.freeze({ organizationName: 'Alfamart', unitName: '', periodStart: `${CURRENT_YEAR}-01-01`, periodEnd: `${CURRENT_YEAR}-12-31` });
 const fieldClass = 'mt-1 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-500/20';
 
 export default function EmissionCalculatorPage() {

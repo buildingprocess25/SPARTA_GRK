@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRunningMonth } from '@/hooks/useRunningMonth';
+import { getRunningMonth } from '@/lib/reportingMonths';
 import { AlertCircle, Building2, FileQuestion, Flame, Hotel, Plane, RefreshCw, Route, Search, TrainFront, Wallet } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -100,8 +102,10 @@ const juta = value => Number(((value || 0) / 1_000_000).toFixed(2));
 
 /** Year, YTD, quarter and month ranges for every year with data plus the current year; future months are left out. */
 function periodOptions(availableMonths, now = new Date()) {
-  const currentYear = String(now.getFullYear());
-  const currentMonth = now.getMonth() + 1;
+  // WIB like the API's default period, not the browser clock (WITA/WIT would turn the month an hour or two early).
+  const running = getRunningMonth(now);
+  const currentYear = String(running.year);
+  const currentMonth = running.month;
   const withData = new Set(availableMonths);
   const years = [...new Set([...availableMonths.map(m => m.slice(0, 4)), currentYear])].sort().reverse();
   const ym = (year, month) => `${year}-${String(month).padStart(2, '0')}`;
@@ -143,6 +147,7 @@ function ChartCardHeader({ title, action = null }: { title?: any; action?: any }
 
 export default function Scope3TravelDashboard() {
   const [period, setPeriod] = useState('');
+  const runningYearMonth = useRunningMonth().yearMonth;
   const [api, setApi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -174,10 +179,11 @@ export default function Scope3TravelDashboard() {
     }
   };
 
-  useEffect(() => { load(period || undefined); }, [period]);
+  useEffect(() => { load(period || undefined); }, [period, runningYearMonth]);
 
   const summary = api?.summary;
-  const options = useMemo(() => periodOptions(api?.availableMonths || []), [api?.availableMonths]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const options = useMemo(() => periodOptions(api?.availableMonths || []), [api?.availableMonths, runningYearMonth]);
   const hasData = (api?.availableMonths?.length ?? 0) > 0;
   const knownKuu = useMemo(() => (api?.byKuu || []).map(r => r.kuu).sort(), [api?.byKuu]);
 

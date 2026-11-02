@@ -50,7 +50,7 @@ export default function ResumeTrendChart({
                 if (data.pending) {
                   return (
                     <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs max-w-[240px]">
-                      <span className="font-bold">Bulan: {String(label).replace("*", "")} 2026</span>
+                      <span className="font-bold">Bulan: {String(label).replace("*", "")} {data.yearMonth?.slice(0, 4)}</span>
                       <p className="mt-1 text-slate-500 dark:text-slate-400">Data listrik & PLTS bulan ini belum tersedia.</p>
                     </div>
                   );
@@ -58,7 +58,7 @@ export default function ResumeTrendChart({
                 return (
                   <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-xl p-3 shadow-xl border border-slate-200 dark:border-slate-700 text-xs space-y-1.5 min-w-[240px] select-text">
                     <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1 mb-1">
-                      <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {String(label).replace("*", "")} 2026</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-200">Bulan: {String(label).replace("*", "")} {data.yearMonth?.slice(0, 4)}</span>
                       {isPartial && (
                         <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
                           Sebagian

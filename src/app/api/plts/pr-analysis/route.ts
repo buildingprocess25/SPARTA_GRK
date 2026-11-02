@@ -10,13 +10,14 @@ import {
 } from '@/lib/solar/performanceRatio';
 import { WEATHER_LOCATION_REGISTRY } from '@/lib/solar/openMeteoService';
 import { isDcLocation } from '@/lib/solar/plantMap.ts';
+import { getCurrentYearMonth } from '@/lib/reportingMonths';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const yearParam = searchParams.get('year') || '2026';
+    const yearParam = searchParams.get('year') || getCurrentYearMonth().slice(0, 4);
     const compareParam = searchParams.get('compare') || '';
     const scopeParam = (searchParams.get('scope') || 'national').toLowerCase(); // 'national' | 'grid' | 'dc'
     const targetId = searchParams.get('id') || searchParams.get('grid') || searchParams.get('dc') || 'ALL';
@@ -24,7 +25,7 @@ export async function GET(request) {
 
     const years = compareParam === 'true' || compareParam === '2025,2026'
       ? [2025, 2026]
-      : [parseInt(yearParam, 10) || 2026];
+      : [parseInt(yearParam, 10) || Number(getCurrentYearMonth().slice(0, 4))];
 
     const minYm = `${Math.min(...years)}01`;
     const maxYm = `${Math.max(...years)}12`;
@@ -149,8 +150,8 @@ export async function GET(request) {
       scopedPlants = plants.filter(p => p.dcId === targetId);
     }
 
-    // Current execution month (October 2026 is partial)
-    const currentYearMonth = '202610';
+    // The running WIB month is partial; every month before it is closed.
+    const currentYearMonth = getCurrentYearMonth().replace('-', '');
 
     // Build monthly series for each requested year
     const yearlySeries: Record<string, any> = {};

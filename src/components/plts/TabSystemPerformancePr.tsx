@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { getRecentYears } from '@/lib/reportingMonths';
 import {
   CartesianGrid, Line, ComposedChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend,
 } from 'recharts';
@@ -30,7 +31,7 @@ function formatNum(value, min = 0, max = 2) {
 }
 
 export default function TabSystemPerformancePr({ filters, onPlantSelect }: { filters?: any; onPlantSelect?: any }) {
-  const [selectedYear, setSelectedYear] = useState('2026');
+  const [selectedYear, setSelectedYear] = useState(() => getRecentYears(1)[0]);
   const [selectedScope, setSelectedScope] = useState('national');
   const [selectedTargetId, setSelectedTargetId] = useState('ALL');
   const [selectedParamId, setSelectedParamId] = useState('temp_panel');
@@ -187,7 +188,7 @@ export default function TabSystemPerformancePr({ filters, onPlantSelect }: { fil
         <div className="flex flex-wrap items-center gap-2">
           {/* Year Selector */}
           <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-            {['2026', '2025'].map(yr => (
+            {getRecentYears(2).map(yr => (
               <button
                 key={yr}
                 onClick={() => setSelectedYear(yr)}

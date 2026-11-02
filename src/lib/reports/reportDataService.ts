@@ -1,4 +1,5 @@
 import { kwhToMwh } from '../units.ts';
+import { getLastClosedMonth, MONTH_LABELS_LONG } from '../reportingMonths.ts';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '../solar/conversionConfig.ts';
 
 const MONTH_NAMES = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -13,25 +14,30 @@ export function monthLabel(yearMonth) {
   return MONTH_NAMES[Number(m) - 1] || yearMonth;
 }
 
-export function getAvailableReportPeriods(availableMonths = []) {
+export function getAvailableReportPeriods(availableMonths = [], now = new Date()) {
+  // YTD runs to the last closed month (WIB) of its year, so the default report period moves with the calendar.
+  const lastClosed = getLastClosedMonth(now);
   const years = availableMonths.length > 0
     ? [...new Set(availableMonths.map(m => m.slice(0, 4)))].sort().reverse()
-    : ['2026'];
+    : [String(lastClosed.year)];
 
   const periods = [];
 
   years.forEach(year => {
     const yNum = Number(year);
 
-    // 1. Akumulasi YTD & 1 Tahun Penuh
-    periods.push({
-      value: `${year}-01_${year}-09`,
-      label: `Januari - September ${year} (YTD)`,
-      type: 'ytd',
-      year: yNum,
-      startMonth: 1,
-      endMonth: 9,
-    });
+    // 1. Akumulasi YTD & 1 Tahun Penuh. A closed year (or December) has no separate YTD: it equals the full year.
+    const ytdEnd = yNum === lastClosed.year ? lastClosed.month : 12;
+    if (ytdEnd < 12) {
+      periods.push({
+        value: `${year}-01_${year}-${String(ytdEnd).padStart(2, '0')}`,
+        label: `Januari - ${MONTH_LABELS_LONG[ytdEnd - 1]} ${year} (YTD)`,
+        type: 'ytd',
+        year: yNum,
+        startMonth: 1,
+        endMonth: ytdEnd,
+      });
+    }
     periods.push({
       value: `${year}-01_${year}-12`,
       label: `Januari - Desember ${year} (1 Tahun Penuh)`,

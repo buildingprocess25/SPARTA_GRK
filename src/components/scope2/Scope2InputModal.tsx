@@ -13,7 +13,7 @@ import BaseModal from '@/components/ui/BaseModal';
 import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { notify } from '@/components/ui/ToastProvider';
 import { dialogPresets, toastPresets } from '@/lib/dialog-presets';
-import { getYearToDateMonths } from '@/lib/reportingMonths';
+import { getRecentYears, getYearToDateMonths } from '@/lib/reportingMonths';
 import { CustomSelect } from '@/components/ui/select';
 
 export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = [] }: { isOpen?: any; onClose?: any; onSuccess?: any; plants?: any[] }) {
@@ -396,9 +396,9 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
     || selectedPsId !== defaultDcKey
     || energyUnit !== 'mwh'
     || energyValue
-    || periodMonth !== '09'
-    || periodYear !== '2026'
-    || activityDate !== '2026-09-15'
+    || periodMonth !== String(today.getMonth() + 1).padStart(2, '0')
+    || periodYear !== String(today.getFullYear())
+    || activityDate !== today.toISOString().slice(0, 10)
     || tariffPerKwh !== '1400'
     || plnCustomerNumber
     || invoiceRef
@@ -552,11 +552,7 @@ export default function Scope2InputModal({ isOpen, onClose, onSuccess, plants = 
                       ariaLabel="Tahun"
                       value={periodYear}
                       onValueChange={(val) => handlePeriodChange(periodMonth, val)}
-                      options={[
-                        { value: '2026', label: '2026' },
-                        { value: '2025', label: '2025' },
-                        { value: '2024', label: '2024' },
-                      ]}
+                      options={getRecentYears().map(year => ({ value: year, label: year }))}
                     />
                   </div>
                   <div className="col-span-6 sm:col-span-4">

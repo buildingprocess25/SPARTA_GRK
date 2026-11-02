@@ -5,6 +5,7 @@
 
 import { OFFICIAL_RKAP_FACTORS, getRkapFactorsForPeriod } from './rkap-factors.ts';
 import { PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './conversionConfig.ts';
+import { getRunningMonth } from '../reportingMonths.ts';
 
 export const EMISSION_CONFIG = {
   DEFAULT_BASIS: 'production', // 'production' | 'self_consumption'
@@ -53,7 +54,7 @@ export function computeEnergyBalance(rows = [], options: { startMonth?: number; 
   const basis = options.basis || EMISSION_CONFIG.DEFAULT_BASIS;
   const plnTariff = options.plnTariff || EMISSION_CONFIG.ASSUMED_PLN_TARIFF_IDR;
   const startMonth = options.startMonth || 1;
-  const endMonth = options.endMonth || 9;
+  const endMonth = options.endMonth || getRunningMonth().month;
 
   let totalProductionKwh = 0;
   let totalFeedInKwh = 0;

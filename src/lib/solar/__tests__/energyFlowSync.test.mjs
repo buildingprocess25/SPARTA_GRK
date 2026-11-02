@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ENERGY_FLOW_SOURCE, isEnergyFlowFinal, mergeEnergyFlowRows } from '../energyFlowSources.ts';
-import { energyFlowRowsFromPoints, syncEnergyFlowFromApi } from '../energyFlowSync.ts';
+import { energyFlowRowsFromPoints, syncEnergyFlowFromApi, yieldObservationsFromRows } from '../energyFlowSync.ts';
 
 const row = (source, values) => ({ yearMonth: '202610', psId: 1, yieldKwh: 0, feedInKwh: 0, purchasedKwh: 0, loadKwh: 0, source, ...values });
 
@@ -91,6 +91,28 @@ test('a repeat pull moves fetched_at forward so the "data s.d." label follows th
   await syncEnergyFlowFromApi({ db, now, request, force: true });
   assert.match(db.sql[0], /DO UPDATE[\s\S]*fetched_at = EXCLUDED\.fetched_at/);
   assert.ok(db.written[0].includes(now));
+});
+
+test('yield goes to the PLTS page as final for a closed month and partial for the running month', () => {
+  const rows = [
+    { yearMonth: '202610', psId: 1, yieldKwh: 596.8 },
+    { yearMonth: '202611', psId: 1, yieldKwh: 18.9 },
+    { yearMonth: '202611', psId: 2, yieldKwh: null },
+  ];
+  assert.deepEqual(yieldObservationsFromRows(rows, '202611'), [
+    { yearMonth: '202610', psId: 1, energyKwh: 596.8, source: 'api_history', qualityStatus: 'FINAL' },
+    { yearMonth: '202611', psId: 1, energyKwh: 18.9, source: 'api_live_partial', qualityStatus: 'PARTIAL' },
+  ]);
+});
+
+test('sync also writes the yield observation the PLTS page reads', async () => {
+  const now = new Date('2026-11-02T02:00:00Z');
+  const db = fakeDb();
+  const request = async () => ({ data: { result_code: '1', result_data: { '1_11_0_0': { p83022: [{ 4: '596800', time_stamp: '202610' }] } } } });
+  const result = await syncEnergyFlowFromApi({ db, now, request, force: true });
+  assert.equal(result.yieldObservations, 1);
+  assert.ok(db.sql.some((sql) => sql.includes('monthly_yield_observation')));
+  assert.ok(db.written.some((values) => values.includes('api_history') && values.includes(596.8)));
 });
 
 test('sync surfaces a vendor rejection instead of writing nothing silently', async () => {

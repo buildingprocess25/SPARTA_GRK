@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { useRunningMonth } from '@/hooks/useRunningMonth';
+import { buildMonthPeriodOptions } from '@/lib/reportingMonths';
 import {
   TrendingUp, Fuel, Zap, AlertCircle,
   Calculator, Gauge, Factory, Building2, Flame,
@@ -71,6 +73,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
   const [scope1Loading, setScope1Loading] = useState(true);
   const [scope1Error, setScope1Error] = useState(null);
   const [scope1Search, setScope1Search] = useState('');
+  const runningYearMonth = useRunningMonth().yearMonth;
   const [scope1Category, setScope1Category] = useState('genset'); // 'genset' | 'vehicle'
 
   const loadScope1Data = async (period) => {
@@ -90,30 +93,15 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
     }
   };
 
+  // Reloads when the month turns too, so the default "Jan s.d. bulan ini" period follows the calendar.
   useEffect(() => {
     loadScope1Data(scope1Period || undefined);
-  }, [scope1Period]);
+  }, [scope1Period, runningYearMonth]);
 
-  const scope1PeriodOptions = useMemo(() => {
-    const months = scope1Api?.availableMonths || [];
-    if (months.length === 0) return [];
-    const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    const years = [...new Set(months.map(m => m.slice(0, 4)))].sort().reverse();
-    const options = [];
-    // The API's default period runs to the current month, which may have no data yet; the YTD option must
-    // carry that same value or the select shows its placeholder instead of the period on screen.
-    const apiPeriod = scope1Api?.period || '';
-    years.forEach(year => {
-      const monthsInYear = months.filter(m => m.startsWith(year));
-      const apiYtdEnd = apiPeriod.startsWith(`${year}-01_`) ? apiPeriod.slice(8, 15) : null;
-      const last = apiYtdEnd && apiYtdEnd > monthsInYear.at(-1) ? apiYtdEnd : monthsInYear.at(-1);
-      options.push({ value: `${year}-01_${last}`, label: `Jan-${monthNames[Number(last.slice(5, 7)) - 1].slice(0, 3)} ${year} (YTD)` });
-      [...monthsInYear].reverse().forEach(ym => {
-        options.push({ value: `${ym}_${ym}`, label: `${monthNames[Number(ym.slice(5, 7)) - 1]} ${year}` });
-      });
-    });
-    return options;
-  }, [scope1Api?.availableMonths, scope1Api?.period]);
+  const scope1PeriodOptions = useMemo(
+    () => buildMonthPeriodOptions(scope1Api?.availableMonths || [], scope1Api?.period || ''),
+    [scope1Api?.availableMonths, scope1Api?.period],
+  );
 
   const scope1Slice = scope1Api?.[scope1Category] || null;
   const filteredScope1Rows = useMemo(() => {

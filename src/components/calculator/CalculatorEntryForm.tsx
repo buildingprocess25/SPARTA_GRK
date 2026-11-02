@@ -9,6 +9,10 @@ import { formatEmission, formatNumber } from '@/lib/calculator/format.ts';
 import { CATEGORY_MAP } from './calculatorConfig';
 import SearchableSelect from './SearchableSelect';
 import { CustomSelect } from '@/components/ui/select';
+import { getCurrentYearMonth } from '@/lib/reportingMonths';
+
+// Offsets default to the current calendar year (WIB) as their ownership window.
+const CURRENT_YEAR = getCurrentYearMonth().slice(0, 4);
 
 const defaults = {
   scope1a: { activity: '', activityUnit: 'L', factorCode: 'FUEL_DIESEL' },
@@ -16,7 +20,7 @@ const defaults = {
   scope2: { activity: '', factorCode: 'GRID_JAMALI', prefillSource: '' },
   travel: { travelType: 'flight', passengers: '1', distanceKm: '', rooms: '1', nights: '1', factorCode: 'FLIGHT_DOMESTIC_ECONOMY_SHORT' },
   financed: { outstanding: '', enterpriseValue: '', investeeEmissionKg: '' },
-  offset: { annualKg: '', ownershipStart: '2026-01-01', ownershipEnd: '2026-12-31', factorCode: 'OFFSET_SPE_GRK' },
+  offset: { annualKg: '', ownershipStart: `${CURRENT_YEAR}-01-01`, ownershipEnd: `${CURRENT_YEAR}-12-31`, factorCode: 'OFFSET_SPE_GRK' },
   ev: { distanceKm: '', evFactorCode: 'EV_CAR', gridFactorCode: 'GRID_JAMALI' },
   renewable: { technologyFactorCode: 'RENEWABLE_SOLAR', gridFactorCode: 'GRID_JAMALI', selfConsumedKwh: '', exportedKwh: '0', prefillSource: '' },
   kkb: { units: '1', distanceKmPerUnit: '', evFactorCode: 'EV_CAR', gridFactorCode: 'GRID_JAMALI' },

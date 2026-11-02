@@ -4,6 +4,7 @@ import { getGridFactor } from '../emission-factors.ts';
 import { classifyLocationStatus } from './status.ts';
 import { isPlantUnderConstruction } from './dashboard.ts';
 import { createPrismaHistoryRepository, getPltsHistory } from './history.ts';
+import { getCurrentYearMonth, getLastClosedMonth } from '../reportingMonths.ts';
 import type { HistoryQuery } from './history.ts';
 import type { PlantLatest } from '../../generated/prisma/index.js';
 
@@ -95,15 +96,17 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
   });
 
   const allMonths = monthGroups.map(m => m.yearMonth).sort();
-  const lastFullMonth = allMonths[allMonths.length - 1] || '202609';
+  const lastFullMonth = allMonths[allMonths.length - 1] || getLastClosedMonth().yearMonth.replace('-', '');
   const latestYear = lastFullMonth.slice(0, 4);
   const firstMonth = `${latestYear}01`;
 
   // Check if current month partial exists in DailyYield
-  const now = new Date();
-  const currentYM = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+  // WIB, not the server clock: a UTC server would still be in the old month for the first 7 hours.
+  const currentYearMonthWib = getCurrentYearMonth();
+  const currentYM = currentYearMonthWib.replace('-', '');
+  const [currentYearWib, currentMonthWib] = currentYearMonthWib.split('-').map(Number);
   const currentMonthDailyCount = await prisma.dailyYield.count({
-    where: { dateWib: { startsWith: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}` } }
+    where: { dateWib: { startsWith: currentYearMonthWib } }
   });
   const hasCurrentMonthDaily = currentMonthDailyCount > 0;
 
@@ -121,10 +124,10 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
   const ytdVal = `${latestYear}-01_${latestYear}-${lastFullMonth.slice(4, 6)}`;
 
   if (hasCurrentMonthDaily) {
-    const curVal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const curVal = `${currentYearMonthWib}_${currentYearMonthWib}`;
     availablePeriods.push({
       value: curVal,
-      label: `${MONTH_NAMES_SHORT[now.getMonth()]} ${now.getFullYear()} (sebagian)`
+      label: `${MONTH_NAMES_SHORT[currentMonthWib - 1]} ${currentYearWib} (sebagian)`
     });
   }
 
@@ -554,7 +557,7 @@ async function computeSummarizePlts({ period, grid, dc, compareYears, comparison
     comparisonThroughMonth,
     grid,
     dc,
-    now,
+    now: new Date(),
   });
 
   return {

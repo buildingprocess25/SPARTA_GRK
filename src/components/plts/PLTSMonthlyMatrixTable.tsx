@@ -11,6 +11,7 @@ import { CustomSelect } from '@/components/ui/select';
 import { CONVERSION_CONFIG } from '@/lib/solar/conversionConfig';
 import { isDcLocation } from '@/lib/solar/plantMap';
 import { formatNum } from '@/data/sustainabilityData';
+import { getRunningMonth } from '@/lib/reportingMonths';
 
 const MONTH_NAMES = [
   'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
@@ -28,15 +29,15 @@ export default function PLTSMonthlyMatrixTable({
   onFilterChange,
 }: { dashboardData?: any; filters?: any; onFilterChange?: any }) {
   // Local Controls
-  const currentMonth = new Date().getMonth() + 1;
-  const [selectedThroughMonth, setSelectedThroughMonth] = useState(filters?.throughMonth || Math.max(1, currentMonth - 1));
+  const runningMonth = getRunningMonth().month;
+  const [selectedThroughMonth, setSelectedThroughMonth] = useState(filters?.throughMonth || runningMonth);
   const [unit, setUnit] = useState('MWh'); // 'kWh' | 'MWh'
   const [selectedPlant, setSelectedPlant] = useState(filters?.plant || 'ALL');
-  const selectedYear = Number(dashboardData?.selectedYear || String(filters?.period || '2026').slice(0, 4));
+  const selectedYear = Number(dashboardData?.selectedYear || String(filters?.period || getRunningMonth().year).slice(0, 4));
 
   useEffect(() => {
     setSelectedPlant(filters?.plant || 'ALL');
-    setSelectedThroughMonth(filters?.throughMonth || filters?.month || 9);
+    setSelectedThroughMonth(filters?.throughMonth || filters?.month || getRunningMonth().month);
   }, [filters?.plant, filters?.throughMonth, filters?.month]);
 
   const unitMultiplier = unit === 'MWh' ? 0.001 : 1;
@@ -350,7 +351,7 @@ export default function PLTSMonthlyMatrixTable({
                 onValueChange={(val) => setSelectedThroughMonth(Number(val))}
                 options={FULL_MONTH_NAMES.map((name, idx) => ({
                   value: idx + 1,
-                  label: `${name}${idx + 1 > currentMonth ? ' (belum berjalan)' : ''}`,
+                  label: `${name}${idx + 1 > runningMonth ? ' (belum berjalan)' : ''}`,
                 }))}
               />
             </div>
@@ -533,7 +534,7 @@ export default function PLTSMonthlyMatrixTable({
                     className={`tabular-nums text-right px-2 py-2.5 font-bold ${
                       val !== null ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-500 dark:text-slate-400 italic text-[11px]'
                     } ${isHighlight ? 'bg-amber-50/40 dark:bg-amber-500/10' : isDimmed ? 'opacity-40 text-slate-500 dark:text-slate-400' : ''}`}
-                    title={val === null ? (m.month <= currentMonth ? 'Data belum masuk' : 'Bulan belum berjalan') : undefined}
+                    title={val === null ? (m.month <= runningMonth ? 'Data belum masuk' : 'Bulan belum berjalan') : undefined}
                   >
                     {val !== null ? formatVal(val, unitDecimals) : 'Belum masuk'}
                   </td>

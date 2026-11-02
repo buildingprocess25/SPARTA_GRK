@@ -3,6 +3,7 @@ import { summarizePlantStatuses } from './status.ts';
 import { computeEnergyBalance, validateEnergyBalanceRow } from './energyBalance.ts';
 import { isValidPlantPr, PR_VALID_RANGE } from './prValidity.ts';
 import { EMISSION_CONSTANTS, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from './conversionConfig.ts';
+import { getRunningMonth } from '../reportingMonths.ts';
 
 export const MONTHLY_SOURCE_POLICY = Object.freeze({
   preferredCompletedSource: 'ISOLAR_REPORT_IMPORT',
@@ -369,7 +370,7 @@ function resolvePlantMonth(plant, yearMonth, index, currentYearMonth) {
 
 function periodYear(query) {
   const match = String(query.period || '').match(/^(20\d{2})/);
-  return match ? Number(match[1]) : Number(query.compareYears?.at(-1) || 2026);
+  return match ? Number(match[1]) : Number(query.compareYears?.at(-1) || getRunningMonth().year);
 }
 
 function selectedMonthNumbers(query) {
@@ -644,7 +645,7 @@ export function buildPltsDashboardFromRows({
   const energyBalance = computeEnergyBalance(relevantEnergyFlows, {
     basis: query.emissionBasis || 'production',
     startMonth: monthNumbers[0] || 1,
-    endMonth: monthNumbers.at(-1) || 9,
+    endMonth: monthNumbers.at(-1) || getRunningMonth().month,
   });
 
   const prInputs = [];
@@ -1134,7 +1135,7 @@ export function buildPltsDashboardFromRows({
           timeZone: 'Asia/Jakarta',
           day: '2-digit', month: 'short', year: 'numeric',
           hour: '2-digit', minute: '2-digit'
-        }).format(new Date(lastSync.startedAt)) + ' WIB' : '02 Okt 2026 14:52 WIB',
+        }).format(new Date(lastSync.startedAt)) + ' WIB' : 'Belum pernah sinkron',
         status: lastSync?.status || 'success',
         isStale: lastSync?.startedAt ? (Date.now() - new Date(lastSync.startedAt).getTime() > 36 * 3600 * 1000) : false,
         plantCount: lastSync?.plantCount ?? plantRows.length,

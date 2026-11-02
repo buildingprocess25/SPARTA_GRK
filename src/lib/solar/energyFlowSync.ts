@@ -40,8 +40,43 @@ export function energyFlowRowsFromPoints(resultData = {}, psIds = []) {
 }
 
 /**
- * Pulls last month and this month (WIB) for every plant and stores them as ISOLAR_API rows.
- * Last month is included so its final days land before the monthly report is uploaded; the report still wins once it is.
+ * The PLTS page reads production from monthly_yield_observation, not energy_flow_monthly. Mirror each pulled yield
+ * there: a closed month as api_history (final, beaten only by an imported report), the running month as
+ * api_live_partial. Without this the PLTS page kept whatever partial figure the standalone daemon last wrote.
+ */
+export function yieldObservationsFromRows(rows = [], currentYm) {
+  return rows
+    .filter((row) => row.yieldKwh !== null && row.yieldKwh !== undefined)
+    .map((row) => {
+      const closed = row.yearMonth < currentYm;
+      return {
+        yearMonth: row.yearMonth,
+        psId: Number(row.psId),
+        energyKwh: Number(row.yieldKwh),
+        source: closed ? 'api_history' : 'api_live_partial',
+        qualityStatus: closed ? 'FINAL' : 'PARTIAL',
+      };
+    });
+}
+
+async function upsertYieldObservations(db, observations, now) {
+  for (const o of observations) {
+    await db.$executeRaw`
+      INSERT INTO monthly_yield_observation (id, year_month, ps_id, energy_kwh, measurement_type, source, quality_status, metadata, observed_at, updated_at)
+      VALUES (${`myo_${o.yearMonth}_${o.psId}_${o.source}`}, ${o.yearMonth}, ${o.psId}, ${o.energyKwh}, 'MONTHLY_YIELD', ${o.source}, ${o.qualityStatus},
+              '{"origin":"energy_flow_sync"}'::jsonb, ${now}, ${now})
+      ON CONFLICT (year_month, ps_id, measurement_type, source) DO UPDATE
+      SET energy_kwh = EXCLUDED.energy_kwh,
+          quality_status = EXCLUDED.quality_status,
+          updated_at = EXCLUDED.updated_at;
+    `;
+  }
+  return observations.length;
+}
+
+/**
+ * Pulls last month and this month (WIB) for every plant and stores them as ISOLAR_API rows, plus the yield as
+ * monthly observations for the PLTS page. Last month is included so its final days land once the month closes.
  */
 export async function syncEnergyFlowFromApi({ db = prisma, now = new Date(), request = executeIsolarRequest, force = false } = {}) {
   if (!force) {
@@ -78,5 +113,6 @@ export async function syncEnergyFlowFromApi({ db = prisma, now = new Date(), req
 
   const rows = energyFlowRowsFromPoints(resultData, psIds);
   await upsertEnergyFlowRows(db, rows, now);
-  return { status: 'success', months: [startYm, endYm], plants: new Set(rows.map((r) => r.psId)).size, rows: rows.length };
+  const yieldObservations = await upsertYieldObservations(db, yieldObservationsFromRows(rows, endYm), now);
+  return { status: 'success', months: [startYm, endYm], plants: new Set(rows.map((r) => r.psId)).size, rows: rows.length, yieldObservations };
 }

@@ -12,7 +12,8 @@ import { isFeatureEnabled, PLTS_AVOIDED_EMISSION_FACTOR_KG_PER_KWH } from '@/lib
 import { buildCacheKey } from '@/lib/solar/cacheKey';
 import { TabContentSkeleton, TableSkeleton } from '@/components/plts/PLTSDashboardSkeletons';
 import IsolarReportUploadCard from '@/components/plts/IsolarReportUploadCard';
-import { getYearToDateMonths } from '@/lib/reportingMonths';
+import { buildDefaultPeriodOptions, getCurrentYearMonth, getRunningMonth, getRunningYtdPeriod, MONTH_LABELS_LONG } from '@/lib/reportingMonths';
+import { useRunningMonth } from '@/hooks/useRunningMonth';
 import InputDataButton from '@/components/ui/InputDataButton';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import PLTSInputModal from '@/components/plts/PLTSInputModal';
@@ -63,10 +64,32 @@ export default function PLTSTab() {
   const { summary: alarmSummary, openPanel: openAlarmPanel } = useAlarms();
   const pltsAlarms = alarmSummary?.byTab?.plts || { faultCount: 0, alertCount: 0, activeCount: 0 };
 
-  const [dashboardFilters, setDashboardFilters] = useState({
-    period: '2026-01_2026-09', mode: 'YTD', month: 9, throughMonth: 9,
-    grid: 'ALL', plant: 'ALL', compareYears: true,
+  // Opens on January through the running month (WIB), like Scope 1, Scope 3, water and the resume page.
+  const [dashboardFilters, setDashboardFilters] = useState(() => {
+    const running = getRunningMonth();
+    return {
+      period: getRunningYtdPeriod(), mode: 'YTD', month: running.month, throughMonth: running.month,
+      grid: 'ALL', plant: 'ALL', compareYears: true,
+    };
   });
+  const runningMonth = useRunningMonth();
+  const ytdPeriod = `${runningMonth.year}-01_${runningMonth.yearMonth}`;
+  const runningMonthPeriod = `${runningMonth.yearMonth}_${runningMonth.yearMonth}`;
+  const previousRunningMonth = useRef(runningMonth);
+  // When the month turns while the page is open, a filter still on the old default moves to the new month.
+  useEffect(() => {
+    const old = previousRunningMonth.current;
+    previousRunningMonth.current = runningMonth;
+    if (old.yearMonth === runningMonth.yearMonth) return;
+    const oldYtd = `${old.year}-01_${old.yearMonth}`;
+    const oldMonth = `${old.yearMonth}_${old.yearMonth}`;
+    setDashboardFilters(prev => {
+      if (prev.period === oldYtd) return { ...prev, period: ytdPeriod, mode: 'YTD', month: runningMonth.month, throughMonth: runningMonth.month };
+      if (prev.period === oldMonth) return { ...prev, period: runningMonthPeriod, mode: 'MONTH', month: runningMonth.month, throughMonth: runningMonth.month };
+      return prev;
+    });
+    setEmissionsPeriods(buildDefaultPeriodOptions());
+  }, [runningMonth, ytdPeriod, runningMonthPeriod]);
   const [isInputModalOpen, setIsInputModalOpen] = useState(false);
   const setDashboardFilter = (key, next) => setDashboardFilters(current => ({
     ...current,
@@ -86,19 +109,7 @@ export default function PLTSTab() {
     const single = Boolean(match && match[1] === match[3] && match[2] === match[4]);
     return { ...current, period: value, mode: single ? 'MONTH' : 'YTD', month, throughMonth: month };
   });
-  const [emissionsPeriods, setEmissionsPeriods] = useState([
-    { value: '2026-01_2026-09', label: 'Jan-Sep 2026 (YTD)' },
-    { value: '2026-10_2026-10', label: 'Okt 2026 (sebagian)' },
-    { value: '2026-09_2026-09', label: 'September 2026' },
-    { value: '2026-08_2026-08', label: 'Agustus 2026' },
-    { value: '2026-07_2026-07', label: 'Juli 2026' },
-    { value: '2026-06_2026-06', label: 'Juni 2026' },
-    { value: '2026-05_2026-05', label: 'Mei 2026' },
-    { value: '2026-04_2026-04', label: 'April 2026' },
-    { value: '2026-03_2026-03', label: 'Maret 2026' },
-    { value: '2026-02_2026-02', label: 'Februari 2026' },
-    { value: '2026-01_2026-01', label: 'Januari 2026' },
-  ]);
+  const [emissionsPeriods, setEmissionsPeriods] = useState(() => buildDefaultPeriodOptions());
   const [activePltsSubView, setActivePltsSubView] = useState('overview'); // 'overview' | 'april-audit' | 'isolar-api'
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isolarLiveState, setIsolarLiveState] = useState(null);
@@ -154,11 +165,12 @@ export default function PLTSTab() {
 
   useEffect(() => {
     let isCurrent = true;
+    const running = getRunningMonth();
     const params = new URLSearchParams({
-      period: dashboardFilters.period || '2026-01_2026-09',
+      period: dashboardFilters.period || getRunningYtdPeriod(),
       mode: dashboardFilters.mode || 'YTD',
-      month: String(dashboardFilters.month || 9),
-      throughMonth: String(dashboardFilters.throughMonth || 9),
+      month: String(dashboardFilters.month || running.month),
+      throughMonth: String(dashboardFilters.throughMonth || running.month),
       compare: '2025,2026',
     });
     if (dashboardFilters.grid && dashboardFilters.grid !== 'ALL') params.set('grid', dashboardFilters.grid);
@@ -232,7 +244,7 @@ export default function PLTSTab() {
   }, [dashboardFilters.period, dashboardFilters.mode, dashboardFilters.month, dashboardFilters.throughMonth, dashboardFilters.grid, dashboardFilters.plant]);
 
   const loadActualEmissions = async (period) => {
-    const periodToFetch = period || '2026-01_2026-09';
+    const periodToFetch = period || getRunningYtdPeriod();
     setEmissionsLoading(true);
     setEmissionsError(null);
     try {
@@ -255,31 +267,26 @@ export default function PLTSTab() {
         if (json.history?.periodOptions?.length > 0) {
           setEmissionsPeriods(json.history.periodOptions);
         } else if (json.availableMonths && Array.isArray(json.availableMonths) && json.availableMonths.length > 0) {
-          const mNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-          const fullMonths = json.availableMonths.filter(m => m !== '202610');
-          const lastFull = fullMonths[fullMonths.length - 1];
+          const mNames = MONTH_LABELS_LONG;
+          // YTD runs through the running month like the top toggle; the running month itself is marked "(sebagian)".
+          const runningYm = getCurrentYearMonth().replace('-', '');
+          const months = [...json.availableMonths].sort();
           const list = [];
-          const years = [...new Set(fullMonths.map(month => month.slice(0, 4)))].sort().reverse();
+          const years = [...new Set(months.map(month => month.slice(0, 4)))].sort().reverse();
           years.forEach(year => {
-            const lastForYear = fullMonths.filter(month => month.startsWith(year)).at(-1);
+            const lastForYear = months.filter(month => month.startsWith(year)).at(-1);
             if (lastForYear) list.push({
               value: `${year}-01_${year}-${lastForYear.slice(4, 6)}`,
               label: `Jan-${mNames[Number(lastForYear.slice(4, 6)) - 1]} ${year} (YTD)`
             });
           });
-          if (json.availableMonths.includes('202610')) {
-            list.push({
-              value: '2026-10_2026-10',
-              label: 'Okt 2026 (sebagian)'
-            });
-          }
-          for (let i = fullMonths.length - 1; i >= 0; i--) {
-            const ym = fullMonths[i];
+          for (let i = months.length - 1; i >= 0; i--) {
+            const ym = months[i];
             const y = ym.slice(0, 4);
             const m = parseInt(ym.slice(4, 6), 10);
             list.push({
               value: `${y}-${String(m).padStart(2, '0')}_${y}-${String(m).padStart(2, '0')}`,
-              label: `${mNames[m - 1]} ${y}`
+              label: `${mNames[m - 1]} ${y}${ym === runningYm ? ' (sebagian)' : ''}`
             });
           }
           setEmissionsPeriods(list);
@@ -300,11 +307,12 @@ export default function PLTSTab() {
 
   const refreshDashboardSummaryAfterSync = async () => {
     summaryClientCache.clear();
+    const running = getRunningMonth();
     const params = new URLSearchParams({
-      period: dashboardFilters.period || '2026-01_2026-09',
+      period: dashboardFilters.period || getRunningYtdPeriod(),
       mode: dashboardFilters.mode || 'YTD',
-      month: String(dashboardFilters.month || 9),
-      throughMonth: String(dashboardFilters.throughMonth || 9),
+      month: String(dashboardFilters.month || running.month),
+      throughMonth: String(dashboardFilters.throughMonth || running.month),
       compare: '2025,2026',
       refresh: String(Date.now()),
     });
@@ -313,7 +321,7 @@ export default function PLTSTab() {
     const response = await fetch(`/api/plts/dashboard/summary?${params.toString()}`, { cache: 'no-store' });
     const payload = await response.json();
     if (!response.ok || !payload.success) throw new Error(payload.error || 'Gagal memuat ulang ringkasan PLTS');
-    const year = String(dashboardFilters.period || '2026').slice(0, 4);
+    const year = String(dashboardFilters.period || getRunningYtdPeriod()).slice(0, 4);
     const grid = dashboardFilters.grid && dashboardFilters.grid !== 'ALL' ? dashboardFilters.grid : 'ALL';
     const plant = dashboardFilters.plant && dashboardFilters.plant !== 'ALL' ? dashboardFilters.plant : 'ALL';
     summaryClientCache.set(`${year}:${grid}:${plant}`, payload.data);
@@ -581,11 +589,9 @@ export default function PLTSTab() {
     return Math.ceil((maxVal * 1.1) / 200) * 200 || 1600;
   }, [chartData]);
 
-  // The period toggle covers closed months only; the running month is still partial.
-  const reportingMonths = getYearToDateMonths();
-  const lastClosedMonth = reportingMonths.at(-2) || reportingMonths[0];
-  const reportingYear = lastClosedMonth.yearMonth.slice(0, 4);
-  const lastClosedNumber = Number(lastClosedMonth.yearMonth.slice(5, 7));
+  // The period toggle follows the running month (useRunningMonth above); its data is marked partial on the chart.
+  const reportingYear = String(runningMonth.year);
+  const runningMonthNumber = runningMonth.month;
 
   return (
     <div className="space-y-6 animate-in">
@@ -743,32 +749,35 @@ export default function PLTSTab() {
               <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
                 <button
                   type="button"
+                  aria-pressed={dashboardFilters.period === ytdPeriod}
                   onClick={() => {
-                    const period = `${reportingYear}-01_${lastClosedMonth.yearMonth}`;
-                    setSelectedPeriod(period);
-                    setDashboardFilters(prev => ({ ...prev, period, mode: 'YTD', month: lastClosedNumber, throughMonth: lastClosedNumber }));
+                    setSelectedPeriod(ytdPeriod);
+                    setDashboardFilters(prev => ({ ...prev, period: ytdPeriod, mode: 'YTD', month: runningMonthNumber, throughMonth: runningMonthNumber }));
                   }}
-                  className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.mode === 'YTD'
+                  className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.period === ytdPeriod
                     ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs ring-1 ring-slate-200/60 dark:ring-slate-700'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                     }`}
                 >
-                  Jan s.d. {lastClosedMonth.label} {reportingYear}
+                  {runningMonthNumber === 1 ? `Jan ${reportingYear}` : `Jan s.d. ${runningMonth.label} ${reportingYear}`}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const period = `${lastClosedMonth.yearMonth}_${lastClosedMonth.yearMonth}`;
-                    setSelectedPeriod(period);
-                    setDashboardFilters(prev => ({ ...prev, period, mode: 'MONTH', month: lastClosedNumber, throughMonth: lastClosedNumber }));
-                  }}
-                  className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.mode === 'MONTH'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs ring-1 ring-slate-200/60 dark:ring-slate-700'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-                    }`}
-                >
-                  {lastClosedMonth.label} {reportingYear} saja
-                </button>
+                {/* In January the year-to-date range is the running month itself, so the second button would repeat it. */}
+                {runningMonthNumber > 1 && (
+                  <button
+                    type="button"
+                    aria-pressed={dashboardFilters.period === runningMonthPeriod}
+                    onClick={() => {
+                      setSelectedPeriod(runningMonthPeriod);
+                      setDashboardFilters(prev => ({ ...prev, period: runningMonthPeriod, mode: 'MONTH', month: runningMonthNumber, throughMonth: runningMonthNumber }));
+                    }}
+                    className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${dashboardFilters.period === runningMonthPeriod
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs ring-1 ring-slate-200/60 dark:ring-slate-700'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+                      }`}
+                  >
+                    {runningMonth.label} {reportingYear} saja
+                  </button>
+                )}
               </div>
             </div>
 

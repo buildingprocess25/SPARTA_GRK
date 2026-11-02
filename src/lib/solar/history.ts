@@ -81,9 +81,13 @@ function round(value, digits = 2) {
   return Number(Number(value).toFixed(digits));
 }
 
-function buildPeriodOptions(availableMonths, partialMonths = new Set()) {
+function buildPeriodOptions(availableMonths, partialMonths = new Set(), currentYearMonth = null) {
   const byYear = new Map();
-  for (const ym of availableMonths) {
+  // The running month always belongs to its year's YTD, even before its first data arrives (1st of the month).
+  const months = currentYearMonth && !availableMonths.includes(currentYearMonth)
+    ? [...availableMonths, currentYearMonth]
+    : availableMonths;
+  for (const ym of months) {
     const year = ym.slice(0, 4);
     const months = byYear.get(year) || [];
     months.push(ym);
@@ -92,8 +96,8 @@ function buildPeriodOptions(availableMonths, partialMonths = new Set()) {
   const options = [];
   for (const year of [...byYear.keys()].sort((a, b) => b.localeCompare(a))) {
     const months = byYear.get(year).sort();
-    const finalMonths = months.filter(ym => !partialMonths.has(ym));
-    const last = finalMonths.at(-1) || months.at(-1);
+    // YTD runs through the latest month with data, including the running one, so it matches the page's period toggle.
+    const last = months.at(-1);
     options.push({
       value: `${year}-01_${formatYearMonth(last)}`,
       label: `Jan-${MONTH_SHORT[Number(last.slice(4)) - 1]} ${year} (YTD)`,
@@ -296,7 +300,7 @@ export function aggregateMonthlyHistory({
     ym === currentYearMonth
     && allRows.filter(item => item.yearMonth === ym).some(item => qualityOf([item]) === 'PARTIAL')
   )));
-  const periodOptions = buildPeriodOptions(availableMonths, partialMonths);
+  const periodOptions = buildPeriodOptions(availableMonths, new Set([...partialMonths, currentYearMonth]), currentYearMonth);
   return {
     availableYears,
     availableMonths,

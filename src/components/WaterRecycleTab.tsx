@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useRunningMonth } from '@/hooks/useRunningMonth';
+import { buildMonthPeriodOptions } from '@/lib/reportingMonths';
 import {
   Droplets, Recycle, Gauge, Calculator, Factory,
   ArrowDownRight, Waves, AlertCircle, RefreshCw, Search
@@ -27,6 +29,7 @@ import { formatNum } from '@/data/sustainabilityData';
 export default function WaterRecycleTab() {
   const [isInputModalOpen, setIsInputModalOpen] = useState(false);
   const [period, setPeriod] = useState('');
+  const runningYearMonth = useRunningMonth().yearMonth;
   const [api, setApi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -51,24 +54,13 @@ export default function WaterRecycleTab() {
 
   useEffect(() => {
     loadData(period || undefined);
-  }, [period]);
+  }, [period, runningYearMonth]);
 
-  const periodOptions = useMemo(() => {
-    const months = api?.availableMonths || [];
-    if (months.length === 0) return [];
-    const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    const years = [...new Set(months.map(m => m.slice(0, 4)))].sort().reverse();
-    const options = [];
-    years.forEach(year => {
-      const monthsInYear = months.filter(m => m.startsWith(year));
-      const last = monthsInYear.at(-1);
-      options.push({ value: `${year}-01_${last}`, label: `Jan-${monthNames[Number(last.slice(5, 7)) - 1].slice(0, 3)} ${year} (YTD)` });
-      [...monthsInYear].reverse().forEach(ym => {
-        options.push({ value: `${ym}_${ym}`, label: `${monthNames[Number(ym.slice(5, 7)) - 1]} ${year}` });
-      });
-    });
-    return options;
-  }, [api?.availableMonths]);
+  // Same builder as Scope 1: the YTD option reaches the API's default end month, so the select never shows "Pilih...".
+  const periodOptions = useMemo(
+    () => buildMonthPeriodOptions(api?.availableMonths || [], api?.period || ''),
+    [api?.availableMonths, api?.period],
+  );
 
   const filteredRows = useMemo(() => {
     const rows = api?.rows || [];
