@@ -52,11 +52,13 @@ export interface RawEnergyFlowRow {
 }
 
 export async function fetchRawEnergyFlows({ year = 2026, rootDir = process.cwd() } = {}): Promise<RawEnergyFlowRow[]> {
-  const minYm = `${year}01`;
-  const maxYm = `${year}12`;
+  const parsedYear = Number(year);
+  const safeYear = Number.isInteger(parsedYear) && parsedYear >= 2000 && parsedYear <= 2100 ? parsedYear : 2026;
+  const minYm = `${safeYear}01`;
+  const maxYm = `${safeYear}12`;
 
   try {
-    const dbFlows = await prisma.$queryRawUnsafe(`
+    const dbFlows = await prisma.$queryRawUnsafe<any[]>(`
       SELECT ef.year_month as "yearMonth", 
              ef.ps_id as "psId", 
              ef.yield_kwh as "yieldKwh", 
@@ -71,9 +73,9 @@ export async function fetchRawEnergyFlows({ year = 2026, rootDir = process.cwd()
              pm.api_installed_kwp as "apiInstalledKwp"
       FROM energy_flow_monthly ef
       LEFT JOIN plant_master pm ON ef.ps_id = ANY(pm.sungrow_ps_ids)
-      WHERE ef.year_month BETWEEN '${minYm}' AND '${maxYm}'
+      WHERE ef.year_month BETWEEN $1 AND $2
       ORDER BY ef.year_month ASC, pm.canonical_name ASC
-    `);
+    `, minYm, maxYm);
 
     if (Array.isArray(dbFlows) && dbFlows.length > 0) {
       return mergeEnergyFlowRows(dbFlows).map(r => ({
