@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { AlertCircle, ArrowDown, ArrowUp, Download, FileQuestion, Flame, Gauge, RefreshCw, Search, Store, Zap } from 'lucide-react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-import Scope2CompareChart, { useEntityColors } from '@/components/scope2/Scope2CompareChart';
 import Scope2StoreCompare from '@/components/scope2/Scope2StoreCompare';
+import EntityCompareChart, { EntityRow, useEntityColors } from '@/components/ui/EntityCompareChart';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -26,6 +26,7 @@ import { MONTH_LABELS_SHORT } from '@/lib/reportingMonths';
 const number = (value, digits = 0) => new Intl.NumberFormat('id-ID', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value ?? 0);
 const periodLabel = ym => `${MONTH_LABELS_SHORT[Number(ym.slice(5, 7)) - 1]} ${ym.slice(0, 4)}`;
 const shortPeriod = ym => MONTH_LABELS_SHORT[Number(ym.slice(5, 7)) - 1];
+const dayPoints = data => Array.from({ length: data.daysInMonth }, (_, day) => ({ label: String(day + 1), tooltip: `${day + 1} ${periodLabel(data.period)}` }));
 const EMPTY_FILTERS = { grid: '', branch: '', type: '', complete: '' };
 const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
 
@@ -204,27 +205,17 @@ function BranchComparison({ data, headerActions }) {
           {shown.map(({ branch, rank }) => {
             const isOn = !deselected.has(branch.code);
             return (
-              <label
+              <EntityRow
                 key={branch.code}
-                onMouseEnter={() => setHighlight(branch.code)}
-                onMouseLeave={() => setHighlight(null)}
-                onFocus={() => setHighlight(branch.code)}
-                onBlur={() => setHighlight(null)}
-                className={`grid min-h-[52px] cursor-pointer grid-cols-[18px_minmax(0,1fr)_auto] items-center gap-2.5 rounded-xl border px-2.5 py-2 hover:border-blue-400 dark:hover:border-blue-500/60 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-500 ${isOn ? 'border-blue-100 bg-blue-50/70 dark:border-blue-500/20 dark:bg-blue-500/10' : 'border-slate-200 dark:border-slate-700'}`}
-              >
-                <input type="checkbox" checked={isOn} onChange={() => toggle(branch.code)} className="size-4 accent-blue-600 dark:accent-blue-400" />
-                <span className="min-w-0">
-                  <span className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100">
-                    {isOn && showColors && <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: colorOf(branch.code) }} aria-hidden="true" />}
-                    <span className="truncate">{branch.name}</span>
-                  </span>
-                  <span className="block truncate text-[11px] text-slate-500 dark:text-slate-400">{branch.grid} · {number(branch.storeCount)} toko</span>
-                </span>
-                <span className="text-right">
-                  <span className="block text-xs font-bold tabular-nums text-slate-900 dark:text-slate-100">{formatList(listValue(branch, metric))}</span>
-                  <span className="block text-[11px] text-slate-500 dark:text-slate-400">#{rank}</span>
-                </span>
-              </label>
+                checked={isOn}
+                onToggle={() => toggle(branch.code)}
+                onHighlight={on => setHighlight(on ? branch.code : null)}
+                dotColor={isOn && showColors ? colorOf(branch.code) : null}
+                title={branch.name}
+                subtitle={`${branch.grid} · ${number(branch.storeCount)} toko`}
+                value={formatList(listValue(branch, metric))}
+                rank={rank}
+              />
             );
           })}
         </div>
@@ -235,14 +226,14 @@ function BranchComparison({ data, headerActions }) {
         </p>
       </Card>
 
-      <Scope2CompareChart
+      <EntityCompareChart
         entities={selected.map(b => ({ code: b.code, name: b.name }))}
         seriesByCode={seriesByCode}
         average={average}
-        days={data.daysInMonth}
-        period={data.period}
+        points={dayPoints(data)}
+        xInterval={4}
         info={info}
-        fixedPercent={metric === 'pct'}
+        yDomain={metric === 'pct' ? [0, 100] : null}
         highlight={highlight}
         showColors={showColors}
         colorOf={colorOf}

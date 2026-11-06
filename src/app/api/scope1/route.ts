@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma.ts';
-import { isVehicleFuelRecord } from '@/lib/scope1/fuelCategory.ts';
+import { getRecordCost, isVehicleFuelRecord } from '@/lib/scope1/fuelCategory.ts';
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -37,20 +37,6 @@ function monthRange(start, end) {
     if (month === 13) { year += 1; month = 1; }
   }
   return months;
-}
-
-function getRecordCost(record) {
-  if (record.costRupiah !== null && record.costRupiah !== undefined && Number(record.costRupiah) > 0) {
-    return Number(record.costRupiah);
-  }
-  const liters = Number(record.liters) || 0;
-  if (liters <= 0) return 0;
-  const p = Number(record.pricePerLiter);
-  if (p > 0) return Math.round(liters * p);
-
-  const fuel = String(record.fuelType || '').toUpperCase();
-  const rate = (fuel === 'PERTALITE') ? 10000 : (fuel === 'PERTAMAX') ? 12500 : 6800;
-  return Math.round(liters * rate);
 }
 
 /**

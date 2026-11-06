@@ -43,8 +43,8 @@ test('Scope 1 Modal & Input Data Component Verification', async (t) => {
     assert.ok(content.includes('/api/import/batch'), 'Has batch upload endpoint call');
   });
 
-  await t.test('PenambahEmisiTab.jsx incorporates + Input Data button and modal', () => {
-    const filePath = path.resolve('src/components/PenambahEmisiTab.tsx');
+  await t.test('Scope1Page incorporates + Input Data button and modal', () => {
+    const filePath = path.resolve('src/components/scope1/Scope1Page.tsx');
     const content = fs.readFileSync(filePath, 'utf-8');
 
     assert.ok(content.includes('Scope1InputModal'), 'Imports Scope1InputModal');

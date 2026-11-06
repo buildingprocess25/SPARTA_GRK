@@ -137,7 +137,8 @@ Untuk halaman dengan banyak dimensi, seperti Scope 2 tab Toko:
 - Pilihan bertingkat saling menyesuaikan. Memilih Wilayah PLN mempersempit daftar Cabang.
 - Filter aktif tampil sebagai tombol kecil yang bisa dihapus satu per satu, ditambah "Hapus filter".
 - Grafik komposisi seperti Emisi per Wilayah PLN boleh memakai batang yang bisa diklik sebagai filter, dengan tombol asli dan `aria-pressed`.
-- Agregasi dihitung di server. Browser tidak memuat data per baris.
+- Data besar diagregasi di server. Data kecil, seperti Scope 1 yang sekitar 640 baris setahun, boleh difilter di browser supaya tanpa jeda.
+- Kalau hanya ada satu pilihan, seperti Jenis BBM kendaraan, filternya tidak ditampilkan.
 
 ### Pola daftar dan garis
 
@@ -151,7 +152,7 @@ Untuk membandingkan banyak entitas sekaligus. Mengacu ke "Perbandingan antar DC"
 - Centang adalah `input type="checkbox"` asli di dalam `label`, tinggi baris minimal 44 px.
 - Rata-rata harus jujur soal cara hitungnya: sebut "per cabang" atau "menurut jumlah toko".
 - Tanpa pilihan, tampilkan ajakan untuk memilih, bukan grafik kosong tanpa penjelasan.
-- Bila entitasnya ribuan, seperti toko, daftar dipaginasi dari server, pilihan dibatasi (Scope 2: 30 toko), dan yang dipilih otomatis di awal hanya 8 teratas. Komponen grafiknya sama: `scope2/Scope2CompareChart`.
+- Bila entitasnya ribuan, seperti toko, daftar dipaginasi dari server, pilihan dibatasi (Scope 2: 30 toko), dan yang dipilih otomatis di awal hanya 8 teratas. Komponen bersamanya `ui/EntityCompareChart` (grafik, `EntityRow`, `useEntityColors`), dengan sumbu X berupa hari atau bulan. Nilai `null` menjadi celah pada garis.
 - Tombol "Hapus filter" diulang di kartu yang jauh dari kartu "Pilihan data", supaya pengguna tidak perlu scroll ke atas.
 
 ### Pola tabel rincian
@@ -180,7 +181,7 @@ Mengacu ke Scope 3:
 Pakai Recharts. Tinggi `h-72`, `h-80`, atau `h-96`.
 
 Aturan untuk grafik baru:
-- **Satu sumbu Y.** Dua ukuran berbeda skala dibuat dua grafik. Empat file lama masih memakai dua sumbu (`PenambahEmisiTab`, `PLTSMonthlyEnergyCharts`, `ResumeTrendChart`, `Scope2AnnualLoadDashboard`), jangan ditiru.
+- **Satu sumbu Y.** Dua ukuran berbeda skala dibuat dua grafik. Tiga file lama masih memakai dua sumbu (`PLTSMonthlyEnergyCharts`, `ResumeTrendChart`, `Scope2AnnualLoadDashboard`), jangan ditiru.
 - **Warna mengikuti kategori data, bukan urutan.** `CHART_PALETTE` tidak aman dipakai berurutan sebagai warna kategori. Hasil `validate_palette.js`: `calc` dan `target` hanya berjarak ΔE 6,3 untuk mata normal dan 0,8 untuk buta warna protan. Jangan pasang keduanya bersebelahan.
 - **Warna terang butuh label.** `pln`, `plts`, `water`, dan `savings` di bawah 3:1 terhadap kartu putih, jadi wajib ada label angka atau tabel.
 - **Satu seri tidak perlu legenda.** Judul kartu sudah menyebut isinya. Dua seri atau lebih wajib `ChartPillLegend`.
@@ -245,10 +246,10 @@ Dicatat supaya tidak ditiru. Perbaikannya terpisah dari fitur baru.
 
 | Kondisi di kode lama | Aturan untuk kode baru |
 |---|---|
-| 4 file memakai grafik dua sumbu | Satu sumbu |
+| 3 file memakai grafik dua sumbu | Satu sumbu |
 | Warna angka emisi campur rose, amber, red | Rose |
 | 180 pemakaian `text-[9px]` dan `text-[10px]` | Minimal 11px |
-| Tabel manual di Scope 1 dan Scope 2, dan baris tabel Scope 2 tanpa fokus terlihat | `ui/table`, fokus terlihat |
+| Tabel manual di Scope 2 DC, dan barisnya tanpa fokus terlihat | `ui/table`, fokus terlihat |
 | Token `globals.css` tidak terpakai | Class Tailwind sesuai tabel warna |
 | Tooltip lama memakai warna seri pada teks | Warna teks biasa |
 | Banyak hex langsung di komponen | `CHART_PALETTE` dan props `ChartTheme` |

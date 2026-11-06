@@ -17,7 +17,6 @@ import {
   formatYAxisNumber,
 } from '@/components/ui/ChartTheme';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
-import { MONTH_LABELS_SHORT } from '@/lib/reportingMonths';
 
 const number = (value, digits = 0) => new Intl.NumberFormat('id-ID', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value ?? 0);
 
@@ -40,32 +39,61 @@ export function useEntityColors(selectedCodes: string[]) {
   return { showColors, colorOf: (code: string) => ENTITY_COLORS[slots.current.get(code) ?? 0] };
 }
 
-export default function Scope2CompareChart({ entities, seriesByCode, average, days, period, info, fixedPercent = false, highlight, showColors, colorOf, noun, status = null }: {
-  entities: { code: string; name: string }[]; seriesByCode: Map<string, number[]>; average: number[]; days: number; period: string;
-  info: { title: string; unit: string; digits: number }; fixedPercent?: boolean; highlight: string | null; showColors: boolean; colorOf: (code: string) => string; noun: string; status?: any;
+// One checkbox row of the ranked list beside the chart.
+export function EntityRow({ checked, disabled = false, onToggle, onHighlight, dotColor = null, title, subtitle, value, rank = null }: {
+  checked: boolean; disabled?: boolean; onToggle: () => void; onHighlight: (on: boolean) => void; dotColor?: string | null; title: any; subtitle: any; value: any; rank?: any;
+}) {
+  return (
+    <label
+      onMouseEnter={() => onHighlight(true)}
+      onMouseLeave={() => onHighlight(false)}
+      onFocus={() => onHighlight(true)}
+      onBlur={() => onHighlight(false)}
+      className={`grid min-h-[52px] cursor-pointer grid-cols-[18px_minmax(0,1fr)_auto] items-center gap-2.5 rounded-xl border px-2.5 py-2 hover:border-blue-400 dark:hover:border-blue-500/60 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-500 ${checked ? 'border-blue-100 bg-blue-50/70 dark:border-blue-500/20 dark:bg-blue-500/10' : 'border-slate-200 dark:border-slate-700'}`}
+    >
+      <input type="checkbox" checked={checked} disabled={disabled} onChange={onToggle} className="size-4 accent-blue-600 dark:accent-blue-400" />
+      <span className="min-w-0">
+        <span className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100">
+          {dotColor && <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: dotColor }} aria-hidden="true" />}
+          <span className="truncate">{title}</span>
+        </span>
+        <span className="block truncate text-[11px] text-slate-500 dark:text-slate-400">{subtitle}</span>
+      </span>
+      <span className="text-right">
+        <span className="block text-xs font-bold tabular-nums text-slate-900 dark:text-slate-100">{value}</span>
+        {rank !== null && <span className="block text-[11px] text-slate-500 dark:text-slate-400">#{rank}</span>}
+      </span>
+    </label>
+  );
+}
+
+// Points are the x axis: days of a month or months of a year. A null value is a gap in that entity's line.
+export default function EntityCompareChart({ entities, seriesByCode, average, points, info, xInterval = 0, yDomain = null, highlight, showColors, colorOf, noun, status = null }: {
+  entities: { code: string; name: string }[]; seriesByCode: Map<string, (number | null)[]>; average: (number | null)[];
+  points: { label: string; tooltip: string }[]; info: { title: string; unit: string; digits: number }; xInterval?: number; yDomain?: any;
+  highlight: string | null; showColors: boolean; colorOf: (code: string) => string; noun: string; status?: any;
 }) {
   const [mode, setMode] = useState('all');
   const [asTable, setAsTable] = useState(false);
-  const monthIndex = Number(period.slice(5, 7)) - 1;
-  const month = MONTH_LABELS_SHORT[monthIndex];
   const showHighlight = highlight && seriesByCode.has(highlight);
 
-  const rows = useMemo(() => Array.from({ length: days }, (_, day) => {
-    const row: any = { day: day + 1, average: average[day] ?? 0 };
-    const values = entities.map(entity => seriesByCode.get(entity.code)?.[day] ?? 0);
-    row.min = values.length ? Math.min(...values) : 0;
-    row.max = values.length ? Math.max(...values) : 0;
-    row.range = [row.min, row.max];
-    for (const entity of entities) row[entity.code] = seriesByCode.get(entity.code)?.[day] ?? 0;
-    if (showHighlight && row[highlight] === undefined) row[highlight] = seriesByCode.get(highlight)?.[day] ?? 0;
+  const rows = useMemo(() => points.map((point, index) => {
+    const row: any = { label: point.label, tooltip: point.tooltip, average: average[index] ?? null };
+    const values = entities.map(entity => seriesByCode.get(entity.code)?.[index]).filter(value => value !== null && value !== undefined);
+    row.min = values.length ? Math.min(...values) : null;
+    row.max = values.length ? Math.max(...values) : null;
+    row.range = values.length ? [row.min, row.max] : null;
+    for (const entity of entities) row[entity.code] = seriesByCode.get(entity.code)?.[index] ?? null;
+    if (showHighlight && row[highlight] === undefined) row[highlight] = seriesByCode.get(highlight)?.[index] ?? null;
     return row;
-  }), [entities, seriesByCode, average, days, highlight, showHighlight]);
+  }), [entities, seriesByCode, average, points, highlight, showHighlight]);
 
   const colored = mode === 'all' && showColors;
   const legend = colored
     ? [...entities.map(entity => ({ label: entity.name, color: colorOf(entity.code), type: 'line' })), ...(entities.length > 1 ? [{ label: 'Rata-rata', color: 'var(--chart-net)', type: 'line' }] : [])]
     : [{ label: 'Rata-rata', color: CHART_AVERAGE, type: 'line' }];
-  const highlightedIsDrawn = entities.some(entity => entity.code === highlight) && mode === 'all' && showColors;
+  const highlightedIsDrawn = entities.some(entity => entity.code === highlight) && colored;
+  const cell = value => (value === null || value === undefined ? '-' : number(value, info.digits));
 
   return (
     <Card className="lg:col-span-3 flex min-w-0 flex-col gap-3">
@@ -81,8 +109,8 @@ export default function Scope2CompareChart({ entities, seriesByCode, average, da
       ) : asTable ? (
         <div className="max-h-96 overflow-auto rounded-xl border border-slate-100 dark:border-slate-800">
           <table className="w-full text-xs">
-            <thead className="sticky top-0 bg-slate-900 dark:bg-slate-950 text-white"><tr><th scope="col" className="p-3 text-left font-semibold">Tanggal</th><th scope="col" className="p-3 text-right font-semibold">Rata-rata</th><th scope="col" className="p-3 text-right font-semibold">Terendah</th><th scope="col" className="p-3 text-right font-semibold">Tertinggi</th></tr></thead>
-            <tbody>{rows.map(row => <tr key={row.day} className="border-b border-slate-100 dark:border-slate-800"><td className="p-3">{row.day} {month}</td><td className="p-3 text-right tabular-nums">{number(row.average, info.digits)}</td><td className="p-3 text-right tabular-nums">{number(row.min, info.digits)}</td><td className="p-3 text-right tabular-nums">{number(row.max, info.digits)}</td></tr>)}</tbody>
+            <thead className="sticky top-0 bg-slate-900 dark:bg-slate-950 text-white"><tr><th scope="col" className="p-3 text-left font-semibold">Waktu</th><th scope="col" className="p-3 text-right font-semibold">Rata-rata</th><th scope="col" className="p-3 text-right font-semibold">Terendah</th><th scope="col" className="p-3 text-right font-semibold">Tertinggi</th></tr></thead>
+            <tbody>{rows.map(row => <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800"><td className="p-3">{row.tooltip}</td><td className="p-3 text-right tabular-nums">{cell(row.average)}</td><td className="p-3 text-right tabular-nums">{cell(row.min)}</td><td className="p-3 text-right tabular-nums">{cell(row.max)}</td></tr>)}</tbody>
           </table>
         </div>
       ) : (
@@ -90,20 +118,21 @@ export default function Scope2CompareChart({ entities, seriesByCode, average, da
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart accessibilityLayer data={rows} margin={{ top: 8, right: 16, left: 4, bottom: 0 }}>
               <CartesianGrid {...CHART_GRID_PROPS} />
-              <XAxis dataKey="day" {...CHART_AXIS_PROPS} interval={4} />
-              <YAxis {...CHART_AXIS_PROPS} width={56} domain={fixedPercent ? [0, 100] : [0, 'auto']} tickFormatter={formatYAxisNumber} />
+              <XAxis dataKey="label" {...CHART_AXIS_PROPS} interval={xInterval} />
+              <YAxis {...CHART_AXIS_PROPS} width={56} domain={yDomain ?? [0, 'auto']} tickFormatter={formatYAxisNumber} />
               <Tooltip content={({ active, label }: { active?: any; label?: any }) => {
                 if (!active || !entities.length) return null;
-                const row = rows[label - 1];
-                const value = v => `${number(v, info.digits)} ${info.unit}`;
+                const row = rows.find(item => item.label === String(label));
+                if (!row) return null;
+                const value = v => (v === null || v === undefined ? '-' : `${number(v, info.digits)} ${info.unit}`);
                 const items: any[] = [{ label: 'Rata-rata', value: value(row.average) }];
                 if (colored) {
-                  for (const entity of [...entities].sort((x, y) => row[y.code] - row[x.code])) items.push({ label: entity.name, value: value(row[entity.code]), dotColor: colorOf(entity.code) });
+                  for (const entity of [...entities].sort((x, y) => (row[y.code] ?? -1) - (row[x.code] ?? -1))) items.push({ label: entity.name, value: value(row[entity.code]), dotColor: colorOf(entity.code) });
                 } else {
                   if (showHighlight) items.push({ label: entities.find(entity => entity.code === highlight)?.name ?? highlight, value: value(row[highlight]) });
                   items.push({ label: 'Tertinggi', value: value(row.max) }, { label: 'Terendah', value: value(row.min) });
                 }
-                return <ChartTooltipCard title={`${label} ${month} ${period.slice(0, 4)}`} items={items} />;
+                return <ChartTooltipCard title={row.tooltip} items={items} />;
               }} />
               {mode === 'range' && entities.length > 0 && <Area dataKey="range" stroke="none" fill={CHART_BAND} fillOpacity={1} isAnimationActive={false} activeDot={false} />}
               {mode === 'all' && entities.map(entity => <Line key={entity.code} dataKey={entity.code} stroke={showColors ? colorOf(entity.code) : CHART_MUTED_LINE} strokeWidth={showColors ? 2 : 1} dot={false} activeDot={false} isAnimationActive={false} />)}

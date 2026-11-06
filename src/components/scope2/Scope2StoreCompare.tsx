@@ -3,11 +3,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshCw, Search } from 'lucide-react';
 
-import Scope2CompareChart, { useEntityColors } from '@/components/scope2/Scope2CompareChart';
 import { Button } from '@/components/ui/button';
+import EntityCompareChart, { EntityRow, useEntityColors } from '@/components/ui/EntityCompareChart';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { CustomSelect } from '@/components/ui/select';
+import { MONTH_LABELS_SHORT } from '@/lib/reportingMonths';
 
 const number = (value, digits = 0) => new Intl.NumberFormat('id-ID', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value ?? 0);
 
@@ -143,27 +144,18 @@ export default function Scope2StoreCompare({ data, query, type, headerActions })
           ) : result.rows.map((row, index) => {
             const isOn = selected.has(row.code);
             return (
-              <label
+              <EntityRow
                 key={row.code}
-                onMouseEnter={() => setHighlight(row.code)}
-                onMouseLeave={() => setHighlight(null)}
-                onFocus={() => setHighlight(row.code)}
-                onBlur={() => setHighlight(null)}
-                className={`grid min-h-[52px] cursor-pointer grid-cols-[18px_minmax(0,1fr)_auto] items-center gap-2.5 rounded-xl border px-2.5 py-2 hover:border-blue-400 dark:hover:border-blue-500/60 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-500 ${isOn ? 'border-blue-100 bg-blue-50/70 dark:border-blue-500/20 dark:bg-blue-500/10' : 'border-slate-200 dark:border-slate-700'}`}
-              >
-                <input type="checkbox" checked={isOn} disabled={!isOn && isFull} onChange={() => toggle(row)} className="size-4 accent-blue-600 dark:accent-blue-400" />
-                <span className="min-w-0">
-                  <span className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-slate-100">
-                    {isOn && showColors && <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: colorOf(row.code) }} aria-hidden="true" />}
-                    <span className="truncate">{row.code} {row.name}</span>
-                  </span>
-                  <span className="block truncate text-[11px] text-slate-500 dark:text-slate-400">{row.branchName} · {row.meters} meter · {row.days} hari input</span>
-                </span>
-                <span className="text-right">
-                  <span className="block text-xs font-bold tabular-nums text-slate-900 dark:text-slate-100">{number(row[info.field], info.listDigits)} {info.unit}</span>
-                  {!search.trim() && <span className="block text-[11px] text-slate-500 dark:text-slate-400">#{number(rankOffset + index + 1)}</span>}
-                </span>
-              </label>
+                checked={isOn}
+                disabled={!isOn && isFull}
+                onToggle={() => toggle(row)}
+                onHighlight={on => setHighlight(on ? row.code : null)}
+                dotColor={isOn && showColors ? colorOf(row.code) : null}
+                title={`${row.code} ${row.name}`}
+                subtitle={`${row.branchName} · ${row.meters} meter · ${row.days} hari input`}
+                value={`${number(row[info.field], info.listDigits)} ${info.unit}`}
+                rank={search.trim() ? null : number(rankOffset + index + 1)}
+              />
             );
           })}
         </div>
@@ -181,12 +173,12 @@ export default function Scope2StoreCompare({ data, query, type, headerActions })
         </p>
       </Card>
 
-      <Scope2CompareChart
+      <EntityCompareChart
         entities={entities}
         seriesByCode={seriesByCode}
         average={average}
-        days={data.daysInMonth}
-        period={data.period}
+        points={Array.from({ length: data.daysInMonth }, (_, day) => ({ label: String(day + 1), tooltip: `${day + 1} ${MONTH_LABELS_SHORT[Number(data.period.slice(5, 7)) - 1]} ${data.period.slice(0, 4)}` }))}
+        xInterval={4}
         info={info}
         highlight={highlight}
         showColors={showColors}

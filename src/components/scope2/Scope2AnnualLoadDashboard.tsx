@@ -12,6 +12,8 @@ import CardBox from '@/components/ui/CardBox';
 import PageHeader from '@/components/ui/PageHeader';
 import KpiCard from '@/components/ui/KpiCard';
 import MetricInfoIcon from '@/components/ui/MetricInfoIcon';
+import { Button } from '@/components/ui/button';
+import Scope2DcCompare from '@/components/scope2/Scope2DcCompare';
 import Scope2DcDrawer from '@/components/scope2/Scope2DcDrawer';
 import Scope2Filters from '@/components/scope2/Scope2Filters';
 import Scope2Waterfall from '@/components/scope2/Scope2Waterfall';
@@ -27,6 +29,7 @@ import {
   ChartPillLegend,
 } from '@/components/ui/ChartTheme';
 import { buildProjection, filterCanonicalRows, parseScope2Query } from '@/lib/scope2/analytics.ts';
+import { countActiveFilters } from '@/lib/scope2/dcCompare.ts';
 import { aggregateCanonicalRows } from '@/lib/scope2/energyReconciliation.ts';
 import { getGridFactor, DEFAULT_GRID_FACTOR_KG_PER_KWH } from '@/lib/emission-factors.ts';
 import { getRunningMonth, MONTH_LABELS_SHORT } from '@/lib/reportingMonths';
@@ -323,6 +326,10 @@ export default function Scope2AnnualLoadDashboard({ tabs = null }: { tabs?: any 
     return canonicalRows.filter(r => r.yearMonth?.startsWith(`${getRunningMonth().year}-`)) || canonicalRows;
   }, [canonicalRows, filters]);
 
+  const compareRows = useMemo(() => filterCanonicalRows(canonicalRows, { ...filters, dc: 'all', q: '' }) || [], [canonicalRows, filters]);
+  const filterCount = countActiveFilters(filters);
+  const clearFilters = () => setFilters(prev => ({ ...prev, ...defaultPeriodFilters(), period: 'ytd', grid: 'all', dc: 'all', q: '' }));
+
   const monitoredCount = data?.coverage?.monitoredPlantCount || 37;
   const summary = useMemo(() => {
     const s = aggregateCanonicalRows(filteredRows);
@@ -427,7 +434,7 @@ export default function Scope2AnnualLoadDashboard({ tabs = null }: { tabs?: any 
     />
     {tabs}
 
-    <CardBox className="space-y-3"><h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Pilihan Data & Wilayah</h2><Scope2Filters filters={filters} grids={grids} plants={plants} onChange={setFilters} />{SHOW_TARIFF && <div className="flex flex-wrap items-end gap-3 border-t pt-3"><label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Tarif asumsi (Rp/kWh)<input type="number" min="1" value={filters.tariff} onChange={event => setFilters({ ...filters, tariff: Math.max(1, Number(event.target.value) || 1) })} className="ml-2 w-32 rounded-lg border px-3 py-2" /></label><span className="rounded-full bg-amber-50 dark:bg-amber-500/10 px-3 py-1 text-xs text-amber-800 dark:text-amber-300">Asumsi, perlu konfirmasi</span><span className="text-xs text-slate-500 dark:text-slate-400">Implisit portal: Rp {number.format(data.assumptions.portalImplicitTariffRupiahPerKwh)}/kWh</span></div>}</CardBox>
+    <CardBox className="space-y-3"><div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Pilihan Data & Wilayah</h2>{filterCount > 0 && <Button variant="outline" size="sm" className="min-h-11 sm:min-h-0" onClick={clearFilters}>Hapus filter ({filterCount})</Button>}</div><Scope2Filters filters={filters} grids={grids} plants={plants} onChange={setFilters} />{SHOW_TARIFF && <div className="flex flex-wrap items-end gap-3 border-t pt-3"><label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Tarif asumsi (Rp/kWh)<input type="number" min="1" value={filters.tariff} onChange={event => setFilters({ ...filters, tariff: Math.max(1, Number(event.target.value) || 1) })} className="ml-2 w-32 rounded-lg border px-3 py-2" /></label><span className="rounded-full bg-amber-50 dark:bg-amber-500/10 px-3 py-1 text-xs text-amber-800 dark:text-amber-300">Asumsi, perlu konfirmasi</span><span className="text-xs text-slate-500 dark:text-slate-400">Implisit portal: Rp {number.format(data.assumptions.portalImplicitTariffRupiahPerKwh)}/kWh</span></div>}</CardBox>
 
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -619,6 +626,8 @@ export default function Scope2AnnualLoadDashboard({ tabs = null }: { tabs?: any 
       )}
     </CardBox>
 
+    <Scope2DcCompare rows={compareRows} selectedDc={filters.dc} filterCount={filterCount} onClear={clearFilters} />
+
     <CardBox className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
@@ -630,6 +639,7 @@ export default function Scope2AnnualLoadDashboard({ tabs = null }: { tabs?: any 
         </div>
         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
           {ranking.length} DC
+          {filterCount > 0 && <Button variant="outline" size="sm" className="min-h-11 sm:min-h-0" onClick={clearFilters}>Hapus filter ({filterCount})</Button>}
         </div>
       </div>
       {ranking.length ? (
@@ -646,7 +656,7 @@ export default function Scope2AnnualLoadDashboard({ tabs = null }: { tabs?: any 
             </thead>
             <tbody>
               {ranking.map((row, index) => (
-                <tr key={row.psId} onClick={() => setSelectedPlant(row)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') setSelectedPlant(row); }} className={`cursor-pointer border-b dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 focus:bg-blue-50 dark:focus:bg-blue-500/10 focus:outline-none ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : ''}`}>
+                <tr key={row.psId} onClick={() => setSelectedPlant(row)} tabIndex={0} onKeyDown={event => { if (event.key === 'Enter') setSelectedPlant(row); }} className={`cursor-pointer border-b dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 focus:bg-blue-50 dark:focus:bg-blue-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 ${index % 2 === 1 ? 'bg-slate-50/60 dark:bg-slate-800/30' : ''}`}>
                   <td className="p-3 font-semibold text-slate-900 dark:text-slate-100">{row.dcName}</td>
                   <td className="p-3 tabular-nums text-slate-600 dark:text-slate-400">{row.grid}</td>
                   <td className="p-3 text-right tabular-nums font-medium text-slate-700 dark:text-slate-300">{formatFactor(row.emissionFactor)}</td>
@@ -658,7 +668,10 @@ export default function Scope2AnnualLoadDashboard({ tabs = null }: { tabs?: any 
           </table>
         </div>
       ) : (
-        <div className="rounded-xl border border-dashed p-10 text-center text-sm text-slate-500 dark:text-slate-400">Tidak ada DC yang cocok dengan filter.</div>
+        <div className="rounded-xl border border-dashed p-10 text-center text-sm text-slate-500 dark:text-slate-400">
+          Tidak ada DC yang cocok dengan filter.{' '}
+          {filterCount > 0 && <button type="button" onClick={clearFilters} className="rounded font-semibold text-blue-600 dark:text-blue-400 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">Hapus filter</button>}
+        </div>
       )}
     </CardBox>
 
