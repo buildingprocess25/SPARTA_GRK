@@ -386,6 +386,19 @@ Pada awal setiap bulan (setelah bulan sebelumnya berakhir dan laporan resmi diun
 
 ---
 
+## 9a. Prosedur Bulanan: Impor Listrik Toko (Scope 2 Toko)
+
+Sekali saat pertama: backup database, lalu `npx prisma migrate deploy` untuk membuat tabel `store_kwh_*`. Tiap bulan, setelah REPORT KWH TOKO bulan itu selesai:
+
+```bash
+node --env-file=.env scripts/data/import-store-kwh.mjs "REPORT_KWH_TOKO.xlsx"
+node --env-file=.env scripts/data/import-store-kwh.mjs "REPORT_KWH_TOKO.xlsx" --apply
+```
+
+Perintah pertama hanya membaca dan mencetak ringkasan: jumlah toko, toko Franchise yang dikeluarkan, kode toko yang tidak ada di master, total MWh, dan porsi estimasi. Periksa dulu sebelum menjalankan yang kedua. Impor berurutan dari bulan paling lama, supaya bacaan terakhir bulan sebelumnya tersedia untuk tanggal 1. Skrip memuat seluruh file ke memori; satu bulan butuh sekitar satu menit.
+
+---
+
 ## 10. Keamanan Token OpenAPI & Lokasi Penyimpanan Cache
 
 1. **Lokasi Penyimpanan**:

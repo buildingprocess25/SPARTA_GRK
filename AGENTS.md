@@ -15,6 +15,7 @@ To update antislop later: `npx antislop-ai --update`, or run `npx antislop-ai` a
 
 ## Project Rules
 
+- **UI follows `DESIGN.md`.** Read it before building or changing any screen: tokens, page order, components, chart rules, and the new-feature checklist.
 - **Never commit or push.** Do not run `git commit`, `git push`, or anything that creates or publishes commits (including amend, rebase, tags, or PR creation). Leave all changes in the working tree; the user commits and pushes.
 - **The DC total is 37** in every label, report and doc. The iSolarCloud account has 39 plants because it includes the 2 Drive Thru pilot stores (`facilityType: 'STORE'`), which `isDcLocation()` excludes. Gorontalo is one of the 37 but has no PLTS yet, so it stays "dalam pembangunan".
 - **Refer to [CLAUDE.md](file:///c:/ALfa/Test/CLAUDE.md)** for all other project guidelines, detailed architecture, and domain conventions.

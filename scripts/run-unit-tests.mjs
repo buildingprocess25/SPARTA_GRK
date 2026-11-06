@@ -18,6 +18,7 @@ const unitTestScripts = [
   ['--test', 'src/lib/scope2/__tests__/dashboardService.test.mjs'],
   ['--test', 'src/lib/scope2/__tests__/crossPageContract.test.mjs'],
   ['--test', 'src/lib/scope2/__tests__/export.test.mjs'],
+  ['--test', 'src/lib/scope2/__tests__/storeKwh.test.mjs'],
   ['--test', 'src/lib/scope3/__tests__/travelLedger.test.mjs'],
   ['--test', 'src/lib/scope1/__tests__/gensetJournal.test.mjs'],
   ['--test', 'src/lib/__tests__/sessionPolicy.test.mjs'],

@@ -27,7 +27,7 @@ import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import dynamic from 'next/dynamic';
 import { TabContentSkeleton } from '@/components/plts/PLTSDashboardSkeletons';
 
-const Scope2AnnualLoadDashboard = dynamic(() => import('@/components/scope2/Scope2AnnualLoadDashboard'), {
+const Scope2Page = dynamic(() => import('@/components/scope2/Scope2Page'), {
   loading: () => <TabContentSkeleton />,
   ssr: false,
 });
@@ -134,7 +134,7 @@ export default function PenambahEmisiTab({ activeSubScope = 'scope1', setActiveS
   const currentBranchObj = branchHierarchyList.find(b => b.id === selectedBranch);
 
   if (activeSubScope === 'scope2') {
-    return <Scope2AnnualLoadDashboard />;
+    return <Scope2Page />;
   }
   if (activeSubScope === 'scope3') {
     return <Scope3TravelDashboard />;

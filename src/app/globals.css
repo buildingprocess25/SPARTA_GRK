@@ -43,6 +43,18 @@
      near-black for a confident "this is the headline number" look; dark
      mode uses a light slate so the line still reads against a dark card. */
   --chart-net: #0F172A;
+  --chart-average: #2563EB;
+  --chart-band: #DBEAFE;
+  --chart-muted-line: #CBD5E1;
+  /* Entity lines: order validated with the dataviz palette script (adjacent CVD and normal-vision pairs pass). */
+  --entity-0: #2A78D6;
+  --entity-1: #EB6834;
+  --entity-2: #1BAF7A;
+  --entity-3: #EDA100;
+  --entity-4: #E87BA4;
+  --entity-5: #008300;
+  --entity-6: #6250D6;
+  --entity-7: #E34948;
 
   /* Elevation Tokens */
   --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
@@ -75,6 +87,17 @@
   --chart-axis: #94A3B8;
   --chart-axis-line: #334155;
   --chart-net: #E2E8F0; /* Slate-200 - was the same near-black as light mode and disappeared against dark cards */
+  --chart-average: #60A5FA;
+  --chart-band: #172554;
+  --chart-muted-line: #334155;
+  --entity-0: #3987E5;
+  --entity-1: #D95926;
+  --entity-2: #199E70;
+  --entity-3: #C98500;
+  --entity-4: #D55181;
+  --entity-5: #008300;
+  --entity-6: #9085E9;
+  --entity-7: #E66767;
 
   /* Elevation Tokens (dark - subtler, screens emit their own light) */
   --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.2);

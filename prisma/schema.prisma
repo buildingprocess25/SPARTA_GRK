@@ -859,3 +859,83 @@ model StoreSyncRun {
   @@index([startedAt])
   @@map("store_sync_run")
 }
+
+/// Scope 2 stores: one meter reading per day from REPORT KWH TOKO, kept for audit. Dashboards read the two rollups below.
+model StoreKwhReading {
+  readingDate DateTime  @map("reading_date") @db.Date
+  yearMonth   String    @map("year_month")
+  storeCode   String    @map("store_code")
+  meterId     String    @map("meter_id")
+  branchCode  String    @map("branch_code")
+  meterType   String    @map("meter_type") // POSTPAID | PREPAID
+  inputAt     DateTime? @map("input_at") @db.Timestamptz(6)
+  readingKwh  Float     @map("reading_kwh")
+  previousKwh Float     @map("previous_kwh")
+  rawGapKwh   Float     @map("raw_gap_kwh")
+  usageKwh    Float?    @map("usage_kwh") // Null when the day is replaced by an estimate; see computeMeterUsage.
+  spreadDays  Int       @default(1) @map("spread_days")
+  flag        String    @default("OK")
+  batchId     String?   @map("batch_id")
+
+  @@id([storeCode, meterId, readingDate])
+  @@index([yearMonth])
+  @@index([branchCode, readingDate])
+  @@map("store_kwh_reading")
+}
+
+/// Scope 2 stores: usage per meter per month. Franchise stores stay here with inScope = false so they remain traceable.
+model StoreKwhMonthly {
+  yearMonth         String    @map("year_month")
+  storeCode         String    @map("store_code")
+  meterId           String    @map("meter_id")
+  storeName         String    @map("store_name")
+  branchCode        String    @map("branch_code")
+  branchName        String    @map("branch_name")
+  gridRegion        String    @map("grid_region")
+  gridFactor        Float     @map("grid_factor")
+  meterType         String    @map("meter_type")
+  ownership         String? // Snapshot of store_master at import; null when the code is not in the master.
+  inScope           Boolean   @default(true) @map("in_scope")
+  storeComplete     Boolean   @default(false) @map("store_complete")
+  measuredKwh       Float     @default(0) @map("measured_kwh")
+  estimatedKwh      Float     @default(0) @map("estimated_kwh")
+  emissionKg        Float     @default(0) @map("emission_kg")
+  medianDailyKwh    Float     @default(0) @map("median_daily_kwh")
+  reportedDays      Int       @default(0) @map("reported_days")
+  storeReportedDays Int       @default(0) @map("store_reported_days")
+  coveredDays       Int       @default(0) @map("covered_days")
+  missingDays       Int       @default(0) @map("missing_days")
+  flaggedDays       Int       @default(0) @map("flagged_days")
+  lowUsage          Boolean   @default(false) @map("low_usage")
+  lastReadingKwh    Float?    @map("last_reading_kwh")
+  lastReadingDate   DateTime? @map("last_reading_date") @db.Date
+  batchId           String?   @map("batch_id")
+
+  @@id([yearMonth, storeCode, meterId])
+  @@index([yearMonth, inScope])
+  @@index([yearMonth, branchCode])
+  @@map("store_kwh_monthly")
+}
+
+/// Scope 2 stores: in-scope usage per branch per day, split by the two filters the charts need.
+model StoreKwhBranchDaily {
+  readingDate    DateTime @map("reading_date") @db.Date
+  yearMonth      String   @map("year_month")
+  dayIndex       Int      @map("day_index")
+  branchCode     String   @map("branch_code")
+  meterType      String   @map("meter_type")
+  storeComplete  Boolean  @map("store_complete")
+  usageKwh       Float    @default(0) @map("usage_kwh")
+  reportedMeters Int      @default(0) @map("reported_meters")
+  zeroPrevious   Int      @default(0) @map("zero_previous")
+  topUp          Int      @default(0) @map("top_up")
+  decreased      Int      @default(0)
+  placeholder    Int      @default(0)
+  replaced       Int      @default(0)
+  lowUsageRows   Int      @default(0) @map("low_usage_rows")
+  batchId        String?  @map("batch_id")
+
+  @@id([readingDate, branchCode, meterType, storeComplete])
+  @@index([yearMonth])
+  @@map("store_kwh_branch_daily")
+}

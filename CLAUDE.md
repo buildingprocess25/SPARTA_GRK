@@ -15,6 +15,7 @@ To update antislop later: `npx antislop-ai --update`, or run `npx antislop-ai` a
 
 ## Project Rules
 
+- **UI follows `DESIGN.md`.** Read it before building or changing any screen: tokens, page order, components, chart rules, and the new-feature checklist.
 - **Never commit or push.** Do not run `git commit`, `git push`, or anything that creates or publishes commits (including amend, rebase, tags, or PR creation). Leave all changes in the working tree; the user commits and pushes.
 - **`src/` is TypeScript.** Write new files as `.tsx` when they contain JSX and `.ts` otherwise; never add `.js` or `.jsx` files under `src/`. Import `src/lib` modules by their `.ts` path (e.g. `../../src/lib/units.ts`) from scripts and tests, which stay `.mjs` and run on Node 22 type stripping, so keep `src/lib` syntax erasable (no `enum`, `namespace`, or parameter properties) and use `import type` for type-only imports.
 - Run `pnpm run typecheck` after code changes; it must report 0 errors.

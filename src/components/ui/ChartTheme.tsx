@@ -34,6 +34,12 @@ export const CHART_AXIS_PROPS = Object.freeze({
 
 export const PARTIAL_OPACITY = 0.45;
 
+// For comparing many entities on one chart. CHART_PALETTE stays tied to data categories and is not safe to use in sequence.
+export const ENTITY_COLORS = Object.freeze(Array.from({ length: 8 }, (_, slot) => `var(--entity-${slot})`));
+export const CHART_AVERAGE = 'var(--chart-average)';
+export const CHART_BAND = 'var(--chart-band)';
+export const CHART_MUTED_LINE = 'var(--chart-muted-line)';
+
 export function formatYAxisNumber(val) {
   if (val == null || !Number.isFinite(val)) return '—';
   return Number(val).toLocaleString('id-ID');

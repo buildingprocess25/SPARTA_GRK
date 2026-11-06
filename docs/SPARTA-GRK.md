@@ -171,6 +171,23 @@ Halaman utama yang menampilkan total emisi GRK Alfamart secara year-to-date:
   - Kalbar, Kalselteng, Sulselrabar, Batam, Lombok, Sulutgo
 - Rekonsiliasi data pemakaian listrik PLN terhadap tarif per golongan
 - Analitik dan visualisasi beban tahunan per DC
+- **Dua tab di halaman Scope 2:** DC (37 DC dari `energy_flow_monthly`) dan Toko (listrik toko dari REPORT KWH TOKO)
+
+**Tab Toko.** Angkanya berdiri sendiri dan **belum masuk** total Scope 2 di Ringkasan Emisi maupun laporan SRN-PPI dan OJK, karena baru ada data Oktober 2026 dan nilainya jauh lebih besar dari DC.
+
+- **Impor:** `node --env-file=.env scripts/data/import-store-kwh.mjs "<REPORT_KWH_TOKO.xlsx>" [--apply]`. Tanpa `--apply` hanya membaca dan mencetak ringkasan. Satu file berisi satu bulan; impor ulang mengganti bulan yang sama. Filenya sekitar 40 MB, jadi belum bisa diunggah lewat web (batas nginx 20 MB).
+- **Tabel:** `store_kwh_reading` (bacaan per meter per hari, untuk audit), `store_kwh_monthly` (rekap per meter per bulan), `store_kwh_branch_daily` (rekap harian per cabang untuk grafik). Satu bulan sekitar 621 ribu baris dan 133 MB di `store_kwh_reading`.
+- **Perhitungan (`computeMeterUsage` di `src/lib/scope2/storeKwh.ts`):** kolom GAP KWH tidak dipakai langsung, karena setelah hari yang tidak diinput isinya seluruh angka meter.
+  - Postpaid: kenaikan angka meter. Setelah hari kosong, selisih dari bacaan valid terakhir dibagi rata ke hari yang terlewat.
+  - Prepaid: penurunan sisa kWh. Hari saldo naik dianggap isi token, jadi tidak terukur.
+  - Kenaikan di atas 2.000 kWh per hari atau di atas 10 kali median meter (minimal acuan 50 kWh) dianggap salah input. Begitu juga input 9999999 dan postpaid yang turun.
+  - Hari tanpa angka terukur, antara bacaan pertama dan terakhir meter, diisi median harian meter itu dan dihitung sebagai estimasi. Di luar rentang itu tidak diestimasi karena toko bisa saja belum buka atau sudah tutup.
+  - Meter dengan median 5 kWh per hari atau kurang ditandai "hampir tidak naik" dan tetap dihitung apa adanya sampai penyebabnya dikonfirmasi.
+- **Wilayah PLN:** mengikuti cabang (`src/lib/scope2/storeBranchGrid.ts`). Cabang baru yang belum terpetakan menghentikan impor. Faktor emisi disimpan saat impor, jadi perubahan faktor perlu impor ulang.
+- **Perbandingan cabang dan toko:** kartu daftar dan grafik punya pilihan "Per cabang" dan "Per toko". Memilih satu cabang di filter otomatis pindah ke Per toko. Di Per toko, daftar dipaginasi dari server, 8 toko teratas terpilih di awal, dan maksimal 30 toko bisa dipilih. Garis hariannya dari `/api/scope2/stores/daily`, dibangun ulang dari `store_kwh_reading` dengan aturan yang sama (`buildStoreDailySeries`).
+- **Faktor sementara Sulutgo:** tab Toko tetap menghitung emisi Manado dan Gorontalo dengan faktor 0,60 dan label "sementara", sedangkan tab DC tidak menghitung data berfaktor sementara. Ini disengaja, karena listriknya benar-benar terpakai dan angka toko belum masuk total Scope 2. Aturannya harus disamakan bila angka toko digabung ke Ringkasan Emisi. Setelah SK ESDM terbit, perbarui `emission-factors.ts` lalu impor ulang bulan yang sudah masuk.
+- **Franchise:** toko dengan F/R = F di `store_master` disimpan dengan `inScope = false` dan tidak dihitung. Per 6 Nov 2026 kolom F/R di master masih kosong, jadi semua toko masih dihitung dan halaman menampilkan peringatannya.
+- **Hasil uji Oktober 2026 (database lokal, belum di server):** 20.673 toko, 92.933 MWh, 79.176 tCO₂e, estimasi 6,3%. 421 kode toko tidak ada di master, dan 2.765 toko semua meternya hampir tidak naik.
 
 #### Scope 3: Emisi Tidak Langsung Lainnya (Perjalanan Dinas, Kategori 6)
 - **Empat jenis biaya**: Pesawat, Hotel, Kereta Api, dan Lainnya (uang saku, transport lokal)
@@ -334,6 +351,9 @@ Baris per plant mencakup 39 plant iSolarCloud (37 DC + 2 toko Drive Thru); toko 
 | `FuelActivity` | Konsumsi BBM Scope 1 | variabel |
 | `WaterActivity` | Data daur ulang air per DC per bulan | variabel |
 | `ImportBatch` | Riwayat file yang di-upload | variabel |
+| `StoreKwhReading` | Bacaan meter toko per hari, untuk audit Scope 2 Toko | sekitar 620.000/bulan |
+| `StoreKwhMonthly` | Pemakaian dan emisi toko per meter per bulan | sekitar 22.000/bulan |
+| `StoreKwhBranchDaily` | Rekap harian per cabang untuk grafik Scope 2 Toko | sekitar 3.800/bulan |
 | `AppUser` | Akun login | variabel |
 | `PushSubscription` | Subscription push notification per device | variabel |
 

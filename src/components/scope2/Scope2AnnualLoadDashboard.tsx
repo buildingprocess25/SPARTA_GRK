@@ -163,7 +163,7 @@ function Scope2ChartTooltip({ active, payload, label }: { active?: any; payload?
   );
 }
 
-export default function Scope2AnnualLoadDashboard() {
+export default function Scope2AnnualLoadDashboard({ tabs = null }: { tabs?: any }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [filters, setFilters] = useState(initialFilters);
@@ -385,6 +385,8 @@ export default function Scope2AnnualLoadDashboard() {
 
   if (error) {
     return (
+      <div className="space-y-4">
+      {tabs}
       <div role="alert" className="rounded-2xl border border-rose-200 dark:border-rose-500/30 bg-rose-50/70 dark:bg-rose-500/10 p-6 text-rose-950 dark:text-rose-200 space-y-3">
         <div className="flex items-start gap-3">
           <AlertCircle className="size-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
@@ -401,9 +403,10 @@ export default function Scope2AnnualLoadDashboard() {
           Coba Lagi
         </button>
       </div>
+      </div>
     );
   }
-  if (!data) return <div aria-label="Memuat data Scope 2" className="space-y-4"><div className="h-24 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800" /><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{[1, 2, 3, 4].map(item => <div key={item} className="h-32 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />)}</div><div className="h-80 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" /></div>;
+  if (!data) return <div aria-label="Memuat data Scope 2" className="space-y-4">{tabs}<div className="h-24 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800" /><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{[1, 2, 3, 4].map(item => <div key={item} className="h-32 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />)}</div><div className="h-80 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" /></div>;
 
   const purchasedMwh = (summary.purchasedBasisEnergyKwh + summary.loadUpperBoundEnergyKwh) / 1_000;
   const intensity = purchasedMwh > 0 ? summary.scope2EmissionTon / purchasedMwh : null;
@@ -422,6 +425,7 @@ export default function Scope2AnnualLoadDashboard() {
         <InputDataButton label="Input data Scope 2" icon={Zap} onClick={() => setIsInputModalOpen(true)} />
       }
     />
+    {tabs}
 
     <CardBox className="space-y-3"><h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Pilihan Data & Wilayah</h2><Scope2Filters filters={filters} grids={grids} plants={plants} onChange={setFilters} />{SHOW_TARIFF && <div className="flex flex-wrap items-end gap-3 border-t pt-3"><label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Tarif asumsi (Rp/kWh)<input type="number" min="1" value={filters.tariff} onChange={event => setFilters({ ...filters, tariff: Math.max(1, Number(event.target.value) || 1) })} className="ml-2 w-32 rounded-lg border px-3 py-2" /></label><span className="rounded-full bg-amber-50 dark:bg-amber-500/10 px-3 py-1 text-xs text-amber-800 dark:text-amber-300">Asumsi, perlu konfirmasi</span><span className="text-xs text-slate-500 dark:text-slate-400">Implisit portal: Rp {number.format(data.assumptions.portalImplicitTariffRupiahPerKwh)}/kWh</span></div>}</CardBox>
 

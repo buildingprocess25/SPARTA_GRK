@@ -14,6 +14,7 @@ const MODULE_LABELS = {
   GENSET: 'Scope 1 · Genset (Emisi Langsung)',
   VEHICLE: 'Scope 1 · Kendaraan (Emisi Langsung)',
   PLN: 'Scope 2 · Listrik PLN (Emisi Tidak Langsung)',
+  SCOPE2_STORE_KWH: 'Scope 2 · Listrik Toko',
   PLTS: 'PLTS',
   WATER: 'Daur ulang air',
   PLTS_ENERGY: 'PLTS',
