@@ -79,6 +79,9 @@ export async function GET(req) {
     // a raw id or bare CSV label.
     const plantById = new Map(CANONICAL_DC_ENTITIES.map(e => [e.dcId, e] as const));
 
+    const facilityName = record => facilityById.get(record.dcId)?.name || plantById.get(record.dcId)?.canonicalName || record.branchName || record.dcId;
+    const facilityRegion = record => facilityById.get(record.dcId)?.region || plantById.get(record.dcId)?.region || null;
+
     const byFacility = new Map();
     for (const r of records) {
       if (!byFacility.has(r.dcId)) {
@@ -113,8 +116,19 @@ export async function GET(req) {
         yearMonth: ym,
         volumeM3: round(monthRecords.reduce((s, r) => s + r.volumeM3, 0), 2),
         emissionAvoidedTon: round(monthRecords.reduce((s, r) => s + r.emissionAvoidedTon, 0), 3),
+        locations: new Set(monthRecords.map(r => r.dcId)).size,
       };
     });
+
+    const facilityMonths = records.map(r => ({
+      id: r.dcId,
+      name: facilityName(r),
+      region: facilityRegion(r),
+      yearMonth: r.yearMonth,
+      volumeM3: r.volumeM3,
+      emissionAvoidedTon: r.emissionAvoidedTon,
+      costSavedRupiah: r.costSavedRupiah || 0,
+    }));
 
     const summary = {
       totalVolumeM3: round(records.reduce((s, r) => s + r.volumeM3, 0), 2),
@@ -131,6 +145,7 @@ export async function GET(req) {
       summary,
       monthlyTrend,
       rows,
+      facilityMonths,
     });
   } catch (error) {
     console.error('[API /api/water-recycle] Error:', error);

@@ -14,7 +14,7 @@ export default function SegmentedTabs({
 
   return (
     <Tabs value={value} onValueChange={onChange} className={className}>
-      <TabsList className={`${fullWidthOnMobile ? 'w-full sm:w-auto flex' : 'inline-flex'}`}>
+      <TabsList className={`h-auto sm:h-10 ${fullWidthOnMobile ? 'w-full sm:w-auto flex' : 'inline-flex'}`}>
         {visibleOptions.map((opt) => {
           const isActive = opt.value === value;
           const Icon = opt.icon;
@@ -22,7 +22,7 @@ export default function SegmentedTabs({
             <TabsTrigger
               key={opt.value}
               value={opt.value}
-              className={`gap-2 py-2 px-3.5 text-xs font-bold ${
+              className={`min-h-11 sm:min-h-0 gap-2 py-2 px-3.5 text-xs font-bold ${
                 fullWidthOnMobile ? 'flex-1 sm:flex-initial' : ''
               }`}
             >

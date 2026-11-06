@@ -1,20 +1,10 @@
 import { NextResponse } from 'next/server';
 
 import prisma from '@/lib/prisma.ts';
+import { loadKuuNames } from '@/lib/kuuNames.ts';
 import { getRecordCost, isVehicleFuelRecord } from '@/lib/scope1/fuelCategory.ts';
 
 export const dynamic = 'force-dynamic';
-
-// KUU codes share their format with the branch codes in the store report. Unknown codes stay as codes rather than guessed names.
-async function locationNames() {
-  try {
-    const branches = await prisma.storeKwhMonthly.findMany({ distinct: ['branchCode'], select: { branchCode: true, branchName: true } });
-    return Object.fromEntries(branches.map(branch => [branch.branchCode, branch.branchName]));
-  } catch (error) {
-    if (error?.code === 'P2021') return {};
-    throw error;
-  }
-}
 
 /** GET /api/scope1/records : every active fuel row of the latest reporting year, for the filters and charts on the Scope 1 page. */
 export async function GET() {
@@ -34,7 +24,7 @@ export async function GET() {
       emissionTon: record.emissionTon,
       coveredThrough: (record.metadata as any)?.coveredThrough ?? null,
     }));
-    return NextResponse.json({ success: true, data: { year: latestYear, rows, names: await locationNames() } });
+    return NextResponse.json({ success: true, data: { year: latestYear, rows, names: await loadKuuNames() } });
   } catch (error) {
     console.error(`[API_ERROR] endpoint=/api/scope1/records code=SCOPE1_RECORDS_FAILED error=${error.message}`);
     return NextResponse.json({ success: false, error: 'Data Scope 1 belum bisa dibaca dari server.', code: 'SCOPE1_RECORDS_FAILED' }, { status: 500 });

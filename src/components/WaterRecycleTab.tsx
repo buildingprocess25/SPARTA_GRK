@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRunningMonth } from '@/hooks/useRunningMonth';
-import { buildMonthPeriodOptions } from '@/lib/reportingMonths';
+import { buildMonthPeriodOptions, MONTH_LABELS_SHORT } from '@/lib/reportingMonths';
+import { buildCoverage, findReportingDrop } from '@/lib/water/waterInsights.ts';
+import { WaterCoverage, WaterLocationCompare } from '@/components/water/WaterInsights';
 import {
   Droplets, Recycle, Gauge, Calculator, Factory,
   ArrowDownRight, Waves, AlertCircle, RefreshCw, Search
@@ -72,6 +74,15 @@ export default function WaterRecycleTab() {
   }, [api?.rows, search]);
 
   const summary = api?.summary;
+  const coverage = useMemo(() => buildCoverage(api?.facilityMonths || []), [api?.facilityMonths]);
+  const reportingNote = useMemo(() => {
+    const drop = findReportingDrop(coverage);
+    const noReports = (api?.monthlyTrend || []).filter(m => !m.locations && coverage.months.length && m.yearMonth > coverage.months[coverage.months.length - 1]).map(m => m.month);
+    return [
+      drop && `${MONTH_LABELS_SHORT[Number(drop.month.slice(5, 7)) - 1]} hanya ${drop.reported} dari ${drop.fullest} lokasi yang melapor, jadi volume yang lebih rendah belum tentu berarti air daur ulangnya berkurang.`,
+      noReports.length > 0 && `Belum ada laporan untuk ${noReports.join(', ')}.`,
+    ].filter(Boolean).join(' ');
+  }, [coverage, api?.monthlyTrend]);
 
   return (
     <div className="space-y-6 animate-in">
@@ -135,6 +146,10 @@ export default function WaterRecycleTab() {
         />
       </div>
 
+      {reportingNote && (
+        <p className="rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">{reportingNote}</p>
+      )}
+
       {/* Chart bulanan */}
       <CardBox className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -171,6 +186,10 @@ export default function WaterRecycleTab() {
                             <strong className="text-slate-900 dark:text-slate-100">{formatYAxisNumber(entry.value)} m³</strong>
                           </div>
                         ))}
+                        <div className="flex items-center justify-between gap-3 text-slate-600 dark:text-slate-400">
+                          <span>Lokasi melapor:</span>
+                          <strong className="text-slate-900 dark:text-slate-100">{payload[0]?.payload?.locations ?? 0}</strong>
+                        </div>
                       </div>
                     );
                   }
@@ -182,6 +201,13 @@ export default function WaterRecycleTab() {
           </ResponsiveContainer>
         </div>
       </CardBox>
+
+      {coverage.items.length > 0 && (
+        <>
+          <WaterCoverage coverage={coverage} />
+          <WaterLocationCompare rows={api?.facilityMonths || []} months={coverage.months} />
+        </>
+      )}
 
       {/* Tabel per fasilitas */}
       <CardBox className="space-y-4">

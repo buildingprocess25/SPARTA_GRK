@@ -17,6 +17,7 @@ import KpiCard from '@/components/ui/KpiCard';
 import SegmentedTabs from '@/components/ui/SegmentedTabs';
 import InputDataButton from '@/components/ui/InputDataButton';
 import Scope3InputModal from '@/components/scope3/Scope3InputModal';
+import { IncompleteEntries, RouteRanking, Scope3KuuCompare } from '@/components/scope3/Scope3Insights';
 import { formatNum } from '@/data/sustainabilityData';
 import { AIRPORTS } from '@/lib/scope3/airports';
 import { TRAVEL_CATEGORY } from '@/lib/scope3/travelLedger';
@@ -276,6 +277,16 @@ export default function Scope3TravelDashboard() {
   const columnCount = 1 + (showKindColumn ? 1 : 0) + 1 + (showDistance ? 1 : 0) + (showNights ? 1 : 0) + 1 + (showCostSplit ? COST_KEYS.length + 1 : 1);
   const categoryHasNoData = filters.category !== ALL && !groups.some(g => g.category === filters.category);
   const resetFilters = () => { setFilters(EMPTY_FILTERS); setSearch(''); };
+  const kuuNames = api?.kuuNames ?? {};
+  const importedMonths = useMemo(() => (api?.monthlyTrend || []).map(m => m.yearMonth).filter(month => (api?.availableMonths || []).includes(month)), [api?.monthlyTrend, api?.availableMonths]);
+  // The comparison keeps every KUU in its list, so it follows the kind filter but not the KUU one.
+  const kuuMonthly = useMemo(() => (api?.kuuMonthly || []).filter(row => filters.category === ALL || row.category === filters.category), [api?.kuuMonthly, filters.category]);
+  const incomplete = useMemo(() => (api?.incomplete || []).filter(entry => (filters.category === ALL || entry.category === filters.category) && (filters.kuu === ALL || entry.kuu === filters.kuu)), [api?.incomplete, filters.category, filters.kuu]);
+  const openRoute = route => {
+    setView('route');
+    setSearch(routeLabel(route));
+    document.getElementById('scope3-rincian')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   // A month with nothing imported is unknown, not zero: null leaves a gap instead of a misleading drop to 0.
   const monthlyData = useMemo(() => {
@@ -638,7 +649,17 @@ export default function Scope3TravelDashboard() {
             )}
           </Card>
 
-          <Card className="space-y-4">
+          {!loading && (
+            <>
+              <Scope3KuuCompare rows={kuuMonthly} months={importedMonths} names={kuuNames} selectedKuu={filters.kuu} filterCount={activeFilterCount} onClear={resetFilters} />
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+                <RouteRanking groups={filteredGroups} onPick={openRoute} />
+                <IncompleteEntries entries={incomplete} names={kuuNames} />
+              </div>
+            </>
+          )}
+
+          <Card id="scope3-rincian" className="space-y-4">
             <ChartCardHeader
               title="Rincian perjalanan dinas"
               action={

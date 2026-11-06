@@ -208,6 +208,9 @@ Halaman utama yang menampilkan total emisi GRK Alfamart secara year-to-date:
 - **Kartu "Emisi per sumber"** menampilkan seluruh Scope 3: Pesawat, Hotel, Kereta (emisi, porsi, jumlah tiket/malam/km, biaya) dan Lainnya (biaya, tanpa emisi, dirinci per jenis transaksi: uang saku & PJUM, luar negeri, transport, klaim, lain-lain). Di bawah Pesawat ada rincian kelompok jarak faktor BI (<926 km, 926-1.852 km, >1.852 km, internasional) yang dihitung per segmen, lengkap dengan jumlah segmen dan faktor ekonominya; filter "Kelompok jarak" di tabel tetap per tiket (rata-rata segmen)
 - **Kartu "Biaya belum dihitung emisinya"** merinci dua kelompok Lainnya terbesar, sisanya digabung (termasuk tiket tanpa rute, hotel tanpa tanggal menginap, dan kereta tanpa km)
 - **Rincian Lainnya**: biaya Lainnya dipecah dari keterangan jurnal saat halaman dimuat (`otherTravelKind` di `travelLedger.ts`), jadi aturan baru berlaku tanpa import ulang. Kelompoknya: Uang saku & PJUM, Perjalanan luar negeri (Bangladesh, Vietnam, Manila, dll.), Transport darat & laut (tunjangan transport, kapal, penyeberangan), Klaim kekurangan, Lewat payroll (jurnal tipe `PL` berketerangan "BPDL", nilainya Rp 0 di ekspor), dan Lain-lain. Saat filter Lainnya aktif muncul pilihan "Rincian lainnya", tampilan "Per rincian", urutan default berubah ke biaya, dan kolom Transaksi menghitung baris bernilai positif
+- **Perbandingan KUU** (`Scope3Insights.tsx`, logika di `travelInsights.ts`): daftar KUU bercentang dengan peringkat Emisi, Biaya, atau Jarak, dan grafik per bulan yang memakai komponen bersama `EntityCompareChart`. Bulan tanpa transaksi menjadi celah garis. Daftar mengikuti filter jenis; filter KUU memilih satu KUU tanpa membuang KUU lain dari daftar. Bila KUU teratas minimal 5 kali KUU berikutnya, muncul catatan dan tombol "Sembunyikan" karena garis lain menjadi datar. Nama KUU dibaca dari cabang di `store_kwh_monthly` (`kuuNames.ts`); kode tanpa padanan ditulis "Nama belum ada", tidak ditebak
+- **10 rute pesawat dengan emisi terbesar**: rute digabung lintas KUU dan mengikuti filter aktif. Klik rute untuk membuka tampilan Per rute di tabel rincian dengan pencarian terisi
+- **Transaksi yang perlu dilengkapi**: baris Pesawat, Hotel, dan Kereta bernilai positif yang belum punya emisi karena rute tidak terbaca, bandara tidak dikenal, atau jumlah malam/km kosong, diurutkan dari biaya terbesar dan bisa diunduh sebagai CSV. Lainnya tidak masuk karena memang tidak punya faktor emisi
 
 ### 3. Pengurangan Emisi: PLTS Atap
 
@@ -237,6 +240,9 @@ Monitoring real-time PLTS atap di 37 DC (5.778,8 kWp; 36 beroperasi, Gorontalo b
 - Input data volume air daur ulang per DC per bulan
 - Perhitungan kontribusi pengurangan beban lingkungan
 - Tracking realisasi program daur ulang air
+- **Kelengkapan lapor per lokasi** (`WaterInsights.tsx`, logika di `waterInsights.ts`): tabel lokasi × bulan yang punya laporan. "Kosong" berarti belum melapor, berbeda dari 0 yang berarti melapor volumenya nol. Baris "Lokasi melapor" menghitung lokasi per bulan, lokasi dengan bulan kosong terbanyak tampil di atas, dan ada filter "Ada bulan kosong" serta pencarian
+- **Catatan pelaporan**: bila bulan terakhir punya lebih sedikit lokasi daripada bulan terlengkap, halaman menyebutkannya karena volume yang turun belum tentu berarti air daur ulangnya berkurang. Bulan setelah laporan terakhir yang belum berisi juga disebut, dan tooltip grafik bulanan menampilkan jumlah lokasi melapor
+- **Perbandingan lokasi**: daftar lokasi bercentang dengan peringkat Volume, Emisi terhindar, atau Penghematan, dan grafik per bulan (`EntityCompareChart`); bulan tanpa laporan menjadi celah garis
 
 ### 5. Riwayat Audit
 

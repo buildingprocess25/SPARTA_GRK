@@ -1,4 +1,6 @@
 import prisma from '@/lib/prisma.ts';
+import { loadKuuNames } from '@/lib/kuuNames.ts';
+import { buildKuuMonthly, listIncompleteEntries } from '@/lib/scope3/travelInsights.ts';
 import { monthRange, summarizeTravelEntries } from '@/lib/scope3/travelSummary.ts';
 
 export const dynamic = 'force-dynamic';
@@ -47,7 +49,7 @@ export async function GET(req) {
     const entries = await prisma.businessTravelEntry.findMany({
       where: { yearMonth: { gte: period.start, lte: period.end } },
       select: {
-        kuu: true, yearMonth: true, category: true, route: true, amountRupiah: true, description: true, journalType: true,
+        journalCode: true, kuu: true, yearMonth: true, category: true, route: true, amountRupiah: true, description: true, journalType: true,
         distanceKm: true, legCount: true, emissionTon: true, emissionStatus: true, isInternational: true, metadata: true,
       },
     });
@@ -57,6 +59,9 @@ export async function GET(req) {
       period: `${period.start}_${period.end}`,
       availableMonths,
       ...summarizeTravelEntries(entries, monthRange(period.start, period.end)),
+      kuuMonthly: buildKuuMonthly(entries),
+      incomplete: listIncompleteEntries(entries),
+      kuuNames: await loadKuuNames(),
     });
   } catch (error) {
     console.error('[API /api/scope3] Error:', error);
